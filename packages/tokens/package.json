@@ -1,6 +1,6 @@
 {
   "name": "@treeui/tokens",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Framework-agnostic design tokens and themes for TreeUI.",
   "type": "module",
   "main": "./dist/index.cjs",

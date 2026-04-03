@@ -1,6 +1,6 @@
 {
   "name": "@treeui/icons",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Lucide-backed icon defaults and registry for TreeUI.",
   "type": "module",
   "main": "./dist/index.cjs",

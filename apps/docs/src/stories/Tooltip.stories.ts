@@ -16,7 +16,7 @@ const meta = {
   argTypes: {
     side: {
       control: 'select',
-      options: ['top', 'bottom'],
+      options: ['top', 'right', 'bottom', 'left'],
     },
   },
 } satisfies Meta<typeof TTooltip>;

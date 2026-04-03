@@ -1,7 +1,7 @@
 export const treeSizes = ['sm', 'md', 'lg'] as const;
 export const treeVariants = ['solid', 'outline', 'ghost', 'soft', 'danger'] as const;
 export const treeCardVariants = ['outline', 'soft', 'solid'] as const;
-export const treeTooltipSides = ['top', 'bottom'] as const;
+export const treeTooltipSides = ['top', 'right', 'bottom', 'left'] as const;
 
 export type TreeSize = (typeof treeSizes)[number];
 export type TreeVariant = (typeof treeVariants)[number];

@@ -38,6 +38,7 @@
   --tree-button-text: var(--tree-color-brand-contrast);
   --tree-button-border: transparent;
   --tree-button-shadow: transparent;
+  position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -60,6 +61,18 @@
     background-color var(--tree-motion-duration-fast) var(--tree-motion-easing-standard),
     border-color var(--tree-motion-duration-fast) var(--tree-motion-easing-standard),
     box-shadow var(--tree-motion-duration-fast) var(--tree-motion-easing-standard);
+}
+
+.tree-button::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  min-width: 44px;
+  min-height: 44px;
+  width: 100%;
+  height: 100%;
+  transform: translate(-50%, -50%);
 }
 
 .tree-button:hover:not(.is-disabled) {
@@ -293,6 +306,7 @@
 }
 
 .tree-date-picker__nav {
+  position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -305,6 +319,16 @@
   transition:
     background-color var(--tree-motion-duration-fast) var(--tree-motion-easing-standard),
     color var(--tree-motion-duration-fast) var(--tree-motion-easing-standard);
+}
+
+.tree-date-picker__nav::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  min-width: 44px;
+  min-height: 44px;
+  transform: translate(-50%, -50%);
 }
 
 .tree-date-picker__nav:hover:not(:disabled),
@@ -345,6 +369,7 @@
 }
 
 .tree-date-picker__day {
+  position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -360,6 +385,16 @@
     background-color var(--tree-motion-duration-fast) var(--tree-motion-easing-standard),
     color var(--tree-motion-duration-fast) var(--tree-motion-easing-standard),
     box-shadow var(--tree-motion-duration-fast) var(--tree-motion-easing-standard);
+}
+
+.tree-date-picker__day::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  min-width: 44px;
+  min-height: 44px;
+  transform: translate(-50%, -50%);
 }
 
 .tree-date-picker__day.is-muted {
@@ -474,11 +509,12 @@
 }
 
 .tree-modal__close {
+  position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 2.5rem;
-  height: 2.5rem;
+  width: 2.75rem;
+  height: 2.75rem;
   border: 0;
   border-radius: var(--tree-radius-md);
   background: transparent;
@@ -655,6 +691,19 @@
   top: calc(100% + var(--tree-space-2));
 }
 
+.tree-tooltip__content--left {
+  top: 50%;
+  left: auto;
+  right: calc(100% + var(--tree-space-2));
+  transform: translateY(-50%);
+}
+
+.tree-tooltip__content--right {
+  top: 50%;
+  left: calc(100% + var(--tree-space-2));
+  transform: translateY(-50%);
+}
+
 .tree-fade-enter-active,
 .tree-fade-leave-active {
   transition:
@@ -666,6 +715,18 @@
 .tree-fade-leave-to {
   opacity: 0;
   transform: translate(-50%, 4px);
+}
+
+.tree-tooltip__content--left.tree-fade-enter-from,
+.tree-tooltip__content--left.tree-fade-leave-to {
+  opacity: 0;
+  transform: translateY(-50%) translateX(4px);
+}
+
+.tree-tooltip__content--right.tree-fade-enter-from,
+.tree-tooltip__content--right.tree-fade-leave-to {
+  opacity: 0;
+  transform: translateY(-50%) translateX(-4px);
 }
 
 .tree-date-picker .tree-fade-enter-from,

@@ -28,6 +28,45 @@ describe('@treeui/vue', () => {
     expect(wrapper.emitted('click')).toBeUndefined();
   });
 
+  it('renders polymorphic button with correct a11y when disabled', async () => {
+    const wrapper = mount(TreeButton, {
+      props: {
+        as: 'a',
+        disabled: true,
+      },
+      slots: {
+        default: 'Disabled link',
+      },
+    });
+
+    expect(wrapper.element.tagName).toBe('A');
+    expect(wrapper.attributes('aria-disabled')).toBe('true');
+    expect(wrapper.attributes('tabindex')).toBe('-1');
+    expect(wrapper.attributes('disabled')).toBeUndefined();
+
+    await wrapper.trigger('click');
+    expect(wrapper.emitted('click')).toBeUndefined();
+  });
+
+  it('renders polymorphic button without a11y attrs when enabled', async () => {
+    const wrapper = mount(TreeButton, {
+      props: {
+        as: 'a',
+      },
+      slots: {
+        default: 'Active link',
+      },
+    });
+
+    expect(wrapper.element.tagName).toBe('A');
+    expect(wrapper.attributes('aria-disabled')).toBeUndefined();
+    expect(wrapper.attributes('tabindex')).toBeUndefined();
+    expect(wrapper.attributes('type')).toBeUndefined();
+
+    await wrapper.trigger('click');
+    expect(wrapper.emitted('click')).toHaveLength(1);
+  });
+
   it('emits input updates and keeps prefix and suffix slots', async () => {
     const wrapper = mount(TreeInput, {
       props: {

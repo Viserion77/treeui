@@ -22,7 +22,7 @@ props:
   side:
     type: TreeTooltipSide
     default: top
-    values: [top, bottom]
+    values: [top, right, bottom, left]
   delay:
     type: number
     default: 80

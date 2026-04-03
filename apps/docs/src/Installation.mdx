@@ -1,0 +1,21 @@
+import { Meta, Title } from '@storybook/blocks';
+
+<Meta title="Foundation/Installation" />
+
+<Title>Installation</Title>
+
+Install and run TreeUI through Docker when working in this repository:
+Install and run TreeUI through Docker when working in this repository:
+
+```bash
+docker compose run --rm workspace pnpm install
+docker compose up docs
+```
+
+For consumers, install the Vue package and import the bundled stylesheet:
+For consumers, install the Vue package and import the bundled stylesheet:
+
+```ts
+import TreeUIPlugin from '@treeui/vue';
+import '@treeui/vue/style.css';
+```

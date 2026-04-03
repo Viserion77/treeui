@@ -1,0 +1,112 @@
+version: 0.1
+package: "@treeui/vue"
+public_component_prefix: "T"
+legacy_component_prefix: "Tree"
+legacy_alias_status: "compatibility_only"
+source_component_filename_prefix: "Tree"
+
+primary_exports:
+  - TBadge
+  - TButton
+  - TCard
+  - TDatePicker
+  - TInput
+  - TModal
+  - TSpinner
+  - TTooltip
+
+compatibility_aliases:
+  TBadge: TreeBadge
+  TButton: TreeButton
+  TCard: TreeCard
+  TDatePicker: TreeDatePicker
+  TInput: TreeInput
+  TModal: TreeModal
+  TSpinner: TreeSpinner
+  TTooltip: TreeTooltip
+
+shared_sizes:
+  values: [sm, md, lg]
+  used_by:
+    - TBadge
+    - TButton
+    - TCard
+    - TDatePicker
+    - TInput
+    - TModal
+    - TSpinner
+
+shared_variants:
+  action_values: [solid, outline, ghost, soft, danger]
+  card_values: [outline, soft, solid]
+
+shared_props:
+  variant:
+    used_by: [TBadge, TButton, TCard]
+  size:
+    used_by: [TBadge, TButton, TCard, TDatePicker, TInput, TModal, TSpinner]
+  disabled:
+    used_by: [TButton, TDatePicker, TInput, TModal, TTooltip]
+  loading:
+    used_by: [TButton, TInput]
+  as:
+    used_by: [TButton, TCard]
+  class:
+    status: "supported via standard Vue attrs when relevant"
+
+shared_events:
+  update:modelValue:
+    used_by: [TDatePicker, TInput]
+  update:open:
+    used_by: [TDatePicker, TModal, TTooltip]
+  open-change:
+    used_by: [TDatePicker, TModal, TTooltip]
+
+shared_slots:
+  default:
+    used_by: [TBadge, TButton, TCard, TInput, TModal, TTooltip]
+  icon:
+    used_by: [TBadge, TButton]
+  prefix:
+    used_by: [TDatePicker, TInput]
+  suffix:
+    used_by: [TDatePicker, TInput]
+  trigger:
+    used_by: [TModal, TTooltip]
+  content:
+    used_by: [TModal, TTooltip]
+  header:
+    used_by: [TCard, TModal]
+  footer:
+    used_by: [TCard, TModal]
+
+value_formats:
+  date: "YYYY-MM-DD"
+
+overlay_contract:
+  props:
+    - open
+    - defaultOpen
+  events:
+    - update:open
+    - open-change
+  rule: "controlled and uncontrolled modes should behave the same from the outside"
+
+form_contract:
+  props:
+    - modelValue
+  events:
+    - update:modelValue
+
+accessibility_baseline:
+  focus_visible: true
+  keyboard_support: true
+  semantic_markup: true
+  disabled_state_clarity: true
+  loading_state_clarity: true
+  screen_reader_labels_when_needed: true
+
+notes:
+  - "Prefer T<Name> in examples, docs, and new code."
+  - "Keep Tree<Name> only for migration compatibility."
+  - "Do not introduce Vue-specific naming into tokens or design contracts."

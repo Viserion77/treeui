@@ -1,0 +1,14 @@
+import { Meta, Title } from '@storybook/blocks';
+
+<Meta title="Foundation/Theming" />
+
+<Title>Theming</Title>
+
+TreeUI ships with official light and dark themes from the first release.
+Runtime theme switching is handled with CSS custom properties and the `data-tree-theme` attribute.
+
+Components read semantic color tokens instead of hard-coded Vue-specific style decisions,
+which keeps the same design contract usable in future framework packages.
+
+Dark mode is not a later retrofit. Semantic tokens make it straightforward to switch roles like `text.primary`,
+`bg.surface`, and `border.default` without rewriting component logic or reaching for raw hex values.

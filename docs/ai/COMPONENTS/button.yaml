@@ -1,0 +1,51 @@
+name: TButton
+legacy_alias: TreeButton
+source_file: packages/vue/src/components/TreeButton.vue
+package: "@treeui/vue"
+kind: primitive
+status: available
+purpose: "Clickable action trigger with variants, sizes, optional polymorphism, and loading state."
+
+props:
+  as:
+    type: string
+    default: button
+  variant:
+    type: TreeVariant
+    default: solid
+    values: [solid, outline, ghost, soft, danger]
+  size:
+    type: TreeSize
+    default: md
+    values: [sm, md, lg]
+  disabled:
+    type: boolean
+    default: false
+  loading:
+    type: boolean
+    default: false
+    note: "loading implies disabled behavior"
+  type:
+    type: "button | submit | reset"
+    default: button
+
+events:
+  - click
+
+slots:
+  - icon
+  - default
+
+forwards_attrs_to: root_element
+
+a11y:
+  native_button_by_default: true
+  aria_busy_when_loading: true
+  aria_disabled_for_non_button: true
+  tabindex_minus_one_when_non_button_disabled: true
+
+behavior:
+  blocks_click_when_disabled_or_loading: true
+  renders_spinner_when_loading: true
+
+example: '<TButton variant="outline">Invite teammate</TButton>'

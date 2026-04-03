@@ -1,0 +1,71 @@
+name: TModal
+legacy_alias: TreeModal
+source_file: packages/vue/src/components/TreeModal.vue
+package: "@treeui/vue"
+kind: overlay
+status: available
+purpose: "Accessible modal dialog for focused tasks and confirmations."
+
+props:
+  open:
+    type: boolean
+    default: controlled_optional
+  defaultOpen:
+    type: boolean
+    default: false
+  disabled:
+    type: boolean
+    default: false
+  size:
+    type: TreeSize
+    default: md
+    values: [sm, md, lg]
+  title:
+    type: string
+    default: ""
+  description:
+    type: string
+    default: ""
+  closeOnEscape:
+    type: boolean
+    default: true
+  closeOnOverlay:
+    type: boolean
+    default: true
+  showCloseButton:
+    type: boolean
+    default: true
+  closeLabel:
+    type: string
+    default: Close modal
+  id:
+    type: string
+    default: auto
+
+events:
+  - update:open
+  - open-change
+
+slots:
+  - trigger
+  - header
+  - default
+  - content
+  - footer
+
+forwards_attrs_to: trigger_wrapper
+
+a11y:
+  role: dialog
+  aria_modal: true
+  focus_trap: true
+  restores_focus_on_close: true
+  escape_closes_when_enabled: true
+
+behavior:
+  uses_teleport_to_body: true
+  locks_body_scroll_while_open: true
+  overlay_click_closes_when_enabled: true
+  close_button_optional: true
+
+example: '<TModal title="Invite teammate"><template #trigger><TButton>Open modal</TButton></template></TModal>'

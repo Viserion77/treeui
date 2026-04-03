@@ -1,0 +1,29 @@
+name: TBadge
+legacy_alias: TreeBadge
+source_file: packages/vue/src/components/TreeBadge.vue
+package: "@treeui/vue"
+kind: display
+status: available
+purpose: "Compact status or metadata label with optional icon."
+
+props:
+  variant:
+    type: TreeVariant
+    default: soft
+    values: [solid, outline, ghost, soft, danger]
+  size:
+    type: TreeSize
+    default: md
+    values: [sm, md, lg]
+
+events: []
+
+slots:
+  - icon
+  - default
+
+a11y:
+  interactive_by_default: false
+  icon_slot_marked_aria_hidden: true
+
+example: '<TBadge variant="soft">Stable foundation</TBadge>'

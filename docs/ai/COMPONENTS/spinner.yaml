@@ -1,0 +1,27 @@
+name: TSpinner
+legacy_alias: TreeSpinner
+source_file: packages/vue/src/components/TreeSpinner.vue
+package: "@treeui/vue"
+kind: feedback
+status: available
+purpose: "Accessible loading indicator."
+
+props:
+  size:
+    type: TreeSize
+    default: md
+    values: [sm, md, lg]
+  label:
+    type: string
+    default: Loading
+
+events: []
+
+slots: []
+
+a11y:
+  role: status
+  aria_label_from_label_prop: true
+  includes_visually_hidden_label: true
+
+example: '<TSpinner label="Saving" />'

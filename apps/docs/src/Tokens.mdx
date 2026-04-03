@@ -1,0 +1,16 @@
+import { Meta, Title } from '@storybook/blocks';
+
+<Meta title="Foundation/Tokens" />
+
+<Title>Tokens</Title>
+
+TreeUI tokens are framework-agnostic and organized by semantic categories:
+color, font, space, layout, radius, shadow, motion, border, size, z-index, and breakpoints.
+
+The public CSS variable format uses stable names like `--tree-color-bg-primary`, `--tree-color-border-default`, `--tree-space-4`, and `--tree-radius-md`.
+These names are designed to survive framework expansion without redesigning the system.
+
+TreeUI prefers semantic roles over raw values. Examples include `bg.primary`, `bg.surface`, `border.default`,
+`text.primary`, `text.muted`, `brand.primary`, and `status.error`.
+
+The foundation also follows a modular type scale, a 4px spacing rhythm, and a 12-column layout model with 8px visual cadence.

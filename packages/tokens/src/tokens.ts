@@ -1,0 +1,195 @@
+export const treeTokens = {
+  font: {
+    family: {
+      sans: "'IBM Plex Sans', 'Segoe UI', sans-serif",
+      mono: "'IBM Plex Mono', 'SFMono-Regular', monospace",
+    },
+    size: {
+      xs: '0.6875rem',
+      sm: '0.8125rem',
+      md: '0.9375rem',
+      base: '0.9375rem',
+      lg: '1.125rem',
+      xl: '1.375rem',
+      '2xl': '1.375rem',
+      '3xl': '1.75rem',
+      '4xl': '2.25rem',
+      '5xl': '3rem',
+    },
+    weight: {
+      regular: '400',
+      medium: '500',
+      semibold: '600',
+      bold: '700',
+      extrabold: '800',
+    },
+    lineHeight: {
+      compact: '1.1',
+      ui: '1.15',
+      tight: '1.25',
+      heading: '1.3',
+      base: '1.5',
+      body: '1.6',
+      relaxed: '1.65',
+    },
+  },
+  space: {
+    0: '0',
+    1: '0.25rem',
+    2: '0.5rem',
+    3: '0.75rem',
+    4: '1rem',
+    5: '1.25rem',
+    6: '1.5rem',
+    7: '2rem',
+    8: '2.5rem',
+    12: '3rem',
+    16: '4rem',
+  },
+  radius: {
+    sm: '0.375rem',
+    md: '0.625rem',
+    lg: '0.875rem',
+    pill: '999px',
+  },
+  shadow: {
+    xs: '0 1px 2px rgba(15, 23, 42, 0.06)',
+    sm: '0 6px 18px rgba(15, 23, 42, 0.08)',
+    md: '0 14px 34px rgba(15, 23, 42, 0.12)',
+  },
+  border: {
+    width: {
+      subtle: '1px',
+      strong: '1.5px',
+    },
+  },
+  motion: {
+    duration: {
+      fast: '100ms',
+      moderate: '200ms',
+      normal: '300ms',
+      slow: '400ms',
+      slower: '500ms',
+    },
+    easing: {
+      standard: 'cubic-bezier(0.2, 0, 0, 1)',
+      easeOut: 'cubic-bezier(0, 0, 0.2, 1)',
+      easeInOut: 'cubic-bezier(0.4, 0, 0.2, 1)',
+      easeIn: 'cubic-bezier(0.4, 0, 1, 1)',
+    },
+  },
+  size: {
+    control: {
+      sm: '2rem',
+      md: '2.5rem',
+      lg: '3rem',
+    },
+    icon: {
+      sm: '1rem',
+      md: '1.25rem',
+      lg: '1.5rem',
+      xl: '2rem',
+      '2xl': '3rem',
+    },
+  },
+  layout: {
+    grid: {
+      columns: '12',
+      base: '8px',
+    },
+    gutter: {
+      sm: '1rem',
+      md: '1.5rem',
+    },
+    margin: {
+      sm: '1.5rem',
+      md: '2rem',
+      lg: '3rem',
+    },
+  },
+  z: {
+    base: '1',
+    dropdown: '1000',
+    sticky: '1100',
+    overlay: '1200',
+    modal: '1300',
+    toast: '1400',
+  },
+  breakpoint: {
+    sm: '640px',
+    md: '768px',
+    lg: '1024px',
+    xl: '1280px',
+  },
+} as const;
+
+export const treeThemes = {
+  light: {
+    color: {
+      bg: {
+        primary: '#f3f5f9',
+        surface: '#ffffff',
+        subtle: '#eef2f7',
+      },
+      border: {
+        default: '#d7dfeb',
+        strong: '#b8c4d8',
+      },
+      text: {
+        primary: '#142033',
+        muted: '#5b6b84',
+        inverse: '#ffffff',
+      },
+      brand: {
+        primary: '#2057d4',
+        hover: '#1845ac',
+        soft: '#e8efff',
+        contrast: '#ffffff',
+      },
+      status: {
+        success: '#117c50',
+        warning: '#a15d00',
+        error: '#bc2f3f',
+        info: '#2459d6',
+      },
+      overlay: 'rgba(15, 23, 42, 0.4)',
+      'focus-ring': 'rgba(32, 87, 212, 0.32)',
+    },
+  },
+  dark: {
+    color: {
+      bg: {
+        primary: '#0f1724',
+        surface: '#162131',
+        subtle: '#1b293d',
+      },
+      border: {
+        default: '#2d3d57',
+        strong: '#41516d',
+      },
+      text: {
+        primary: '#edf3ff',
+        muted: '#aab7cb',
+        inverse: '#07101f',
+      },
+      brand: {
+        primary: '#74a2ff',
+        hover: '#8bb1ff',
+        soft: '#18386d',
+        contrast: '#07101f',
+      },
+      status: {
+        success: '#4cc38f',
+        warning: '#ffb14d',
+        error: '#ff7d88',
+        info: '#8ab0ff',
+      },
+      overlay: 'rgba(7, 16, 31, 0.68)',
+      'focus-ring': 'rgba(116, 162, 255, 0.34)',
+    },
+  },
+} as const;
+
+export type TreeTokens = typeof treeTokens;
+export type TreeThemes = typeof treeThemes;
+export type TreeThemeName = keyof TreeThemes;

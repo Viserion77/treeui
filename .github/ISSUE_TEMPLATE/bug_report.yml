@@ -1,0 +1,32 @@
+name: Bug report
+description: Report a reproducible problem in TreeUI.
+title: '[Bug]: '
+labels: ['bug']
+body:
+  - type: textarea
+    id: description
+    attributes:
+      label: What happened?
+      description: Describe the problem and the expected behavior.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Reproduction
+      description: Share steps, code, or a minimal reproduction.
+    validations:
+      required: true
+  - type: dropdown
+    id: package
+    attributes:
+      label: Package
+      options:
+        - @treeui/vue
+        - @treeui/tokens
+        - @treeui/utils
+        - docs
+        - other
+    validations:
+      required: true
+

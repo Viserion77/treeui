@@ -1,0 +1,50 @@
+name: TInput
+legacy_alias: TreeInput
+source_file: packages/vue/src/components/TreeInput.vue
+package: "@treeui/vue"
+kind: primitive
+status: available
+purpose: "Text input with size, loading, invalid, and prefix or suffix slots."
+
+props:
+  modelValue:
+    type: "string | number"
+    default: ""
+  size:
+    type: TreeSize
+    default: md
+    values: [sm, md, lg]
+  disabled:
+    type: boolean
+    default: false
+  loading:
+    type: boolean
+    default: false
+  invalid:
+    type: boolean
+    default: false
+  type:
+    type: string
+    default: text
+  placeholder:
+    type: string
+    default: ""
+
+events:
+  - update:modelValue
+
+slots:
+  - prefix
+  - suffix
+
+forwards_attrs_to: native_input
+
+a11y:
+  aria_invalid_when_invalid: true
+  loading_uses_status_spinner: true
+
+behavior:
+  update_payload_type: string
+  loading_does_not_disable_by_itself: true
+
+example: '<TInput aria-label="Project name" :model-value="name" @update:model-value="name = $event" />'

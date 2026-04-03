@@ -1,0 +1,79 @@
+name: TDatePicker
+legacy_alias: TreeDatePicker
+source_file: packages/vue/src/components/TreeDatePicker.vue
+package: "@treeui/vue"
+kind: form_overlay
+status: available
+purpose: "Date input with calendar popover and keyboard navigation."
+
+props:
+  modelValue:
+    type: string
+    format: YYYY-MM-DD
+    default: ""
+  open:
+    type: boolean
+    default: controlled_optional
+  defaultOpen:
+    type: boolean
+    default: false
+  size:
+    type: TreeSize
+    default: md
+    values: [sm, md, lg]
+  disabled:
+    type: boolean
+    default: false
+  invalid:
+    type: boolean
+    default: false
+  placeholder:
+    type: string
+    default: Select date
+  locale:
+    type: string
+    default: en-US
+  min:
+    type: string
+    format: YYYY-MM-DD
+    default: ""
+  max:
+    type: string
+    format: YYYY-MM-DD
+    default: ""
+  weekStartsOn:
+    type: number
+    values: [0, 1, 2, 3, 4, 5, 6]
+    default: 0
+  id:
+    type: string
+    default: auto
+
+events:
+  - update:modelValue
+  - update:open
+  - open-change
+  - select
+
+slots:
+  - prefix
+  - suffix
+
+forwards_attrs_to: trigger_button
+
+a11y:
+  trigger_has_popup_dialog: true
+  calendar_uses_grid_roles: true
+  escape_closes: true
+  returns_focus_to_trigger_after_selection: true
+
+keyboard:
+  trigger_open: [Enter, Space, ArrowDown, ArrowUp]
+  day_navigation: [ArrowLeft, ArrowRight, ArrowUp, ArrowDown, Home, End, PageUp, PageDown, Escape]
+
+behavior:
+  selection_closes_popover: true
+  hidden_input_created_when_name_attr_present: true
+  out_of_range_dates_disabled: true
+
+example: '<TDatePicker aria-label="Ship date" model-value="2026-04-02" />'

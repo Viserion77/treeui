@@ -1,0 +1,50 @@
+services:
+  workspace:
+    build:
+      context: .
+      dockerfile: ./tooling/docker/Dockerfile
+    image: treeui-workspace
+    working_dir: /workspace
+    volumes:
+      - .:/workspace
+      - treeui-pnpm-store:/pnpm/store
+    environment:
+      PNPM_HOME: /pnpm
+      PLAYWRIGHT_BROWSERS_PATH: /ms-playwright
+    command: ["pnpm", "--version"]
+
+  docs:
+    build:
+      context: .
+      dockerfile: ./tooling/docker/Dockerfile
+    image: treeui-workspace
+    working_dir: /workspace
+    volumes:
+      - .:/workspace
+      - treeui-pnpm-store:/pnpm/store
+      - treeui-playwright:/ms-playwright
+    environment:
+      PNPM_HOME: /pnpm
+      PLAYWRIGHT_BROWSERS_PATH: /ms-playwright
+    ports:
+      - '6006:6006'
+    command: ["sh", "-lc", "pnpm install && pnpm docs:dev"]
+
+  e2e:
+    build:
+      context: .
+      dockerfile: ./tooling/docker/Dockerfile
+    image: treeui-workspace
+    working_dir: /workspace
+    volumes:
+      - .:/workspace
+      - treeui-pnpm-store:/pnpm/store
+      - treeui-playwright:/ms-playwright
+    environment:
+      PNPM_HOME: /pnpm
+      PLAYWRIGHT_BROWSERS_PATH: /ms-playwright
+    command: ["sh", "-lc", "pnpm install && pnpm exec playwright install chromium && pnpm test:e2e"]
+
+volumes:
+  treeui-pnpm-store:
+  treeui-playwright:

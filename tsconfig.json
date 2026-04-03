@@ -1,0 +1,25 @@
+{
+  "extends": "./tooling/tsconfig/base.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@treeui/tokens": ["./packages/tokens/src/index.ts"],
+      "@treeui/tokens/*": ["./packages/tokens/src/*"],
+      "@treeui/utils": ["./packages/utils/src/index.ts"],
+      "@treeui/utils/*": ["./packages/utils/src/*"],
+      "@treeui/icons": ["./packages/icons/src/index.ts"],
+      "@treeui/icons/*": ["./packages/icons/src/*"],
+      "@treeui/vue": ["./packages/vue/src/index.ts"],
+      "@treeui/vue/*": ["./packages/vue/src/*"]
+    }
+  },
+  "include": [
+    "global.d.ts",
+    "apps/**/*",
+    "packages/**/*",
+    "tooling/**/*",
+    "playwright.config.ts",
+    "vitest.config.ts",
+    "vitest.setup.ts"
+  ]
+}

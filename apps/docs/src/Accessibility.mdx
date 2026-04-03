@@ -1,0 +1,13 @@
+import { Meta, Title } from '@storybook/blocks';
+
+<Meta title="Foundation/Accessibility" />
+
+<Title>Accessibility</Title>
+
+Accessibility is part of the TreeUI contract, not a later pass. Interactive components include visible focus treatment,
+keyboard behavior, semantic markup, and clear disabled or loading states.
+
+The v0.1.0 quality gate includes unit tests, interaction checks, Storybook accessibility coverage, and Playwright smoke tests.
+
+Components must be defined beyond the happy path. Focus, disabled, loading, error, empty, and keyboard states are part of the public system,
+and clickable icon affordances should preserve at least a `44x44px` target area even when the glyph itself is smaller.

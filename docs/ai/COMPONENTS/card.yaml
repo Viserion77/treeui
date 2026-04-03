@@ -1,0 +1,32 @@
+name: TCard
+legacy_alias: TreeCard
+source_file: packages/vue/src/components/TreeCard.vue
+package: "@treeui/vue"
+kind: layout
+status: available
+purpose: "Surface container with optional header and footer slots."
+
+props:
+  as:
+    type: string
+    default: section
+  variant:
+    type: TreeCardVariant
+    default: outline
+    values: [outline, soft, solid]
+  size:
+    type: TreeSize
+    default: md
+    values: [sm, md, lg]
+
+events: []
+
+slots:
+  - header
+  - default
+  - footer
+
+behavior:
+  body_wrapper_class: tree-card__body
+
+example: '<TCard><p>Quiet elegance for product UI.</p></TCard>'

@@ -704,11 +704,16 @@
   transform: translateY(-50%);
 }
 
-.tree-fade-enter-active,
+.tree-fade-enter-active {
+  transition:
+    opacity var(--tree-motion-duration-fast) var(--tree-motion-easing-easeOut),
+    transform var(--tree-motion-duration-fast) var(--tree-motion-easing-easeOut);
+}
+
 .tree-fade-leave-active {
   transition:
-    opacity var(--tree-motion-duration-fast) var(--tree-motion-easing-standard),
-    transform var(--tree-motion-duration-fast) var(--tree-motion-easing-standard);
+    opacity var(--tree-motion-duration-fast) var(--tree-motion-easing-easeIn),
+    transform var(--tree-motion-duration-fast) var(--tree-motion-easing-easeIn);
 }
 
 .tree-fade-enter-from,
@@ -734,11 +739,16 @@
   transform: translateY(4px);
 }
 
-.tree-modal-fade-enter-active,
-.tree-modal-fade-leave-active {
+.tree-modal-fade-enter-active {
   transition:
     opacity var(--tree-motion-duration-moderate) var(--tree-motion-easing-easeOut),
     transform var(--tree-motion-duration-moderate) var(--tree-motion-easing-easeOut);
+}
+
+.tree-modal-fade-leave-active {
+  transition:
+    opacity var(--tree-motion-duration-moderate) var(--tree-motion-easing-easeIn),
+    transform var(--tree-motion-duration-moderate) var(--tree-motion-easing-easeIn);
 }
 
 .tree-modal-fade-enter-from,

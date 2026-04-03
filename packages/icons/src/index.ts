@@ -3,8 +3,8 @@ import { defineComponent, h, type Component } from 'vue';
 type TreeIconNode = Array<[string, Record<string, string>]>;
 
 export const treeIconDefaults = {
-  size: 16,
-  strokeWidth: 1.75,
+  size: 20,
+  strokeWidth: 2,
   absoluteStrokeWidth: true,
 } as const;
 

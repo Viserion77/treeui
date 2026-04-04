@@ -16,6 +16,8 @@
     "typecheck": "pnpm --filter @treeui/tokens typecheck && pnpm --filter @treeui/utils typecheck && pnpm --filter @treeui/icons typecheck && pnpm --filter @treeui/vue typecheck && pnpm --filter @treeui/docs typecheck",
     "test": "pnpm -w exec vitest run --coverage",
     "test:e2e": "pnpm -w exec playwright test",
+    "screenshots": "pnpm -w exec tsx scripts/screenshot-components.ts",
+    "screenshots:only": "pnpm -w exec tsx scripts/screenshot-components.ts --skip-build",
     "changeset": "pnpm -w exec changeset",
     "version-packages": "pnpm -w exec changeset version",
     "release": "pnpm build && pnpm -w exec changeset publish"

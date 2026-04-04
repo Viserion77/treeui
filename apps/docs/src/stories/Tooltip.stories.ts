@@ -12,6 +12,8 @@ const meta = {
     content: 'Invite another teammate to the workspace.',
     side: 'top',
     delay: 80,
+    defaultOpen: true,
+    open: true,
   },
   argTypes: {
     side: {
@@ -36,6 +38,7 @@ export const Playground: Story = {
             <TButton variant="outline">Invite teammate</TButton>
           </template>
         </TTooltip>
+        <pre style="position:fixed;bottom:0;left:0;font-size:11px;background:#000;color:#0f0;padding:8px;z-index:9999">args: {{ JSON.stringify(args) }}</pre>
       </div>
     `,
   }),

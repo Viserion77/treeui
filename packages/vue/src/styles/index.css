@@ -137,6 +137,10 @@
   justify-content: center;
 }
 
+.tree-button__spinner .tree-spinner {
+  color: currentColor;
+}
+
 .tree-input {
   display: inline-flex;
   align-items: center;

@@ -1,0 +1,83 @@
+name: TSelect
+legacy_alias: TreeSelect
+source_file: packages/vue/src/components/TreeSelect.vue
+package: "@treeui/vue"
+kind: primitive
+status: available
+purpose: "Custom styled dropdown select with listbox; controlled and uncontrolled via v-model and open/defaultOpen."
+
+props:
+  modelValue:
+    type: string
+    default: ""
+  options:
+    type: "TreeSelectOption[]"
+    default: "[]"
+    note: "Array of { label: string; value: string; disabled?: boolean }"
+  open:
+    type: boolean
+    default: undefined
+  defaultOpen:
+    type: boolean
+    default: false
+  size:
+    type: TreeSize
+    default: md
+    values: [sm, md, lg]
+  disabled:
+    type: boolean
+    default: false
+  loading:
+    type: boolean
+    default: false
+  invalid:
+    type: boolean
+    default: false
+  placeholder:
+    type: string
+    default: ""
+
+events:
+  - update:modelValue
+  - update:open
+  - open-change
+
+slots:
+  - prefix
+
+forwards_attrs_to: trigger_button
+
+a11y:
+  role: listbox
+  trigger_aria_haspopup: listbox
+  trigger_aria_expanded: true
+  aria_invalid_when_invalid: true
+  aria_busy_when_loading: true
+  aria_selected_on_options: true
+  aria_disabled_on_disabled_options: true
+  focus_visible_on_trigger: true
+  keyboard_arrow_navigation: true
+  escape_closes_dropdown: true
+  enter_space_selects_option: true
+  home_end_navigation: true
+
+behavior:
+  update_payload_type: string
+  loading_does_not_disable_by_itself: true
+  placeholder_shown_as_muted_text: true
+  chevron_rotates_when_open: true
+  check_icon_on_selected_option: true
+  outside_click_closes_dropdown: true
+  focus_restores_on_close: true
+
+example: |
+  <TSelect
+    aria-label="Fruit"
+    placeholder="Choose a fruit"
+    :options="[
+      { label: 'Apple', value: 'apple' },
+      { label: 'Banana', value: 'banana' },
+    ]"
+    :model-value="fruit"
+    @update:model-value="fruit = $event"
+  />

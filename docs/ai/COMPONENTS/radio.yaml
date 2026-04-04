@@ -1,0 +1,91 @@
+name: TRadio
+legacy_alias: TreeRadio
+source_file: packages/vue/src/components/TreeRadio.vue
+package: "@treeui/vue"
+kind: primitive
+status: available
+purpose: "Single radio option within a TRadioGroup; renders a native radio input."
+
+props:
+  value:
+    type: string
+    required: true
+  disabled:
+    type: boolean
+    default: false
+  invalid:
+    type: boolean
+    default: false
+  size:
+    type: TreeSize
+    default: inherited_from_group
+    values: [sm, md, lg]
+
+slots:
+  - default
+
+forwards_attrs_to: native_input[type=radio]
+
+a11y:
+  role: native_radio
+  aria_checked: true
+  aria_invalid_when_invalid: true
+  focus_visible_on_control: true
+  clickable_target_44x44: true
+
+behavior:
+  inherits_group_disabled: true
+  inherits_group_invalid: true
+  inherits_group_size: true
+  inherits_group_name: true
+  label_click_selects_radio: true
+
+---
+
+name: TRadioGroup
+legacy_alias: TreeRadioGroup
+source_file: packages/vue/src/components/TreeRadioGroup.vue
+package: "@treeui/vue"
+kind: primitive
+status: available
+purpose: "Container for TRadio options; manages v-model for single-select from a group."
+
+props:
+  modelValue:
+    type: string
+    default: undefined
+  name:
+    type: string
+    default: undefined
+  disabled:
+    type: boolean
+    default: false
+  invalid:
+    type: boolean
+    default: false
+  size:
+    type: TreeSize
+    default: md
+    values: [sm, md, lg]
+
+events:
+  - update:modelValue
+
+slots:
+  - default
+
+a11y:
+  role: radiogroup
+  keyboard: "Arrow keys move between radios within the group"
+
+behavior:
+  update_payload_type: string
+  provides_context_to_children: true
+  children_component: TRadio
+
+example: |
+  <TRadioGroup :model-value="plan" name="plan" @update:model-value="plan = $event">
+    <TRadio value="free">Free</TRadio>
+    <TRadio value="pro">Pro</TRadio>
+    <TRadio value="enterprise">Enterprise</TRadio>
+  </TRadioGroup>

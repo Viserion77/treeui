@@ -1,0 +1,52 @@
+name: TTextarea
+legacy_alias: TreeTextarea
+source_file: packages/vue/src/components/TreeTextarea.vue
+package: "@treeui/vue"
+kind: primitive
+status: available
+purpose: "Multi-line text field with size, loading, invalid states, and auto-grow option."
+
+props:
+  modelValue:
+    type: string
+    default: ""
+  size:
+    type: TreeSize
+    default: md
+    values: [sm, md, lg]
+  disabled:
+    type: boolean
+    default: false
+  loading:
+    type: boolean
+    default: false
+  invalid:
+    type: boolean
+    default: false
+  placeholder:
+    type: string
+    default: ""
+  rows:
+    type: number
+    default: 3
+  autoGrow:
+    type: boolean
+    default: false
+
+events:
+  - update:modelValue
+
+slots: []
+
+forwards_attrs_to: native_textarea
+
+a11y:
+  aria_invalid_when_invalid: true
+  loading_uses_status_spinner: true
+
+behavior:
+  update_payload_type: string
+  loading_does_not_disable_by_itself: true
+  auto_grow_resizes_on_input: true
+
+example: '<TTextarea aria-label="Notes" :model-value="notes" @update:model-value="notes = $event" />'

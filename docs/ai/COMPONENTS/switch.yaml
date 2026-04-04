@@ -1,0 +1,43 @@
+name: TSwitch
+legacy_alias: TreeSwitch
+source_file: packages/vue/src/components/TreeSwitch.vue
+package: "@treeui/vue"
+kind: primitive
+status: available
+purpose: "On/off toggle; semantic alternative to checkbox for settings. Supports v-model via modelValue."
+
+props:
+  modelValue:
+    type: boolean
+    default: false
+  size:
+    type: TreeSize
+    default: md
+    values: [sm, md, lg]
+  disabled:
+    type: boolean
+    default: false
+  invalid:
+    type: boolean
+    default: false
+
+events:
+  - update:modelValue
+
+slots:
+  - default
+
+forwards_attrs_to: native_input[type=checkbox][role=switch]
+
+a11y:
+  role: switch
+  aria_checked: true
+  aria_invalid_when_invalid: true
+  focus_visible_on_track: true
+  clickable_target_44x44: true
+
+behavior:
+  update_payload_type: boolean
+  label_click_toggles_switch: true
+
+example: '<TSwitch :model-value="darkMode" @update:model-value="darkMode = $event">Dark mode</TSwitch>'

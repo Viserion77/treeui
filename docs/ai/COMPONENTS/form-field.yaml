@@ -1,0 +1,73 @@
+component: TFormField
+status: milestone-1
+package: "@treeui/vue"
+source: TreeFormField.vue
+description: >
+  Label + input wrapper with error and hint slots.
+  Provides consistent layout, labelling, and validation messaging for any form control.
+
+props:
+  label:
+    type: string
+    required: false
+    description: "Text content for the field label."
+  htmlFor:
+    type: string
+    required: false
+    description: "The id of the associated form control, used on the <label> for attribute."
+  error:
+    type: string
+    required: false
+    description: "Error message to display. When present, the hint is hidden and the field gets is-invalid state."
+  hint:
+    type: string
+    required: false
+    description: "Hint or help text displayed below the control. Hidden when error is present."
+  required:
+    type: boolean
+    default: false
+    description: "Adds a visual required indicator (*) next to the label."
+  disabled:
+    type: boolean
+    default: false
+    description: "Applies disabled styling (reduced opacity) to the entire field."
+  size:
+    type: TreeSize
+    default: md
+    values: [sm, md, lg]
+    description: "Controls the label font size."
+
+slots:
+  default:
+    description: "The form control (e.g. TInput, TCheckbox, TSelect)."
+  label:
+    description: "Custom label content. Overrides the label prop text."
+  error:
+    description: "Custom error content. Overrides the error prop text."
+  hint:
+    description: "Custom hint content. Overrides the hint prop text."
+
+events: []
+
+css:
+  root: tree-form-field
+  elements:
+    - tree-form-field__label
+    - tree-form-field__required
+    - tree-form-field__control
+    - tree-form-field__hint
+    - tree-form-field__error
+  modifiers:
+    - tree-form-field--sm
+    - tree-form-field--md
+    - tree-form-field--lg
+  states:
+    - is-disabled
+    - is-invalid
+    - is-required
+
+accessibility:
+  - "Uses native <label> element with for attribute for input association."
+  - "Error messages are wrapped in role='alert' for screen reader announcements."
+  - "Required indicator (*) is aria-hidden to avoid redundant announcements; use aria-required on the input itself."
+  - "Error takes precedence over hint to avoid conflicting messages."

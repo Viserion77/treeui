@@ -4,7 +4,96 @@ import { Meta, Title } from '@storybook/blocks';
 
 <Title>Roadmap</Title>
 
-After the foundation stabilizes, the next milestone adds composed interaction patterns such as Dropdown, Tabs, and Toast,
-followed by selection controls and larger application primitives.
+TreeUI ships components in milestones, grouped by dependency depth and usage frequency.
+Each milestone builds on the previous one. Components within a milestone can be implemented in parallel.
 
-Future framework packages should reuse the same token system, naming, accessibility guidance, and design language.
+---
+
+## Current state — Foundation (shipped)
+
+| Component | Package | Notes |
+|---|---|---|
+| `TButton` | `@treeui/vue` | Variants: solid, outline, ghost, soft, danger |
+| `TBadge` | `@treeui/vue` | Inline label with color variants |
+| `TCard` | `@treeui/vue` | Surface container: outline, soft, solid |
+| `TInput` | `@treeui/vue` | Text field with prefix/suffix slots |
+| `TSpinner` | `@treeui/vue` | Indeterminate loading indicator |
+| `TTooltip` | `@treeui/vue` | Hover/focus tooltip, four sides |
+| `TModal` | `@treeui/vue` | Focus-trapped dialog with overlay |
+| `TDatePicker` | `@treeui/vue` | Controlled/uncontrolled date input |
+
+---
+
+## Milestone 1 — Form Controls
+
+Complete the set of primitive form inputs so any real form can be built without workarounds.
+
+| Component | Description |
+|---|---|
+| `TCheckbox` | Boolean toggle with indeterminate state; supports `v-model` |
+| `TRadio` / `TRadioGroup` | Single-select from a group; `v-model` on the group |
+| `TSwitch` | On/off toggle; semantic alternative to checkbox for settings |
+| `TSelect` | Native-backed dropdown; controlled and uncontrolled |
+| `TTextarea` | Multi-line text field; auto-grow option |
+| `TFormField` | Label + input wrapper with error and hint slots |
+
+---
+
+## Milestone 2 — Feedback & Status
+
+Provide the feedback layer: notifications, inline messages, and loading placeholders.
+
+| Component | Description |
+|---|---|
+| `TAlert` | Inline status banner: info, success, warning, danger |
+| `TToast` | Ephemeral notification stack (composable `useToast`) |
+| `TProgress` | Determinate progress bar and ring |
+| `TSkeleton` | Placeholder shimmer for loading states |
+
+---
+
+## Milestone 3 — Navigation & Disclosure
+
+Add structured navigation and content disclosure patterns.
+
+| Component | Description |
+|---|---|
+| `TTabs` | Tabbed panel navigation with keyboard support |
+| `TAccordion` | Collapsible sections, single or multi-open |
+| `TDropdown` | Trigger + floating menu with keyboard navigation |
+| `TPagination` | Page controls with prev/next and jump-to |
+| `TBreadcrumb` | Hierarchical navigation trail |
+
+---
+
+## Milestone 4 — Advanced Overlays
+
+Richer overlay and contextual patterns built on the existing overlay contract.
+
+| Component | Description |
+|---|---|
+| `TDrawer` | Side-anchored panel (top, right, bottom, left) |
+| `TPopover` | Rich floating content anchored to a trigger |
+| `TContextMenu` | Right-click floating menu |
+
+---
+
+## Milestone 5 — Data & Display Primitives
+
+Application-level primitives for structured content and identity.
+
+| Component | Description |
+|---|---|
+| `TAvatar` | User image with fallback initials and status dot |
+| `TTable` | Sortable, accessible data table |
+| `TDivider` | Horizontal or vertical visual separator |
+| `TTag` / `TChip` | Removable label/chip for filters and selections |
+
+---
+
+## Future
+
+- Additional framework packages (`@treeui/react`, `@treeui/svelte`) reusing the same token system, naming, accessibility guidance, and design language.
+- Motion/animation token expansion.
+- Right-to-left (RTL) layout support.
+- Theme builder / visual token editor.

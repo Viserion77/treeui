@@ -3,6 +3,7 @@ import { mount } from '@vue/test-utils';
 import TreeBadge from './TreeBadge.vue';
 import TreeButton from './TreeButton.vue';
 import TreeCard from './TreeCard.vue';
+import TreeCheckbox from './TreeCheckbox.vue';
 import TreeDatePicker from './TreeDatePicker.vue';
 import TreeInput from './TreeInput.vue';
 import TreeModal from './TreeModal.vue';
@@ -299,5 +300,92 @@ describe('@treeui/vue', () => {
     expect(document.body.querySelector('[role="dialog"]')).toBeNull();
 
     wrapper.unmount();
+  });
+
+  it('toggles checkbox and emits update:modelValue', async () => {
+    const wrapper = mount(TreeCheckbox, {
+      props: {
+        modelValue: false,
+        'onUpdate:modelValue': (value: boolean) => value,
+      },
+      slots: {
+        default: 'Accept terms',
+      },
+    });
+
+    expect(wrapper.classes()).toContain('tree-checkbox');
+    expect(wrapper.classes()).not.toContain('is-checked');
+    expect(wrapper.text()).toContain('Accept terms');
+
+    await wrapper.get('input[type="checkbox"]').trigger('change');
+
+    expect(wrapper.emitted('update:modelValue')?.[0]).toEqual([true]);
+  });
+
+  it('renders checked state with correct aria', () => {
+    const wrapper = mount(TreeCheckbox, {
+      props: {
+        modelValue: true,
+      },
+      slots: {
+        default: 'Checked item',
+      },
+    });
+
+    expect(wrapper.classes()).toContain('is-checked');
+    expect(wrapper.get('input').attributes('aria-checked')).toBe('true');
+  });
+
+  it('renders indeterminate state with aria-checked mixed', () => {
+    const wrapper = mount(TreeCheckbox, {
+      props: {
+        modelValue: false,
+        indeterminate: true,
+      },
+      slots: {
+        default: 'Select all',
+      },
+    });
+
+    expect(wrapper.classes()).toContain('is-indeterminate');
+    expect(wrapper.get('input').attributes('aria-checked')).toBe('mixed');
+  });
+
+  it('applies disabled state to checkbox', () => {
+    const wrapper = mount(TreeCheckbox, {
+      props: {
+        modelValue: false,
+        disabled: true,
+      },
+      slots: {
+        default: 'Disabled option',
+      },
+    });
+
+    expect(wrapper.classes()).toContain('is-disabled');
+    expect(wrapper.get('input').attributes('disabled')).toBeDefined();
+  });
+
+  it('applies invalid state to checkbox', () => {
+    const wrapper = mount(TreeCheckbox, {
+      props: {
+        modelValue: false,
+        invalid: true,
+      },
+      slots: {
+        default: 'Required field',
+      },
+    });
+
+    expect(wrapper.classes()).toContain('is-invalid');
+    expect(wrapper.get('input').attributes('aria-invalid')).toBe('true');
+  });
+
+  it('renders checkbox sizes', () => {
+    const sm = mount(TreeCheckbox, { props: { size: 'sm' as const } });
+    const lg = mount(TreeCheckbox, { props: { size: 'lg' as const } });
+
+    expect(sm.classes()).toContain('tree-checkbox--sm');
+    expect(lg.classes()).toContain('tree-checkbox--lg');
   });
 });

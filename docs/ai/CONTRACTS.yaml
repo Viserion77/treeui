@@ -9,6 +9,7 @@ primary_exports:
   - TBadge
   - TButton
   - TCard
+  - TCheckbox
   - TDatePicker
   - TInput
   - TModal
@@ -19,6 +20,7 @@ compatibility_aliases:
   TBadge: TreeBadge
   TButton: TreeButton
   TCard: TreeCard
+  TCheckbox: TreeCheckbox
   TDatePicker: TreeDatePicker
   TInput: TreeInput
   TModal: TreeModal
@@ -44,9 +46,9 @@ shared_props:
   variant:
     used_by: [TBadge, TButton, TCard]
   size:
-    used_by: [TBadge, TButton, TCard, TDatePicker, TInput, TModal, TSpinner]
+    used_by: [TBadge, TButton, TCard, TCheckbox, TDatePicker, TInput, TModal, TSpinner]
   disabled:
-    used_by: [TButton, TDatePicker, TInput, TModal, TTooltip]
+    used_by: [TButton, TCheckbox, TDatePicker, TInput, TModal, TTooltip]
   loading:
     used_by: [TButton, TInput]
   as:
@@ -56,7 +58,7 @@ shared_props:
 
 shared_events:
   update:modelValue:
-    used_by: [TDatePicker, TInput]
+    used_by: [TCheckbox, TDatePicker, TInput]
   update:open:
     used_by: [TDatePicker, TModal, TTooltip]
   open-change:

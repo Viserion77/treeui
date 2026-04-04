@@ -1,0 +1,47 @@
+name: TCheckbox
+legacy_alias: TreeCheckbox
+source_file: packages/vue/src/components/TreeCheckbox.vue
+package: "@treeui/vue"
+kind: primitive
+status: available
+purpose: "Boolean toggle with indeterminate state; supports v-model via modelValue."
+
+props:
+  modelValue:
+    type: boolean
+    default: false
+  size:
+    type: TreeSize
+    default: md
+    values: [sm, md, lg]
+  disabled:
+    type: boolean
+    default: false
+  indeterminate:
+    type: boolean
+    default: false
+  invalid:
+    type: boolean
+    default: false
+
+events:
+  - update:modelValue
+
+slots:
+  - default
+
+forwards_attrs_to: native_input[type=checkbox]
+
+a11y:
+  role: native_checkbox
+  aria_checked_mixed_when_indeterminate: true
+  aria_invalid_when_invalid: true
+  focus_visible_on_control: true
+  clickable_target_44x44: true
+
+behavior:
+  update_payload_type: boolean
+  indeterminate_clears_on_user_toggle: false
+  label_click_toggles_checkbox: true
+
+example: '<TCheckbox :model-value="accepted" @update:model-value="accepted = $event">Accept terms</TCheckbox>'

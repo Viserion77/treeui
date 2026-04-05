@@ -10,17 +10,12 @@ const meta = {
     modelValue: '',
     size: 'md',
     disabled: false,
-    previewMode: 'split',
     placeholder: 'Write your markdown here...',
   },
   argTypes: {
     size: {
       control: 'select',
       options: ['sm', 'md', 'lg'],
-    },
-    previewMode: {
-      control: 'select',
-      options: ['split', 'tab'],
     },
   },
 } satisfies Meta<typeof TMarkdownEditor>;
@@ -76,26 +71,6 @@ export const Playground: Story = {
 export const WithContent: Story = {
   args: {
     modelValue: sampleMarkdown,
-  },
-  render: (args: Record<string, unknown>) => ({
-    components: { TMarkdownEditor },
-    setup() {
-      const content = ref(args.modelValue);
-      return { args, content };
-    },
-    template: `
-      <TMarkdownEditor
-        v-bind="args"
-        v-model="content"
-      />
-    `,
-  }),
-};
-
-export const TabMode: Story = {
-  args: {
-    modelValue: sampleMarkdown,
-    previewMode: 'tab',
   },
   render: (args: Record<string, unknown>) => ({
     components: { TMarkdownEditor },

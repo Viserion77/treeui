@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, useAttrs, watch, nextTick, onMounted, onBeforeUnmount } from 'vue';
+import { computed, ref, useAttrs, nextTick, onBeforeUnmount } from 'vue';
 import type { TreeSize } from '../types/contracts';
 
 defineOptions({
@@ -13,8 +13,6 @@ const props = withDefaults(
     disabled?: boolean;
     placeholder?: string;
     uploadImage?: (file: File) => Promise<string>;
-    previewMode?: 'split' | 'tab';
-    initialTab?: 'write' | 'preview';
   }>(),
   {
     modelValue: '',
@@ -22,8 +20,6 @@ const props = withDefaults(
     disabled: false,
     placeholder: 'Write your markdown here...',
     uploadImage: undefined,
-    previewMode: 'split',
-    initialTab: 'write',
   },
 );
 
@@ -39,13 +35,11 @@ defineSlots<{
 
 const attrs = useAttrs();
 const textareaRef = ref<HTMLTextAreaElement | null>(null);
-const activeTab = ref<'write' | 'preview'>(props.initialTab);
 const isUploading = ref(false);
 
 const rootClasses = computed(() => [
   'tree-md-editor',
   `tree-md-editor--${props.size}`,
-  `tree-md-editor--${props.previewMode}`,
   {
     'is-disabled': props.disabled,
     'is-uploading': isUploading.value,
@@ -358,11 +352,6 @@ const handleKeydown = (event: KeyboardEvent) => {
   }
 };
 
-/* ──────── Tab switching (tab mode) ──────── */
-
-const switchTab = (tab: 'write' | 'preview') => {
-  activeTab.value = tab;
-};
 </script>
 
 <template>
@@ -513,45 +502,13 @@ const switchTab = (tab: 'write' | 'preview') => {
       </div>
 
       <slot name="toolbar" />
-
-      <!-- Tab buttons (only in tab mode) -->
-      <div
-        v-if="previewMode === 'tab'"
-        class="tree-md-editor__tabs"
-        role="tablist"
-      >
-        <button
-          type="button"
-          role="tab"
-          class="tree-md-editor__tab"
-          :class="{ 'is-active': activeTab === 'write' }"
-          :aria-selected="activeTab === 'write'"
-          :disabled="disabled"
-          @click="switchTab('write')"
-        >
-          Write
-        </button>
-        <button
-          type="button"
-          role="tab"
-          class="tree-md-editor__tab"
-          :class="{ 'is-active': activeTab === 'preview' }"
-          :aria-selected="activeTab === 'preview'"
-          :disabled="disabled"
-          @click="switchTab('preview')"
-        >
-          Preview
-        </button>
-      </div>
     </div>
 
     <!-- Editor body -->
     <div class="tree-md-editor__body">
       <!-- Write pane -->
       <div
-        v-show="previewMode === 'split' || activeTab === 'write'"
         class="tree-md-editor__pane tree-md-editor__pane--write"
-        :role="previewMode === 'tab' ? 'tabpanel' : undefined"
       >
         <textarea
           ref="textareaRef"
@@ -570,9 +527,7 @@ const switchTab = (tab: 'write' | 'preview') => {
 
       <!-- Preview pane -->
       <div
-        v-show="previewMode === 'split' || activeTab === 'preview'"
         class="tree-md-editor__pane tree-md-editor__pane--preview"
-        :role="previewMode === 'tab' ? 'tabpanel' : undefined"
         aria-label="Markdown preview"
       >
         <div

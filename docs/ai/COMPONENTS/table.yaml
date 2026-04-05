@@ -17,18 +17,6 @@ props:
     type: TreeSize
     default: md
     values: [sm, md, lg]
-  striped:
-    type: boolean
-    default: false
-    description: Alternating row background colors.
-  hoverable:
-    type: boolean
-    default: false
-    description: Highlight rows on hover.
-  bordered:
-    type: boolean
-    default: false
-    description: Add borders around all cells.
   sortBy:
     type: TreeTableSortState
     required: false

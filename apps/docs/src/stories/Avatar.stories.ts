@@ -12,7 +12,6 @@ const meta = {
   argTypes: {
     size: { control: 'select', options: ['sm', 'md', 'lg'] },
     status: { control: 'select', options: [undefined, 'online', 'offline', 'busy', 'away'] },
-    square: { control: 'boolean' },
   },
 } satisfies Meta<typeof TAvatar>;
 
@@ -67,18 +66,6 @@ export const Sizes: Story = {
         <TAvatar alt="Small" initials="SM" size="sm" />
         <TAvatar alt="Medium" initials="MD" size="md" />
         <TAvatar alt="Large" initials="LG" size="lg" />
-      </div>
-    `,
-  }),
-};
-
-export const Square: Story = {
-  render: () => ({
-    components: { TAvatar },
-    template: `
-      <div style="display: flex; gap: 0.75rem; align-items: center;">
-        <TAvatar alt="Square" initials="SQ" square />
-        <TAvatar alt="Square" initials="SQ" square size="lg" />
       </div>
     `,
   }),

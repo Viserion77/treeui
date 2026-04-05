@@ -11,7 +11,6 @@ const props = withDefaults(
     initials?: string;
     size?: TreeSize;
     status?: TreeAvatarStatus;
-    square?: boolean;
   }>(),
   {
     src: undefined,
@@ -19,14 +18,12 @@ const props = withDefaults(
     initials: undefined,
     size: 'md',
     status: undefined,
-    square: false,
   },
 );
 
 const classes = computed(() => [
   'tree-avatar',
   `tree-avatar--${props.size}`,
-  props.square ? 'tree-avatar--square' : '',
 ]);
 
 const computedInitials = computed(() => {

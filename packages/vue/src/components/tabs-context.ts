@@ -1,13 +1,11 @@
 import type { InjectionKey, Ref } from 'vue';
 import type { TreeSize } from '../types/contracts';
 
-export type TabsVariant = 'line' | 'enclosed';
 export type TabsActivationMode = 'automatic' | 'manual';
 
 export interface TabsContext {
   activeValue: Ref<string>;
   setActiveValue: (value: string) => void;
-  variant: Ref<TabsVariant>;
   size: Ref<TreeSize>;
   activationMode: Ref<TabsActivationMode>;
   disabled: Ref<boolean>;

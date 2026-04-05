@@ -10,7 +10,6 @@ const meta = {
     max: 100,
     size: 'md',
     label: 'Progress',
-    variant: 'bar',
   },
 } satisfies Meta<typeof TProgress>;
 
@@ -45,20 +44,6 @@ export const Indeterminate: Story = {
     template: `
       <div style="display: grid; gap: 1rem; max-width: 24rem;">
         <TProgress label="Loading…" />
-        <TProgress variant="ring" label="Loading…" />
-      </div>
-    `,
-  }),
-};
-
-export const Ring: Story = {
-  render: () => ({
-    components: { TProgress },
-    template: `
-      <div style="display: flex; gap: 1rem; align-items: center;">
-        <TProgress variant="ring" :value="25" size="sm" label="25%" />
-        <TProgress variant="ring" :value="50" size="md" label="50%" />
-        <TProgress variant="ring" :value="75" size="lg" label="75%" />
       </div>
     `,
   }),

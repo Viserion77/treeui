@@ -24,11 +24,6 @@ props:
     type: string
     default: "Progress"
     description: "Accessible label read by screen readers."
-  variant:
-    type: string
-    default: bar
-    values: [bar, ring]
-    description: "Visual style — linear bar or circular ring."
 
 events: {}
 
@@ -51,13 +46,8 @@ css:
   elements:
     - tree-progress__track
     - tree-progress__fill
-    - tree-progress__ring
-    - tree-progress__ring-track
-    - tree-progress__ring-fill
   modifiers:
     - tree-progress--sm
     - tree-progress--md
     - tree-progress--lg
-    - tree-progress--bar
-    - tree-progress--ring
     - tree-progress--indeterminate

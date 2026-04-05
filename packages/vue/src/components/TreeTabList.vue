@@ -96,7 +96,6 @@ const onKeydown = (event: KeyboardEvent) => {
 
 const classes = computed(() => [
   'tree-tabs__list',
-  `tree-tabs__list--${ctx.variant.value}`,
 ]);
 </script>
 

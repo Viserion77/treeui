@@ -2,14 +2,13 @@
 import { createId } from '@treeui/utils';
 import { computed, provide, reactive, ref, toRef, watch } from 'vue';
 import type { TreeSize } from '../types/contracts';
-import type { TabsActivationMode, TabsVariant } from './tabs-context';
+import type { TabsActivationMode } from './tabs-context';
 import { TABS_INJECTION_KEY } from './tabs-context';
 
 const props = withDefaults(
   defineProps<{
     modelValue?: string;
     defaultValue?: string;
-    variant?: TabsVariant;
     size?: TreeSize;
     activationMode?: TabsActivationMode;
     disabled?: boolean;
@@ -17,7 +16,6 @@ const props = withDefaults(
   {
     modelValue: undefined,
     defaultValue: '',
-    variant: 'line',
     size: 'md',
     activationMode: 'automatic',
     disabled: false,
@@ -79,7 +77,6 @@ watch(
 provide(TABS_INJECTION_KEY, {
   activeValue,
   setActiveValue,
-  variant: toRef(props, 'variant'),
   size: toRef(props, 'size'),
   activationMode: toRef(props, 'activationMode'),
   disabled: toRef(props, 'disabled'),
@@ -93,7 +90,6 @@ provide(TABS_INJECTION_KEY, {
 
 const rootClasses = computed(() => [
   'tree-tabs',
-  `tree-tabs--${props.variant}`,
   `tree-tabs--${props.size}`,
 ]);
 </script>

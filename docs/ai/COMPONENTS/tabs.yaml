@@ -15,10 +15,6 @@ props:
     type: string
     default: ""
     note: "Initial active tab when uncontrolled."
-  variant:
-    type: "'line' | 'enclosed'"
-    default: line
-    note: "Visual style of the tab list."
   size:
     type: TreeSize
     default: md

@@ -1648,10 +1648,6 @@
   --tree-progress-height: 0.75rem;
 }
 
-.tree-progress--ring {
-  width: auto;
-}
-
 .tree-progress__track {
   width: 100%;
   height: var(--tree-progress-height);
@@ -1672,36 +1668,12 @@
   animation: tree-progress-slide 1.4s var(--tree-motion-easing-easeInOut) infinite;
 }
 
-.tree-progress__ring-track {
-  stroke: color-mix(in srgb, currentColor 16%, transparent);
-}
-
-.tree-progress__ring-fill {
-  stroke: currentColor;
-  transform: rotate(-90deg);
-  transform-origin: center;
-  transition: stroke-dashoffset var(--tree-motion-duration-normal) var(--tree-motion-easing-standard);
-}
-
-.tree-progress--indeterminate .tree-progress__ring-fill {
-  animation: tree-progress-ring-spin 1.4s linear infinite;
-}
-
 @keyframes tree-progress-slide {
   0% {
     transform: translateX(-100%);
   }
   100% {
     transform: translateX(250%);
-  }
-}
-
-@keyframes tree-progress-ring-spin {
-  0% {
-    transform: rotate(-90deg);
-  }
-  100% {
-    transform: rotate(270deg);
   }
 }
 
@@ -1817,19 +1789,6 @@
   line-height: 1;
   overflow: hidden;
   position: relative;
-}
-
-.tree-skeleton--text {
-  height: 1em;
-  border-radius: var(--tree-radius-sm);
-}
-
-.tree-skeleton--circular {
-  border-radius: 50%;
-}
-
-.tree-skeleton--rectangular {
-  border-radius: var(--tree-radius-md);
 }
 
 .tree-skeleton--pulse {
@@ -2653,23 +2612,13 @@
 
 .tree-tabs__list {
   display: flex;
-  gap: var(--tree-space-1);
+  gap: 0;
   margin: 0;
   padding: 0;
-}
-
-.tree-tabs__list--line {
   border-bottom: var(--tree-border-width-subtle) solid var(--tree-color-border-default);
-  gap: 0;
 }
 
-.tree-tabs__list--enclosed {
-  background: var(--tree-color-bg-subtle);
-  border-radius: var(--tree-radius-md);
-  padding: var(--tree-space-1);
-}
-
-/* ── Tab trigger ── */
+/* Line-style tab indicator */
 
 .tree-tabs__tab {
   position: relative;
@@ -2685,10 +2634,23 @@
   cursor: pointer;
   white-space: nowrap;
   outline: none;
+  margin-bottom: calc(-1 * var(--tree-border-width-subtle));
+  border-bottom: 2px solid transparent;
+  border-radius: 0;
   transition:
     color var(--tree-motion-duration-fast) var(--tree-motion-easing-standard),
     background-color var(--tree-motion-duration-fast) var(--tree-motion-easing-standard),
     box-shadow var(--tree-motion-duration-fast) var(--tree-motion-easing-standard);
+}
+
+.tree-tabs__tab:hover:not([disabled]) {
+  color: var(--tree-color-text-primary);
+  border-bottom-color: var(--tree-color-border-strong);
+}
+
+.tree-tabs__tab.is-active {
+  color: var(--tree-color-brand-primary);
+  border-bottom-color: var(--tree-color-brand-primary);
 }
 
 /* Sizes */
@@ -2706,41 +2668,6 @@
 .tree-tabs__tab--lg {
   padding: var(--tree-space-3) var(--tree-space-5);
   font-size: var(--tree-font-size-lg);
-}
-
-/* Line variant */
-
-.tree-tabs__list--line .tree-tabs__tab {
-  margin-bottom: calc(-1 * var(--tree-border-width-subtle));
-  border-bottom: 2px solid transparent;
-  border-radius: 0;
-}
-
-.tree-tabs__list--line .tree-tabs__tab:hover:not([disabled]) {
-  color: var(--tree-color-text-primary);
-  border-bottom-color: var(--tree-color-border-strong);
-}
-
-.tree-tabs__list--line .tree-tabs__tab.is-active {
-  color: var(--tree-color-brand-primary);
-  border-bottom-color: var(--tree-color-brand-primary);
-}
-
-/* Enclosed variant */
-
-.tree-tabs__list--enclosed .tree-tabs__tab {
-  border-radius: var(--tree-radius-sm);
-}
-
-.tree-tabs__list--enclosed .tree-tabs__tab:hover:not([disabled]) {
-  color: var(--tree-color-text-primary);
-  background: var(--tree-color-bg-surface);
-}
-
-.tree-tabs__list--enclosed .tree-tabs__tab.is-active {
-  color: var(--tree-color-text-primary);
-  background: var(--tree-color-bg-surface);
-  box-shadow: var(--tree-shadow-xs);
 }
 
 /* States */
@@ -2861,10 +2788,6 @@
   font-weight: var(--tree-font-weight-medium);
   vertical-align: middle;
   user-select: none;
-}
-
-.tree-avatar--square {
-  border-radius: var(--tree-radius-md);
 }
 
 .tree-avatar--sm {
@@ -3068,16 +2991,6 @@
   color: var(--tree-color-text-primary);
 }
 
-.tree-table--bordered {
-  border: var(--tree-border-width-subtle) solid var(--tree-color-border-default);
-  border-radius: var(--tree-radius-md);
-}
-
-.tree-table--bordered .tree-table__cell,
-.tree-table--bordered .tree-table__header {
-  border: var(--tree-border-width-subtle) solid var(--tree-color-border-default);
-}
-
 .tree-table__head {
   border-bottom: var(--tree-border-width-subtle) solid var(--tree-color-border-default);
 }
@@ -3135,11 +3048,11 @@
   border-bottom: none;
 }
 
-.tree-table--striped .tree-table__body .tree-table__row:nth-child(even) {
+.tree-table__body .tree-table__row:nth-child(even) {
   background: var(--tree-color-bg-subtle);
 }
 
-.tree-table--hoverable .tree-table__body .tree-table__row:hover {
+.tree-table__body .tree-table__row:hover {
   background: var(--tree-color-brand-soft);
 }
 
@@ -3404,52 +3317,13 @@
   cursor: not-allowed;
 }
 
-/* ── Tabs (tab mode) ── */
-
-.tree-md-editor__tabs {
-  display: flex;
-  align-items: center;
-  gap: var(--tree-space-1);
-  margin-left: auto;
-}
-
-.tree-md-editor__tab {
-  padding: var(--tree-space-1) var(--tree-space-3);
-  border: none;
-  border-radius: var(--tree-radius-md);
-  background: transparent;
-  color: var(--tree-color-text-muted);
-  font-size: var(--tree-font-size-sm);
-  font-family: var(--tree-font-family-sans);
-  cursor: pointer;
-  transition: background 0.15s ease, color 0.15s ease;
-}
-
-.tree-md-editor__tab.is-active {
-  background: var(--tree-color-bg-primary);
-  color: var(--tree-color-text-primary);
-  font-weight: 600;
-}
-
-.tree-md-editor__tab:focus-visible {
-  outline: 2px solid var(--tree-color-brand-primary);
-  outline-offset: -2px;
-}
-
 /* ── Body ── */
 
 .tree-md-editor__body {
   display: flex;
   flex: 1;
-  min-height: 200px;
-}
-
-.tree-md-editor--split .tree-md-editor__body {
   flex-direction: row;
-}
-
-.tree-md-editor--tab .tree-md-editor__body {
-  flex-direction: column;
+  min-height: 200px;
 }
 
 .tree-md-editor__pane {
@@ -3457,7 +3331,7 @@
   min-width: 0;
 }
 
-.tree-md-editor--split .tree-md-editor__pane--preview {
+.tree-md-editor__pane--preview {
   border-left: 1px solid var(--tree-color-border-default);
 }
 

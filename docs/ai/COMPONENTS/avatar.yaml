@@ -26,10 +26,6 @@ props:
     required: false
     values: [online, offline, busy, away]
     description: Shows a colored status dot on the avatar.
-  square:
-    type: boolean
-    default: false
-    description: Uses rounded-rectangle shape instead of circle.
 
 slots:
   default:

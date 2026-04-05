@@ -24,15 +24,9 @@ const meta = {
     columns: sampleColumns,
     rows: sampleRows,
     size: 'md',
-    striped: false,
-    hoverable: false,
-    bordered: false,
   },
   argTypes: {
     size: { control: 'select', options: ['sm', 'md', 'lg'] },
-    striped: { control: 'boolean' },
-    hoverable: { control: 'boolean' },
-    bordered: { control: 'boolean' },
   },
 } satisfies Meta<typeof TTable>;
 
@@ -48,35 +42,11 @@ export const Playground: Story = {
   }),
 };
 
-export const Striped: Story = {
-  render: () => ({
-    components: { TTable },
-    setup: () => ({ columns: sampleColumns, rows: sampleRows }),
-    template: `<TTable :columns="columns" :rows="rows" striped />`,
-  }),
-};
-
-export const Hoverable: Story = {
-  render: () => ({
-    components: { TTable },
-    setup: () => ({ columns: sampleColumns, rows: sampleRows }),
-    template: `<TTable :columns="columns" :rows="rows" hoverable />`,
-  }),
-};
-
-export const Bordered: Story = {
-  render: () => ({
-    components: { TTable },
-    setup: () => ({ columns: sampleColumns, rows: sampleRows }),
-    template: `<TTable :columns="columns" :rows="rows" bordered />`,
-  }),
-};
-
 export const Sortable: Story = {
   render: () => ({
     components: { TTable },
     setup: () => ({ columns: sampleColumns, rows: sampleRows }),
-    template: `<TTable :columns="columns" :rows="rows" hoverable />`,
+    template: `<TTable :columns="columns" :rows="rows" />`,
   }),
 };
 
@@ -92,6 +62,6 @@ export const Small: Story = {
   render: () => ({
     components: { TTable },
     setup: () => ({ columns: sampleColumns, rows: sampleRows }),
-    template: `<TTable :columns="columns" :rows="rows" size="sm" striped hoverable />`,
+    template: `<TTable :columns="columns" :rows="rows" size="sm" />`,
   }),
 };

@@ -7,17 +7,12 @@ const meta = {
   component: TTabs,
   tags: ['autodocs'],
   args: {
-    variant: 'line',
     size: 'md',
     activationMode: 'automatic',
     disabled: false,
     defaultValue: 'account',
   },
   argTypes: {
-    variant: {
-      control: 'select',
-      options: ['line', 'enclosed'],
-    },
     size: {
       control: 'select',
       options: ['sm', 'md', 'lg'],
@@ -43,7 +38,6 @@ export const Playground: Story = {
       <div style="width: 480px;">
         <TTabs
           v-model="value"
-          :variant="args.variant"
           :size="args.size"
           :activation-mode="args.activationMode"
           :disabled="args.disabled"
@@ -71,32 +65,12 @@ export const Playground: Story = {
   }),
 };
 
-export const LineVariant: Story = {
+export const Default: Story = {
   render: () => ({
     components: { TTabs, TTabList, TTab, TTabPanel },
     template: `
       <div style="width: 480px;">
-        <TTabs default-value="tab1" variant="line">
-          <TTabList>
-            <TTab value="tab1">Overview</TTab>
-            <TTab value="tab2">Analytics</TTab>
-            <TTab value="tab3">Reports</TTab>
-          </TTabList>
-          <TTabPanel value="tab1"><p>Overview content goes here.</p></TTabPanel>
-          <TTabPanel value="tab2"><p>Analytics content goes here.</p></TTabPanel>
-          <TTabPanel value="tab3"><p>Reports content goes here.</p></TTabPanel>
-        </TTabs>
-      </div>
-    `,
-  }),
-};
-
-export const EnclosedVariant: Story = {
-  render: () => ({
-    components: { TTabs, TTabList, TTab, TTabPanel },
-    template: `
-      <div style="width: 480px;">
-        <TTabs default-value="tab1" variant="enclosed">
+        <TTabs default-value="tab1">
           <TTabList>
             <TTab value="tab1">Overview</TTab>
             <TTab value="tab2">Analytics</TTab>

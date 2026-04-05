@@ -7,11 +7,6 @@ status: available
 purpose: "Placeholder shimmer for loading states. Renders an animated block that indicates content is being loaded."
 
 props:
-  variant:
-    type: '"text" | "circular" | "rectangular"'
-    default: text
-    values: [text, circular, rectangular]
-    description: "Shape of the skeleton placeholder."
   width:
     type: string
     default: '"100%"'
@@ -19,7 +14,7 @@ props:
   height:
     type: string
     default: undefined
-    description: "CSS height. Defaults vary by variant: text uses line-height, circular uses width."
+    description: "CSS height of the skeleton element."
   animation:
     type: '"pulse" | "wave" | "none"'
     default: pulse
@@ -38,4 +33,4 @@ a11y:
   role: none
   notes: "Skeleton is purely decorative. Use aria-busy on the parent container."
 
-example: '<TSkeleton variant="text" width="60%" />'
+example: '<TSkeleton width="60%" height="1em" />'

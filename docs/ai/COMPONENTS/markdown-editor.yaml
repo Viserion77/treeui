@@ -29,18 +29,6 @@ props:
     description: >
       Async function that receives a File and returns the uploaded image URL.
       When not provided, pasting an image inserts an empty markdown image tag.
-  previewMode:
-    type: string
-    default: split
-    values: [split, tab]
-    description: >
-      "split" shows editor and preview side-by-side.
-      "tab" shows Write/Preview tabs.
-  initialTab:
-    type: string
-    default: write
-    values: [write, preview]
-    description: Initial active tab when previewMode is "tab".
 
 events:
   update:modelValue:

@@ -977,7 +977,6 @@ describe('@treeui/vue', () => {
 
     expect(wrapper.classes()).toContain('tree-progress');
     expect(wrapper.classes()).toContain('tree-progress--md');
-    expect(wrapper.classes()).toContain('tree-progress--bar');
     expect(wrapper.attributes('role')).toBe('progressbar');
     expect(wrapper.attributes('aria-valuenow')).toBe('60');
     expect(wrapper.attributes('aria-valuemin')).toBe('0');
@@ -993,16 +992,6 @@ describe('@treeui/vue', () => {
 
     expect(wrapper.classes()).toContain('tree-progress--indeterminate');
     expect(wrapper.attributes('aria-valuenow')).toBeUndefined();
-  });
-
-  it('renders progress ring variant', () => {
-    const wrapper = mount(TreeProgress, {
-      props: { value: 50, variant: 'ring' as const, label: 'Half done' },
-    });
-
-    expect(wrapper.classes()).toContain('tree-progress--ring');
-    expect(wrapper.find('.tree-progress__ring').exists()).toBe(true);
-    expect(wrapper.find('svg').exists()).toBe(true);
   });
 
   it('renders progress sizes', () => {
@@ -1103,25 +1092,14 @@ describe('@treeui/vue', () => {
   it('renders skeleton with default text variant', () => {
     const wrapper = mount(TreeSkeleton);
     expect(wrapper.classes()).toContain('tree-skeleton');
-    expect(wrapper.classes()).toContain('tree-skeleton--text');
     expect(wrapper.classes()).toContain('tree-skeleton--pulse');
     expect(wrapper.attributes('aria-hidden')).toBe('true');
   });
 
-  it('renders skeleton circular variant', () => {
+  it('renders skeleton with custom dimensions', () => {
     const wrapper = mount(TreeSkeleton, {
-      props: { variant: 'circular', width: '3rem' },
+      props: { width: '100%', height: '8rem' },
     });
-    expect(wrapper.classes()).toContain('tree-skeleton--circular');
-    expect(wrapper.element.style.width).toBe('3rem');
-    expect(wrapper.element.style.height).toBe('3rem');
-  });
-
-  it('renders skeleton rectangular variant', () => {
-    const wrapper = mount(TreeSkeleton, {
-      props: { variant: 'rectangular', width: '100%', height: '8rem' },
-    });
-    expect(wrapper.classes()).toContain('tree-skeleton--rectangular');
     expect(wrapper.element.style.height).toBe('8rem');
   });
 
@@ -1797,16 +1775,11 @@ describe('TTabs', () => {
     wrapper.unmount();
   });
 
-  it('renders correct variant classes', () => {
+  it('renders correct size classes', () => {
     const line = mount(TabsFixture, {
-      attrs: { 'default-value': 'a', variant: 'line' },
+      attrs: { 'default-value': 'a', size: 'sm' },
     });
-    expect(line.find('.tree-tabs--line').exists()).toBe(true);
-
-    const enclosed = mount(TabsFixture, {
-      attrs: { 'default-value': 'a', variant: 'enclosed' },
-    });
-    expect(enclosed.find('.tree-tabs--enclosed').exists()).toBe(true);
+    expect(line.find('.tree-tabs--sm').exists()).toBe(true);
   });
 
   it('opens the popover on click and closes on escape', async () => {
@@ -2039,13 +2012,6 @@ describe('TTabs', () => {
     expect(dot.classes()).toContain('tree-avatar__status--online');
   });
 
-  it('renders square avatar', () => {
-    const wrapper = mount(TreeAvatar, {
-      props: { alt: 'User', square: true },
-    });
-    expect(wrapper.classes()).toContain('tree-avatar--square');
-  });
-
   // ── Divider ──
 
   it('renders horizontal divider by default', () => {
@@ -2096,18 +2062,6 @@ describe('TTabs', () => {
 
     expect(wrapper.find('.tree-table__cell--empty').exists()).toBe(true);
     expect(wrapper.text()).toContain('No data available');
-  });
-
-  it('applies striped and hoverable classes', () => {
-    const columns = [{ key: 'name', label: 'Name' }];
-    const rows = [{ name: 'Alice' }];
-    const wrapper = mount(TreeTable, {
-      props: { columns, rows, striped: true, hoverable: true },
-    });
-
-    const table = wrapper.find('table');
-    expect(table.classes()).toContain('tree-table--striped');
-    expect(table.classes()).toContain('tree-table--hoverable');
   });
 
   it('sorts rows client-side when sortable header is clicked', async () => {
@@ -2281,7 +2235,6 @@ describe('TTabs', () => {
     const wrapper = mount(TreeMarkdownEditor);
     expect(wrapper.classes()).toContain('tree-md-editor');
     expect(wrapper.classes()).toContain('tree-md-editor--md');
-    expect(wrapper.classes()).toContain('tree-md-editor--split');
   });
 
   it('emits update:modelValue on textarea input', async () => {
@@ -2322,18 +2275,6 @@ describe('TTabs', () => {
 
     expect(sm.classes()).toContain('tree-md-editor--sm');
     expect(lg.classes()).toContain('tree-md-editor--lg');
-  });
-
-  it('shows write/preview tabs in tab mode', () => {
-    const wrapper = mount(TreeMarkdownEditor, {
-      props: { previewMode: 'tab' as const },
-    });
-
-    expect(wrapper.classes()).toContain('tree-md-editor--tab');
-    const tabs = wrapper.findAll('.tree-md-editor__tab');
-    expect(tabs).toHaveLength(2);
-    expect(tabs[0].text()).toBe('Write');
-    expect(tabs[1].text()).toBe('Preview');
   });
 
   it('renders headings at different levels in preview', () => {

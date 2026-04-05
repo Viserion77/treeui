@@ -22,16 +22,10 @@ const props = withDefaults(
     columns: TreeTableColumn[];
     rows: Record<string, unknown>[];
     size?: TreeSize;
-    striped?: boolean;
-    hoverable?: boolean;
-    bordered?: boolean;
     sortBy?: TreeTableSortState;
   }>(),
   {
     size: 'md',
-    striped: false,
-    hoverable: false,
-    bordered: false,
     sortBy: undefined,
   },
 );
@@ -53,9 +47,6 @@ const currentSort = computed(() => props.sortBy ?? internalSort.value);
 const classes = computed(() => [
   'tree-table',
   `tree-table--${props.size}`,
-  props.striped ? 'tree-table--striped' : '',
-  props.hoverable ? 'tree-table--hoverable' : '',
-  props.bordered ? 'tree-table--bordered' : '',
 ]);
 
 const sortedRows = computed(() => {

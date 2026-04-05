@@ -1,0 +1,24 @@
+component: TDivider
+package: "@treeui/vue"
+source: TreeDivider.vue
+description: Horizontal or vertical visual separator.
+aliases: [TreeDivider]
+
+props:
+  orientation:
+    type: string
+    default: horizontal
+    values: [horizontal, vertical]
+  decorative:
+    type: boolean
+    default: true
+    description: "When true, renders role='none' (purely visual). When false, renders as role='separator'."
+  label:
+    type: string
+    required: false
+    description: Accessible label for non-decorative dividers.
+
+accessibility:
+  role: "none (decorative) or separator (semantic)"
+  aria-orientation: Set when non-decorative.
+  aria-label: Set from `label` prop when non-decorative.

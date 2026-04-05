@@ -1,0 +1,76 @@
+name: TDrawer
+legacy_alias: TreeDrawer
+source_file: packages/vue/src/components/TreeDrawer.vue
+package: "@treeui/vue"
+kind: overlay
+status: available
+purpose: "Side-anchored panel for secondary content, navigation, or forms."
+
+props:
+  open:
+    type: boolean
+    default: controlled_optional
+  defaultOpen:
+    type: boolean
+    default: false
+  disabled:
+    type: boolean
+    default: false
+  size:
+    type: TreeSize
+    default: md
+    values: [sm, md, lg]
+  side:
+    type: TreeDrawerSide
+    default: right
+    values: [top, right, bottom, left]
+  title:
+    type: string
+    default: ""
+  description:
+    type: string
+    default: ""
+  closeOnEscape:
+    type: boolean
+    default: true
+  closeOnOverlay:
+    type: boolean
+    default: true
+  showCloseButton:
+    type: boolean
+    default: true
+  closeLabel:
+    type: string
+    default: Close drawer
+  id:
+    type: string
+    default: auto
+
+events:
+  - update:open
+  - open-change
+
+slots:
+  - trigger
+  - header
+  - default
+  - content
+  - footer
+
+forwards_attrs_to: trigger_wrapper
+
+a11y:
+  role: dialog
+  aria_modal: true
+  focus_trap: true
+  restores_focus_on_close: true
+  escape_closes_when_enabled: true
+
+behavior:
+  uses_teleport_to_body: true
+  locks_body_scroll_while_open: true
+  overlay_click_closes_when_enabled: true
+  close_button_optional: true
+  slides_in_from_side: true
+
+example: '<TDrawer title="Settings" side="right"><template #trigger><TButton>Open drawer</TButton></template><p>Drawer content</p></TDrawer>'

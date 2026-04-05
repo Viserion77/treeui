@@ -15,6 +15,7 @@ primary_exports:
   - TCheckbox
   - TDatePicker
   - TDropdown
+  - TDrawer
   - TFormField
   - TInput
   - TModal
@@ -31,6 +32,10 @@ primary_exports:
   - TToast
   - TToastProvider
   - TTooltip
+  - TAvatar
+  - TDivider
+  - TTable
+  - TTag
 
 compatibility_aliases:
   TAlert: TreeAlert
@@ -42,6 +47,7 @@ compatibility_aliases:
   TCheckbox: TreeCheckbox
   TDatePicker: TreeDatePicker
   TDropdown: TreeDropdown
+  TDrawer: TreeDrawer
   TFormField: TreeFormField
   TInput: TreeInput
   TModal: TreeModal
@@ -58,6 +64,10 @@ compatibility_aliases:
   TToast: TreeToast
   TToastProvider: TreeToastProvider
   TTooltip: TreeTooltip
+  TAvatar: TreeAvatar
+  TDivider: TreeDivider
+  TTable: TreeTable
+  TTag: TreeTag
 
 shared_sizes:
   values: [sm, md, lg]
@@ -98,9 +108,9 @@ shared_events:
   update:modelValue:
     used_by: [TCheckbox, TDatePicker, TInput, TRadioGroup, TSelect, TSwitch, TTextarea]
   update:open:
-    used_by: [TDatePicker, TDropdown, TModal, TSelect, TTooltip]
+    used_by: [TDatePicker, TDrawer, TDropdown, TModal, TSelect, TTooltip]
   open-change:
-    used_by: [TDatePicker, TDropdown, TModal, TSelect, TTooltip]
+    used_by: [TDatePicker, TDrawer, TDropdown, TModal, TSelect, TTooltip]
 
 shared_slots:
   default:
@@ -112,13 +122,13 @@ shared_slots:
   suffix:
     used_by: [TDatePicker, TInput]
   trigger:
-    used_by: [TModal, TTooltip]
+    used_by: [TDrawer, TModal, TTooltip]
   content:
-    used_by: [TModal, TTooltip]
+    used_by: [TDrawer, TModal, TTooltip]
   header:
-    used_by: [TCard, TModal]
+    used_by: [TCard, TDrawer, TModal]
   footer:
-    used_by: [TCard, TModal]
+    used_by: [TCard, TDrawer, TModal]
 
 value_formats:
   date: "YYYY-MM-DD"

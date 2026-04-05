@@ -1,0 +1,38 @@
+component: TTag
+package: "@treeui/vue"
+source: TreeTag.vue
+description: Removable label/chip for filters and selections.
+aliases: [TreeTag]
+
+props:
+  variant:
+    type: TreeTagVariant
+    default: soft
+    values: [solid, outline, soft]
+  size:
+    type: TreeSize
+    default: md
+    values: [sm, md, lg]
+  removable:
+    type: boolean
+    default: false
+    description: Shows a remove/close button.
+  disabled:
+    type: boolean
+    default: false
+    description: Disables interaction and dims the tag.
+
+events:
+  remove:
+    description: Emitted when the remove button is clicked (not emitted when disabled).
+
+slots:
+  default:
+    description: Tag label content.
+  icon:
+    description: Optional leading icon.
+
+accessibility:
+  remove_button: Has aria-label="Remove" and is keyboard-focusable.
+  disabled_state: Applied via is-disabled class and native disabled on remove button.
+  icon: Marked aria-hidden="true".

@@ -24,11 +24,18 @@ import TreeAccordionItem from './TreeAccordionItem.vue';
 import TreeBreadcrumb from './TreeBreadcrumb.vue';
 import TreeBreadcrumbItem from './TreeBreadcrumbItem.vue';
 import TreeDropdown from './TreeDropdown.vue';
+import TreeDrawer from './TreeDrawer.vue';
+import TreeContextMenu from './TreeContextMenu.vue';
+import TreePopover from './TreePopover.vue';
 import TreeTabs from './TreeTabs.vue';
 import TreeTabList from './TreeTabList.vue';
 import TreeTab from './TreeTab.vue';
 import TreeTabPanel from './TreeTabPanel.vue';
 import TreeToastProvider from './TreeToastProvider.vue';
+import TreeAvatar from './TreeAvatar.vue';
+import TreeDivider from './TreeDivider.vue';
+import TreeTable from './TreeTable.vue';
+import TreeTag from './TreeTag.vue';
 import { useToast } from '../composables/useToast';
 
 describe('@treeui/vue', () => {
@@ -355,6 +362,95 @@ describe('@treeui/vue', () => {
 
     (
       document.body.querySelector('.tree-modal__backdrop') as HTMLDivElement | null
+    )?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    await nextTick();
+    expect(document.body.querySelector('[role="dialog"]')).toBeNull();
+
+    wrapper.unmount();
+  });
+
+  it('opens the drawer from a trigger slot and closes on escape', async () => {
+    const wrapper = mount(TreeDrawer, {
+      attachTo: document.body,
+      props: {
+        title: 'Settings',
+        description: 'Manage your preferences.',
+        side: 'right',
+      },
+      slots: {
+        trigger: '<button type="button">Open drawer</button>',
+        default: '<p>Drawer content</p>',
+        footer: `
+          <button type="button" id="drawer-cancel">Cancel</button>
+          <button type="button" id="drawer-save">Save</button>
+        `,
+      },
+    });
+
+    await wrapper.get('button').trigger('click');
+    await nextTick();
+
+    expect(wrapper.emitted('update:open')?.[0]).toEqual([true]);
+    expect(document.body.querySelector('[role="dialog"]')).not.toBeNull();
+    expect(document.body.textContent).toContain('Settings');
+    expect(document.body.textContent).toContain('Drawer content');
+
+    const surface = document.body.querySelector('.tree-drawer__surface');
+    expect(surface?.classList.contains('tree-drawer__surface--right')).toBe(true);
+
+    (
+      document.getElementById('drawer-save') as HTMLButtonElement | null
+    )?.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, key: 'Escape' }));
+    await nextTick();
+
+    expect(wrapper.emitted('open-change')?.[1]).toEqual([false]);
+    expect(document.body.querySelector('[role="dialog"]')).toBeNull();
+    expect(document.activeElement?.textContent).toContain('Open drawer');
+
+    wrapper.unmount();
+  });
+
+  it('traps focus inside the drawer and closes from the overlay', async () => {
+    const wrapper = mount(TreeDrawer, {
+      attachTo: document.body,
+      props: {
+        defaultOpen: true,
+        side: 'left',
+        showCloseButton: false,
+      },
+      slots: {
+        header: '<h2>Focus trap</h2>',
+        default: '<p>Keep focus inside the drawer.</p>',
+        footer: `
+          <button type="button" id="drawer-first">First</button>
+          <button type="button" id="drawer-last">Last</button>
+        `,
+      },
+    });
+
+    await nextTick();
+    (document.getElementById('drawer-last') as HTMLButtonElement | null)?.focus();
+
+    (
+      document.getElementById('drawer-last') as HTMLButtonElement | null
+    )?.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, key: 'Tab' }));
+    await nextTick();
+    expect(document.activeElement?.id).toBe('drawer-first');
+
+    (
+      document.getElementById('drawer-first') as HTMLButtonElement | null
+    )?.dispatchEvent(
+      new KeyboardEvent('keydown', {
+        bubbles: true,
+        key: 'Tab',
+        shiftKey: true,
+      }),
+    );
+    await nextTick();
+    expect(document.activeElement?.id).toBe('drawer-last');
+
+    (
+      document.body.querySelector('.tree-drawer__backdrop') as HTMLDivElement | null
     )?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
     await nextTick();
     expect(document.body.querySelector('[role="dialog"]')).toBeNull();
@@ -1708,5 +1804,389 @@ describe('TTabs', () => {
       attrs: { 'default-value': 'a', variant: 'enclosed' },
     });
     expect(enclosed.find('.tree-tabs--enclosed').exists()).toBe(true);
+  });
+
+  it('opens the popover on click and closes on escape', async () => {
+    const wrapper = mount(TreePopover, {
+      attachTo: document.body,
+      slots: {
+        trigger: '<button type="button">Open</button>',
+        default: '<p>Popover content</p>',
+      },
+    });
+
+    expect(wrapper.find('[role="dialog"]').exists()).toBe(false);
+
+    await wrapper.get('button').trigger('click');
+    await nextTick();
+
+    expect(wrapper.emitted('update:open')?.[0]).toEqual([true]);
+    expect(wrapper.emitted('open-change')?.[0]).toEqual([true]);
+    expect(wrapper.find('[role="dialog"]').exists()).toBe(true);
+
+    await wrapper.find('[role="dialog"]').trigger('keydown', { key: 'Escape' });
+    await nextTick();
+
+    expect(wrapper.emitted('update:open')?.[1]).toEqual([false]);
+    expect(wrapper.emitted('open-change')?.[1]).toEqual([false]);
+
+    wrapper.unmount();
+  });
+
+  it('renders the popover with the correct side class', () => {
+    const wrapper = mount(TreePopover, {
+      attachTo: document.body,
+      props: {
+        defaultOpen: true,
+        side: 'right',
+        align: 'start',
+      },
+      slots: {
+        trigger: '<button type="button">Open</button>',
+        default: '<p>Right content</p>',
+      },
+    });
+
+    const content = wrapper.find('[role="dialog"]');
+    expect(content.classes()).toContain('tree-popover__content--right');
+    expect(content.classes()).toContain('tree-popover__content--align-start');
+
+    wrapper.unmount();
+  });
+
+  it('does not open the popover when disabled', async () => {
+    const wrapper = mount(TreePopover, {
+      attachTo: document.body,
+      props: {
+        disabled: true,
+      },
+      slots: {
+        trigger: '<button type="button">Open</button>',
+        default: '<p>Content</p>',
+      },
+    });
+
+    await wrapper.get('button').trigger('click');
+    await nextTick();
+
+    expect(wrapper.find('[role="dialog"]').exists()).toBe(false);
+    expect(wrapper.emitted('update:open')).toBeUndefined();
+
+    wrapper.unmount();
+  });
+
+  // ── Context Menu ──────────────────────────────────────────
+
+  it('renders context menu and emits select on item click', async () => {
+    const wrapper = mount(TreeContextMenu, {
+      props: {
+        items: [
+          { label: 'Cut', value: 'cut' },
+          { label: 'Copy', value: 'copy' },
+        ],
+      },
+      slots: {
+        default: '<div class="trigger-area">Right-click here</div>',
+      },
+      attachTo: document.body,
+    });
+
+    expect(wrapper.classes()).toContain('tree-context-menu');
+
+    // Open context menu via right-click
+    await wrapper.trigger('contextmenu');
+    await nextTick();
+
+    const items = document.querySelectorAll('[role="menuitem"]');
+    expect(items.length).toBe(2);
+    expect(items[0].textContent?.trim()).toBe('Cut');
+
+    // Select an item
+    (items[0] as HTMLElement).click();
+    await nextTick();
+    expect(wrapper.emitted('select')?.[0]).toEqual(['cut']);
+
+    wrapper.unmount();
+  });
+
+  it('renders context menu sizes', () => {
+    const sm = mount(TreeContextMenu, {
+      props: { size: 'sm' as const, items: [] },
+      slots: { default: '<div>Area</div>' },
+    });
+    const lg = mount(TreeContextMenu, {
+      props: { size: 'lg' as const, items: [] },
+      slots: { default: '<div>Area</div>' },
+    });
+
+    expect(sm.classes()).toContain('tree-context-menu--sm');
+    expect(lg.classes()).toContain('tree-context-menu--lg');
+
+    sm.unmount();
+    lg.unmount();
+  });
+
+  it('does not open context menu when disabled', async () => {
+    const wrapper = mount(TreeContextMenu, {
+      props: {
+        disabled: true,
+        items: [{ label: 'Cut', value: 'cut' }],
+      },
+      slots: {
+        default: '<div>Right-click here</div>',
+      },
+      attachTo: document.body,
+    });
+
+    expect(wrapper.classes()).toContain('is-disabled');
+
+    await wrapper.trigger('contextmenu');
+    await nextTick();
+
+    const items = document.querySelectorAll('[role="menuitem"]');
+    expect(items.length).toBe(0);
+
+    wrapper.unmount();
+  });
+
+  it('renders disabled items in context menu', async () => {
+    const wrapper = mount(TreeContextMenu, {
+      props: {
+        items: [
+          { label: 'Cut', value: 'cut' },
+          { label: 'Copy', value: 'copy', disabled: true },
+        ],
+      },
+      slots: {
+        default: '<div>Right-click here</div>',
+      },
+      attachTo: document.body,
+    });
+
+    await wrapper.trigger('contextmenu');
+    await nextTick();
+
+    const items = document.querySelectorAll('[role="menuitem"]');
+    expect(items[1].classList.contains('is-disabled')).toBe(true);
+    expect(items[1].getAttribute('aria-disabled')).toBe('true');
+
+    wrapper.unmount();
+  });
+
+  it('emits open-change events on context menu', async () => {
+    const wrapper = mount(TreeContextMenu, {
+      props: {
+        items: [{ label: 'Cut', value: 'cut' }],
+      },
+      slots: {
+        default: '<div>Right-click here</div>',
+      },
+      attachTo: document.body,
+    });
+
+    await wrapper.trigger('contextmenu');
+    await nextTick();
+    expect(wrapper.emitted('open-change')?.[0]).toEqual([true]);
+
+    // Select to close
+    const item = document.querySelector('[role="menuitem"]') as HTMLElement;
+    item?.click();
+    await nextTick();
+    expect(wrapper.emitted('open-change')?.[1]).toEqual([false]);
+
+    wrapper.unmount();
+  });
+
+  // ── Avatar ──
+
+  it('renders avatar with initials from alt text', () => {
+    const wrapper = mount(TreeAvatar, {
+      props: { alt: 'Jane Doe', size: 'md' },
+    });
+    expect(wrapper.classes()).toContain('tree-avatar');
+    expect(wrapper.classes()).toContain('tree-avatar--md');
+    expect(wrapper.text()).toBe('JD');
+    expect(wrapper.attributes('role')).toBe('img');
+    expect(wrapper.attributes('aria-label')).toBe('Jane Doe');
+  });
+
+  it('renders avatar with explicit initials', () => {
+    const wrapper = mount(TreeAvatar, {
+      props: { alt: 'Jane Doe', initials: 'X' },
+    });
+    expect(wrapper.text()).toBe('X');
+  });
+
+  it('renders avatar with image', () => {
+    const wrapper = mount(TreeAvatar, {
+      props: { src: 'https://example.com/photo.jpg', alt: 'Jane' },
+    });
+    const img = wrapper.find('img');
+    expect(img.exists()).toBe(true);
+    expect(img.attributes('src')).toBe('https://example.com/photo.jpg');
+    expect(img.attributes('alt')).toBe('Jane');
+  });
+
+  it('renders avatar with status dot', () => {
+    const wrapper = mount(TreeAvatar, {
+      props: { alt: 'User', status: 'online' },
+    });
+    const dot = wrapper.find('.tree-avatar__status');
+    expect(dot.exists()).toBe(true);
+    expect(dot.classes()).toContain('tree-avatar__status--online');
+  });
+
+  it('renders square avatar', () => {
+    const wrapper = mount(TreeAvatar, {
+      props: { alt: 'User', square: true },
+    });
+    expect(wrapper.classes()).toContain('tree-avatar--square');
+  });
+
+  // ── Divider ──
+
+  it('renders horizontal divider by default', () => {
+    const wrapper = mount(TreeDivider);
+    expect(wrapper.classes()).toContain('tree-divider');
+    expect(wrapper.classes()).toContain('tree-divider--horizontal');
+    expect(wrapper.attributes('role')).toBe('none');
+  });
+
+  it('renders vertical divider with separator role', () => {
+    const wrapper = mount(TreeDivider, {
+      props: { orientation: 'vertical', decorative: false, label: 'Section' },
+    });
+    expect(wrapper.classes()).toContain('tree-divider--vertical');
+    expect(wrapper.attributes('role')).toBe('separator');
+    expect(wrapper.attributes('aria-orientation')).toBe('vertical');
+    expect(wrapper.attributes('aria-label')).toBe('Section');
+  });
+
+  // ── Table ──
+
+  it('renders table with columns and rows', () => {
+    const columns = [
+      { key: 'name', label: 'Name' },
+      { key: 'email', label: 'Email' },
+    ];
+    const rows = [
+      { name: 'Alice', email: 'alice@example.com' },
+      { name: 'Bob', email: 'bob@example.com' },
+    ];
+
+    const wrapper = mount(TreeTable, {
+      props: { columns, rows },
+    });
+
+    expect(wrapper.find('.tree-table').exists()).toBe(true);
+    expect(wrapper.findAll('.tree-table__header')).toHaveLength(2);
+    expect(wrapper.findAll('.tree-table__body .tree-table__row')).toHaveLength(2);
+    expect(wrapper.text()).toContain('Alice');
+    expect(wrapper.text()).toContain('bob@example.com');
+  });
+
+  it('renders empty state when no rows', () => {
+    const columns = [{ key: 'name', label: 'Name' }];
+    const wrapper = mount(TreeTable, {
+      props: { columns, rows: [] },
+    });
+
+    expect(wrapper.find('.tree-table__cell--empty').exists()).toBe(true);
+    expect(wrapper.text()).toContain('No data available');
+  });
+
+  it('applies striped and hoverable classes', () => {
+    const columns = [{ key: 'name', label: 'Name' }];
+    const rows = [{ name: 'Alice' }];
+    const wrapper = mount(TreeTable, {
+      props: { columns, rows, striped: true, hoverable: true },
+    });
+
+    const table = wrapper.find('table');
+    expect(table.classes()).toContain('tree-table--striped');
+    expect(table.classes()).toContain('tree-table--hoverable');
+  });
+
+  it('sorts rows client-side when sortable header is clicked', async () => {
+    const columns = [
+      { key: 'name', label: 'Name', sortable: true },
+      { key: 'age', label: 'Age' },
+    ];
+    const rows = [
+      { name: 'Charlie', age: 30 },
+      { name: 'Alice', age: 25 },
+      { name: 'Bob', age: 28 },
+    ];
+
+    const wrapper = mount(TreeTable, {
+      props: { columns, rows },
+    });
+
+    const sortableHeader = wrapper.find('.tree-table__header--sortable');
+    await sortableHeader.trigger('click');
+
+    const cells = wrapper.findAll('.tree-table__body .tree-table__row');
+    expect(cells[0].text()).toContain('Alice');
+    expect(cells[1].text()).toContain('Bob');
+    expect(cells[2].text()).toContain('Charlie');
+
+    expect(wrapper.emitted('sort')).toBeTruthy();
+    expect(wrapper.emitted('sort')![0]).toEqual([{ key: 'name', direction: 'asc' }]);
+  });
+
+  it('sets aria-sort on sortable headers', async () => {
+    const columns = [{ key: 'name', label: 'Name', sortable: true }];
+    const rows = [{ name: 'A' }];
+
+    const wrapper = mount(TreeTable, {
+      props: { columns, rows },
+    });
+
+    const header = wrapper.find('.tree-table__header--sortable');
+    expect(header.attributes('aria-sort')).toBe('none');
+
+    await header.trigger('click');
+    expect(header.attributes('aria-sort')).toBe('ascending');
+
+    await header.trigger('click');
+    expect(header.attributes('aria-sort')).toBe('descending');
+  });
+
+  // ── Tag ──
+
+  it('renders tag with variant and size classes', () => {
+    const wrapper = mount(TreeTag, {
+      props: { variant: 'solid', size: 'sm' },
+      slots: { default: 'Vue' },
+    });
+    expect(wrapper.classes()).toContain('tree-tag');
+    expect(wrapper.classes()).toContain('tree-tag--solid');
+    expect(wrapper.classes()).toContain('tree-tag--sm');
+    expect(wrapper.text()).toContain('Vue');
+  });
+
+  it('shows remove button and emits remove event', async () => {
+    const wrapper = mount(TreeTag, {
+      props: { removable: true },
+      slots: { default: 'React' },
+    });
+
+    const removeBtn = wrapper.find('.tree-tag__remove');
+    expect(removeBtn.exists()).toBe(true);
+    expect(removeBtn.attributes('aria-label')).toBe('Remove');
+
+    await removeBtn.trigger('click');
+    expect(wrapper.emitted('remove')).toHaveLength(1);
+  });
+
+  it('does not emit remove when disabled', async () => {
+    const wrapper = mount(TreeTag, {
+      props: { removable: true, disabled: true },
+      slots: { default: 'Disabled' },
+    });
+
+    expect(wrapper.classes()).toContain('is-disabled');
+    await wrapper.find('.tree-tag__remove').trigger('click');
+    expect(wrapper.emitted('remove')).toBeUndefined();
   });
 });

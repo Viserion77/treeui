@@ -1,0 +1,65 @@
+component: TTable
+package: "@treeui/vue"
+source: TreeTable.vue
+description: Sortable, accessible data table with column definitions and row data.
+aliases: [TreeTable]
+
+props:
+  columns:
+    type: "TreeTableColumn[]"
+    required: true
+    description: Array of column definitions with key, label, sortable, align, and width.
+  rows:
+    type: "Record<string, unknown>[]"
+    required: true
+    description: Array of row data objects keyed by column keys.
+  size:
+    type: TreeSize
+    default: md
+    values: [sm, md, lg]
+  striped:
+    type: boolean
+    default: false
+    description: Alternating row background colors.
+  hoverable:
+    type: boolean
+    default: false
+    description: Highlight rows on hover.
+  bordered:
+    type: boolean
+    default: false
+    description: Add borders around all cells.
+  sortBy:
+    type: TreeTableSortState
+    required: false
+    description: Controlled sort state. When provided, overrides internal sort tracking.
+
+events:
+  sort:
+    payload: "TreeTableSortState"
+    description: Emitted when a sortable column header is clicked.
+
+slots:
+  "cell-{key}":
+    description: Custom cell renderer for a specific column. Receives `{ row, value }`.
+  "header-{key}":
+    description: Custom header renderer for a specific column. Receives `{ column }`.
+  empty:
+    description: Content shown when rows array is empty.
+
+types:
+  TreeTableColumn:
+    key: string
+    label: string
+    sortable: boolean (optional)
+    align: "'left' | 'center' | 'right'" (optional)
+    width: string (optional)
+  TreeTableSortState:
+    key: string
+    direction: "'asc' | 'desc' | 'none'"
+
+accessibility:
+  role: grid
+  aria-sort: Set on sortable column headers (ascending, descending, none).
+  keyboard: Sortable headers are focusable and activated with Enter or Space.
+  scope: col on all th elements.

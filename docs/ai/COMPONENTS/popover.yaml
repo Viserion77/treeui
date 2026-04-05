@@ -1,0 +1,99 @@
+component: TPopover
+status: stable
+package: "@treeui/vue"
+since: "0.5.0"
+description: >
+  Rich floating content panel anchored to a trigger element.
+  Opened by click, dismissed by outside click or Escape.
+  Supports four placement sides with alignment options.
+
+anatomy:
+  - tree-popover              # root wrapper (relative positioning context)
+  - tree-popover__anchor      # trigger wrapper
+  - tree-popover__content     # floating panel (role="dialog")
+
+props:
+  - name: open
+    type: boolean
+    optional: true
+    description: Controlled open state (v-model:open)
+
+  - name: defaultOpen
+    type: boolean
+    default: false
+    description: Initial open state for uncontrolled usage
+
+  - name: disabled
+    type: boolean
+    default: false
+    description: Prevents opening
+
+  - name: side
+    type: "'top' | 'right' | 'bottom' | 'left'"
+    default: "'bottom'"
+    description: Placement side relative to trigger
+
+  - name: align
+    type: "'start' | 'center' | 'end'"
+    default: "'center'"
+    description: Alignment along the placement axis
+
+  - name: id
+    type: string
+    optional: true
+    description: Custom id for the content panel
+
+events:
+  - name: update:open
+    payload: [value: boolean]
+    description: Emitted when open state changes (enables v-model:open)
+
+  - name: open-change
+    payload: [value: boolean]
+    description: Emitted when open state changes (non-v-model usage)
+
+slots:
+  - name: trigger
+    props: { isOpen: boolean }
+    description: Custom trigger element. Receives current open state.
+
+  - name: default
+    description: Popover content displayed inside the floating panel.
+
+a11y:
+  role: dialog
+  attrs:
+    - aria-haspopup="dialog" on trigger
+    - aria-expanded on trigger
+    - aria-controls linking trigger to content
+    - tabindex="-1" on content for focus management
+  keyboard:
+    - Click or Enter/Space on trigger toggles popover
+    - Escape closes popover and restores focus to trigger
+    - Tab navigates within popover content
+  focus:
+    - On open, focuses first focusable element inside content (or content itself)
+    - On Escape close, restores focus to trigger
+  dismiss:
+    - Outside click closes popover
+    - Escape key closes popover
+
+contract: overlay_contract
+composable: useControllableOpen
+
+css_classes:
+  - tree-popover
+  - tree-popover__anchor
+  - tree-popover__content
+  - tree-popover__content--top
+  - tree-popover__content--right
+  - tree-popover__content--bottom
+  - tree-popover__content--left
+  - tree-popover__content--align-start
+  - tree-popover__content--align-center
+  - tree-popover__content--align-end
+  - is-open
+  - is-disabled
+
+transition: tree-popover-fade
+z_index: var(--tree-z-dropdown)

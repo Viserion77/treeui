@@ -1,0 +1,90 @@
+# TContextMenu
+# Right-click floating menu anchored at cursor position.
+
+component: TContextMenu
+since: 0.5.0
+status: stable
+category: overlay
+
+props:
+  items:
+    type: TreeContextMenuItem[]
+    default: "[]"
+    description: Menu items to render.
+  open:
+    type: boolean | undefined
+    default: undefined
+    description: Controlled open state (v-model:open).
+  defaultOpen:
+    type: boolean
+    default: false
+    description: Uncontrolled initial open state.
+  disabled:
+    type: boolean
+    default: false
+    description: Prevents the context menu from opening.
+  size:
+    type: TreeSize
+    default: md
+    description: Item sizing variant.
+
+events:
+  select:
+    payload: "[value: string]"
+    description: Emitted when a menu item is selected.
+  update:open:
+    payload: "[value: boolean]"
+    description: Emitted when open state changes (v-model support).
+  open-change:
+    payload: "[value: boolean]"
+    description: Emitted when open state changes.
+
+slots:
+  default:
+    description: Content that acts as the right-click trigger area.
+  item:
+    props: "{ item: TreeContextMenuItem; index: number }"
+    description: Custom rendering for each menu item.
+
+types:
+  TreeContextMenuItem:
+    label: string
+    value: string
+    disabled?: boolean
+
+accessibility:
+  role: menu (on the floating list)
+  items_role: menuitem
+  keyboard:
+    - "Right-click / contextmenu event opens menu at cursor"
+    - "ArrowDown / ArrowUp navigates items"
+    - "Home / End jumps to first / last enabled item"
+    - "Enter / Space selects focused item"
+    - "Escape closes menu and restores focus"
+  aria:
+    - "aria-disabled on disabled items"
+    - "aria-label on menu element"
+  focus:
+    - "First enabled item receives focus on open"
+    - "Focus restored to trigger area on close"
+
+behavior:
+  - Opens at cursor position on right-click (contextmenu event).
+  - Uses Teleport to body to escape stacking contexts.
+  - Closes on click outside, Escape key, or item selection.
+  - Prevents native browser context menu on trigger area.
+  - Uses position fixed for viewport-relative placement.
+
+css:
+  block: tree-context-menu
+  modifiers:
+    - "tree-context-menu--sm"
+    - "tree-context-menu--md"
+    - "tree-context-menu--lg"
+  states:
+    - "is-disabled"
+    - "is-open"
+    - "is-focused (on items)"
+  elements:
+    - "tree-context-menu__menu"
+    - "tree-context-menu__item"

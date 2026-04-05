@@ -3,7 +3,7 @@ import { ref } from 'vue';
 import { TRadio, TRadioGroup } from '@treeui/vue';
 
 const meta = {
-  title: 'Components/Radio',
+  title: 'Components/Data Entry/Radio',
   component: TRadioGroup,
   tags: ['autodocs'],
   args: {

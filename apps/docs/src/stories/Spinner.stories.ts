@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/vue3';
 import { TSpinner } from '@treeui/vue';
 
 const meta = {
-  title: 'Components/Spinner',
+  title: 'Components/Feedback/Spinner',
   component: TSpinner,
   tags: ['autodocs'],
   args: {

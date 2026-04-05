@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/vue3';
 import { TBadge, TButton, TCard } from '@treeui/vue';
 
 const meta = {
-  title: 'Components/Card',
+  title: 'Components/Data Display/Card',
   component: TCard,
   tags: ['autodocs'],
   args: {

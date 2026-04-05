@@ -3,7 +3,7 @@ import { TBadge } from '@treeui/vue';
 import { InfoIcon, iconProps } from './icon-helpers';
 
 const meta = {
-  title: 'Components/Badge',
+  title: 'Components/Data Display/Badge',
   component: TBadge,
   tags: ['autodocs'],
   args: {

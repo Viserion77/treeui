@@ -11,7 +11,7 @@ const fruitOptions = [
 ];
 
 const meta = {
-  title: 'Components/Select',
+  title: 'Components/Data Entry/Select',
   component: TSelect,
   tags: ['autodocs'],
   args: {

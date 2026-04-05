@@ -3,7 +3,7 @@ import { ref } from 'vue';
 import { TDatePicker } from '@treeui/vue';
 
 const meta = {
-  title: 'Components/DatePicker',
+  title: 'Components/Data Entry/DatePicker',
   component: TDatePicker,
   tags: ['autodocs'],
   args: {

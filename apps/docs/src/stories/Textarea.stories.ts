@@ -3,7 +3,7 @@ import { ref } from 'vue';
 import { TTextarea } from '@treeui/vue';
 
 const meta = {
-  title: 'Components/Textarea',
+  title: 'Components/Data Entry/Textarea',
   component: TTextarea,
   tags: ['autodocs'],
   args: {

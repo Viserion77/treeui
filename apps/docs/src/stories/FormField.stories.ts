@@ -3,7 +3,7 @@ import { ref } from 'vue';
 import { TFormField, TInput, TCheckbox } from '@treeui/vue';
 
 const meta = {
-  title: 'Components/FormField',
+  title: 'Components/Data Entry/FormField',
   component: TFormField,
   tags: ['autodocs'],
   args: {

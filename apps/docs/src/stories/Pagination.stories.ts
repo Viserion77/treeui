@@ -3,7 +3,7 @@ import { ref } from 'vue';
 import { TPagination } from '@treeui/vue';
 
 const meta = {
-  title: 'Components/Pagination',
+  title: 'Components/Navigation/Pagination',
   component: TPagination,
   tags: ['autodocs'],
   args: {

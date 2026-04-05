@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/vue3';
 import { TAvatar } from '@treeui/vue';
 
 const meta = {
-  title: 'Components/Avatar',
+  title: 'Components/Data Display/Avatar',
   component: TAvatar,
   tags: ['autodocs'],
   args: {

@@ -3,7 +3,7 @@ import { ref } from 'vue';
 import { TTabs, TTabList, TTab, TTabPanel } from '@treeui/vue';
 
 const meta = {
-  title: 'Components/Tabs',
+  title: 'Components/Navigation/Tabs',
   component: TTabs,
   tags: ['autodocs'],
   args: {

@@ -3,7 +3,7 @@ import { ref } from 'vue';
 import { TSwitch } from '@treeui/vue';
 
 const meta = {
-  title: 'Components/Switch',
+  title: 'Components/Data Entry/Switch',
   component: TSwitch,
   tags: ['autodocs'],
   args: {

@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/vue3';
 import { TSkeleton } from '@treeui/vue';
 
 const meta = {
-  title: 'Components/Skeleton',
+  title: 'Components/Feedback/Skeleton',
   component: TSkeleton,
   tags: ['autodocs'],
   args: {

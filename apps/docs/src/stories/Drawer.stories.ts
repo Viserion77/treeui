@@ -3,7 +3,7 @@ import { ref } from 'vue';
 import { TButton, TDrawer, TInput } from '@treeui/vue';
 
 const meta = {
-  title: 'Components/Drawer',
+  title: 'Components/Overlay/Drawer',
   component: TDrawer,
   tags: ['autodocs'],
   args: {

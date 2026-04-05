@@ -17,7 +17,7 @@ const sampleRows = [
 ];
 
 const meta = {
-  title: 'Components/Table',
+  title: 'Components/Data Display/Table',
   component: TTable,
   tags: ['autodocs'],
   args: {

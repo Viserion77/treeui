@@ -3,7 +3,7 @@ import { ref } from 'vue';
 import { TCheckbox } from '@treeui/vue';
 
 const meta = {
-  title: 'Components/Checkbox',
+  title: 'Components/Data Entry/Checkbox',
   component: TCheckbox,
   tags: ['autodocs'],
   args: {

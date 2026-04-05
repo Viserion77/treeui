@@ -10,7 +10,7 @@ const menuItems = [
 ];
 
 const meta = {
-  title: 'Components/ContextMenu',
+  title: 'Components/Overlay/ContextMenu',
   component: TContextMenu,
   tags: ['autodocs'],
   args: {

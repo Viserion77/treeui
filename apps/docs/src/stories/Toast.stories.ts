@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/vue3';
 import { TButton, TToastProvider, useToast } from '@treeui/vue';
 
 const meta = {
-  title: 'Components/Toast',
+  title: 'Components/Feedback/Toast',
   component: TToastProvider,
   tags: ['autodocs'],
   args: {

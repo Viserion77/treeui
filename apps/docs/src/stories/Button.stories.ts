@@ -3,7 +3,7 @@ import { TButton } from '@treeui/vue';
 import { CheckIcon, iconProps } from './icon-helpers';
 
 const meta = {
-  title: 'Components/Button',
+  title: 'Components/Actions/Button',
   component: TButton,
   tags: ['autodocs'],
   args: {

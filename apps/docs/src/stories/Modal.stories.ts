@@ -3,7 +3,7 @@ import { ref } from 'vue';
 import { TButton, TInput, TModal } from '@treeui/vue';
 
 const meta = {
-  title: 'Components/Modal',
+  title: 'Components/Overlay/Modal',
   component: TModal,
   tags: ['autodocs'],
   args: {

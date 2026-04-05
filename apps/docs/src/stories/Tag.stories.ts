@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/vue3';
 import { TTag } from '@treeui/vue';
 
 const meta = {
-  title: 'Components/Tag',
+  title: 'Components/Data Display/Tag',
   component: TTag,
   tags: ['autodocs'],
   args: {

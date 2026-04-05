@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/vue3';
 import { TProgress } from '@treeui/vue';
 
 const meta = {
-  title: 'Components/Progress',
+  title: 'Components/Feedback/Progress',
   component: TProgress,
   tags: ['autodocs'],
   args: {

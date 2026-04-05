@@ -4,7 +4,7 @@ import { TInput } from '@treeui/vue';
 import { CheckIcon, SearchIcon, iconProps } from './icon-helpers';
 
 const meta = {
-  title: 'Components/Input',
+  title: 'Components/Data Entry/Input',
   component: TInput,
   tags: ['autodocs'],
   args: {

@@ -3,7 +3,7 @@ import { TAlert } from '@treeui/vue';
 import { InfoIcon, iconProps } from './icon-helpers';
 
 const meta = {
-  title: 'Components/Alert',
+  title: 'Components/Feedback/Alert',
   component: TAlert,
   tags: ['autodocs'],
   args: {

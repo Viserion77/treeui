@@ -26,5 +26,5 @@ const classes = computed(() => [
     :role="decorative ? 'none' : 'separator'"
     :aria-orientation="!decorative ? orientation : undefined"
     :aria-label="!decorative ? label : undefined"
-  />
+  >
 </template>

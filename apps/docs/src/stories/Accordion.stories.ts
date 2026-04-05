@@ -3,7 +3,7 @@ import { ref } from 'vue';
 import { TAccordion, TAccordionItem } from '@treeui/vue';
 
 const meta = {
-  title: 'Components/Accordion',
+  title: 'Components/Data Display/Accordion',
   component: TAccordion,
   tags: ['autodocs'],
   args: {

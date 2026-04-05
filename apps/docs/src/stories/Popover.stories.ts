@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/vue3';
 import { TButton, TPopover, TInput } from '@treeui/vue';
 
 const meta = {
-  title: 'Components/Popover',
+  title: 'Components/Overlay/Popover',
   component: TPopover,
   tags: ['autodocs'],
   parameters: {

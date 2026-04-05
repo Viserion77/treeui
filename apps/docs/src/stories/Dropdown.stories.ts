@@ -10,7 +10,7 @@ const menuItems = [
 ];
 
 const meta = {
-  title: 'Components/Dropdown',
+  title: 'Components/Overlay/Dropdown',
   component: TDropdown,
   tags: ['autodocs'],
   args: {

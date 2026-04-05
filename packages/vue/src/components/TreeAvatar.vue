@@ -61,7 +61,7 @@ function onImgError(event: Event) {
       :alt="alt"
       class="tree-avatar__image"
       @error="onImgError"
-    />
+    >
     <span
       v-else
       class="tree-avatar__initials"

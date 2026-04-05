@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/vue3';
 import { TButton, TTooltip } from '@treeui/vue';
 
 const meta = {
-  title: 'Components/Tooltip',
+  title: 'Components/Overlay/Tooltip',
   component: TTooltip,
   tags: ['autodocs'],
   parameters: {

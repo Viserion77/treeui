@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/vue3';
 import { TBreadcrumb, TBreadcrumbItem } from '@treeui/vue';
 
 const meta = {
-  title: 'Components/Breadcrumb',
+  title: 'Components/Navigation/Breadcrumb',
   component: TBreadcrumb,
   tags: ['autodocs'],
   args: {

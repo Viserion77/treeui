@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/vue3';
 import { TDivider } from '@treeui/vue';
 
 const meta = {
-  title: 'Components/Divider',
+  title: 'Components/Layout/Divider',
   component: TDivider,
   tags: ['autodocs'],
   args: {

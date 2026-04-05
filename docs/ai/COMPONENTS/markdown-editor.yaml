@@ -1,0 +1,96 @@
+component: MarkdownEditor
+status: stable
+since: 0.x.x
+description: >
+  A rich Markdown editor with live preview, toolbar formatting,
+  keyboard shortcuts, and image paste/drop upload support.
+
+element: div
+role: textbox (textarea within)
+
+props:
+  modelValue:
+    type: string
+    default: "''"
+    description: Markdown content (v-model)
+  size:
+    type: TreeSize
+    default: md
+    values: [sm, md, lg]
+  disabled:
+    type: boolean
+    default: false
+  placeholder:
+    type: string
+    default: "'Write your markdown here...'"
+  uploadImage:
+    type: "(file: File) => Promise<string>"
+    default: undefined
+    description: >
+      Async function that receives a File and returns the uploaded image URL.
+      When not provided, pasting an image inserts an empty markdown image tag.
+  previewMode:
+    type: string
+    default: split
+    values: [split, tab]
+    description: >
+      "split" shows editor and preview side-by-side.
+      "tab" shows Write/Preview tabs.
+  initialTab:
+    type: string
+    default: write
+    values: [write, preview]
+    description: Initial active tab when previewMode is "tab".
+
+events:
+  update:modelValue:
+    payload: [string]
+    description: Emitted on every content change for v-model binding.
+  image-upload:
+    payload: [File, string]
+    description: Emitted after a successful image upload with the file and resulting URL.
+  image-upload-error:
+    payload: [File, Error]
+    description: Emitted when image upload fails.
+
+slots:
+  toolbar:
+    description: Extra content appended to the toolbar.
+
+keyboard:
+  Ctrl+B: Toggle bold
+  Ctrl+I: Toggle italic
+  Ctrl+K: Insert link
+  Ctrl+E: Toggle inline code
+
+a11y:
+  - Toolbar has role="toolbar" with aria-label.
+  - Tab buttons use role="tab" and aria-selected.
+  - Preview pane has aria-label="Markdown preview".
+  - Upload status bar uses role="status" and aria-live="polite".
+  - All toolbar buttons have title attributes describing the action.
+  - Textarea has aria-label for screen readers.
+
+css:
+  block: tree-md-editor
+  modifiers:
+    - tree-md-editor--sm
+    - tree-md-editor--md
+    - tree-md-editor--lg
+    - tree-md-editor--split
+    - tree-md-editor--tab
+  states:
+    - is-disabled
+    - is-uploading
+  elements:
+    - tree-md-editor__toolbar
+    - tree-md-editor__toolbar-group
+    - tree-md-editor__toolbar-btn
+    - tree-md-editor__toolbar-divider
+    - tree-md-editor__tabs
+    - tree-md-editor__tab
+    - tree-md-editor__body
+    - tree-md-editor__pane
+    - tree-md-editor__textarea
+    - tree-md-editor__preview
+    - tree-md-editor__upload-bar

@@ -36,6 +36,9 @@ import TreeAvatar from './TreeAvatar.vue';
 import TreeDivider from './TreeDivider.vue';
 import TreeTable from './TreeTable.vue';
 import TreeTag from './TreeTag.vue';
+import TreePricingCard from './TreePricingCard.vue';
+import TreePricing from './TreePricing.vue';
+import TreeMarkdownEditor from './TreeMarkdownEditor.vue';
 import { useToast } from '../composables/useToast';
 
 describe('@treeui/vue', () => {
@@ -2188,5 +2191,222 @@ describe('TTabs', () => {
     expect(wrapper.classes()).toContain('is-disabled');
     await wrapper.find('.tree-tag__remove').trigger('click');
     expect(wrapper.emitted('remove')).toBeUndefined();
+  });
+
+  it('renders pricing card with title, price, and features', () => {
+    const wrapper = mount(TreePricingCard, {
+      props: {
+        title: 'Pro',
+        price: 29,
+        currency: '$',
+        period: '/month',
+        features: [
+          { text: 'Unlimited projects', included: true },
+          { text: 'Custom domain', included: false },
+        ],
+        buttonText: 'Get started',
+      },
+    });
+
+    expect(wrapper.find('.tree-pricing-card__title').text()).toBe('Pro');
+    expect(wrapper.find('.tree-pricing-card__amount').text()).toBe('29');
+    expect(wrapper.find('.tree-pricing-card__currency').text()).toBe('$');
+    expect(wrapper.find('.tree-pricing-card__period').text()).toBe('/month');
+    expect(wrapper.findAll('.tree-pricing-card__feature-item')).toHaveLength(2);
+    expect(wrapper.find('.tree-pricing-card__feature-item--excluded').exists()).toBe(true);
+    expect(wrapper.find('.tree-button').text()).toBe('Get started');
+  });
+
+  it('applies highlighted class and badge on pricing card', () => {
+    const wrapper = mount(TreePricingCard, {
+      props: {
+        title: 'Pro',
+        price: 29,
+        highlighted: true,
+        badge: 'Most popular',
+      },
+    });
+
+    expect(wrapper.classes()).toContain('tree-pricing-card--highlighted');
+    expect(wrapper.find('.tree-pricing-card__badge').exists()).toBe(true);
+    expect(wrapper.find('.tree-badge').text()).toBe('Most popular');
+  });
+
+  it('emits select when pricing card button is clicked', async () => {
+    const wrapper = mount(TreePricingCard, {
+      props: {
+        title: 'Pro',
+        price: 29,
+        buttonText: 'Choose',
+      },
+    });
+
+    await wrapper.find('.tree-button').trigger('click');
+    expect(wrapper.emitted('select')).toHaveLength(1);
+  });
+
+  it('renders pricing grid with multiple plans', () => {
+    const wrapper = mount(TreePricing, {
+      props: {
+        plans: [
+          { title: 'Free', price: 0, buttonText: 'Start' },
+          { title: 'Pro', price: 29, highlighted: true, buttonText: 'Choose' },
+          { title: 'Enterprise', price: 99, buttonText: 'Contact' },
+        ],
+      },
+    });
+
+    expect(wrapper.findAll('.tree-pricing-card')).toHaveLength(3);
+    expect(wrapper.find('.tree-pricing-card--highlighted').exists()).toBe(true);
+  });
+
+  it('emits select with plan data from pricing grid', async () => {
+    const plans = [
+      { title: 'Free', price: 0, buttonText: 'Start' },
+      { title: 'Pro', price: 29, buttonText: 'Choose' },
+    ];
+
+    const wrapper = mount(TreePricing, {
+      props: { plans },
+    });
+
+    await wrapper.findAll('.tree-button')[1].trigger('click');
+    expect(wrapper.emitted('select')).toHaveLength(1);
+    expect(wrapper.emitted('select')![0]).toEqual([plans[1], 1]);
+  });
+
+  /* ── MarkdownEditor ── */
+
+  it('renders markdown editor with default classes', () => {
+    const wrapper = mount(TreeMarkdownEditor);
+    expect(wrapper.classes()).toContain('tree-md-editor');
+    expect(wrapper.classes()).toContain('tree-md-editor--md');
+    expect(wrapper.classes()).toContain('tree-md-editor--split');
+  });
+
+  it('emits update:modelValue on textarea input', async () => {
+    const wrapper = mount(TreeMarkdownEditor, {
+      props: { modelValue: '' },
+    });
+
+    const textarea = wrapper.find('.tree-md-editor__textarea');
+    await textarea.setValue('# Hello');
+
+    expect(wrapper.emitted('update:modelValue')).toBeTruthy();
+    expect(wrapper.emitted('update:modelValue')![0]).toEqual(['# Hello']);
+  });
+
+  it('renders markdown preview from modelValue', () => {
+    const wrapper = mount(TreeMarkdownEditor, {
+      props: { modelValue: '# Title\n\nSome **bold** text' },
+    });
+
+    const preview = wrapper.find('.tree-md-editor__preview');
+    expect(preview.html()).toContain('<h1');
+    expect(preview.html()).toContain('Title');
+    expect(preview.html()).toContain('<strong>bold</strong>');
+  });
+
+  it('applies disabled state', () => {
+    const wrapper = mount(TreeMarkdownEditor, {
+      props: { disabled: true },
+    });
+
+    expect(wrapper.classes()).toContain('is-disabled');
+    expect(wrapper.find('.tree-md-editor__textarea').attributes('disabled')).toBeDefined();
+  });
+
+  it('applies size variants', () => {
+    const sm = mount(TreeMarkdownEditor, { props: { size: 'sm' as const } });
+    const lg = mount(TreeMarkdownEditor, { props: { size: 'lg' as const } });
+
+    expect(sm.classes()).toContain('tree-md-editor--sm');
+    expect(lg.classes()).toContain('tree-md-editor--lg');
+  });
+
+  it('shows write/preview tabs in tab mode', () => {
+    const wrapper = mount(TreeMarkdownEditor, {
+      props: { previewMode: 'tab' as const },
+    });
+
+    expect(wrapper.classes()).toContain('tree-md-editor--tab');
+    const tabs = wrapper.findAll('.tree-md-editor__tab');
+    expect(tabs).toHaveLength(2);
+    expect(tabs[0].text()).toBe('Write');
+    expect(tabs[1].text()).toBe('Preview');
+  });
+
+  it('renders headings at different levels in preview', () => {
+    const md = '# H1\n## H2\n### H3';
+    const wrapper = mount(TreeMarkdownEditor, {
+      props: { modelValue: md },
+    });
+
+    const preview = wrapper.find('.tree-md-editor__preview');
+    expect(preview.html()).toContain('<h1');
+    expect(preview.html()).toContain('<h2');
+    expect(preview.html()).toContain('<h3');
+  });
+
+  it('renders code blocks in preview', () => {
+    const md = '```\nconst x = 1;\n```';
+    const wrapper = mount(TreeMarkdownEditor, {
+      props: { modelValue: md },
+    });
+
+    const preview = wrapper.find('.tree-md-editor__preview');
+    expect(preview.html()).toContain('<pre');
+    expect(preview.html()).toContain('const x = 1;');
+  });
+
+  it('renders blockquotes in preview', () => {
+    const wrapper = mount(TreeMarkdownEditor, {
+      props: { modelValue: '> quoted text' },
+    });
+
+    const preview = wrapper.find('.tree-md-editor__preview');
+    expect(preview.html()).toContain('<blockquote');
+    expect(preview.html()).toContain('quoted text');
+  });
+
+  it('renders lists in preview', () => {
+    const wrapper = mount(TreeMarkdownEditor, {
+      props: { modelValue: '- item 1\n- item 2' },
+    });
+
+    const preview = wrapper.find('.tree-md-editor__preview');
+    expect(preview.html()).toContain('<ul');
+    expect(preview.html()).toContain('<li>');
+  });
+
+  it('has accessible toolbar buttons with titles', () => {
+    const wrapper = mount(TreeMarkdownEditor);
+    const buttons = wrapper.findAll('.tree-md-editor__toolbar-btn');
+
+    expect(buttons.length).toBeGreaterThan(0);
+    buttons.forEach((btn) => {
+      expect(btn.attributes('title')).toBeTruthy();
+    });
+  });
+
+  it('calls uploadImage and emits image-upload on paste', async () => {
+    const uploadImage = vi.fn().mockResolvedValue('https://example.com/img.png');
+
+    const wrapper = mount(TreeMarkdownEditor, {
+      props: { modelValue: '', uploadImage },
+    });
+
+    const file = new File(['img'], 'test.png', { type: 'image/png' });
+    const clipboardData = {
+      items: [{ type: 'image/png', getAsFile: () => file }],
+    };
+
+    const textarea = wrapper.find('.tree-md-editor__textarea');
+    await textarea.trigger('paste', { clipboardData });
+
+    // Wait for async upload
+    await new Promise((r) => setTimeout(r, 50));
+
+    expect(uploadImage).toHaveBeenCalledWith(file);
   });
 });

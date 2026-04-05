@@ -35,6 +35,9 @@ export { default as TAvatar } from './TreeAvatar.vue';
 export { default as TDivider } from './TreeDivider.vue';
 export { default as TTable } from './TreeTable.vue';
 export { default as TTag } from './TreeTag.vue';
+export { default as TPricing } from './TreePricing.vue';
+export { default as TPricingCard } from './TreePricingCard.vue';
+export { default as TMarkdownEditor } from './TreeMarkdownEditor.vue';
 
 export { default as TreeAccordion } from './TreeAccordion.vue';
 export { default as TreeAccordionItem } from './TreeAccordionItem.vue';
@@ -73,3 +76,6 @@ export { default as TreeAvatar } from './TreeAvatar.vue';
 export { default as TreeDivider } from './TreeDivider.vue';
 export { default as TreeTable } from './TreeTable.vue';
 export { default as TreeTag } from './TreeTag.vue';
+export { default as TreePricing } from './TreePricing.vue';
+export { default as TreePricingCard } from './TreePricingCard.vue';
+export { default as TreeMarkdownEditor } from './TreeMarkdownEditor.vue';

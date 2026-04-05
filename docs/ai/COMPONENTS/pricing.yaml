@@ -1,0 +1,164 @@
+# Pricing — Component Contract
+# Components: TPricingCard, TPricing
+
+component: PricingCard
+status: stable
+category: data-display
+description: >
+  A card component for displaying pricing plans with title, price, features list,
+  and call-to-action button. Supports highlighted state and badges.
+
+props:
+  title:
+    type: string
+    required: true
+    description: Plan name displayed in the card header.
+
+  description:
+    type: string
+    required: false
+    description: Short plan description below the title.
+
+  price:
+    type: string | number
+    required: true
+    description: The price value to display.
+
+  currency:
+    type: string
+    default: "$"
+    description: Currency symbol displayed before the price.
+
+  period:
+    type: string
+    required: false
+    description: Billing period text (e.g., "/month", "/year").
+
+  features:
+    type: "PricingFeature[]"
+    default: "[]"
+    description: >
+      Array of features to display. Each feature has `text: string` and
+      optional `included: boolean` (defaults to true). Excluded features
+      are shown with strikethrough.
+
+  highlighted:
+    type: boolean
+    default: false
+    description: >
+      When true, the card gets a prominent border and shadow to indicate
+      the recommended plan.
+
+  badge:
+    type: string
+    required: false
+    description: Badge text displayed above the card (e.g., "Most popular").
+
+  buttonText:
+    type: string
+    required: false
+    description: CTA button label. If omitted and no action slot, footer is hidden.
+
+  size:
+    type: TreeSize
+    default: md
+    description: Card size — affects padding, font sizes.
+
+  disabled:
+    type: boolean
+    default: false
+    description: Disables the CTA button.
+
+events:
+  select:
+    payload: "[]"
+    description: Emitted when the CTA button is clicked.
+
+slots:
+  header:
+    description: Custom header content replacing title and description.
+  price:
+    description: Custom price display replacing currency, amount, and period.
+  features:
+    description: Custom features list replacing the built-in feature list.
+  action:
+    description: Custom CTA area replacing the built-in button.
+  badge:
+    description: Custom badge content replacing the built-in badge.
+
+css-classes:
+  root: tree-pricing-card
+  modifiers:
+    - tree-pricing-card--sm
+    - tree-pricing-card--md
+    - tree-pricing-card--lg
+    - tree-pricing-card--highlighted
+  elements:
+    - tree-pricing-card__badge
+    - tree-pricing-card__header
+    - tree-pricing-card__title
+    - tree-pricing-card__description
+    - tree-pricing-card__price
+    - tree-pricing-card__currency
+    - tree-pricing-card__amount
+    - tree-pricing-card__period
+    - tree-pricing-card__features
+    - tree-pricing-card__feature-list
+    - tree-pricing-card__feature-item
+    - tree-pricing-card__feature-item--excluded
+    - tree-pricing-card__feature-icon
+    - tree-pricing-card__action
+
+a11y:
+  - Uses semantic <article> element as root.
+  - Uses <h3> for plan title.
+  - Feature list uses role="list" with <ul>/<li>.
+  - Feature icons are aria-hidden="true".
+  - CTA button inherits TreeButton a11y (disabled, aria-busy).
+
+---
+
+component: Pricing
+status: stable
+category: data-display
+description: >
+  Grid wrapper that renders multiple PricingCard components from an array
+  of plan objects.
+
+props:
+  plans:
+    type: "PricingPlan[]"
+    required: true
+    description: >
+      Array of plan objects. Each plan supports the same props as PricingCard
+      (title, description, price, currency, period, features, highlighted,
+      badge, buttonText, disabled).
+
+  size:
+    type: TreeSize
+    default: md
+    description: Size applied to all child pricing cards.
+
+  columns:
+    type: number
+    required: false
+    description: >
+      Number of grid columns. Defaults to the number of plans.
+
+events:
+  select:
+    payload: "[plan: PricingPlan, index: number]"
+    description: Emitted when any plan's CTA is clicked. Provides the plan data and index.
+
+slots:
+  plan:
+    scoped: true
+    bindings: "{ plan: PricingPlan, index: number }"
+    description: Custom rendering for each plan card.
+
+css-classes:
+  root: tree-pricing
+
+a11y:
+  - Uses role="list" on grid container.
+  - Each plan is wrapped in role="listitem".

@@ -24,6 +24,27 @@ a11y:
   uses_ol_for_ordered_list: true
   interactive_by_default: false
 
+sub_components:
+  TBreadcrumbItem:
+    legacy_alias: TreeBreadcrumbItem
+    source_file: packages/vue/src/components/TreeBreadcrumbItem.vue
+    purpose: "Individual breadcrumb link or current-page indicator."
+    props:
+      href:
+        type: string
+        required: false
+        description: "URL the breadcrumb item links to. Omit for the current/last item."
+      current:
+        type: boolean
+        default: false
+        description: "Marks this item as the current page. Automatically set if it's the last item without href."
+    slots:
+      - default
+        note: "Label text for the breadcrumb item."
+    a11y:
+      renders_anchor_when_href_present: true
+      renders_span_with_aria_current_page_when_current: true
+
 notes:
   - "Renders a <nav> with aria-label='Breadcrumb' wrapping an <ol>."
   - "Each item is an <li>. The last item uses aria-current='page'."

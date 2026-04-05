@@ -1,0 +1,60 @@
+name: TAlert
+legacy_alias: TreeAlert
+source_file: packages/vue/src/components/TreeAlert.vue
+package: "@treeui/vue"
+kind: feedback
+status: available
+purpose: "Inline status banner for info, success, warning, and danger messages."
+
+props:
+  variant:
+    type: "'info' | 'success' | 'warning' | 'danger'"
+    default: info
+    values: [info, success, warning, danger]
+  size:
+    type: TreeSize
+    default: md
+    values: [sm, md, lg]
+  dismissible:
+    type: boolean
+    default: false
+
+events:
+  - name: dismiss
+    payload: none
+    description: "Emitted when the dismiss button is clicked."
+
+slots:
+  - name: default
+    description: "Alert message content."
+  - name: icon
+    description: "Optional leading icon; rendered with aria-hidden."
+  - name: dismiss-icon
+    description: "Custom dismiss button content; replaces the default × icon."
+
+a11y:
+  role: alert
+  icon_slot_marked_aria_hidden: true
+  dismiss_button_aria_label: "Dismiss"
+  keyboard: "Tab to dismiss button, Enter/Space to activate"
+
+css:
+  block: tree-alert
+  modifiers:
+    - tree-alert--info
+    - tree-alert--success
+    - tree-alert--warning
+    - tree-alert--danger
+    - tree-alert--sm
+    - tree-alert--md
+    - tree-alert--lg
+  elements:
+    - tree-alert__icon
+    - tree-alert__content
+    - tree-alert__dismiss
+
+example: |
+  <TAlert variant="warning" dismissible @dismiss="handleDismiss">
+    <template #icon><WarningIcon /></template>
+    Please review your input before submitting.
+  </TAlert>

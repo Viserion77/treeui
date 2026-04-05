@@ -1,0 +1,106 @@
+name: TToast
+legacy_alias: TreeToast
+source_file: packages/vue/src/components/TreeToast.vue
+provider_source_file: packages/vue/src/components/TreeToastProvider.vue
+composable_source_file: packages/vue/src/composables/useToast.ts
+package: "@treeui/vue"
+kind: feedback
+status: available
+purpose: "Ephemeral notification stack driven by a composable. Renders toast items inside a positioned container with auto-dismiss and manual close."
+
+composable:
+  name: useToast
+  returns:
+    toasts:
+      type: "DeepReadonly<Ref<ToastItem[]>>"
+    add:
+      type: "(options: ToastOptions) => string"
+      description: "Add a toast; returns its id."
+    remove:
+      type: "(id: string) => void"
+      description: "Dismiss a single toast by id."
+    clear:
+      type: "() => void"
+      description: "Dismiss all toasts."
+
+types:
+  ToastVariant:
+    values: [info, success, warning, danger]
+  ToastPosition:
+    values: [top-right, top-left, top-center, bottom-right, bottom-left, bottom-center]
+  ToastOptions:
+    title: { type: string, required: true }
+    description: { type: string, required: false }
+    variant: { type: ToastVariant, default: info }
+    duration: { type: number, default: 5000 }
+    closable: { type: boolean, default: true }
+  ToastItem:
+    extends: ToastOptions
+    id: { type: string, auto: true }
+
+provider_props:
+  position:
+    type: ToastPosition
+    default: bottom-right
+  max:
+    type: number
+    default: 5
+
+toast_props:
+  toast:
+    type: ToastItem
+    required: true
+
+toast_events:
+  - close
+
+a11y:
+  role: status
+  aria_live: polite
+  aria_relevant: "additions removals"
+  aria_labelledby: auto_title_id
+  aria_describedby: auto_description_id
+  close_button_label: "Dismiss notification"
+
+behavior:
+  uses_teleport_to_body: true
+  auto_dismiss_after_duration: true
+  duration_zero_is_persistent: true
+  max_limits_visible_toasts: true
+  newest_toasts_appear_last: true
+
+css_classes:
+  provider: tree-toast-provider
+  provider_positions:
+    - tree-toast-provider--top-right
+    - tree-toast-provider--top-left
+    - tree-toast-provider--top-center
+    - tree-toast-provider--bottom-right
+    - tree-toast-provider--bottom-left
+    - tree-toast-provider--bottom-center
+  toast: tree-toast
+  variants:
+    - tree-toast--info
+    - tree-toast--success
+    - tree-toast--warning
+    - tree-toast--danger
+  elements:
+    - tree-toast__icon
+    - tree-toast__content
+    - tree-toast__title
+    - tree-toast__description
+    - tree-toast__close
+
+z_index: var(--tree-z-toast)
+
+example: |
+  <script setup>
+  import { TButton, TToastProvider, useToast } from '@treeui/vue';
+  const toast = useToast();
+  </script>
+  <template>
+    <TToastProvider position="bottom-right" />
+    <TButton @click="toast.add({ title: 'Saved!', variant: 'success' })">
+      Save
+    </TButton>
+  </template>

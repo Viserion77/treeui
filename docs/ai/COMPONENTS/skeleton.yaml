@@ -1,0 +1,41 @@
+name: TSkeleton
+legacy_alias: TreeSkeleton
+source_file: packages/vue/src/components/TreeSkeleton.vue
+package: "@treeui/vue"
+kind: feedback
+status: available
+purpose: "Placeholder shimmer for loading states. Renders an animated block that indicates content is being loaded."
+
+props:
+  variant:
+    type: '"text" | "circular" | "rectangular"'
+    default: text
+    values: [text, circular, rectangular]
+    description: "Shape of the skeleton placeholder."
+  width:
+    type: string
+    default: '"100%"'
+    description: "CSS width of the skeleton element."
+  height:
+    type: string
+    default: undefined
+    description: "CSS height. Defaults vary by variant: text uses line-height, circular uses width."
+  animation:
+    type: '"pulse" | "wave" | "none"'
+    default: pulse
+    values: [pulse, wave, none]
+    description: "Animation style for the shimmer effect."
+
+events: []
+
+slots:
+  default:
+    description: "When provided, skeleton wraps children and hides them while loading prop is true."
+
+a11y:
+  aria_hidden: true
+  aria_busy_on_parent: "recommended"
+  role: none
+  notes: "Skeleton is purely decorative. Use aria-busy on the parent container."
+
+example: '<TSkeleton variant="text" width="60%" />'

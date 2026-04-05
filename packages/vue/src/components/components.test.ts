@@ -2,6 +2,7 @@ import { nextTick } from 'vue';
 import { mount } from '@vue/test-utils';
 import TreeBadge from './TreeBadge.vue';
 import TreeButton from './TreeButton.vue';
+import TreeAlert from './TreeAlert.vue';
 import TreeCard from './TreeCard.vue';
 import TreeCheckbox from './TreeCheckbox.vue';
 import TreeDatePicker from './TreeDatePicker.vue';
@@ -15,6 +16,10 @@ import TreeRadioGroup from './TreeRadioGroup.vue';
 import TreeSelect from './TreeSelect.vue';
 import TreeFormField from './TreeFormField.vue';
 import TreeSwitch from './TreeSwitch.vue';
+import TreeSkeleton from './TreeSkeleton.vue';
+import TreeProgress from './TreeProgress.vue';
+import TreeToastProvider from './TreeToastProvider.vue';
+import { useToast } from '../composables/useToast';
 
 describe('@treeui/vue', () => {
   it('renders button states and blocks clicks while loading', async () => {
@@ -854,5 +859,294 @@ describe('@treeui/vue', () => {
 
     expect(sm.classes()).toContain('tree-form-field--sm');
     expect(lg.classes()).toContain('tree-form-field--lg');
+  });
+
+  it('renders progress bar with determinate value', () => {
+    const wrapper = mount(TreeProgress, {
+      props: { value: 60, label: 'Upload progress' },
+    });
+
+    expect(wrapper.classes()).toContain('tree-progress');
+    expect(wrapper.classes()).toContain('tree-progress--md');
+    expect(wrapper.classes()).toContain('tree-progress--bar');
+    expect(wrapper.attributes('role')).toBe('progressbar');
+    expect(wrapper.attributes('aria-valuenow')).toBe('60');
+    expect(wrapper.attributes('aria-valuemin')).toBe('0');
+    expect(wrapper.attributes('aria-valuemax')).toBe('100');
+    expect(wrapper.attributes('aria-label')).toBe('Upload progress');
+    expect(wrapper.find('.tree-progress__fill').exists()).toBe(true);
+  });
+
+  it('renders progress bar as indeterminate when no value', () => {
+    const wrapper = mount(TreeProgress, {
+      props: { label: 'Loading' },
+    });
+
+    expect(wrapper.classes()).toContain('tree-progress--indeterminate');
+    expect(wrapper.attributes('aria-valuenow')).toBeUndefined();
+  });
+
+  it('renders progress ring variant', () => {
+    const wrapper = mount(TreeProgress, {
+      props: { value: 50, variant: 'ring' as const, label: 'Half done' },
+    });
+
+    expect(wrapper.classes()).toContain('tree-progress--ring');
+    expect(wrapper.find('.tree-progress__ring').exists()).toBe(true);
+    expect(wrapper.find('svg').exists()).toBe(true);
+  });
+
+  it('renders progress sizes', () => {
+    const sm = mount(TreeProgress, {
+      props: { value: 30, size: 'sm' as const },
+    });
+    const lg = mount(TreeProgress, {
+      props: { value: 30, size: 'lg' as const },
+    });
+
+    expect(sm.classes()).toContain('tree-progress--sm');
+    expect(lg.classes()).toContain('tree-progress--lg');
+  });
+
+  it('clamps progress value between 0 and 100', () => {
+    const over = mount(TreeProgress, {
+      props: { value: 150 },
+    });
+    expect(over.attributes('aria-valuenow')).toBe('100');
+
+    const under = mount(TreeProgress, {
+      props: { value: -10 },
+    });
+    expect(under.attributes('aria-valuenow')).toBe('0');
+  });
+
+  it('renders alert with role and variant class', () => {
+    const wrapper = mount(TreeAlert, {
+      props: {
+        variant: 'danger',
+      },
+      slots: {
+        default: 'Something went wrong!',
+      },
+    });
+
+    expect(wrapper.attributes('role')).toBe('alert');
+    expect(wrapper.classes()).toContain('tree-alert');
+    expect(wrapper.classes()).toContain('tree-alert--danger');
+    expect(wrapper.text()).toContain('Something went wrong!');
+  });
+
+  it('renders alert sizes', () => {
+    const sm = mount(TreeAlert, {
+      props: { size: 'sm' as const },
+      slots: { default: 'Small' },
+    });
+    const lg = mount(TreeAlert, {
+      props: { size: 'lg' as const },
+      slots: { default: 'Large' },
+    });
+
+    expect(sm.classes()).toContain('tree-alert--sm');
+    expect(lg.classes()).toContain('tree-alert--lg');
+  });
+
+  it('renders alert icon slot with aria-hidden', () => {
+    const wrapper = mount(TreeAlert, {
+      slots: {
+        default: 'Info message',
+        icon: '<svg data-testid="icon"></svg>',
+      },
+    });
+
+    const iconSlot = wrapper.find('.tree-alert__icon');
+    expect(iconSlot.exists()).toBe(true);
+    expect(iconSlot.attributes('aria-hidden')).toBe('true');
+  });
+
+  it('shows dismiss button and emits dismiss event', async () => {
+    const wrapper = mount(TreeAlert, {
+      props: {
+        dismissible: true,
+      },
+      slots: {
+        default: 'Closable alert',
+      },
+    });
+
+    const dismissBtn = wrapper.find('.tree-alert__dismiss');
+    expect(dismissBtn.exists()).toBe(true);
+    expect(dismissBtn.attributes('aria-label')).toBe('Dismiss');
+
+    await dismissBtn.trigger('click');
+    expect(wrapper.emitted('dismiss')).toHaveLength(1);
+  });
+
+  it('does not show dismiss button when not dismissible', () => {
+    const wrapper = mount(TreeAlert, {
+      slots: {
+        default: 'Not closable',
+      },
+    });
+
+    expect(wrapper.find('.tree-alert__dismiss').exists()).toBe(false);
+  });
+
+  it('renders skeleton with default text variant', () => {
+    const wrapper = mount(TreeSkeleton);
+    expect(wrapper.classes()).toContain('tree-skeleton');
+    expect(wrapper.classes()).toContain('tree-skeleton--text');
+    expect(wrapper.classes()).toContain('tree-skeleton--pulse');
+    expect(wrapper.attributes('aria-hidden')).toBe('true');
+  });
+
+  it('renders skeleton circular variant', () => {
+    const wrapper = mount(TreeSkeleton, {
+      props: { variant: 'circular', width: '3rem' },
+    });
+    expect(wrapper.classes()).toContain('tree-skeleton--circular');
+    expect(wrapper.element.style.width).toBe('3rem');
+    expect(wrapper.element.style.height).toBe('3rem');
+  });
+
+  it('renders skeleton rectangular variant', () => {
+    const wrapper = mount(TreeSkeleton, {
+      props: { variant: 'rectangular', width: '100%', height: '8rem' },
+    });
+    expect(wrapper.classes()).toContain('tree-skeleton--rectangular');
+    expect(wrapper.element.style.height).toBe('8rem');
+  });
+
+  it('renders skeleton wave animation', () => {
+    const wrapper = mount(TreeSkeleton, {
+      props: { animation: 'wave' },
+    });
+    expect(wrapper.classes()).toContain('tree-skeleton--wave');
+    expect(wrapper.classes()).not.toContain('tree-skeleton--pulse');
+  });
+
+  it('renders skeleton without animation', () => {
+    const wrapper = mount(TreeSkeleton, {
+      props: { animation: 'none' },
+    });
+    expect(wrapper.classes()).not.toContain('tree-skeleton--pulse');
+    expect(wrapper.classes()).not.toContain('tree-skeleton--wave');
+  });
+
+  it('renders skeleton with slot content', () => {
+    const wrapper = mount(TreeSkeleton, {
+      slots: { default: '<span>Loading content</span>' },
+    });
+    expect(wrapper.text()).toContain('Loading content');
+  });
+
+  it('renders toast notifications via useToast composable', async () => {
+    const toast = useToast();
+    toast.clear();
+
+    const wrapper = mount(TreeToastProvider, {
+      attachTo: document.body,
+      props: { position: 'bottom-right' },
+    });
+
+    toast.add({
+      title: 'Changes saved',
+      description: 'Your settings have been updated.',
+      variant: 'success',
+      duration: 0,
+    });
+
+    await nextTick();
+
+    const toastEl = document.querySelector('.tree-toast');
+    expect(toastEl).not.toBeNull();
+    expect(toastEl?.classList.contains('tree-toast--success')).toBe(true);
+    expect(toastEl?.getAttribute('role')).toBe('status');
+    expect(toastEl?.textContent).toContain('Changes saved');
+    expect(toastEl?.textContent).toContain('Your settings have been updated.');
+
+    toast.clear();
+    await nextTick();
+    expect(document.querySelector('.tree-toast')).toBeNull();
+
+    wrapper.unmount();
+  });
+
+  it('removes a single toast by id and respects closable', async () => {
+    const toast = useToast();
+    toast.clear();
+
+    const wrapper = mount(TreeToastProvider, {
+      attachTo: document.body,
+    });
+
+    const id = toast.add({
+      title: 'Removable',
+      variant: 'info',
+      duration: 0,
+      closable: true,
+    });
+
+    await nextTick();
+
+    const closeBtn = document.querySelector('.tree-toast__close');
+    expect(closeBtn).not.toBeNull();
+    expect(closeBtn?.getAttribute('aria-label')).toBe('Dismiss notification');
+
+    toast.remove(id);
+    await nextTick();
+
+    expect(document.querySelector('.tree-toast')).toBeNull();
+
+    wrapper.unmount();
+  });
+
+  it('renders toast with all four variants', async () => {
+    const toast = useToast();
+    toast.clear();
+
+    const wrapper = mount(TreeToastProvider, {
+      attachTo: document.body,
+    });
+
+    toast.add({ title: 'Info', variant: 'info', duration: 0 });
+    toast.add({ title: 'Success', variant: 'success', duration: 0 });
+    toast.add({ title: 'Warning', variant: 'warning', duration: 0 });
+    toast.add({ title: 'Danger', variant: 'danger', duration: 0 });
+
+    await nextTick();
+
+    const toasts = document.querySelectorAll('.tree-toast');
+    expect(toasts).toHaveLength(4);
+    expect(toasts[0]?.classList.contains('tree-toast--info')).toBe(true);
+    expect(toasts[1]?.classList.contains('tree-toast--success')).toBe(true);
+    expect(toasts[2]?.classList.contains('tree-toast--warning')).toBe(true);
+    expect(toasts[3]?.classList.contains('tree-toast--danger')).toBe(true);
+
+    toast.clear();
+    wrapper.unmount();
+  });
+
+  it('limits visible toasts to max prop', async () => {
+    const toast = useToast();
+    toast.clear();
+
+    const wrapper = mount(TreeToastProvider, {
+      attachTo: document.body,
+      props: { max: 2 },
+    });
+
+    toast.add({ title: 'First', variant: 'info', duration: 0 });
+    toast.add({ title: 'Second', variant: 'info', duration: 0 });
+    toast.add({ title: 'Third', variant: 'info', duration: 0 });
+
+    await nextTick();
+
+    const toasts = document.querySelectorAll('.tree-toast');
+    expect(toasts).toHaveLength(2);
+    expect(toasts[0]?.textContent).toContain('Second');
+    expect(toasts[1]?.textContent).toContain('Third');
+
+    toast.clear();
+    wrapper.unmount();
   });
 });

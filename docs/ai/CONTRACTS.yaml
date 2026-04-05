@@ -6,6 +6,7 @@ legacy_alias_status: "compatibility_only"
 source_component_filename_prefix: "Tree"
 
 primary_exports:
+  - TAlert
   - TBadge
   - TButton
   - TCard
@@ -17,11 +18,15 @@ primary_exports:
   - TRadio
   - TRadioGroup
   - TSelect
+  - TSkeleton
   - TSpinner
   - TSwitch
+  - TToast
+  - TToastProvider
   - TTooltip
 
 compatibility_aliases:
+  TAlert: TreeAlert
   TBadge: TreeBadge
   TButton: TreeButton
   TCard: TreeCard
@@ -33,8 +38,11 @@ compatibility_aliases:
   TRadio: TreeRadio
   TRadioGroup: TreeRadioGroup
   TSelect: TreeSelect
+  TSkeleton: TreeSkeleton
   TSpinner: TreeSpinner
   TSwitch: TreeSwitch
+  TToast: TreeToast
+  TToastProvider: TreeToastProvider
   TTooltip: TreeTooltip
 
 shared_sizes:

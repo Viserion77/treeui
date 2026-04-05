@@ -18,6 +18,16 @@ import TreeFormField from './TreeFormField.vue';
 import TreeSwitch from './TreeSwitch.vue';
 import TreeSkeleton from './TreeSkeleton.vue';
 import TreeProgress from './TreeProgress.vue';
+import TreePagination from './TreePagination.vue';
+import TreeAccordion from './TreeAccordion.vue';
+import TreeAccordionItem from './TreeAccordionItem.vue';
+import TreeBreadcrumb from './TreeBreadcrumb.vue';
+import TreeBreadcrumbItem from './TreeBreadcrumbItem.vue';
+import TreeDropdown from './TreeDropdown.vue';
+import TreeTabs from './TreeTabs.vue';
+import TreeTabList from './TreeTabList.vue';
+import TreeTab from './TreeTab.vue';
+import TreeTabPanel from './TreeTabPanel.vue';
 import TreeToastProvider from './TreeToastProvider.vue';
 import { useToast } from '../composables/useToast';
 
@@ -1148,5 +1158,555 @@ describe('@treeui/vue', () => {
 
     toast.clear();
     wrapper.unmount();
+  });
+
+  it('renders breadcrumb with nav and aria-label', () => {
+    const wrapper = mount(TreeBreadcrumb, {
+      slots: {
+        default: '<li>Home</li>',
+      },
+    });
+
+    expect(wrapper.element.tagName).toBe('NAV');
+    expect(wrapper.attributes('aria-label')).toBe('Breadcrumb');
+    expect(wrapper.classes()).toContain('tree-breadcrumb');
+    expect(wrapper.find('ol.tree-breadcrumb__list').exists()).toBe(true);
+  });
+
+  it('renders breadcrumb items with links and current page', () => {
+    const wrapper = mount(TreeBreadcrumb, {
+      slots: {
+        default: [
+          `<li class="tree-breadcrumb__item"><a href="/" class="tree-breadcrumb__link">Home</a></li>`,
+          `<li class="tree-breadcrumb__item"><span class="tree-breadcrumb__current" aria-current="page">Current</span></li>`,
+        ],
+      },
+    });
+
+    const link = wrapper.find('.tree-breadcrumb__link');
+    expect(link.exists()).toBe(true);
+    expect(link.attributes('href')).toBe('/');
+
+    const current = wrapper.find('.tree-breadcrumb__current');
+    expect(current.exists()).toBe(true);
+    expect(current.attributes('aria-current')).toBe('page');
+  });
+
+  it('renders breadcrumb item as link when href is provided', () => {
+    const wrapper = mount(TreeBreadcrumbItem, {
+      props: { href: '/products' },
+      slots: { default: 'Products' },
+    });
+
+    const link = wrapper.find('a.tree-breadcrumb__link');
+    expect(link.exists()).toBe(true);
+    expect(link.attributes('href')).toBe('/products');
+    expect(link.text()).toBe('Products');
+    expect(wrapper.find('[aria-current]').exists()).toBe(false);
+  });
+
+  it('renders breadcrumb item as current when no href', () => {
+    const wrapper = mount(TreeBreadcrumbItem, {
+      slots: { default: 'Current Page' },
+    });
+
+    expect(wrapper.find('a').exists()).toBe(false);
+    const current = wrapper.find('span.tree-breadcrumb__current');
+    expect(current.exists()).toBe(true);
+    expect(current.attributes('aria-current')).toBe('page');
+    expect(current.text()).toBe('Current Page');
+  });
+
+  it('applies custom separator via CSS variable', () => {
+    const wrapper = mount(TreeBreadcrumb, {
+      props: { separator: '›' },
+      slots: { default: '<li>Home</li>' },
+    });
+
+    const ol = wrapper.find('ol.tree-breadcrumb__list');
+    expect(ol.attributes('style')).toContain("--tree-breadcrumb-separator: '›'");
+  });
+
+  // ── Accordion ─────────────────────────────────────────────
+
+  function mountAccordion(props: Record<string, unknown> = {}) {
+    return mount(TreeAccordion, {
+      attachTo: document.body,
+      props: {
+        type: 'single' as const,
+        collapsible: true,
+        ...props,
+      },
+      slots: {
+        default: {
+          components: { TreeAccordionItem },
+          template: `
+            <TreeAccordionItem value="item-1">
+              <template #trigger>First</template>
+              Content 1
+            </TreeAccordionItem>
+            <TreeAccordionItem value="item-2">
+              <template #trigger>Second</template>
+              Content 2
+            </TreeAccordionItem>
+            <TreeAccordionItem value="item-3" disabled>
+              <template #trigger>Third (disabled)</template>
+              Content 3
+            </TreeAccordionItem>
+          `,
+        },
+      },
+    });
+  }
+
+  it('renders accordion with items and aria attributes', () => {
+    const wrapper = mountAccordion();
+
+    const triggers = wrapper.findAll('.tree-accordion__trigger');
+    expect(triggers).toHaveLength(3);
+    expect(triggers[0].attributes('aria-expanded')).toBe('false');
+    expect(triggers[0].text()).toContain('First');
+  });
+
+  it('opens an item on click and sets aria-expanded', async () => {
+    const wrapper = mountAccordion();
+
+    const trigger = wrapper.findAll('.tree-accordion__trigger')[0];
+    await trigger.trigger('click');
+
+    expect(trigger.attributes('aria-expanded')).toBe('true');
+    expect(wrapper.find('.tree-accordion__content').exists()).toBe(true);
+    expect(wrapper.find('.tree-accordion__panel').text()).toContain('Content 1');
+  });
+
+  it('single mode closes previous item when opening another', async () => {
+    const wrapper = mountAccordion();
+
+    const triggers = wrapper.findAll('.tree-accordion__trigger');
+    await triggers[0].trigger('click');
+    expect(triggers[0].attributes('aria-expanded')).toBe('true');
+
+    await triggers[1].trigger('click');
+    expect(triggers[0].attributes('aria-expanded')).toBe('false');
+    expect(triggers[1].attributes('aria-expanded')).toBe('true');
+  });
+
+  it('collapsible single mode allows closing open item', async () => {
+    const wrapper = mountAccordion({ collapsible: true });
+
+    const trigger = wrapper.findAll('.tree-accordion__trigger')[0];
+    await trigger.trigger('click');
+    expect(trigger.attributes('aria-expanded')).toBe('true');
+
+    await trigger.trigger('click');
+    expect(trigger.attributes('aria-expanded')).toBe('false');
+  });
+
+  it('disabled item cannot be toggled', async () => {
+    const wrapper = mountAccordion();
+
+    const disabledTrigger = wrapper.findAll('.tree-accordion__trigger')[2];
+    await disabledTrigger.trigger('click');
+
+    expect(disabledTrigger.attributes('aria-expanded')).toBe('false');
+    expect(wrapper.findAll('.tree-accordion__item')[2].classes()).toContain('is-disabled');
+  });
+
+  it('multiple mode allows several items open at once', async () => {
+    const wrapper = mount(TreeAccordion, {
+      attachTo: document.body,
+      props: { type: 'multiple' as const },
+      slots: {
+        default: {
+          components: { TreeAccordionItem },
+          template: `
+            <TreeAccordionItem value="a">
+              <template #trigger>A</template>
+              Content A
+            </TreeAccordionItem>
+            <TreeAccordionItem value="b">
+              <template #trigger>B</template>
+              Content B
+            </TreeAccordionItem>
+          `,
+        },
+      },
+    });
+
+    const triggers = wrapper.findAll('.tree-accordion__trigger');
+    await triggers[0].trigger('click');
+    await triggers[1].trigger('click');
+
+    expect(triggers[0].attributes('aria-expanded')).toBe('true');
+    expect(triggers[1].attributes('aria-expanded')).toBe('true');
+  });
+
+  it('panel has region role and aria-labelledby linking to trigger', async () => {
+    const wrapper = mountAccordion();
+
+    await wrapper.findAll('.tree-accordion__trigger')[0].trigger('click');
+
+    const panel = wrapper.find('.tree-accordion__content');
+    expect(panel.attributes('role')).toBe('region');
+
+    const triggerId = wrapper.findAll('.tree-accordion__trigger')[0].attributes('id');
+    expect(panel.attributes('aria-labelledby')).toBe(triggerId);
+  });
+
+  it('emits update:modelValue when item is toggled', async () => {
+    const wrapper = mountAccordion();
+
+    await wrapper.findAll('.tree-accordion__trigger')[0].trigger('click');
+    expect(wrapper.emitted('update:modelValue')?.[0]).toEqual(['item-1']);
+  });
+
+  /* ── TPagination ───────── */
+
+  it('renders pagination with correct number of page buttons', () => {
+    const wrapper = mount(TreePagination, {
+      props: { totalPages: 3, modelValue: 1 },
+    });
+    expect(wrapper.find('.tree-pagination').exists()).toBe(true);
+    expect(wrapper.find('nav').attributes('aria-label')).toBe('Pagination');
+    const buttons = wrapper.findAll('.tree-pagination__button').filter(b => !b.classes().includes('tree-pagination__button--prev') && !b.classes().includes('tree-pagination__button--next'));
+    expect(buttons.length).toBe(3);
+  });
+
+  it('marks the active page with aria-current', () => {
+    const wrapper = mount(TreePagination, {
+      props: { totalPages: 5, modelValue: 3 },
+    });
+    const activeBtn = wrapper.find('[aria-current="page"]');
+    expect(activeBtn.exists()).toBe(true);
+    expect(activeBtn.text()).toBe('3');
+    expect(activeBtn.classes()).toContain('is-active');
+  });
+
+  it('emits update:modelValue when a page button is clicked', async () => {
+    const wrapper = mount(TreePagination, {
+      props: { totalPages: 3, modelValue: 1 },
+    });
+    const pageButtons = wrapper.findAll('.tree-pagination__button').filter(b => !b.classes().includes('tree-pagination__button--prev') && !b.classes().includes('tree-pagination__button--next'));
+    await pageButtons[1]!.trigger('click');
+    expect(wrapper.emitted('update:modelValue')?.[0]).toEqual([2]);
+  });
+
+  it('disables previous button on first page', () => {
+    const wrapper = mount(TreePagination, {
+      props: { totalPages: 5, modelValue: 1 },
+    });
+    const prevBtn = wrapper.find('.tree-pagination__button--prev');
+    expect((prevBtn.element as HTMLButtonElement).disabled).toBe(true);
+  });
+
+  it('disables next button on last page', () => {
+    const wrapper = mount(TreePagination, {
+      props: { totalPages: 5, modelValue: 5 },
+    });
+    const nextBtn = wrapper.find('.tree-pagination__button--next');
+    expect((nextBtn.element as HTMLButtonElement).disabled).toBe(true);
+  });
+
+  it('applies size classes', () => {
+    const wrapper = mount(TreePagination, {
+      props: { totalPages: 5, modelValue: 1, size: 'lg' },
+    });
+    expect(wrapper.find('.tree-pagination').classes()).toContain('tree-pagination--lg');
+  });
+
+  it('renders ellipsis for many pages', () => {
+    const wrapper = mount(TreePagination, {
+      props: { totalPages: 20, modelValue: 10, siblings: 1 },
+    });
+    const ellipses = wrapper.findAll('.tree-pagination__ellipsis');
+    expect(ellipses.length).toBe(2);
+  });
+
+  it('disables all buttons when disabled prop is set', () => {
+    const wrapper = mount(TreePagination, {
+      props: { totalPages: 5, modelValue: 3, disabled: true },
+    });
+    expect(wrapper.find('.tree-pagination').classes()).toContain('is-disabled');
+    const buttons = wrapper.findAll('button');
+    buttons.forEach(btn => {
+      expect((btn.element as HTMLButtonElement).disabled).toBe(true);
+    });
+  });
+
+  // ── Dropdown ──────────────────────────────────────────────
+
+  it('renders dropdown with items and emits select on click', async () => {
+    const wrapper = mount(TreeDropdown, {
+      props: {
+        label: 'Actions',
+        items: [
+          { label: 'Edit', value: 'edit' },
+          { label: 'Delete', value: 'delete' },
+        ],
+      },
+    });
+
+    expect(wrapper.classes()).toContain('tree-dropdown');
+    const trigger = wrapper.get('button');
+    expect(trigger.attributes('aria-haspopup')).toBe('menu');
+    expect(trigger.attributes('aria-expanded')).toBe('false');
+
+    // Open dropdown
+    await trigger.trigger('click');
+    expect(trigger.attributes('aria-expanded')).toBe('true');
+    const items = wrapper.findAll('[role="menuitem"]');
+    expect(items.length).toBe(2);
+    expect(items[0].text()).toBe('Edit');
+
+    // Select an item
+    await items[1].trigger('click');
+    expect(wrapper.emitted('select')?.[0]).toEqual(['delete']);
+  });
+
+  it('renders dropdown sizes', () => {
+    const sm = mount(TreeDropdown, {
+      props: { size: 'sm' as const, label: 'SM', items: [] },
+    });
+    const lg = mount(TreeDropdown, {
+      props: { size: 'lg' as const, label: 'LG', items: [] },
+    });
+
+    expect(sm.classes()).toContain('tree-dropdown--sm');
+    expect(lg.classes()).toContain('tree-dropdown--lg');
+  });
+
+  it('applies disabled state to dropdown', () => {
+    const wrapper = mount(TreeDropdown, {
+      props: {
+        disabled: true,
+        label: 'Actions',
+        items: [{ label: 'Edit', value: 'edit' }],
+      },
+    });
+
+    expect(wrapper.classes()).toContain('is-disabled');
+    expect(wrapper.get('button').attributes('disabled')).toBeDefined();
+  });
+
+  it('renders disabled items in dropdown', async () => {
+    const wrapper = mount(TreeDropdown, {
+      props: {
+        label: 'Actions',
+        items: [
+          { label: 'Edit', value: 'edit' },
+          { label: 'Delete', value: 'delete', disabled: true },
+        ],
+      },
+    });
+
+    await wrapper.get('button').trigger('click');
+    const items = wrapper.findAll('[role="menuitem"]');
+    expect(items[1].classes()).toContain('is-disabled');
+    expect(items[1].attributes('aria-disabled')).toBe('true');
+  });
+
+  it('closes dropdown on Escape key', async () => {
+    const wrapper = mount(TreeDropdown, {
+      props: {
+        label: 'Actions',
+        items: [{ label: 'Edit', value: 'edit' }],
+      },
+    });
+
+    const trigger = wrapper.get('button');
+    await trigger.trigger('click');
+    expect(wrapper.findAll('[role="menuitem"]').length).toBe(1);
+
+    await wrapper.get('[role="menuitem"]').trigger('keydown', { key: 'Escape' });
+    await nextTick();
+    expect(wrapper.findAll('[role="menuitem"]').length).toBe(0);
+  });
+
+  it('emits open-change events', async () => {
+    const wrapper = mount(TreeDropdown, {
+      props: {
+        label: 'Actions',
+        items: [{ label: 'Edit', value: 'edit' }],
+      },
+    });
+
+    await wrapper.get('button').trigger('click');
+    expect(wrapper.emitted('open-change')?.[0]).toEqual([true]);
+
+    await wrapper.get('[role="menuitem"]').trigger('click');
+    expect(wrapper.emitted('open-change')?.[1]).toEqual([false]);
+  });
+});
+
+describe('TTabs', () => {
+  const TabsFixture = {
+    components: { TreeTabs, TreeTabList, TreeTab, TreeTabPanel },
+    template: `
+      <TreeTabs v-bind="$attrs">
+        <TreeTabList>
+          <TreeTab value="a">Tab A</TreeTab>
+          <TreeTab value="b">Tab B</TreeTab>
+          <TreeTab value="c" :disabled="disabledC">Tab C</TreeTab>
+        </TreeTabList>
+        <TreeTabPanel value="a">Panel A</TreeTabPanel>
+        <TreeTabPanel value="b">Panel B</TreeTabPanel>
+        <TreeTabPanel value="c">Panel C</TreeTabPanel>
+      </TreeTabs>
+    `,
+    props: {
+      disabledC: { type: Boolean, default: false },
+    },
+  };
+
+  it('renders the active panel based on defaultValue', () => {
+    const wrapper = mount(TabsFixture, {
+      attrs: { 'default-value': 'b' },
+    });
+
+    expect(wrapper.text()).toContain('Panel B');
+    expect(wrapper.text()).not.toContain('Panel A');
+  });
+
+  it('switches tabs on click', async () => {
+    const wrapper = mount(TabsFixture, {
+      attrs: { 'default-value': 'a' },
+    });
+
+    expect(wrapper.text()).toContain('Panel A');
+
+    const tabs = wrapper.findAll('[role="tab"]');
+    await tabs[1].trigger('click');
+    await nextTick();
+
+    expect(wrapper.text()).toContain('Panel B');
+    expect(wrapper.text()).not.toContain('Panel A');
+  });
+
+  it('applies correct ARIA attributes', () => {
+    const wrapper = mount(TabsFixture, {
+      attrs: { 'default-value': 'a' },
+    });
+
+    const tabs = wrapper.findAll('[role="tab"]');
+    expect(tabs[0].attributes('aria-selected')).toBe('true');
+    expect(tabs[1].attributes('aria-selected')).toBe('false');
+    expect(tabs[0].attributes('tabindex')).toBe('0');
+    expect(tabs[1].attributes('tabindex')).toBe('-1');
+
+    const panel = wrapper.find('[role="tabpanel"]');
+    expect(panel.exists()).toBe(true);
+    expect(panel.attributes('aria-labelledby')).toBe(tabs[0].attributes('id'));
+    expect(panel.attributes('id')).toBe(tabs[0].attributes('aria-controls'));
+  });
+
+  it('navigates tabs with arrow keys', async () => {
+    const wrapper = mount(TabsFixture, {
+      attrs: { 'default-value': 'a' },
+      attachTo: document.body,
+    });
+
+    const tabs = wrapper.findAll('[role="tab"]');
+    (tabs[0].element as HTMLElement).focus();
+
+    await tabs[0].trigger('keydown', { key: 'ArrowRight' });
+    await nextTick();
+
+    expect(document.activeElement).toBe(tabs[1].element);
+    expect(wrapper.text()).toContain('Panel B');
+
+    wrapper.unmount();
+  });
+
+  it('skips disabled tabs during keyboard navigation', async () => {
+    const wrapper = mount(TabsFixture, {
+      attrs: { 'default-value': 'a' },
+      props: { disabledC: true },
+      attachTo: document.body,
+    });
+
+    const tabs = wrapper.findAll('[role="tab"]');
+    (tabs[1].element as HTMLElement).focus();
+
+    // Arrow right from B should wrap to A (C is disabled)
+    await tabs[1].trigger('keydown', { key: 'ArrowRight' });
+    await nextTick();
+
+    expect(document.activeElement).toBe(tabs[0].element);
+
+    wrapper.unmount();
+  });
+
+  it('does not activate disabled tabs on click', async () => {
+    const wrapper = mount(TabsFixture, {
+      attrs: { 'default-value': 'a' },
+      props: { disabledC: true },
+    });
+
+    const tabs = wrapper.findAll('[role="tab"]');
+    await tabs[2].trigger('click');
+    await nextTick();
+
+    expect(wrapper.text()).toContain('Panel A');
+    expect(wrapper.text()).not.toContain('Panel C');
+  });
+
+  it('supports controlled mode via v-model', async () => {
+    const ControlledFixture = {
+      components: { TreeTabs, TreeTabList, TreeTab, TreeTabPanel },
+      template: `
+        <TreeTabs :model-value="active" @update:model-value="active = $event">
+          <TreeTabList>
+            <TreeTab value="x">X</TreeTab>
+            <TreeTab value="y">Y</TreeTab>
+          </TreeTabList>
+          <TreeTabPanel value="x">Content X</TreeTabPanel>
+          <TreeTabPanel value="y">Content Y</TreeTabPanel>
+        </TreeTabs>
+      `,
+      data: () => ({ active: 'x' }),
+    };
+
+    const wrapper = mount(ControlledFixture);
+    expect(wrapper.text()).toContain('Content X');
+
+    const tabs = wrapper.findAll('[role="tab"]');
+    await tabs[1].trigger('click');
+    await nextTick();
+
+    expect(wrapper.text()).toContain('Content Y');
+  });
+
+  it('supports Home and End keys', async () => {
+    const wrapper = mount(TabsFixture, {
+      attrs: { 'default-value': 'a' },
+      attachTo: document.body,
+    });
+
+    const tabs = wrapper.findAll('[role="tab"]');
+    (tabs[0].element as HTMLElement).focus();
+
+    await tabs[0].trigger('keydown', { key: 'End' });
+    await nextTick();
+
+    expect(document.activeElement).toBe(tabs[2].element);
+
+    await tabs[2].trigger('keydown', { key: 'Home' });
+    await nextTick();
+
+    expect(document.activeElement).toBe(tabs[0].element);
+
+    wrapper.unmount();
+  });
+
+  it('renders correct variant classes', () => {
+    const line = mount(TabsFixture, {
+      attrs: { 'default-value': 'a', variant: 'line' },
+    });
+    expect(line.find('.tree-tabs--line').exists()).toBe(true);
+
+    const enclosed = mount(TabsFixture, {
+      attrs: { 'default-value': 'a', variant: 'enclosed' },
+    });
+    expect(enclosed.find('.tree-tabs--enclosed').exists()).toBe(true);
   });
 });

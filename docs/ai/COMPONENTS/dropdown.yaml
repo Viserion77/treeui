@@ -1,0 +1,65 @@
+name: TDropdown
+legacy_alias: TreeDropdown
+source_file: packages/vue/src/components/TreeDropdown.vue
+kind: overlay
+status: available
+purpose: "Trigger + floating menu with keyboard navigation for action lists."
+
+props:
+  items:
+    type: "TreeDropdownItem[]"
+    default: "[]"
+    note: "Array of { label: string; value: string; disabled?: boolean }"
+  open:
+    type: boolean
+    default: undefined
+  defaultOpen:
+    type: boolean
+    default: false
+  disabled:
+    type: boolean
+    default: false
+  size:
+    type: TreeSize
+    default: md
+    values: [sm, md, lg]
+  label:
+    type: string
+    default: ""
+
+events:
+  - select
+  - update:open
+  - open-change
+
+slots:
+  - trigger
+  - item
+
+forwards_attrs_to: trigger_button
+
+a11y:
+  role: menu
+  trigger_aria_haspopup: menu
+  trigger_aria_expanded: true
+  aria_disabled_on_disabled_items: true
+  focus_visible_on_trigger: true
+  keyboard_arrow_navigation: true
+  escape_closes_menu: true
+  enter_space_selects_item: true
+  home_end_navigation: true
+
+behavior:
+  outside_click_closes_menu: true
+  focus_restores_on_close: true
+  chevron_rotates_when_open: true
+
+example: |
+  <TDropdown
+    label="Actions"
+    :items="[
+      { label: 'Edit', value: 'edit' },
+      { label: 'Delete', value: 'delete' },
+    ]"
+    @select="handleAction"
+  />

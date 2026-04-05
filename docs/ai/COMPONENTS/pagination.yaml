@@ -1,0 +1,86 @@
+name: TPagination
+legacy_alias: TreePagination
+source_file: packages/vue/src/components/TreePagination.vue
+package: "@treeui/vue"
+kind: primitive
+status: available
+purpose: >
+  Page controls with previous/next navigation, numbered page buttons,
+  and ellipsis for large page ranges. Supports v-model for the active page.
+
+props:
+  modelValue:
+    type: number
+    default: 1
+    description: "Current active page (1-based). Use with v-model."
+  totalPages:
+    type: number
+    required: true
+    description: "Total number of pages."
+  siblings:
+    type: number
+    default: 1
+    description: "Number of sibling page buttons shown around the current page."
+  size:
+    type: TreeSize
+    default: md
+    values: [sm, md, lg]
+    description: "Size variant for the pagination controls."
+  disabled:
+    type: boolean
+    default: false
+    description: "Disables all pagination controls."
+  label:
+    type: string
+    default: Pagination
+    description: "Accessible label for the nav element."
+
+events:
+  - name: update:modelValue
+    payload: "[page: number]"
+    description: "Emitted when the active page changes. Enables v-model binding."
+
+slots:
+  - name: previous
+    description: "Custom content for the previous button."
+  - name: next
+    description: "Custom content for the next button."
+
+forwards_attrs_to: nav_element
+
+a11y:
+  semantic_nav: true
+  aria_label: "Configurable via label prop, defaults to 'Pagination'"
+  aria_current_page: "Applied to the active page button"
+  disabled_buttons: "Previous disabled on first page, next disabled on last page"
+  keyboard_support:
+    - Tab/Shift+Tab to navigate between buttons
+    - Enter/Space to activate a page button
+  touch_targets: "44×44px minimum via ::after pseudo-element"
+  focus_visible: "box-shadow focus ring on all interactive buttons"
+
+behavior:
+  ellipsis: "Shown when page range exceeds visible siblings around the current page"
+  clamping: "Page value is clamped between 1 and totalPages"
+  no_emit_on_same_page: "Does not emit when clicking the already-active page"
+
+css_classes:
+  block: tree-pagination
+  elements:
+    - tree-pagination__list
+    - tree-pagination__item
+    - tree-pagination__button
+    - tree-pagination__button--prev
+    - tree-pagination__button--next
+    - tree-pagination__ellipsis
+    - tree-pagination__icon
+  modifiers:
+    - tree-pagination--sm
+    - tree-pagination--md
+    - tree-pagination--lg
+  states:
+    - is-active
+    - is-disabled
+
+example: |
+  <TPagination v-model="page" :total-pages="20" :siblings="1" size="md" />

@@ -1,0 +1,111 @@
+name: TTabs
+legacy_alias: TreeTabs
+source_file: packages/vue/src/components/TreeTabs.vue
+package: "@treeui/vue"
+kind: navigation
+status: available
+purpose: "Tabbed panel navigation with full keyboard support and automatic/manual activation modes."
+
+props:
+  modelValue:
+    type: string
+    default: ""
+    note: "The value of the currently active tab. Use with v-model."
+  defaultValue:
+    type: string
+    default: ""
+    note: "Initial active tab when uncontrolled."
+  variant:
+    type: "'line' | 'enclosed'"
+    default: line
+    note: "Visual style of the tab list."
+  size:
+    type: TreeSize
+    default: md
+    values: [sm, md, lg]
+  activationMode:
+    type: "'automatic' | 'manual'"
+    default: automatic
+    note: "automatic: tab activates on focus. manual: tab activates on Enter/Space."
+  disabled:
+    type: boolean
+    default: false
+    note: "Disables every tab in the list."
+
+events:
+  - update:modelValue
+
+slots:
+  - default
+    note: "Contains TTabList and TTabPanels children."
+
+sub_components:
+  TTabList:
+    purpose: "Container for tab triggers with role=tablist."
+    slots:
+      - default
+        note: "Contains TTab children."
+    a11y:
+      role: tablist
+      aria_orientation: horizontal
+
+  TTab:
+    purpose: "Individual tab trigger button."
+    props:
+      value:
+        type: string
+        required: true
+      disabled:
+        type: boolean
+        default: false
+    slots:
+      - default
+    a11y:
+      role: tab
+      aria_selected: "true when active"
+      aria_controls: "matching panel id"
+      tabindex: "0 for active, -1 for others"
+
+  TTabPanel:
+    purpose: "Content panel associated with a tab."
+    props:
+      value:
+        type: string
+        required: true
+    slots:
+      - default
+    a11y:
+      role: tabpanel
+      aria_labelledby: "matching tab id"
+      tabindex: 0
+
+forwards_attrs_to: root_div
+
+a11y:
+  role: tablist_on_tab_container
+  keyboard_arrow_navigation: true
+  home_end_navigation: true
+  focus_visible_on_tabs: true
+  aria_selected_on_active_tab: true
+  aria_controls_aria_labelledby_pairing: true
+
+behavior:
+  arrow_left_right_moves_focus: true
+  home_focuses_first_tab: true
+  end_focuses_last_tab: true
+  automatic_mode_activates_on_focus: true
+  manual_mode_activates_on_enter_space: true
+  disabled_tabs_are_skipped: true
+  only_active_panel_rendered: true
+
+example: |
+  <TTabs default-value="tab1">
+    <TTabList>
+      <TTab value="tab1">Account</TTab>
+      <TTab value="tab2">Settings</TTab>
+      <TTab value="tab3" disabled>Billing</TTab>
+    </TTabList>
+    <TTabPanel value="tab1">Account content</TTabPanel>
+    <TTabPanel value="tab2">Settings content</TTabPanel>
+    <TTabPanel value="tab3">Billing content</TTabPanel>
+  </TTabs>

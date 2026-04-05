@@ -8,10 +8,13 @@ source_component_filename_prefix: "Tree"
 primary_exports:
   - TAlert
   - TBadge
+  - TBreadcrumb
+  - TBreadcrumbItem
   - TButton
   - TCard
   - TCheckbox
   - TDatePicker
+  - TDropdown
   - TFormField
   - TInput
   - TModal
@@ -21,6 +24,10 @@ primary_exports:
   - TSkeleton
   - TSpinner
   - TSwitch
+  - TTabs
+  - TTabList
+  - TTab
+  - TTabPanel
   - TToast
   - TToastProvider
   - TTooltip
@@ -28,10 +35,13 @@ primary_exports:
 compatibility_aliases:
   TAlert: TreeAlert
   TBadge: TreeBadge
+  TBreadcrumb: TreeBreadcrumb
+  TBreadcrumbItem: TreeBreadcrumbItem
   TButton: TreeButton
   TCard: TreeCard
   TCheckbox: TreeCheckbox
   TDatePicker: TreeDatePicker
+  TDropdown: TreeDropdown
   TFormField: TreeFormField
   TInput: TreeInput
   TModal: TreeModal
@@ -41,6 +51,10 @@ compatibility_aliases:
   TSkeleton: TreeSkeleton
   TSpinner: TreeSpinner
   TSwitch: TreeSwitch
+  TTabs: TreeTabs
+  TTabList: TreeTabList
+  TTab: TreeTab
+  TTabPanel: TreeTabPanel
   TToast: TreeToast
   TToastProvider: TreeToastProvider
   TTooltip: TreeTooltip
@@ -52,6 +66,7 @@ shared_sizes:
     - TButton
     - TCard
     - TDatePicker
+    - TDropdown
     - TFormField
     - TInput
     - TSelect
@@ -59,6 +74,7 @@ shared_sizes:
     - TModal
     - TSpinner
     - TSwitch
+    - TTabs
 
 shared_variants:
   action_values: [solid, outline, ghost, soft, danger]
@@ -68,9 +84,9 @@ shared_props:
   variant:
     used_by: [TBadge, TButton, TCard]
   size:
-    used_by: [TBadge, TButton, TCard, TCheckbox, TDatePicker, TInput, TModal, TRadio, TRadioGroup, TSelect, TSpinner, TTextarea]
+    used_by: [TBadge, TButton, TCard, TCheckbox, TDatePicker, TDropdown, TInput, TModal, TRadio, TRadioGroup, TSelect, TSpinner, TTextarea]
   disabled:
-    used_by: [TButton, TCheckbox, TDatePicker, TInput, TModal, TRadio, TRadioGroup, TSelect, TSwitch, TTextarea, TTooltip]
+    used_by: [TButton, TCheckbox, TDatePicker, TDropdown, TInput, TModal, TRadio, TRadioGroup, TSelect, TSwitch, TTextarea, TTooltip]
   loading:
     used_by: [TButton, TInput, TSelect, TTextarea]
   as:
@@ -82,9 +98,9 @@ shared_events:
   update:modelValue:
     used_by: [TCheckbox, TDatePicker, TInput, TRadioGroup, TSelect, TSwitch, TTextarea]
   update:open:
-    used_by: [TDatePicker, TModal, TSelect, TTooltip]
+    used_by: [TDatePicker, TDropdown, TModal, TSelect, TTooltip]
   open-change:
-    used_by: [TDatePicker, TModal, TSelect, TTooltip]
+    used_by: [TDatePicker, TDropdown, TModal, TSelect, TTooltip]
 
 shared_slots:
   default:

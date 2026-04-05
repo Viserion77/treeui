@@ -1,0 +1,110 @@
+name: TAccordion
+legacy_alias: TreeAccordion
+source_file: packages/vue/src/components/TreeAccordion.vue
+kind: disclosure
+status: available
+purpose: >
+  Organized content sections with expandable/collapsible behavior.
+  Supports single-open and multi-open modes.
+
+compound:
+  - TAccordionItem (TreeAccordionItem)
+
+# ── TAccordion (container) ──────────────────────────────────────────────
+
+container:
+  props:
+    type:
+      type: "'single' | 'multiple'"
+      default: "'single'"
+      description: >
+        single – at most one item open at a time (opening one closes the rest).
+        multiple – any number of items may be open simultaneously.
+    modelValue:
+      type: "string | string[] | undefined"
+      default: undefined
+      description: >
+        Controlled open state. For type="single" pass a string (the item value).
+        For type="multiple" pass an array of strings.
+    defaultValue:
+      type: "string | string[] | undefined"
+      default: undefined
+      description: >
+        Initial open state for uncontrolled usage.
+    disabled:
+      type: boolean
+      default: false
+      description: Disables all items.
+    collapsible:
+      type: boolean
+      default: false
+      description: >
+        Only applies when type="single". When true, the open item can be
+        collapsed by clicking its trigger again.
+
+  events:
+    - name: "update:modelValue"
+      payload: "string | string[] | undefined"
+      description: Emitted when the open state changes (v-model support).
+
+  slots:
+    - name: default
+      description: Accepts TAccordionItem children.
+
+# ── TAccordionItem ──────────────────────────────────────────────────────
+
+item:
+  props:
+    value:
+      type: string
+      required: true
+      description: Unique identifier for this item within the accordion.
+    disabled:
+      type: boolean
+      default: false
+      description: Disables this individual item.
+
+  slots:
+    - name: trigger
+      description: Custom trigger content. Receives { open }.
+    - name: default
+      description: Collapsible panel content.
+
+# ── Accessibility ───────────────────────────────────────────────────────
+
+a11y:
+  roles:
+    trigger: heading > button
+    panel: region
+  attributes:
+    trigger:
+      - aria-expanded (reflects open state)
+      - aria-controls (references panel id)
+    panel:
+      - role="region"
+      - aria-labelledby (references trigger id)
+  keyboard:
+    - key: Enter / Space
+      action: Toggle the focused item
+    - key: ArrowDown
+      action: Move focus to the next item trigger
+    - key: ArrowUp
+      action: Move focus to the previous item trigger
+    - key: Home
+      action: Move focus to the first item trigger
+    - key: End
+      action: Move focus to the last item trigger
+
+# ── CSS ─────────────────────────────────────────────────────────────────
+
+css:
+  block: tree-accordion
+  elements:
+    - tree-accordion__item
+    - tree-accordion__trigger
+    - tree-accordion__icon
+    - tree-accordion__content
+    - tree-accordion__panel
+  states:
+    - is-open
+    - is-disabled

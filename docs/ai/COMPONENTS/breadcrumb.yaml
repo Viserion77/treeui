@@ -1,0 +1,38 @@
+name: TBreadcrumb
+legacy_alias: TreeBreadcrumb
+source_file: packages/vue/src/components/TreeBreadcrumb.vue
+package: "@treeui/vue"
+kind: navigation
+status: available
+purpose: "Hierarchical navigation trail showing the user's current location within a site or application."
+
+props:
+  separator:
+    type: string
+    default: "/"
+    description: "Character or string used to separate breadcrumb items."
+
+events: []
+
+slots:
+  - default
+
+a11y:
+  element: nav
+  aria_label: "Breadcrumb"
+  current_page_aria_current: "page"
+  uses_ol_for_ordered_list: true
+  interactive_by_default: false
+
+notes:
+  - "Renders a <nav> with aria-label='Breadcrumb' wrapping an <ol>."
+  - "Each item is an <li>. The last item uses aria-current='page'."
+  - "Items are passed as default slot children using TBreadcrumbItem."
+  - "Separator is injected via CSS pseudo-elements or provided via prop."
+
+example: |
+  <TBreadcrumb>
+    <TBreadcrumbItem href="/">Home</TBreadcrumbItem>
+    <TBreadcrumbItem href="/products">Products</TBreadcrumbItem>
+    <TBreadcrumbItem>Current Page</TBreadcrumbItem>
+  </TBreadcrumb>

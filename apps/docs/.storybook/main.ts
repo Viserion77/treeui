@@ -1,3 +1,4 @@
+import { resolve } from 'node:path';
 import type { StorybookConfig } from '@storybook/vue3-vite';
 
 const config: StorybookConfig = {
@@ -13,6 +14,14 @@ const config: StorybookConfig = {
   },
   docs: {
     autodocs: 'tag',
+  },
+  viteFinal(config) {
+    config.resolve ??= {};
+    config.resolve.alias = {
+      ...(config.resolve.alias as Record<string, string>),
+      '@treeui/vue/style.css': resolve(__dirname, '../../../packages/vue/dist/style.css'),
+    };
+    return config;
   },
 };
 

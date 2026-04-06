@@ -1,0 +1,1768 @@
+# ─────────────────────────────────────────────────────────────
+# TreeUI — Component Validation Checklist
+# ─────────────────────────────────────────────────────────────
+# Critérios de aceite para cada componente da biblioteca.
+# Baseado nas convenções internas do TreeUI
+# (STANDARDS.yaml, CONTRACTS.yaml).
+#
+# Status por critério:
+#   PASS   — Atende totalmente
+#   WARN   — Atende parcialmente, melhoria possível
+#   FAIL   — Não atende, ação necessária
+#   N/A    — Não aplicável ao componente
+#
+# Referência de screenshots: /screenshots/<story-id>.png
+# ─────────────────────────────────────────────────────────────
+
+version: "0.1"
+last-audit: "2026-04-05"
+
+# ═══════════════════════════════════════════════════════════════
+# CRITÉRIOS GLOBAIS (aplicáveis a TODOS os componentes)
+# ═══════════════════════════════════════════════════════════════
+global-criteria:
+  naming:
+    - id: NAM-01
+      title: "Export público usa prefixo T"
+      rule: "Componente exportado como T<Name> (ex: TButton)"
+    - id: NAM-02
+      title: "Alias de compatibilidade Tree<Name>"
+      rule: "Alias Tree<Name> exportado em components/index.ts"
+    - id: NAM-03
+      title: "Arquivo fonte usa Tree<Name>.vue"
+      rule: "Nome do arquivo SFC: Tree<Name>.vue"
+    - id: NAM-04
+      title: "Classes CSS usam BEM com prefixo tree-"
+      rule: "Classes: .tree-<name>, .tree-<name>--<variant>, .tree-<name>__<slot>"
+    - id: NAM-05
+      title: "CSS custom properties usam --tree-*"
+      rule: "Nenhum valor raw de cor/espaçamento; sempre var(--tree-*)"
+
+  structure:
+    - id: STR-01
+      title: "Usa <script setup lang='ts'>"
+      rule: "Script setup com TypeScript, nunca Options API"
+    - id: STR-02
+      title: "Props tipadas com defineProps<{}>()"
+      rule: "Props definidas com interface inline e withDefaults()"
+    - id: STR-03
+      title: "Emits tipados com defineEmits<{}>()"
+      rule: "Eventos tipados com assinatura de payload"
+    - id: STR-04
+      title: "Usa tipos compartilhados (TreeSize, TreeVariant, etc.)"
+      rule: "Import de packages/vue/src/types/contracts.ts"
+    - id: STR-05
+      title: "Registrado no plugin"
+      rule: "Componente registrado em packages/vue/src/plugin.ts"
+
+  styling:
+    - id: CSS-01
+      title: "Sem cores hardcoded"
+      rule: "Nenhum valor hex/rgb/hsl no template ou CSS; usa var(--tree-color-*)"
+    - id: CSS-02
+      title: "Sem espaçamento hardcoded"
+      rule: "Padding/margin/gap usam var(--tree-space-*) ou tokens rem"
+    - id: CSS-03
+      title: "Escala de fonte respeitada"
+      rule: "font-size usa var(--tree-font-size-*), nunca px arbitrário"
+    - id: CSS-04
+      title: "Border-radius usa tokens"
+      rule: "border-radius usa var(--tree-radius-*)"
+    - id: CSS-05
+      title: "Sombras usam tokens"
+      rule: "box-shadow usa var(--tree-shadow-*)"
+    - id: CSS-06
+      title: "Motion/transição usa tokens"
+      rule: "transition-duration/timing usa var(--tree-motion-*)"
+    - id: CSS-07
+      title: "Z-index usa tokens (se overlay)"
+      rule: "z-index usa var(--tree-z-*), nunca valor numérico raw"
+
+  states:
+    - id: STA-01
+      title: "Estado default renderizado"
+      rule: "Screenshot do estado default existe e está correto"
+    - id: STA-02
+      title: "Estado hover estilizado"
+      rule: "CSS :hover definido com mudança visual clara"
+    - id: STA-03
+      title: "Estado active/pressed estilizado"
+      rule: "CSS :active definido"
+    - id: STA-04
+      title: "Estado disabled estilizado"
+      rule: "opacity + cursor: not-allowed; aria-disabled se não-nativo"
+    - id: STA-05
+      title: "Estado focus visível"
+      rule: "focus-visible com box-shadow usando --tree-color-focus-ring"
+    - id: STA-06
+      title: "Estado loading (se aplicável)"
+      rule: "Spinner visível, aria-busy='true', interação bloqueada"
+
+  accessibility:
+    - id: A11Y-01
+      title: "Semântica HTML nativa"
+      rule: "Usa <button>, <input>, <label>, role='dialog', etc."
+    - id: A11Y-02
+      title: "Teclado: Tab/Shift+Tab navega"
+      rule: "Focável via Tab, saída via Shift+Tab"
+    - id: A11Y-03
+      title: "Teclado: Escape fecha (se overlay)"
+      rule: "Overlays/modais/drawers fecham com Escape"
+    - id: A11Y-04
+      title: "Teclado: Enter/Space ativa (se interativo)"
+      rule: "Elementos interativos ativam com Enter e Space"
+    - id: A11Y-05
+      title: "Teclado: Arrow keys (se navegação)"
+      rule: "Setas navegam entre itens em listas/tabs/radios"
+    - id: A11Y-06
+      title: "ARIA labels presentes"
+      rule: "aria-label, aria-labelledby, ou aria-describedby onde necessário"
+    - id: A11Y-07
+      title: "Touch target ≥ 44×44px"
+      rule: "Área clicável mínima via padding ou ::after"
+    - id: A11Y-08
+      title: "Focus trap (se modal/drawer)"
+      rule: "Tab cycling: primeiro → último → primeiro"
+    - id: A11Y-09
+      title: "Restauração de foco (se overlay)"
+      rule: "Foco retorna ao trigger quando overlay fecha"
+    - id: A11Y-10
+      title: "Screen reader: status anunciado"
+      rule: "role='status' ou aria-live para toasts/spinners"
+
+  documentation:
+    - id: DOC-01
+      title: "Story Storybook existe"
+      rule: "Arquivo em apps/docs/src/stories/<Name>.stories.ts"
+    - id: DOC-02
+      title: "Screenshot gerado"
+      rule: "Pelo menos 1 screenshot em /screenshots/"
+    - id: DOC-03
+      title: "Contrato YAML atualizado"
+      rule: "Arquivo docs/ai/COMPONENTS/<name>.yaml reflete API atual"
+    - id: DOC-04
+      title: "Testes unitários existem"
+      rule: "Testes em components.test.ts cobrindo comportamento principal"
+
+# ═══════════════════════════════════════════════════════════════
+# VALIDAÇÃO POR COMPONENTE
+# ═══════════════════════════════════════════════════════════════
+
+components:
+
+  # ─────────────────────────────────────────────────────
+  # BUTTON
+  # ─────────────────────────────────────────────────────
+  button:
+    display-name: TButton
+    category: actions
+    screenshots:
+      - components-actions-button--variants.png
+      - components-actions-button--loading.png
+      - components-actions-button--playground.png
+    criteria:
+      NAM-01: { status: PENDING }
+      NAM-02: { status: PENDING }
+      NAM-03: { status: PENDING }
+      NAM-04: { status: PENDING }
+      NAM-05: { status: PENDING }
+      STR-01: { status: PENDING }
+      STR-02: { status: PENDING }
+      STR-03: { status: PENDING }
+      STR-04: { status: PENDING }
+      STR-05: { status: PENDING }
+      CSS-01: { status: PENDING }
+      CSS-02: { status: PENDING }
+      CSS-03: { status: PENDING }
+      CSS-04: { status: PENDING }
+      CSS-05: { status: PENDING }
+      CSS-06: { status: PENDING }
+      CSS-07: { status: PENDING }
+      STA-01: { status: PENDING }
+      STA-02: { status: PENDING }
+      STA-03: { status: PENDING }
+      STA-04: { status: PENDING }
+      STA-05: { status: PENDING }
+      STA-06: { status: PENDING }
+      A11Y-01: { status: PENDING }
+      A11Y-02: { status: PENDING }
+      A11Y-03: { status: PENDING }
+      A11Y-04: { status: PENDING }
+      A11Y-05: { status: PENDING }
+      A11Y-06: { status: PENDING }
+      A11Y-07: { status: PENDING }
+      A11Y-08: { status: PENDING }
+      A11Y-09: { status: PENDING }
+      A11Y-10: { status: PENDING }
+      DOC-01: { status: PENDING }
+      DOC-02: { status: PENDING }
+      DOC-03: { status: PENDING }
+      DOC-04: { status: PENDING }
+
+  # ─────────────────────────────────────────────────────
+  # INPUT
+  # ─────────────────────────────────────────────────────
+  input:
+    display-name: TInput
+    category: data-entry
+    screenshots:
+      - components-data-entry-input--playground.png
+      - components-data-entry-input--states.png
+    criteria:
+      NAM-01: { status: PENDING }
+      NAM-02: { status: PENDING }
+      NAM-03: { status: PENDING }
+      NAM-04: { status: PENDING }
+      NAM-05: { status: PENDING }
+      STR-01: { status: PENDING }
+      STR-02: { status: PENDING }
+      STR-03: { status: PENDING }
+      STR-04: { status: PENDING }
+      STR-05: { status: PENDING }
+      CSS-01: { status: PENDING }
+      CSS-02: { status: PENDING }
+      CSS-03: { status: PENDING }
+      CSS-04: { status: PENDING }
+      CSS-05: { status: PENDING }
+      CSS-06: { status: PENDING }
+      CSS-07: { status: PENDING }
+      STA-01: { status: PENDING }
+      STA-02: { status: PENDING }
+      STA-03: { status: PENDING }
+      STA-04: { status: PENDING }
+      STA-05: { status: PENDING }
+      STA-06: { status: PENDING }
+      A11Y-01: { status: PENDING }
+      A11Y-02: { status: PENDING }
+      A11Y-03: { status: PENDING }
+      A11Y-04: { status: PENDING }
+      A11Y-05: { status: PENDING }
+      A11Y-06: { status: PENDING }
+      A11Y-07: { status: PENDING }
+      A11Y-08: { status: PENDING }
+      A11Y-09: { status: PENDING }
+      A11Y-10: { status: PENDING }
+      DOC-01: { status: PENDING }
+      DOC-02: { status: PENDING }
+      DOC-03: { status: PENDING }
+      DOC-04: { status: PENDING }
+
+  # ─────────────────────────────────────────────────────
+  # BADGE
+  # ─────────────────────────────────────────────────────
+  badge:
+    display-name: TBadge
+    category: data-display
+    screenshots:
+      - components-data-display-badge--playground.png
+      - components-data-display-badge--states.png
+    criteria:
+      NAM-01: { status: PENDING }
+      NAM-02: { status: PENDING }
+      NAM-03: { status: PENDING }
+      NAM-04: { status: PENDING }
+      NAM-05: { status: PENDING }
+      STR-01: { status: PENDING }
+      STR-02: { status: PENDING }
+      STR-03: { status: PENDING }
+      STR-04: { status: PENDING }
+      STR-05: { status: PENDING }
+      CSS-01: { status: PENDING }
+      CSS-02: { status: PENDING }
+      CSS-03: { status: PENDING }
+      CSS-04: { status: PENDING }
+      CSS-05: { status: PENDING }
+      CSS-06: { status: PENDING }
+      CSS-07: { status: PENDING }
+      STA-01: { status: PENDING }
+      STA-02: { status: PENDING }
+      STA-03: { status: PENDING }
+      STA-04: { status: PENDING }
+      STA-05: { status: PENDING }
+      STA-06: { status: PENDING }
+      A11Y-01: { status: PENDING }
+      A11Y-02: { status: PENDING }
+      A11Y-03: { status: PENDING }
+      A11Y-04: { status: PENDING }
+      A11Y-05: { status: PENDING }
+      A11Y-06: { status: PENDING }
+      A11Y-07: { status: PENDING }
+      A11Y-08: { status: PENDING }
+      A11Y-09: { status: PENDING }
+      A11Y-10: { status: PENDING }
+      DOC-01: { status: PENDING }
+      DOC-02: { status: PENDING }
+      DOC-03: { status: PENDING }
+      DOC-04: { status: PENDING }
+
+  # ─────────────────────────────────────────────────────
+  # CARD
+  # ─────────────────────────────────────────────────────
+  card:
+    display-name: TCard
+    category: data-display
+    screenshots:
+      - components-data-display-card--playground.png
+    criteria:
+      NAM-01: { status: PENDING }
+      NAM-02: { status: PENDING }
+      NAM-03: { status: PENDING }
+      NAM-04: { status: PENDING }
+      NAM-05: { status: PENDING }
+      STR-01: { status: PENDING }
+      STR-02: { status: PENDING }
+      STR-03: { status: PENDING }
+      STR-04: { status: PENDING }
+      STR-05: { status: PENDING }
+      CSS-01: { status: PENDING }
+      CSS-02: { status: PENDING }
+      CSS-03: { status: PENDING }
+      CSS-04: { status: PENDING }
+      CSS-05: { status: PENDING }
+      CSS-06: { status: PENDING }
+      CSS-07: { status: PENDING }
+      STA-01: { status: PENDING }
+      STA-02: { status: PENDING }
+      STA-03: { status: PENDING }
+      STA-04: { status: PENDING }
+      STA-05: { status: PENDING }
+      STA-06: { status: PENDING }
+      A11Y-01: { status: PENDING }
+      A11Y-02: { status: PENDING }
+      A11Y-03: { status: PENDING }
+      A11Y-04: { status: PENDING }
+      A11Y-05: { status: PENDING }
+      A11Y-06: { status: PENDING }
+      A11Y-07: { status: PENDING }
+      A11Y-08: { status: PENDING }
+      A11Y-09: { status: PENDING }
+      A11Y-10: { status: PENDING }
+      DOC-01: { status: PENDING }
+      DOC-02: { status: PENDING }
+      DOC-03: { status: PENDING }
+      DOC-04: { status: PENDING }
+
+  # ─────────────────────────────────────────────────────
+  # MODAL
+  # ─────────────────────────────────────────────────────
+  modal:
+    display-name: TModal
+    category: overlay
+    screenshots:
+      - components-overlay-modal--playground.png
+      - components-overlay-modal--states.png
+    criteria:
+      NAM-01: { status: PENDING }
+      NAM-02: { status: PENDING }
+      NAM-03: { status: PENDING }
+      NAM-04: { status: PENDING }
+      NAM-05: { status: PENDING }
+      STR-01: { status: PENDING }
+      STR-02: { status: PENDING }
+      STR-03: { status: PENDING }
+      STR-04: { status: PENDING }
+      STR-05: { status: PENDING }
+      CSS-01: { status: PENDING }
+      CSS-02: { status: PENDING }
+      CSS-03: { status: PENDING }
+      CSS-04: { status: PENDING }
+      CSS-05: { status: PENDING }
+      CSS-06: { status: PENDING }
+      CSS-07: { status: PENDING }
+      STA-01: { status: PENDING }
+      STA-02: { status: PENDING }
+      STA-03: { status: PENDING }
+      STA-04: { status: PENDING }
+      STA-05: { status: PENDING }
+      STA-06: { status: PENDING }
+      A11Y-01: { status: PENDING }
+      A11Y-02: { status: PENDING }
+      A11Y-03: { status: PENDING }
+      A11Y-04: { status: PENDING }
+      A11Y-05: { status: PENDING }
+      A11Y-06: { status: PENDING }
+      A11Y-07: { status: PENDING }
+      A11Y-08: { status: PENDING }
+      A11Y-09: { status: PENDING }
+      A11Y-10: { status: PENDING }
+      DOC-01: { status: PENDING }
+      DOC-02: { status: PENDING }
+      DOC-03: { status: PENDING }
+      DOC-04: { status: PENDING }
+
+  # ─────────────────────────────────────────────────────
+  # DRAWER
+  # ─────────────────────────────────────────────────────
+  drawer:
+    display-name: TDrawer
+    category: overlay
+    screenshots:
+      - components-overlay-drawer--playground.png
+      - components-overlay-drawer--sides.png
+      - components-overlay-drawer--sizes.png
+    criteria:
+      NAM-01: { status: PENDING }
+      NAM-02: { status: PENDING }
+      NAM-03: { status: PENDING }
+      NAM-04: { status: PENDING }
+      NAM-05: { status: PENDING }
+      STR-01: { status: PENDING }
+      STR-02: { status: PENDING }
+      STR-03: { status: PENDING }
+      STR-04: { status: PENDING }
+      STR-05: { status: PENDING }
+      CSS-01: { status: PENDING }
+      CSS-02: { status: PENDING }
+      CSS-03: { status: PENDING }
+      CSS-04: { status: PENDING }
+      CSS-05: { status: PENDING }
+      CSS-06: { status: PENDING }
+      CSS-07: { status: PENDING }
+      STA-01: { status: PENDING }
+      STA-02: { status: PENDING }
+      STA-03: { status: PENDING }
+      STA-04: { status: PENDING }
+      STA-05: { status: PENDING }
+      STA-06: { status: PENDING }
+      A11Y-01: { status: PENDING }
+      A11Y-02: { status: PENDING }
+      A11Y-03: { status: PENDING }
+      A11Y-04: { status: PENDING }
+      A11Y-05: { status: PENDING }
+      A11Y-06: { status: PENDING }
+      A11Y-07: { status: PENDING }
+      A11Y-08: { status: PENDING }
+      A11Y-09: { status: PENDING }
+      A11Y-10: { status: PENDING }
+      DOC-01: { status: PENDING }
+      DOC-02: { status: PENDING }
+      DOC-03: { status: PENDING }
+      DOC-04: { status: PENDING }
+
+  # ─────────────────────────────────────────────────────
+  # TOOLTIP
+  # ─────────────────────────────────────────────────────
+  tooltip:
+    display-name: TTooltip
+    category: overlay
+    screenshots:
+      - components-overlay-tooltip--playground.png
+    criteria:
+      NAM-01: { status: PENDING }
+      NAM-02: { status: PENDING }
+      NAM-03: { status: PENDING }
+      NAM-04: { status: PENDING }
+      NAM-05: { status: PENDING }
+      STR-01: { status: PENDING }
+      STR-02: { status: PENDING }
+      STR-03: { status: PENDING }
+      STR-04: { status: PENDING }
+      STR-05: { status: PENDING }
+      CSS-01: { status: PENDING }
+      CSS-02: { status: PENDING }
+      CSS-03: { status: PENDING }
+      CSS-04: { status: PENDING }
+      CSS-05: { status: PENDING }
+      CSS-06: { status: PENDING }
+      CSS-07: { status: PENDING }
+      STA-01: { status: PENDING }
+      STA-02: { status: PENDING }
+      STA-03: { status: PENDING }
+      STA-04: { status: PENDING }
+      STA-05: { status: PENDING }
+      STA-06: { status: PENDING }
+      A11Y-01: { status: PENDING }
+      A11Y-02: { status: PENDING }
+      A11Y-03: { status: PENDING }
+      A11Y-04: { status: PENDING }
+      A11Y-05: { status: PENDING }
+      A11Y-06: { status: PENDING }
+      A11Y-07: { status: PENDING }
+      A11Y-08: { status: PENDING }
+      A11Y-09: { status: PENDING }
+      A11Y-10: { status: PENDING }
+      DOC-01: { status: PENDING }
+      DOC-02: { status: PENDING }
+      DOC-03: { status: PENDING }
+      DOC-04: { status: PENDING }
+
+  # ─────────────────────────────────────────────────────
+  # CHECKBOX
+  # ─────────────────────────────────────────────────────
+  checkbox:
+    display-name: TCheckbox
+    category: data-entry
+    screenshots:
+      - components-data-entry-checkbox--playground.png
+      - components-data-entry-checkbox--sizes.png
+      - components-data-entry-checkbox--states.png
+    criteria:
+      NAM-01: { status: PENDING }
+      NAM-02: { status: PENDING }
+      NAM-03: { status: PENDING }
+      NAM-04: { status: PENDING }
+      NAM-05: { status: PENDING }
+      STR-01: { status: PENDING }
+      STR-02: { status: PENDING }
+      STR-03: { status: PENDING }
+      STR-04: { status: PENDING }
+      STR-05: { status: PENDING }
+      CSS-01: { status: PENDING }
+      CSS-02: { status: PENDING }
+      CSS-03: { status: PENDING }
+      CSS-04: { status: PENDING }
+      CSS-05: { status: PENDING }
+      CSS-06: { status: PENDING }
+      CSS-07: { status: PENDING }
+      STA-01: { status: PENDING }
+      STA-02: { status: PENDING }
+      STA-03: { status: PENDING }
+      STA-04: { status: PENDING }
+      STA-05: { status: PENDING }
+      STA-06: { status: PENDING }
+      A11Y-01: { status: PENDING }
+      A11Y-02: { status: PENDING }
+      A11Y-03: { status: PENDING }
+      A11Y-04: { status: PENDING }
+      A11Y-05: { status: PENDING }
+      A11Y-06: { status: PENDING }
+      A11Y-07: { status: PENDING }
+      A11Y-08: { status: PENDING }
+      A11Y-09: { status: PENDING }
+      A11Y-10: { status: PENDING }
+      DOC-01: { status: PENDING }
+      DOC-02: { status: PENDING }
+      DOC-03: { status: PENDING }
+      DOC-04: { status: PENDING }
+
+  # ─────────────────────────────────────────────────────
+  # RADIO
+  # ─────────────────────────────────────────────────────
+  radio:
+    display-name: TRadio / TRadioGroup
+    category: data-entry
+    screenshots:
+      - components-data-entry-radio--playground.png
+      - components-data-entry-radio--sizes.png
+      - components-data-entry-radio--states.png
+    criteria:
+      NAM-01: { status: PENDING }
+      NAM-02: { status: PENDING }
+      NAM-03: { status: PENDING }
+      NAM-04: { status: PENDING }
+      NAM-05: { status: PENDING }
+      STR-01: { status: PENDING }
+      STR-02: { status: PENDING }
+      STR-03: { status: PENDING }
+      STR-04: { status: PENDING }
+      STR-05: { status: PENDING }
+      CSS-01: { status: PENDING }
+      CSS-02: { status: PENDING }
+      CSS-03: { status: PENDING }
+      CSS-04: { status: PENDING }
+      CSS-05: { status: PENDING }
+      CSS-06: { status: PENDING }
+      CSS-07: { status: PENDING }
+      STA-01: { status: PENDING }
+      STA-02: { status: PENDING }
+      STA-03: { status: PENDING }
+      STA-04: { status: PENDING }
+      STA-05: { status: PENDING }
+      STA-06: { status: PENDING }
+      A11Y-01: { status: PENDING }
+      A11Y-02: { status: PENDING }
+      A11Y-03: { status: PENDING }
+      A11Y-04: { status: PENDING }
+      A11Y-05: { status: PENDING }
+      A11Y-06: { status: PENDING }
+      A11Y-07: { status: PENDING }
+      A11Y-08: { status: PENDING }
+      A11Y-09: { status: PENDING }
+      A11Y-10: { status: PENDING }
+      DOC-01: { status: PENDING }
+      DOC-02: { status: PENDING }
+      DOC-03: { status: PENDING }
+      DOC-04: { status: PENDING }
+
+  # ─────────────────────────────────────────────────────
+  # SWITCH
+  # ─────────────────────────────────────────────────────
+  switch:
+    display-name: TSwitch
+    category: data-entry
+    screenshots:
+      - components-data-entry-switch--playground.png
+      - components-data-entry-switch--sizes.png
+      - components-data-entry-switch--states.png
+    criteria:
+      NAM-01: { status: PENDING }
+      NAM-02: { status: PENDING }
+      NAM-03: { status: PENDING }
+      NAM-04: { status: PENDING }
+      NAM-05: { status: PENDING }
+      STR-01: { status: PENDING }
+      STR-02: { status: PENDING }
+      STR-03: { status: PENDING }
+      STR-04: { status: PENDING }
+      STR-05: { status: PENDING }
+      CSS-01: { status: PENDING }
+      CSS-02: { status: PENDING }
+      CSS-03: { status: PENDING }
+      CSS-04: { status: PENDING }
+      CSS-05: { status: PENDING }
+      CSS-06: { status: PENDING }
+      CSS-07: { status: PENDING }
+      STA-01: { status: PENDING }
+      STA-02: { status: PENDING }
+      STA-03: { status: PENDING }
+      STA-04: { status: PENDING }
+      STA-05: { status: PENDING }
+      STA-06: { status: PENDING }
+      A11Y-01: { status: PENDING }
+      A11Y-02: { status: PENDING }
+      A11Y-03: { status: PENDING }
+      A11Y-04: { status: PENDING }
+      A11Y-05: { status: PENDING }
+      A11Y-06: { status: PENDING }
+      A11Y-07: { status: PENDING }
+      A11Y-08: { status: PENDING }
+      A11Y-09: { status: PENDING }
+      A11Y-10: { status: PENDING }
+      DOC-01: { status: PENDING }
+      DOC-02: { status: PENDING }
+      DOC-03: { status: PENDING }
+      DOC-04: { status: PENDING }
+
+  # ─────────────────────────────────────────────────────
+  # SELECT
+  # ─────────────────────────────────────────────────────
+  select:
+    display-name: TSelect
+    category: data-entry
+    screenshots:
+      - components-data-entry-select--playground.png
+      - components-data-entry-select--sizes.png
+      - components-data-entry-select--states.png
+      - components-data-entry-select--disabled-options.png
+    criteria:
+      NAM-01: { status: PENDING }
+      NAM-02: { status: PENDING }
+      NAM-03: { status: PENDING }
+      NAM-04: { status: PENDING }
+      NAM-05: { status: PENDING }
+      STR-01: { status: PENDING }
+      STR-02: { status: PENDING }
+      STR-03: { status: PENDING }
+      STR-04: { status: PENDING }
+      STR-05: { status: PENDING }
+      CSS-01: { status: PENDING }
+      CSS-02: { status: PENDING }
+      CSS-03: { status: PENDING }
+      CSS-04: { status: PENDING }
+      CSS-05: { status: PENDING }
+      CSS-06: { status: PENDING }
+      CSS-07: { status: PENDING }
+      STA-01: { status: PENDING }
+      STA-02: { status: PENDING }
+      STA-03: { status: PENDING }
+      STA-04: { status: PENDING }
+      STA-05: { status: PENDING }
+      STA-06: { status: PENDING }
+      A11Y-01: { status: PENDING }
+      A11Y-02: { status: PENDING }
+      A11Y-03: { status: PENDING }
+      A11Y-04: { status: PENDING }
+      A11Y-05: { status: PENDING }
+      A11Y-06: { status: PENDING }
+      A11Y-07: { status: PENDING }
+      A11Y-08: { status: PENDING }
+      A11Y-09: { status: PENDING }
+      A11Y-10: { status: PENDING }
+      DOC-01: { status: PENDING }
+      DOC-02: { status: PENDING }
+      DOC-03: { status: PENDING }
+      DOC-04: { status: PENDING }
+
+  # ─────────────────────────────────────────────────────
+  # TEXTAREA
+  # ─────────────────────────────────────────────────────
+  textarea:
+    display-name: TTextarea
+    category: data-entry
+    screenshots:
+      - components-data-entry-textarea--playground.png
+      - components-data-entry-textarea--sizes.png
+      - components-data-entry-textarea--states.png
+      - components-data-entry-textarea--auto-grow.png
+    criteria:
+      NAM-01: { status: PENDING }
+      NAM-02: { status: PENDING }
+      NAM-03: { status: PENDING }
+      NAM-04: { status: PENDING }
+      NAM-05: { status: PENDING }
+      STR-01: { status: PENDING }
+      STR-02: { status: PENDING }
+      STR-03: { status: PENDING }
+      STR-04: { status: PENDING }
+      STR-05: { status: PENDING }
+      CSS-01: { status: PENDING }
+      CSS-02: { status: PENDING }
+      CSS-03: { status: PENDING }
+      CSS-04: { status: PENDING }
+      CSS-05: { status: PENDING }
+      CSS-06: { status: PENDING }
+      CSS-07: { status: PENDING }
+      STA-01: { status: PENDING }
+      STA-02: { status: PENDING }
+      STA-03: { status: PENDING }
+      STA-04: { status: PENDING }
+      STA-05: { status: PENDING }
+      STA-06: { status: PENDING }
+      A11Y-01: { status: PENDING }
+      A11Y-02: { status: PENDING }
+      A11Y-03: { status: PENDING }
+      A11Y-04: { status: PENDING }
+      A11Y-05: { status: PENDING }
+      A11Y-06: { status: PENDING }
+      A11Y-07: { status: PENDING }
+      A11Y-08: { status: PENDING }
+      A11Y-09: { status: PENDING }
+      A11Y-10: { status: PENDING }
+      DOC-01: { status: PENDING }
+      DOC-02: { status: PENDING }
+      DOC-03: { status: PENDING }
+      DOC-04: { status: PENDING }
+
+  # ─────────────────────────────────────────────────────
+  # DATE PICKER
+  # ─────────────────────────────────────────────────────
+  date-picker:
+    display-name: TDatePicker
+    category: data-entry
+    screenshots:
+      - components-data-entry-datepicker--playground.png
+      - components-data-entry-datepicker--states.png
+    criteria:
+      NAM-01: { status: PENDING }
+      NAM-02: { status: PENDING }
+      NAM-03: { status: PENDING }
+      NAM-04: { status: PENDING }
+      NAM-05: { status: PENDING }
+      STR-01: { status: PENDING }
+      STR-02: { status: PENDING }
+      STR-03: { status: PENDING }
+      STR-04: { status: PENDING }
+      STR-05: { status: PENDING }
+      CSS-01: { status: PENDING }
+      CSS-02: { status: PENDING }
+      CSS-03: { status: PENDING }
+      CSS-04: { status: PENDING }
+      CSS-05: { status: PENDING }
+      CSS-06: { status: PENDING }
+      CSS-07: { status: PENDING }
+      STA-01: { status: PENDING }
+      STA-02: { status: PENDING }
+      STA-03: { status: PENDING }
+      STA-04: { status: PENDING }
+      STA-05: { status: PENDING }
+      STA-06: { status: PENDING }
+      A11Y-01: { status: PENDING }
+      A11Y-02: { status: PENDING }
+      A11Y-03: { status: PENDING }
+      A11Y-04: { status: PENDING }
+      A11Y-05: { status: PENDING }
+      A11Y-06: { status: PENDING }
+      A11Y-07: { status: PENDING }
+      A11Y-08: { status: PENDING }
+      A11Y-09: { status: PENDING }
+      A11Y-10: { status: PENDING }
+      DOC-01: { status: PENDING }
+      DOC-02: { status: PENDING }
+      DOC-03: { status: PENDING }
+      DOC-04: { status: PENDING }
+
+  # ─────────────────────────────────────────────────────
+  # SPINNER
+  # ─────────────────────────────────────────────────────
+  spinner:
+    display-name: TSpinner
+    category: feedback
+    screenshots:
+      - components-feedback-spinner--playground.png
+    criteria:
+      NAM-01: { status: PENDING }
+      NAM-02: { status: PENDING }
+      NAM-03: { status: PENDING }
+      NAM-04: { status: PENDING }
+      NAM-05: { status: PENDING }
+      STR-01: { status: PENDING }
+      STR-02: { status: PENDING }
+      STR-03: { status: PENDING }
+      STR-04: { status: PENDING }
+      STR-05: { status: PENDING }
+      CSS-01: { status: PENDING }
+      CSS-02: { status: PENDING }
+      CSS-03: { status: PENDING }
+      CSS-04: { status: PENDING }
+      CSS-05: { status: PENDING }
+      CSS-06: { status: PENDING }
+      CSS-07: { status: PENDING }
+      STA-01: { status: PENDING }
+      STA-02: { status: PENDING }
+      STA-03: { status: PENDING }
+      STA-04: { status: PENDING }
+      STA-05: { status: PENDING }
+      STA-06: { status: PENDING }
+      A11Y-01: { status: PENDING }
+      A11Y-02: { status: PENDING }
+      A11Y-03: { status: PENDING }
+      A11Y-04: { status: PENDING }
+      A11Y-05: { status: PENDING }
+      A11Y-06: { status: PENDING }
+      A11Y-07: { status: PENDING }
+      A11Y-08: { status: PENDING }
+      A11Y-09: { status: PENDING }
+      A11Y-10: { status: PENDING }
+      DOC-01: { status: PENDING }
+      DOC-02: { status: PENDING }
+      DOC-03: { status: PENDING }
+      DOC-04: { status: PENDING }
+
+  # ─────────────────────────────────────────────────────
+  # TOAST
+  # ─────────────────────────────────────────────────────
+  toast:
+    display-name: TToast / TToastProvider
+    category: feedback
+    screenshots:
+      - components-feedback-toast--playground.png
+      - components-feedback-toast--variants.png
+      - components-feedback-toast--persistent.png
+    criteria:
+      NAM-01: { status: PENDING }
+      NAM-02: { status: PENDING }
+      NAM-03: { status: PENDING }
+      NAM-04: { status: PENDING }
+      NAM-05: { status: PENDING }
+      STR-01: { status: PENDING }
+      STR-02: { status: PENDING }
+      STR-03: { status: PENDING }
+      STR-04: { status: PENDING }
+      STR-05: { status: PENDING }
+      CSS-01: { status: PENDING }
+      CSS-02: { status: PENDING }
+      CSS-03: { status: PENDING }
+      CSS-04: { status: PENDING }
+      CSS-05: { status: PENDING }
+      CSS-06: { status: PENDING }
+      CSS-07: { status: PENDING }
+      STA-01: { status: PENDING }
+      STA-02: { status: PENDING }
+      STA-03: { status: PENDING }
+      STA-04: { status: PENDING }
+      STA-05: { status: PENDING }
+      STA-06: { status: PENDING }
+      A11Y-01: { status: PENDING }
+      A11Y-02: { status: PENDING }
+      A11Y-03: { status: PENDING }
+      A11Y-04: { status: PENDING }
+      A11Y-05: { status: PENDING }
+      A11Y-06: { status: PENDING }
+      A11Y-07: { status: PENDING }
+      A11Y-08: { status: PENDING }
+      A11Y-09: { status: PENDING }
+      A11Y-10: { status: PENDING }
+      DOC-01: { status: PENDING }
+      DOC-02: { status: PENDING }
+      DOC-03: { status: PENDING }
+      DOC-04: { status: PENDING }
+
+  # ─────────────────────────────────────────────────────
+  # ALERT
+  # ─────────────────────────────────────────────────────
+  alert:
+    display-name: TAlert
+    category: feedback
+    screenshots:
+      - components-feedback-alert--playground.png
+      - components-feedback-alert--variants.png
+      - components-feedback-alert--sizes.png
+      - components-feedback-alert--dismissible.png
+      - components-feedback-alert--with-icon.png
+    criteria:
+      NAM-01: { status: PENDING }
+      NAM-02: { status: PENDING }
+      NAM-03: { status: PENDING }
+      NAM-04: { status: PENDING }
+      NAM-05: { status: PENDING }
+      STR-01: { status: PENDING }
+      STR-02: { status: PENDING }
+      STR-03: { status: PENDING }
+      STR-04: { status: PENDING }
+      STR-05: { status: PENDING }
+      CSS-01: { status: PENDING }
+      CSS-02: { status: PENDING }
+      CSS-03: { status: PENDING }
+      CSS-04: { status: PENDING }
+      CSS-05: { status: PENDING }
+      CSS-06: { status: PENDING }
+      CSS-07: { status: PENDING }
+      STA-01: { status: PENDING }
+      STA-02: { status: PENDING }
+      STA-03: { status: PENDING }
+      STA-04: { status: PENDING }
+      STA-05: { status: PENDING }
+      STA-06: { status: PENDING }
+      A11Y-01: { status: PENDING }
+      A11Y-02: { status: PENDING }
+      A11Y-03: { status: PENDING }
+      A11Y-04: { status: PENDING }
+      A11Y-05: { status: PENDING }
+      A11Y-06: { status: PENDING }
+      A11Y-07: { status: PENDING }
+      A11Y-08: { status: PENDING }
+      A11Y-09: { status: PENDING }
+      A11Y-10: { status: PENDING }
+      DOC-01: { status: PENDING }
+      DOC-02: { status: PENDING }
+      DOC-03: { status: PENDING }
+      DOC-04: { status: PENDING }
+
+  # ─────────────────────────────────────────────────────
+  # PROGRESS
+  # ─────────────────────────────────────────────────────
+  progress:
+    display-name: TProgress
+    category: feedback
+    screenshots:
+      - components-feedback-progress--playground.png
+      - components-feedback-progress--sizes.png
+      - components-feedback-progress--values.png
+      - components-feedback-progress--indeterminate.png
+      - components-feedback-progress--ring.png
+    criteria:
+      NAM-01: { status: PENDING }
+      NAM-02: { status: PENDING }
+      NAM-03: { status: PENDING }
+      NAM-04: { status: PENDING }
+      NAM-05: { status: PENDING }
+      STR-01: { status: PENDING }
+      STR-02: { status: PENDING }
+      STR-03: { status: PENDING }
+      STR-04: { status: PENDING }
+      STR-05: { status: PENDING }
+      CSS-01: { status: PENDING }
+      CSS-02: { status: PENDING }
+      CSS-03: { status: PENDING }
+      CSS-04: { status: PENDING }
+      CSS-05: { status: PENDING }
+      CSS-06: { status: PENDING }
+      CSS-07: { status: PENDING }
+      STA-01: { status: PENDING }
+      STA-02: { status: PENDING }
+      STA-03: { status: PENDING }
+      STA-04: { status: PENDING }
+      STA-05: { status: PENDING }
+      STA-06: { status: PENDING }
+      A11Y-01: { status: PENDING }
+      A11Y-02: { status: PENDING }
+      A11Y-03: { status: PENDING }
+      A11Y-04: { status: PENDING }
+      A11Y-05: { status: PENDING }
+      A11Y-06: { status: PENDING }
+      A11Y-07: { status: PENDING }
+      A11Y-08: { status: PENDING }
+      A11Y-09: { status: PENDING }
+      A11Y-10: { status: PENDING }
+      DOC-01: { status: PENDING }
+      DOC-02: { status: PENDING }
+      DOC-03: { status: PENDING }
+      DOC-04: { status: PENDING }
+
+  # ─────────────────────────────────────────────────────
+  # SKELETON
+  # ─────────────────────────────────────────────────────
+  skeleton:
+    display-name: TSkeleton
+    category: feedback
+    screenshots:
+      - components-feedback-skeleton--playground.png
+      - components-feedback-skeleton--circular.png
+      - components-feedback-skeleton--rectangular.png
+      - components-feedback-skeleton--text-lines.png
+      - components-feedback-skeleton--card-placeholder.png
+      - components-feedback-skeleton--wave-animation.png
+    criteria:
+      NAM-01: { status: PENDING }
+      NAM-02: { status: PENDING }
+      NAM-03: { status: PENDING }
+      NAM-04: { status: PENDING }
+      NAM-05: { status: PENDING }
+      STR-01: { status: PENDING }
+      STR-02: { status: PENDING }
+      STR-03: { status: PENDING }
+      STR-04: { status: PENDING }
+      STR-05: { status: PENDING }
+      CSS-01: { status: PENDING }
+      CSS-02: { status: PENDING }
+      CSS-03: { status: PENDING }
+      CSS-04: { status: PENDING }
+      CSS-05: { status: PENDING }
+      CSS-06: { status: PENDING }
+      CSS-07: { status: PENDING }
+      STA-01: { status: PENDING }
+      STA-02: { status: PENDING }
+      STA-03: { status: PENDING }
+      STA-04: { status: PENDING }
+      STA-05: { status: PENDING }
+      STA-06: { status: PENDING }
+      A11Y-01: { status: PENDING }
+      A11Y-02: { status: PENDING }
+      A11Y-03: { status: PENDING }
+      A11Y-04: { status: PENDING }
+      A11Y-05: { status: PENDING }
+      A11Y-06: { status: PENDING }
+      A11Y-07: { status: PENDING }
+      A11Y-08: { status: PENDING }
+      A11Y-09: { status: PENDING }
+      A11Y-10: { status: PENDING }
+      DOC-01: { status: PENDING }
+      DOC-02: { status: PENDING }
+      DOC-03: { status: PENDING }
+      DOC-04: { status: PENDING }
+
+  # ─────────────────────────────────────────────────────
+  # DROPDOWN
+  # ─────────────────────────────────────────────────────
+  dropdown:
+    display-name: TDropdown
+    category: overlay
+    screenshots:
+      - components-overlay-dropdown--playground.png
+      - components-overlay-dropdown--sizes.png
+      - components-overlay-dropdown--custom-trigger.png
+      - components-overlay-dropdown--disabled-items.png
+      - components-overlay-dropdown--disabled.png
+    criteria:
+      NAM-01: { status: PENDING }
+      NAM-02: { status: PENDING }
+      NAM-03: { status: PENDING }
+      NAM-04: { status: PENDING }
+      NAM-05: { status: PENDING }
+      STR-01: { status: PENDING }
+      STR-02: { status: PENDING }
+      STR-03: { status: PENDING }
+      STR-04: { status: PENDING }
+      STR-05: { status: PENDING }
+      CSS-01: { status: PENDING }
+      CSS-02: { status: PENDING }
+      CSS-03: { status: PENDING }
+      CSS-04: { status: PENDING }
+      CSS-05: { status: PENDING }
+      CSS-06: { status: PENDING }
+      CSS-07: { status: PENDING }
+      STA-01: { status: PENDING }
+      STA-02: { status: PENDING }
+      STA-03: { status: PENDING }
+      STA-04: { status: PENDING }
+      STA-05: { status: PENDING }
+      STA-06: { status: PENDING }
+      A11Y-01: { status: PENDING }
+      A11Y-02: { status: PENDING }
+      A11Y-03: { status: PENDING }
+      A11Y-04: { status: PENDING }
+      A11Y-05: { status: PENDING }
+      A11Y-06: { status: PENDING }
+      A11Y-07: { status: PENDING }
+      A11Y-08: { status: PENDING }
+      A11Y-09: { status: PENDING }
+      A11Y-10: { status: PENDING }
+      DOC-01: { status: PENDING }
+      DOC-02: { status: PENDING }
+      DOC-03: { status: PENDING }
+      DOC-04: { status: PENDING }
+
+  # ─────────────────────────────────────────────────────
+  # CONTEXT MENU
+  # ─────────────────────────────────────────────────────
+  context-menu:
+    display-name: TContextMenu
+    category: overlay
+    screenshots:
+      - components-overlay-contextmenu--playground.png
+      - components-overlay-contextmenu--sizes.png
+      - components-overlay-contextmenu--disabled-items.png
+      - components-overlay-contextmenu--disabled.png
+    criteria:
+      NAM-01: { status: PENDING }
+      NAM-02: { status: PENDING }
+      NAM-03: { status: PENDING }
+      NAM-04: { status: PENDING }
+      NAM-05: { status: PENDING }
+      STR-01: { status: PENDING }
+      STR-02: { status: PENDING }
+      STR-03: { status: PENDING }
+      STR-04: { status: PENDING }
+      STR-05: { status: PENDING }
+      CSS-01: { status: PENDING }
+      CSS-02: { status: PENDING }
+      CSS-03: { status: PENDING }
+      CSS-04: { status: PENDING }
+      CSS-05: { status: PENDING }
+      CSS-06: { status: PENDING }
+      CSS-07: { status: PENDING }
+      STA-01: { status: PENDING }
+      STA-02: { status: PENDING }
+      STA-03: { status: PENDING }
+      STA-04: { status: PENDING }
+      STA-05: { status: PENDING }
+      STA-06: { status: PENDING }
+      A11Y-01: { status: PENDING }
+      A11Y-02: { status: PENDING }
+      A11Y-03: { status: PENDING }
+      A11Y-04: { status: PENDING }
+      A11Y-05: { status: PENDING }
+      A11Y-06: { status: PENDING }
+      A11Y-07: { status: PENDING }
+      A11Y-08: { status: PENDING }
+      A11Y-09: { status: PENDING }
+      A11Y-10: { status: PENDING }
+      DOC-01: { status: PENDING }
+      DOC-02: { status: PENDING }
+      DOC-03: { status: PENDING }
+      DOC-04: { status: PENDING }
+
+  # ─────────────────────────────────────────────────────
+  # POPOVER
+  # ─────────────────────────────────────────────────────
+  popover:
+    display-name: TPopover
+    category: overlay
+    screenshots:
+      - components-overlay-popover--playground.png
+      - components-overlay-popover--sides.png
+    criteria:
+      NAM-01: { status: PENDING }
+      NAM-02: { status: PENDING }
+      NAM-03: { status: PENDING }
+      NAM-04: { status: PENDING }
+      NAM-05: { status: PENDING }
+      STR-01: { status: PENDING }
+      STR-02: { status: PENDING }
+      STR-03: { status: PENDING }
+      STR-04: { status: PENDING }
+      STR-05: { status: PENDING }
+      CSS-01: { status: PENDING }
+      CSS-02: { status: PENDING }
+      CSS-03: { status: PENDING }
+      CSS-04: { status: PENDING }
+      CSS-05: { status: PENDING }
+      CSS-06: { status: PENDING }
+      CSS-07: { status: PENDING }
+      STA-01: { status: PENDING }
+      STA-02: { status: PENDING }
+      STA-03: { status: PENDING }
+      STA-04: { status: PENDING }
+      STA-05: { status: PENDING }
+      STA-06: { status: PENDING }
+      A11Y-01: { status: PENDING }
+      A11Y-02: { status: PENDING }
+      A11Y-03: { status: PENDING }
+      A11Y-04: { status: PENDING }
+      A11Y-05: { status: PENDING }
+      A11Y-06: { status: PENDING }
+      A11Y-07: { status: PENDING }
+      A11Y-08: { status: PENDING }
+      A11Y-09: { status: PENDING }
+      A11Y-10: { status: PENDING }
+      DOC-01: { status: PENDING }
+      DOC-02: { status: PENDING }
+      DOC-03: { status: PENDING }
+      DOC-04: { status: PENDING }
+
+  # ─────────────────────────────────────────────────────
+  # TABLE
+  # ─────────────────────────────────────────────────────
+  table:
+    display-name: TTable
+    category: data-display
+    screenshots:
+      - components-data-display-table--playground.png
+      - components-data-display-table--sortable.png
+      - components-data-display-table--striped.png
+      - components-data-display-table--bordered.png
+      - components-data-display-table--hoverable.png
+      - components-data-display-table--small.png
+      - components-data-display-table--empty.png
+    criteria:
+      NAM-01: { status: PENDING }
+      NAM-02: { status: PENDING }
+      NAM-03: { status: PENDING }
+      NAM-04: { status: PENDING }
+      NAM-05: { status: PENDING }
+      STR-01: { status: PENDING }
+      STR-02: { status: PENDING }
+      STR-03: { status: PENDING }
+      STR-04: { status: PENDING }
+      STR-05: { status: PENDING }
+      CSS-01: { status: PENDING }
+      CSS-02: { status: PENDING }
+      CSS-03: { status: PENDING }
+      CSS-04: { status: PENDING }
+      CSS-05: { status: PENDING }
+      CSS-06: { status: PENDING }
+      CSS-07: { status: PENDING }
+      STA-01: { status: PENDING }
+      STA-02: { status: PENDING }
+      STA-03: { status: PENDING }
+      STA-04: { status: PENDING }
+      STA-05: { status: PENDING }
+      STA-06: { status: PENDING }
+      A11Y-01: { status: PENDING }
+      A11Y-02: { status: PENDING }
+      A11Y-03: { status: PENDING }
+      A11Y-04: { status: PENDING }
+      A11Y-05: { status: PENDING }
+      A11Y-06: { status: PENDING }
+      A11Y-07: { status: PENDING }
+      A11Y-08: { status: PENDING }
+      A11Y-09: { status: PENDING }
+      A11Y-10: { status: PENDING }
+      DOC-01: { status: PENDING }
+      DOC-02: { status: PENDING }
+      DOC-03: { status: PENDING }
+      DOC-04: { status: PENDING }
+
+  # ─────────────────────────────────────────────────────
+  # ACCORDION
+  # ─────────────────────────────────────────────────────
+  accordion:
+    display-name: TAccordion / TAccordionItem
+    category: data-display
+    screenshots:
+      - components-data-display-accordion--playground.png
+      - components-data-display-accordion--single-collapsible.png
+      - components-data-display-accordion--multiple.png
+      - components-data-display-accordion--controlled.png
+      - components-data-display-accordion--disabled-item.png
+    criteria:
+      NAM-01: { status: PENDING }
+      NAM-02: { status: PENDING }
+      NAM-03: { status: PENDING }
+      NAM-04: { status: PENDING }
+      NAM-05: { status: PENDING }
+      STR-01: { status: PENDING }
+      STR-02: { status: PENDING }
+      STR-03: { status: PENDING }
+      STR-04: { status: PENDING }
+      STR-05: { status: PENDING }
+      CSS-01: { status: PENDING }
+      CSS-02: { status: PENDING }
+      CSS-03: { status: PENDING }
+      CSS-04: { status: PENDING }
+      CSS-05: { status: PENDING }
+      CSS-06: { status: PENDING }
+      CSS-07: { status: PENDING }
+      STA-01: { status: PENDING }
+      STA-02: { status: PENDING }
+      STA-03: { status: PENDING }
+      STA-04: { status: PENDING }
+      STA-05: { status: PENDING }
+      STA-06: { status: PENDING }
+      A11Y-01: { status: PENDING }
+      A11Y-02: { status: PENDING }
+      A11Y-03: { status: PENDING }
+      A11Y-04: { status: PENDING }
+      A11Y-05: { status: PENDING }
+      A11Y-06: { status: PENDING }
+      A11Y-07: { status: PENDING }
+      A11Y-08: { status: PENDING }
+      A11Y-09: { status: PENDING }
+      A11Y-10: { status: PENDING }
+      DOC-01: { status: PENDING }
+      DOC-02: { status: PENDING }
+      DOC-03: { status: PENDING }
+      DOC-04: { status: PENDING }
+
+  # ─────────────────────────────────────────────────────
+  # AVATAR
+  # ─────────────────────────────────────────────────────
+  avatar:
+    display-name: TAvatar
+    category: data-display
+    screenshots:
+      - components-data-display-avatar--playground.png
+      - components-data-display-avatar--sizes.png
+      - components-data-display-avatar--square.png
+      - components-data-display-avatar--with-initials.png
+      - components-data-display-avatar--with-status.png
+    criteria:
+      NAM-01: { status: PENDING }
+      NAM-02: { status: PENDING }
+      NAM-03: { status: PENDING }
+      NAM-04: { status: PENDING }
+      NAM-05: { status: PENDING }
+      STR-01: { status: PENDING }
+      STR-02: { status: PENDING }
+      STR-03: { status: PENDING }
+      STR-04: { status: PENDING }
+      STR-05: { status: PENDING }
+      CSS-01: { status: PENDING }
+      CSS-02: { status: PENDING }
+      CSS-03: { status: PENDING }
+      CSS-04: { status: PENDING }
+      CSS-05: { status: PENDING }
+      CSS-06: { status: PENDING }
+      CSS-07: { status: PENDING }
+      STA-01: { status: PENDING }
+      STA-02: { status: PENDING }
+      STA-03: { status: PENDING }
+      STA-04: { status: PENDING }
+      STA-05: { status: PENDING }
+      STA-06: { status: PENDING }
+      A11Y-01: { status: PENDING }
+      A11Y-02: { status: PENDING }
+      A11Y-03: { status: PENDING }
+      A11Y-04: { status: PENDING }
+      A11Y-05: { status: PENDING }
+      A11Y-06: { status: PENDING }
+      A11Y-07: { status: PENDING }
+      A11Y-08: { status: PENDING }
+      A11Y-09: { status: PENDING }
+      A11Y-10: { status: PENDING }
+      DOC-01: { status: PENDING }
+      DOC-02: { status: PENDING }
+      DOC-03: { status: PENDING }
+      DOC-04: { status: PENDING }
+
+  # ─────────────────────────────────────────────────────
+  # TABS
+  # ─────────────────────────────────────────────────────
+  tabs:
+    display-name: TTabs / TTabList / TTab / TTabPanel
+    category: navigation
+    screenshots:
+      - components-navigation-tabs--playground.png
+      - components-navigation-tabs--sizes.png
+      - components-navigation-tabs--line-variant.png
+      - components-navigation-tabs--enclosed-variant.png
+      - components-navigation-tabs--disabled-tab.png
+      - components-navigation-tabs--manual-activation.png
+    criteria:
+      NAM-01: { status: PENDING }
+      NAM-02: { status: PENDING }
+      NAM-03: { status: PENDING }
+      NAM-04: { status: PENDING }
+      NAM-05: { status: PENDING }
+      STR-01: { status: PENDING }
+      STR-02: { status: PENDING }
+      STR-03: { status: PENDING }
+      STR-04: { status: PENDING }
+      STR-05: { status: PENDING }
+      CSS-01: { status: PENDING }
+      CSS-02: { status: PENDING }
+      CSS-03: { status: PENDING }
+      CSS-04: { status: PENDING }
+      CSS-05: { status: PENDING }
+      CSS-06: { status: PENDING }
+      CSS-07: { status: PENDING }
+      STA-01: { status: PENDING }
+      STA-02: { status: PENDING }
+      STA-03: { status: PENDING }
+      STA-04: { status: PENDING }
+      STA-05: { status: PENDING }
+      STA-06: { status: PENDING }
+      A11Y-01: { status: PENDING }
+      A11Y-02: { status: PENDING }
+      A11Y-03: { status: PENDING }
+      A11Y-04: { status: PENDING }
+      A11Y-05: { status: PENDING }
+      A11Y-06: { status: PENDING }
+      A11Y-07: { status: PENDING }
+      A11Y-08: { status: PENDING }
+      A11Y-09: { status: PENDING }
+      A11Y-10: { status: PENDING }
+      DOC-01: { status: PENDING }
+      DOC-02: { status: PENDING }
+      DOC-03: { status: PENDING }
+      DOC-04: { status: PENDING }
+
+  # ─────────────────────────────────────────────────────
+  # PAGINATION
+  # ─────────────────────────────────────────────────────
+  pagination:
+    display-name: TPagination
+    category: navigation
+    screenshots:
+      - components-navigation-pagination--playground.png
+      - components-navigation-pagination--sizes.png
+      - components-navigation-pagination--first-page.png
+      - components-navigation-pagination--last-page.png
+      - components-navigation-pagination--many-pages.png
+      - components-navigation-pagination--few-pages.png
+      - components-navigation-pagination--disabled.png
+    criteria:
+      NAM-01: { status: PENDING }
+      NAM-02: { status: PENDING }
+      NAM-03: { status: PENDING }
+      NAM-04: { status: PENDING }
+      NAM-05: { status: PENDING }
+      STR-01: { status: PENDING }
+      STR-02: { status: PENDING }
+      STR-03: { status: PENDING }
+      STR-04: { status: PENDING }
+      STR-05: { status: PENDING }
+      CSS-01: { status: PENDING }
+      CSS-02: { status: PENDING }
+      CSS-03: { status: PENDING }
+      CSS-04: { status: PENDING }
+      CSS-05: { status: PENDING }
+      CSS-06: { status: PENDING }
+      CSS-07: { status: PENDING }
+      STA-01: { status: PENDING }
+      STA-02: { status: PENDING }
+      STA-03: { status: PENDING }
+      STA-04: { status: PENDING }
+      STA-05: { status: PENDING }
+      STA-06: { status: PENDING }
+      A11Y-01: { status: PENDING }
+      A11Y-02: { status: PENDING }
+      A11Y-03: { status: PENDING }
+      A11Y-04: { status: PENDING }
+      A11Y-05: { status: PENDING }
+      A11Y-06: { status: PENDING }
+      A11Y-07: { status: PENDING }
+      A11Y-08: { status: PENDING }
+      A11Y-09: { status: PENDING }
+      A11Y-10: { status: PENDING }
+      DOC-01: { status: PENDING }
+      DOC-02: { status: PENDING }
+      DOC-03: { status: PENDING }
+      DOC-04: { status: PENDING }
+
+  # ─────────────────────────────────────────────────────
+  # BREADCRUMB
+  # ─────────────────────────────────────────────────────
+  breadcrumb:
+    display-name: TBreadcrumb / TBreadcrumbItem
+    category: navigation
+    screenshots:
+      - components-navigation-breadcrumb--playground.png
+      - components-navigation-breadcrumb--two-items.png
+      - components-navigation-breadcrumb--many-items.png
+      - components-navigation-breadcrumb--custom-separator.png
+    criteria:
+      NAM-01: { status: PENDING }
+      NAM-02: { status: PENDING }
+      NAM-03: { status: PENDING }
+      NAM-04: { status: PENDING }
+      NAM-05: { status: PENDING }
+      STR-01: { status: PENDING }
+      STR-02: { status: PENDING }
+      STR-03: { status: PENDING }
+      STR-04: { status: PENDING }
+      STR-05: { status: PENDING }
+      CSS-01: { status: PENDING }
+      CSS-02: { status: PENDING }
+      CSS-03: { status: PENDING }
+      CSS-04: { status: PENDING }
+      CSS-05: { status: PENDING }
+      CSS-06: { status: PENDING }
+      CSS-07: { status: PENDING }
+      STA-01: { status: PENDING }
+      STA-02: { status: PENDING }
+      STA-03: { status: PENDING }
+      STA-04: { status: PENDING }
+      STA-05: { status: PENDING }
+      STA-06: { status: PENDING }
+      A11Y-01: { status: PENDING }
+      A11Y-02: { status: PENDING }
+      A11Y-03: { status: PENDING }
+      A11Y-04: { status: PENDING }
+      A11Y-05: { status: PENDING }
+      A11Y-06: { status: PENDING }
+      A11Y-07: { status: PENDING }
+      A11Y-08: { status: PENDING }
+      A11Y-09: { status: PENDING }
+      A11Y-10: { status: PENDING }
+      DOC-01: { status: PENDING }
+      DOC-02: { status: PENDING }
+      DOC-03: { status: PENDING }
+      DOC-04: { status: PENDING }
+
+  # ─────────────────────────────────────────────────────
+  # DIVIDER
+  # ─────────────────────────────────────────────────────
+  divider:
+    display-name: TDivider
+    category: layout
+    screenshots:
+      - components-layout-divider--playground.png
+      - components-layout-divider--horizontal.png
+      - components-layout-divider--vertical.png
+    criteria:
+      NAM-01: { status: PENDING }
+      NAM-02: { status: PENDING }
+      NAM-03: { status: PENDING }
+      NAM-04: { status: PENDING }
+      NAM-05: { status: PENDING }
+      STR-01: { status: PENDING }
+      STR-02: { status: PENDING }
+      STR-03: { status: PENDING }
+      STR-04: { status: PENDING }
+      STR-05: { status: PENDING }
+      CSS-01: { status: PENDING }
+      CSS-02: { status: PENDING }
+      CSS-03: { status: PENDING }
+      CSS-04: { status: PENDING }
+      CSS-05: { status: PENDING }
+      CSS-06: { status: PENDING }
+      CSS-07: { status: PENDING }
+      STA-01: { status: PENDING }
+      STA-02: { status: PENDING }
+      STA-03: { status: PENDING }
+      STA-04: { status: PENDING }
+      STA-05: { status: PENDING }
+      STA-06: { status: PENDING }
+      A11Y-01: { status: PENDING }
+      A11Y-02: { status: PENDING }
+      A11Y-03: { status: PENDING }
+      A11Y-04: { status: PENDING }
+      A11Y-05: { status: PENDING }
+      A11Y-06: { status: PENDING }
+      A11Y-07: { status: PENDING }
+      A11Y-08: { status: PENDING }
+      A11Y-09: { status: PENDING }
+      A11Y-10: { status: PENDING }
+      DOC-01: { status: PENDING }
+      DOC-02: { status: PENDING }
+      DOC-03: { status: PENDING }
+      DOC-04: { status: PENDING }
+
+  # ─────────────────────────────────────────────────────
+  # FORM FIELD
+  # ─────────────────────────────────────────────────────
+  form-field:
+    display-name: TFormField
+    category: data-entry
+    screenshots:
+      - components-data-entry-formfield--playground.png
+      - components-data-entry-formfield--sizes.png
+      - components-data-entry-formfield--with-error.png
+      - components-data-entry-formfield--with-hint.png
+      - components-data-entry-formfield--with-checkbox.png
+    criteria:
+      NAM-01: { status: PENDING }
+      NAM-02: { status: PENDING }
+      NAM-03: { status: PENDING }
+      NAM-04: { status: PENDING }
+      NAM-05: { status: PENDING }
+      STR-01: { status: PENDING }
+      STR-02: { status: PENDING }
+      STR-03: { status: PENDING }
+      STR-04: { status: PENDING }
+      STR-05: { status: PENDING }
+      CSS-01: { status: PENDING }
+      CSS-02: { status: PENDING }
+      CSS-03: { status: PENDING }
+      CSS-04: { status: PENDING }
+      CSS-05: { status: PENDING }
+      CSS-06: { status: PENDING }
+      CSS-07: { status: PENDING }
+      STA-01: { status: PENDING }
+      STA-02: { status: PENDING }
+      STA-03: { status: PENDING }
+      STA-04: { status: PENDING }
+      STA-05: { status: PENDING }
+      STA-06: { status: PENDING }
+      A11Y-01: { status: PENDING }
+      A11Y-02: { status: PENDING }
+      A11Y-03: { status: PENDING }
+      A11Y-04: { status: PENDING }
+      A11Y-05: { status: PENDING }
+      A11Y-06: { status: PENDING }
+      A11Y-07: { status: PENDING }
+      A11Y-08: { status: PENDING }
+      A11Y-09: { status: PENDING }
+      A11Y-10: { status: PENDING }
+      DOC-01: { status: PENDING }
+      DOC-02: { status: PENDING }
+      DOC-03: { status: PENDING }
+      DOC-04: { status: PENDING }
+
+  # ─────────────────────────────────────────────────────
+  # TAG
+  # ─────────────────────────────────────────────────────
+  tag:
+    display-name: TTag
+    category: data-display
+    screenshots:
+      - components-data-display-tag--playground.png
+      - components-data-display-tag--sizes.png
+      - components-data-display-tag--variants.png
+      - components-data-display-tag--removable.png
+      - components-data-display-tag--disabled.png
+    criteria:
+      NAM-01: { status: PENDING }
+      NAM-02: { status: PENDING }
+      NAM-03: { status: PENDING }
+      NAM-04: { status: PENDING }
+      NAM-05: { status: PENDING }
+      STR-01: { status: PENDING }
+      STR-02: { status: PENDING }
+      STR-03: { status: PENDING }
+      STR-04: { status: PENDING }
+      STR-05: { status: PENDING }
+      CSS-01: { status: PENDING }
+      CSS-02: { status: PENDING }
+      CSS-03: { status: PENDING }
+      CSS-04: { status: PENDING }
+      CSS-05: { status: PENDING }
+      CSS-06: { status: PENDING }
+      CSS-07: { status: PENDING }
+      STA-01: { status: PENDING }
+      STA-02: { status: PENDING }
+      STA-03: { status: PENDING }
+      STA-04: { status: PENDING }
+      STA-05: { status: PENDING }
+      STA-06: { status: PENDING }
+      A11Y-01: { status: PENDING }
+      A11Y-02: { status: PENDING }
+      A11Y-03: { status: PENDING }
+      A11Y-04: { status: PENDING }
+      A11Y-05: { status: PENDING }
+      A11Y-06: { status: PENDING }
+      A11Y-07: { status: PENDING }
+      A11Y-08: { status: PENDING }
+      A11Y-09: { status: PENDING }
+      A11Y-10: { status: PENDING }
+      DOC-01: { status: PENDING }
+      DOC-02: { status: PENDING }
+      DOC-03: { status: PENDING }
+      DOC-04: { status: PENDING }
+
+  # ─────────────────────────────────────────────────────
+  # PRICING / PRICING CARD
+  # ─────────────────────────────────────────────────────
+  pricing:
+    display-name: TPricing / TPricingCard
+    category: data-display
+    screenshots:
+      - components-data-display-pricing--playground.png
+      - components-data-display-pricing--small.png
+      - components-data-display-pricing--two-columns.png
+      - components-data-display-pricing--custom-slot.png
+      - components-data-display-pricingcard--playground.png
+      - components-data-display-pricingcard--highlighted.png
+      - components-data-display-pricingcard--sizes.png
+      - components-data-display-pricingcard--pricing-grid.png
+    criteria:
+      NAM-01: { status: PENDING }
+      NAM-02: { status: PENDING }
+      NAM-03: { status: PENDING }
+      NAM-04: { status: PENDING }
+      NAM-05: { status: PENDING }
+      STR-01: { status: PENDING }
+      STR-02: { status: PENDING }
+      STR-03: { status: PENDING }
+      STR-04: { status: PENDING }
+      STR-05: { status: PENDING }
+      CSS-01: { status: PENDING }
+      CSS-02: { status: PENDING }
+      CSS-03: { status: PENDING }
+      CSS-04: { status: PENDING }
+      CSS-05: { status: PENDING }
+      CSS-06: { status: PENDING }
+      CSS-07: { status: PENDING }
+      STA-01: { status: PENDING }
+      STA-02: { status: PENDING }
+      STA-03: { status: PENDING }
+      STA-04: { status: PENDING }
+      STA-05: { status: PENDING }
+      STA-06: { status: PENDING }
+      A11Y-01: { status: PENDING }
+      A11Y-02: { status: PENDING }
+      A11Y-03: { status: PENDING }
+      A11Y-04: { status: PENDING }
+      A11Y-05: { status: PENDING }
+      A11Y-06: { status: PENDING }
+      A11Y-07: { status: PENDING }
+      A11Y-08: { status: PENDING }
+      A11Y-09: { status: PENDING }
+      A11Y-10: { status: PENDING }
+      DOC-01: { status: PENDING }
+      DOC-02: { status: PENDING }
+      DOC-03: { status: PENDING }
+      DOC-04: { status: PENDING }
+
+  # ─────────────────────────────────────────────────────
+  # MARKDOWN EDITOR
+  # ─────────────────────────────────────────────────────
+  markdown-editor:
+    display-name: TMarkdownEditor
+    category: form
+    screenshots:
+      - components-form-markdowneditor--playground.png
+      - components-form-markdowneditor--small.png
+      - components-form-markdowneditor--large.png
+      - components-form-markdowneditor--disabled.png
+      - components-form-markdowneditor--with-content.png
+      - components-form-markdowneditor--tab-mode.png
+      - components-form-markdowneditor--with-image-upload.png
+    criteria:
+      NAM-01: { status: PENDING }
+      NAM-02: { status: PENDING }
+      NAM-03: { status: PENDING }
+      NAM-04: { status: PENDING }
+      NAM-05: { status: PENDING }
+      STR-01: { status: PENDING }
+      STR-02: { status: PENDING }
+      STR-03: { status: PENDING }
+      STR-04: { status: PENDING }
+      STR-05: { status: PENDING }
+      CSS-01: { status: PENDING }
+      CSS-02: { status: PENDING }
+      CSS-03: { status: PENDING }
+      CSS-04: { status: PENDING }
+      CSS-05: { status: PENDING }
+      CSS-06: { status: PENDING }
+      CSS-07: { status: PENDING }
+      STA-01: { status: PENDING }
+      STA-02: { status: PENDING }
+      STA-03: { status: PENDING }
+      STA-04: { status: PENDING }
+      STA-05: { status: PENDING }
+      STA-06: { status: PENDING }
+      A11Y-01: { status: PENDING }
+      A11Y-02: { status: PENDING }
+      A11Y-03: { status: PENDING }
+      A11Y-04: { status: PENDING }
+      A11Y-05: { status: PENDING }
+      A11Y-06: { status: PENDING }
+      A11Y-07: { status: PENDING }
+      A11Y-08: { status: PENDING }
+      A11Y-09: { status: PENDING }
+      A11Y-10: { status: PENDING }
+      DOC-01: { status: PENDING }
+      DOC-02: { status: PENDING }
+      DOC-03: { status: PENDING }
+      DOC-04: { status: PENDING }
+
+# ═══════════════════════════════════════════════════════════════
+# RESUMO DA VALIDAÇÃO — TOTAIS
+# ═══════════════════════════════════════════════════════════════
+summary:
+  total-components-audited: 28
+  total-criteria-per-component: 34
+  results:
+    PASS: "0"
+    WARN: "0"
+    FAIL: "0"
+    PENDING: "todos — validação manual pendente"
+
+  components-validated: []
+
+  total-screenshots: 145
+  screenshot-coverage: "Todos os componentes possuem pelo menos 1 screenshot"
+
+  key-findings: []

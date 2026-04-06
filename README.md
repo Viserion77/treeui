@@ -60,6 +60,47 @@ The human-facing product docs and component playground live in Storybook under `
 
 Please read [CONTRIBUTING.md](./CONTRIBUTING.md) before opening a pull request.
 
+## CI/CD & Release Flow
+
+The project uses [Changesets](https://github.com/changesets/changesets) for automated versioning and publishing.
+
+### Pipeline
+
+```
+PR / push → CI (lint, typecheck, tests, build, e2e)
+  ↓ merge to main
+Changesets Action creates "Version Packages" PR (auto-bump + CHANGELOG)
+  ↓ merge version PR
+Publish to npm + Deploy Storybook to GitHub Pages
+```
+
+### Workflows
+
+| Workflow | Trigger | Purpose |
+|---|---|---|
+| **CI** | PR + push to `main` | Lint, typecheck, unit tests, build, e2e |
+| **Release** | Push to `main` | Creates version PR or publishes to npm (runs after CI passes) |
+| **Deploy Docs** | Push to `main` | Builds and deploys Storybook to GitHub Pages (runs after CI passes) |
+
+### Creating a changeset
+
+After making changes, describe what changed before committing:
+
+```bash
+pnpm changeset
+# Select affected packages, bump type (patch/minor/major), and write a summary
+git add . && git commit -m "feat: your change"
+git push
+```
+
+The Changesets bot will open a **"chore: version packages"** PR. Merging it bumps versions, updates `CHANGELOG.md`, and publishes to npm automatically.
+
+### Storybook
+
+Live documentation is deployed to GitHub Pages on every push to `main`:
+
+[https://viserion77.github.io/treeui/](https://viserion77.github.io/treeui/)
+
 ## License
 
 MIT. See [LICENSE](./LICENSE).

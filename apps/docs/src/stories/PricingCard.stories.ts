@@ -1,7 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/vue3';
 import { TPricing, TPricingCard } from '@treeui/vue';
+import type { PricingFeature } from '@treeui/vue';
 
-const sampleFeatures = [
+const sampleFeatures: PricingFeature[] = [
   { text: '5 projects', included: true },
   { text: '10 GB storage', included: true },
   { text: 'Community support', included: true },
@@ -9,7 +10,7 @@ const sampleFeatures = [
   { text: 'Analytics', included: false },
 ];
 
-const proFeatures = [
+const proFeatures: PricingFeature[] = [
   { text: 'Unlimited projects', included: true },
   { text: '100 GB storage', included: true },
   { text: 'Priority support', included: true },
@@ -17,7 +18,7 @@ const proFeatures = [
   { text: 'Analytics', included: true },
 ];
 
-const enterpriseFeatures = [
+const enterpriseFeatures: PricingFeature[] = [
   { text: 'Unlimited everything', included: true },
   { text: '1 TB storage', included: true },
   { text: 'Dedicated support', included: true },
@@ -25,7 +26,8 @@ const enterpriseFeatures = [
   { text: 'Advanced analytics', included: true },
 ];
 
-const cardMeta = {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const cardMeta: Meta<any> = {
   title: 'Components/Data Display/PricingCard',
   component: TPricingCard,
   tags: ['autodocs'],
@@ -48,11 +50,11 @@ const cardMeta = {
       options: ['sm', 'md', 'lg'],
     },
   },
-} satisfies Meta<typeof TPricingCard>;
+};
 
 export default cardMeta;
 
-type Story = StoryObj<typeof cardMeta>;
+type Story = StoryObj;
 
 export const Playground: Story = {
   render: (args: Record<string, unknown>) => ({

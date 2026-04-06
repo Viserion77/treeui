@@ -37,6 +37,7 @@ export { default as TTable } from './TreeTable.vue';
 export { default as TTag } from './TreeTag.vue';
 export { default as TPricing } from './TreePricing.vue';
 export { default as TPricingCard } from './TreePricingCard.vue';
+export type { PricingFeature } from './TreePricingCard.vue';
 export { default as TMarkdownEditor } from './TreeMarkdownEditor.vue';
 
 export { default as TreeAccordion } from './TreeAccordion.vue';

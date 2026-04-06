@@ -97,7 +97,7 @@ export const WithImageUpload: Story = {
       const content = ref(args.modelValue);
 
       // Simulated upload function
-      const uploadImage = async (file: File): Promise<string> => {
+      const uploadImage = async (_file: File): Promise<string> => {
         // Simulate network delay
         await new Promise((resolve) => setTimeout(resolve, 1500));
         return `https://picsum.photos/600/400?random=${Date.now()}`;

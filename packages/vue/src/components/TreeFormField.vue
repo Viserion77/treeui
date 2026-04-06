@@ -85,14 +85,18 @@ const fieldAttrs = computed(() => {
       class="tree-form-field__error"
       role="alert"
     >
-      <slot name="error">{{ error }}</slot>
+      <slot name="error">
+        {{ error }}
+      </slot>
     </p>
 
     <p
       v-else-if="hint || $slots.hint"
       class="tree-form-field__hint"
     >
-      <slot name="hint">{{ hint }}</slot>
+      <slot name="hint">
+        {{ hint }}
+      </slot>
     </p>
   </div>
 </template>

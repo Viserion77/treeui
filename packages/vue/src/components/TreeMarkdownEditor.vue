@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, useAttrs, nextTick, onBeforeUnmount } from 'vue';
+import { computed, ref, useAttrs, nextTick } from 'vue';
 import type { TreeSize } from '../types/contracts';
 
 defineOptions({
@@ -143,7 +143,6 @@ function markdownToHtml(md: string): string {
   let inCodeBlock = false;
   let inList = false;
   let inOrderedList = false;
-  let listType = '';
 
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
@@ -396,7 +395,10 @@ const handleKeydown = (event: KeyboardEvent) => {
         </button>
       </div>
 
-      <div class="tree-md-editor__toolbar-divider" role="separator" />
+      <div
+        class="tree-md-editor__toolbar-divider"
+        role="separator"
+      />
 
       <div class="tree-md-editor__toolbar-group">
         <button
@@ -428,7 +430,10 @@ const handleKeydown = (event: KeyboardEvent) => {
         </button>
       </div>
 
-      <div class="tree-md-editor__toolbar-divider" role="separator" />
+      <div
+        class="tree-md-editor__toolbar-divider"
+        role="separator"
+      />
 
       <div class="tree-md-editor__toolbar-group">
         <button
@@ -460,7 +465,10 @@ const handleKeydown = (event: KeyboardEvent) => {
         </button>
       </div>
 
-      <div class="tree-md-editor__toolbar-divider" role="separator" />
+      <div
+        class="tree-md-editor__toolbar-divider"
+        role="separator"
+      />
 
       <div class="tree-md-editor__toolbar-group">
         <button
@@ -530,10 +538,12 @@ const handleKeydown = (event: KeyboardEvent) => {
         class="tree-md-editor__pane tree-md-editor__pane--preview"
         aria-label="Markdown preview"
       >
+        <!-- eslint-disable vue/no-v-html -->
         <div
           class="tree-md-editor__preview"
           v-html="renderedHtml"
         />
+        <!-- eslint-enable vue/no-v-html -->
       </div>
     </div>
 

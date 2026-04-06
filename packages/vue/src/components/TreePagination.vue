@@ -97,7 +97,10 @@ function onKeydown(event: KeyboardEvent, page: number) {
 </script>
 
 <template>
-  <nav :class="classes" :aria-label="label">
+  <nav
+    :class="classes"
+    :aria-label="label"
+  >
     <ul class="tree-pagination__list">
       <!-- Previous button -->
       <li class="tree-pagination__item">

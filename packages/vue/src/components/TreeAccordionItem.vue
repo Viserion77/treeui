@@ -88,7 +88,10 @@ onBeforeUnmount(() => {
         @click="handleToggle"
         @keydown="handleKeydown"
       >
-        <slot name="trigger" :open="isOpen">
+        <slot
+          name="trigger"
+          :open="isOpen"
+        >
           {{ value }}
         </slot>
         <svg

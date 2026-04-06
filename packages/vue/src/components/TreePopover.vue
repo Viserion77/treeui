@@ -79,7 +79,9 @@ const openPopover = () => {
   setValue(true);
   nextTick(() => {
     if (contentRef.value) {
-      focusFirst(contentRef.value) || contentRef.value.focus();
+      if (!focusFirst(contentRef.value)) {
+        contentRef.value.focus();
+      }
     }
   });
 };
@@ -148,7 +150,10 @@ onBeforeUnmount(() => {
       @click="togglePopover"
       @keydown="onTriggerKeydown"
     >
-      <slot name="trigger" :is-open="isOpen">
+      <slot
+        name="trigger"
+        :is-open="isOpen"
+      >
         <button
           ref="triggerRef"
           type="button"

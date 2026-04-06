@@ -1,8 +1,11 @@
 {
   "name": "@treeui/vue",
-  "version": "0.1.3",
+  "version": "0.2.0",
   "description": "Vue 3 component package for TreeUI.",
   "type": "module",
+  "sideEffects": [
+    "*.css"
+  ],
   "main": "./dist/index.js",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",

@@ -1,12 +1,6 @@
 @import '@treeui/tokens/styles.css';
 @import '@treeui/tokens/themes.css';
 
-:root {
-  font-family: var(--tree-font-family-sans);
-  background: var(--tree-color-bg-primary);
-  color: var(--tree-color-text-primary);
-}
-
 *,
 *::before,
 *::after {

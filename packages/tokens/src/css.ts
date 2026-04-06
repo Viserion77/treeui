@@ -56,4 +56,8 @@ export const createStylesheet = () =>
   [createFoundationCss(), createDefaultThemeCss('light')].join('\n\n');
 
 export const createThemesStylesheet = () =>
-  [createThemeCss('light'), createThemeCss('dark')].join('\n\n');
+  [
+    createThemeCss('light'),
+    createThemeCss('dark'),
+    `@media (prefers-color-scheme: dark) {\n${createThemeCss('dark', ':root:not([data-tree-theme="light"])')}\n}`,
+  ].join('\n\n');

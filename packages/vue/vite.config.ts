@@ -15,15 +15,15 @@ export default defineConfig({
     }),
   ],
   build: {
+    sourcemap: true,
     lib: {
       entry: resolveFromPackage('./src/index.ts'),
       name: 'TreeUIVue',
-      fileName: 'index',
-      formats: ['es'],
+      fileName: (format) => format === 'cjs' ? 'index.cjs' : 'index.js',
+      formats: ['es', 'cjs'],
     },
     rollupOptions: {
       external: ['vue', '@treeui/tokens', '@treeui/utils', '@treeui/icons'],
     },
   },
 });
-

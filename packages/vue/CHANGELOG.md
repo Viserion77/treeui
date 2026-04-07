@@ -1,5 +1,13 @@
 # @treeui/vue
 
+## 0.2.1
+
+### Patch Changes
+
+- Fix `TreeToastProvider` so it renders the default slot while still teleporting toast notifications to `body`.
+
+  Improve package DX by adding a CommonJS export path and JavaScript source maps to the Vue build output.
+
 ## 0.2.0
 
 ### Minor Changes

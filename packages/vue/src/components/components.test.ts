@@ -1158,6 +1158,36 @@ describe('@treeui/vue', () => {
     wrapper.unmount();
   });
 
+  it('renders default slot content while teleporting toasts to body', async () => {
+    const toast = useToast();
+    toast.clear();
+
+    const wrapper = mount(TreeToastProvider, {
+      attachTo: document.body,
+      slots: {
+        default: '<div class="toast-provider-child">Wrapped app</div>',
+      },
+    });
+
+    expect(wrapper.find('.toast-provider-child').exists()).toBe(true);
+    expect(wrapper.text()).toContain('Wrapped app');
+
+    toast.add({
+      title: 'Still teleported',
+      variant: 'info',
+      duration: 0,
+    });
+
+    await nextTick();
+
+    const toastContainer = document.querySelector('.tree-toast-provider');
+    expect(toastContainer).not.toBeNull();
+    expect(toastContainer?.parentElement).toBe(document.body);
+
+    toast.clear();
+    wrapper.unmount();
+  });
+
   it('removes a single toast by id and respects closable', async () => {
     const toast = useToast();
     toast.clear();

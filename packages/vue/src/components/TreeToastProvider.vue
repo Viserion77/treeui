@@ -31,6 +31,8 @@ function handleClose(id: string) {
 </script>
 
 <template>
+  <slot />
+
   <Teleport to="body">
     <div
       :class="classes"

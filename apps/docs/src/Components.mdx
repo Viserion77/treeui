@@ -4,7 +4,40 @@ import { Meta, Title } from '@storybook/blocks';
 
 <Title>Components</Title>
 
-The current public foundation focuses on eight components:
-Button, Input, DatePicker, Modal, Card, Badge, Spinner, and Tooltip.
+TreeUI now ships a broader app-ready surface built on the original foundation.
+The package stays intentionally composable, so teams can assemble forms, overlays, data screens, and navigation without depending on one large "kitchen sink" abstraction.
 
-This compact scope keeps the API consistent and lets TreeUI ship a polished public foundation before adding overlays and navigation patterns.
+## Form
+
+`TInput` · `TTextarea` · `TCheckbox` · `TRadio` · `TRadioGroup` · `TSelect` · `TDatePicker` · `TSwitch` · `TFormField` · `TMarkdownEditor`
+
+## Navigation & Disclosure
+
+`TAccordion` · `TAccordionItem` · `TBreadcrumb` · `TBreadcrumbItem` · `TTabs` · `TTabList` · `TTab` · `TTabPanel` · `TPagination`
+
+## Feedback & Overlay
+
+`TAlert` · `TModal` · `TDrawer` · `TDropdown` · `TPopover` · `TTooltip` · `TContextMenu` · `TToast` · `TToastProvider`
+
+## Data & Display
+
+`TAvatar` · `TBadge` · `TCard` · `TDivider` · `TProgress` · `TSkeleton` · `TSpinner` · `TTable` · `TTag` · `TPricing` · `TPricingCard`
+
+## Composition Notes
+
+`TTable` stays intentionally focused on structured listing. Filtering, bulk actions, pagination, and data fetching compose around it in the app layer, with `TPagination` used separately when needed.
+
+## Aliases
+
+TreeUI uses two kinds of aliases in documentation:
+
+- Export aliases: primary exports use the `T` prefix, and `Tree<Name>` remains available only for compatibility and migration.
+- Semantic aliases: some common UI names map to existing patterns instead of creating duplicate standalone components.
+
+These semantic aliases are documentation guidance only. They do not add extra exports to `@treeui/vue`.
+
+| Common term | Use in TreeUI |
+|---|---|
+| `Snackbar` / `Notification` | `TToast` |
+| `Banner` | `TAlert` |
+| `Collapsible` / `Details` | `TAccordion` with `type="single"` and `collapsible` |

@@ -47,6 +47,10 @@ import '@treeui/vue/style.css'
 
 `TButton` · `TModal` · `TDrawer` · `TDropdown` · `TPopover` · `TTooltip` · `TContextMenu` · `TPagination` · `TToast` · `TToastProvider`
 
+### Table composition
+
+`TTable` stays focused on structured listing. Filters, toolbars, bulk actions, and pagination are intended to be composed around it, with `TPagination` used separately when needed.
+
 ## Theming
 
 TreeUI uses CSS custom properties (`--tree-*`) for all styling. Light theme is applied by default.
@@ -73,6 +77,14 @@ document.documentElement.setAttribute('data-tree-theme', 'dark')
 ## Compatibility aliases
 
 All components are also exported with the `Tree` prefix (e.g. `TreeButton`, `TreeInput`) for backwards compatibility.
+
+## Semantic aliases in docs
+
+Some docs use familiar product terms as aliases for existing TreeUI patterns. These are documentation aliases only, not extra exports.
+
+- `Snackbar` / `Notification` -> `TToast`
+- `Banner` -> `TAlert`
+- `Collapsible` / `Details` -> `TAccordion` with `type="single"` and `collapsible`
 
 ## TypeScript
 

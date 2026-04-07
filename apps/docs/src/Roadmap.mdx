@@ -4,97 +4,77 @@ import { Meta, Title } from '@storybook/blocks';
 
 <Title>Roadmap</Title>
 
-TreeUI ships components in milestones, grouped by dependency depth and usage frequency.
-Each milestone builds on the previous one. Components within a milestone can be implemented in parallel.
+TreeUI ships components in milestones, grouped by dependency depth and product impact.
+Each milestone builds on the previous one while keeping the public API compact and composable.
 
 ---
 
-## Current state — Foundation (shipped)
+## Current state — Public surface (shipped)
 
-| Component | Package | Notes |
-|---|---|---|
-| `TButton` | `@treeui/vue` | Variants: solid, outline, ghost, soft, danger |
-| `TBadge` | `@treeui/vue` | Inline label with color variants |
-| `TCard` | `@treeui/vue` | Surface container: outline, soft, solid |
-| `TInput` | `@treeui/vue` | Text field with prefix/suffix slots |
-| `TSpinner` | `@treeui/vue` | Indeterminate loading indicator |
-| `TTooltip` | `@treeui/vue` | Hover/focus tooltip, four sides |
-| `TModal` | `@treeui/vue` | Focus-trapped dialog with overlay |
-| `TDatePicker` | `@treeui/vue` | Controlled/uncontrolled date input |
-| `TPricing` / `TPricingCard` | `@treeui/vue` | Pricing plan grid and individual plan cards |
-| `TMarkdownEditor` | `@treeui/vue` | Markdown editor with preview mode |
+| Area | Components |
+|---|---|
+| Form | `TInput`, `TTextarea`, `TCheckbox`, `TRadio`, `TRadioGroup`, `TSelect`, `TDatePicker`, `TSwitch`, `TFormField`, `TMarkdownEditor` |
+| Feedback & status | `TAlert`, `TToast`, `TToastProvider`, `TProgress`, `TSkeleton`, `TSpinner` |
+| Navigation & disclosure | `TTabs`, `TAccordion`, `TAccordionItem`, `TDropdown`, `TPagination`, `TBreadcrumb`, `TBreadcrumbItem` |
+| Overlay & interaction | `TModal`, `TDrawer`, `TPopover`, `TTooltip`, `TContextMenu` |
+| Data & display | `TAvatar`, `TBadge`, `TCard`, `TDivider`, `TTable`, `TTag`, `TPricing`, `TPricingCard` |
 
 ---
 
-## Milestone 1 — Form Controls
+## Table direction
 
-Complete the set of primitive form inputs so any real form can be built without workarounds.
+`TTable` stays intentionally lean and focused on structured listing. Pagination, filters, toolbars, bulk actions, and data fetching stay composable outside the table, with `TPagination` used separately when needed.
+
+---
+
+## Milestone 1 — Application Primitives
+
+Close the highest-friction gaps for SaaS products, dashboards, admin panels, and internal tools.
 
 | Component | Description |
 |---|---|
-| `TCheckbox` | Boolean toggle with indeterminate state; supports `v-model` |
-| `TRadio` / `TRadioGroup` | Single-select from a group; `v-model` on the group |
-| `TSwitch` | On/off toggle; semantic alternative to checkbox for settings |
-| `TSelect` | Native-backed dropdown; controlled and uncontrolled |
-| `TTextarea` | Multi-line text field; auto-grow option |
-| `TFormField` | Label + input wrapper with error and hint slots |
+| `TCombobox` / `TAutocomplete` | Searchable single-select for large lists, async suggestions, and command-style selection |
+| `TConfirmDialog` / `TAlertDialog` | Blocking confirmation flow for destructive or high-risk actions, built on the existing dialog contract |
+| `TMultiSelect` | Multiple selection for filters, tags, teams, permissions, and bulk actions |
+| `TNumberInput` | Numeric field with increment and decrement stepper controls, min/max, and step behavior |
+| `TEmptyState` | Standardized empty, no-results, and first-run placeholder pattern |
+| `TFileUpload` / `TDropzone` | File selection, drag-and-drop, upload states, and validation affordances |
+| `TTreeView` | Hierarchical navigation and nested selection for files, categories, and permissions |
+| `TSteps` / `TStepper` | Step-by-step progress pattern for onboarding, wizards, and setup flows |
+| `TToggleGroup` | Compact single and multi-select toggle buttons as a visual alternative to radios and checkboxes |
 
 ---
 
-## Milestone 2 — Feedback & Status
+## Milestone 2 — App Shell & Layout
 
-Provide the feedback layer: notifications, inline messages, and loading placeholders.
+Add layout helpers and application shell building blocks without forcing a full page framework.
 
 | Component | Description |
 |---|---|
-| `TAlert` | Inline status banner: info, success, warning, danger |
-| `TToast` | Ephemeral notification stack (composable `useToast`) |
-| `TProgress` | Determinate progress bar and ring |
-| `TSkeleton` | Placeholder shimmer for loading states |
+| `TSidebar` / `TNavMenu` | Collapsible lateral navigation for dashboards and workspace layouts |
+| `TNavbar` / `TAppBar` | Top-level application navigation and global action bar |
+| `TContainer` | Width-constrained layout wrapper for content sections |
+| `TGrid` | Semantic grid helper for dashboard cards, forms, and responsive layouts |
+| `TStack` | Vertical and horizontal spacing primitive for common flex layouts |
 
 ---
 
-## Milestone 3 — Navigation & Disclosure
+## Alias-only concepts
 
-Add structured navigation and content disclosure patterns.
+Some common UI terms are intentionally documented as aliases to existing patterns rather than planned as separate components.
 
-| Component | Description |
+| Common term | TreeUI pattern |
 |---|---|
-| `TTabs` | Tabbed panel navigation with keyboard support |
-| `TAccordion` | Collapsible sections, single or multi-open |
-| `TDropdown` | Trigger + floating menu with keyboard navigation |
-| `TPagination` | Page controls with prev/next and jump-to |
-| `TBreadcrumb` | Hierarchical navigation trail |
-
----
-
-## Milestone 4 — Advanced Overlays
-
-Richer overlay and contextual patterns built on the existing overlay contract.
-
-| Component | Description |
-|---|---|
-| `TDrawer` | Side-anchored panel (top, right, bottom, left) |
-| `TPopover` | Rich floating content anchored to a trigger |
-| `TContextMenu` | Right-click floating menu |
-
----
-
-## Milestone 5 — Data & Display Primitives
-
-Application-level primitives for structured content and identity.
-
-| Component | Description |
-|---|---|
-| `TAvatar` | User image with fallback initials and status dot |
-| `TTable` | Sortable, accessible data table |
-| `TDivider` | Horizontal or vertical visual separator |
-| `TTag` | Removable label/tag for filters and selections |
+| `Snackbar` / `Notification` | Use `TToast` |
+| `Banner` | Use `TAlert` |
+| `Collapsible` / `Details` | Use `TAccordion` in single mode with `collapsible` enabled |
 
 ---
 
 ## Future
 
+- `TCarousel` for focused media and card browsing patterns
+- Data visualization primitives for dashboards, including charts, sparklines, and big-number / stat blocks
 - Additional framework packages (`@treeui/react`, `@treeui/svelte`) reusing the same token system, naming, accessibility guidance, and design language.
 - Motion/animation token expansion.
 - Right-to-left (RTL) layout support.

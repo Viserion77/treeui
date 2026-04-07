@@ -1,0 +1,44 @@
+name: TTimeline
+legacy_alias: TreeTimeline
+source_file: packages/vue/src/components/TreeTimeline.vue
+package: "@treeui/vue"
+kind: data_display
+status: available
+purpose: "Vertical timeline for activity history, audits, release events, and chronological product updates."
+
+props:
+  items:
+    type: "TreeTimelineItem[]"
+    default: "[]"
+    note: "Array of { id?: string | number; title: string; description?: string; meta?: string; timestamp?: string; datetime?: string; tone?: 'neutral' | 'brand' | 'success' | 'warning' | 'danger' }"
+  size:
+    type: TreeSize
+    default: md
+    values: [sm, md, lg]
+
+events: []
+
+slots:
+  - marker
+  - item
+
+forwards_attrs_to: root_list
+
+a11y:
+  root_semantics: "Renders as an ordered list (`ol`) by default."
+  decorative_marker_hidden_from_assistive_tech: true
+  timestamp_uses_time_element_when_provided: true
+
+behavior:
+  items_render_in_order_given: true
+  line_hidden_on_last_item: true
+  marker_tone_defaults_to_neutral: true
+
+example: |
+  <TTimeline
+    aria-label="Release history"
+    :items="[
+      { title: 'Release queued', meta: 'Queued', timestamp: '09:12', tone: 'brand' },
+      { title: 'Review approved', meta: 'Approved', timestamp: '10:03', tone: 'success' },
+    ]"
+  />

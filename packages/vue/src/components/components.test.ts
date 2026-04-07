@@ -39,6 +39,7 @@ import TreeDivider from './TreeDivider.vue';
 import TreeEmptyState from './TreeEmptyState.vue';
 import TreeTable from './TreeTable.vue';
 import TreeTag from './TreeTag.vue';
+import TreeTimeline from './TreeTimeline.vue';
 import TreePricingCard from './TreePricingCard.vue';
 import TreePricing from './TreePricing.vue';
 import TreeMarkdownEditor from './TreeMarkdownEditor.vue';
@@ -2532,6 +2533,86 @@ describe('TTabs', () => {
     expect(wrapper.classes()).toContain('is-disabled');
     await wrapper.find('.tree-tag__remove').trigger('click');
     expect(wrapper.emitted('remove')).toBeUndefined();
+  });
+
+  // ── Timeline ──
+
+  it('renders timeline items with metadata and timestamps', () => {
+    const wrapper = mount(TreeTimeline, {
+      props: {
+        items: [
+          {
+            id: 'queued',
+            meta: 'Queued',
+            title: 'Release queued',
+            description: 'Waiting for review.',
+            timestamp: '09:12',
+            datetime: '2026-04-07T09:12:00Z',
+            tone: 'brand',
+          },
+          {
+            id: 'approved',
+            meta: 'Approved',
+            title: 'Review approved',
+            description: 'Ready to publish.',
+            timestamp: '10:03',
+            tone: 'success',
+          },
+        ],
+      },
+      attrs: {
+        'aria-label': 'Release history',
+      },
+    });
+
+    expect(wrapper.classes()).toContain('tree-timeline');
+    expect(wrapper.findAll('.tree-timeline__item')).toHaveLength(2);
+    expect(wrapper.text()).toContain('Release queued');
+    expect(wrapper.text()).toContain('Approved');
+    expect(wrapper.find('.tree-timeline__marker--brand').exists()).toBe(true);
+    expect(wrapper.find('.tree-timeline__marker--success').exists()).toBe(true);
+    expect(wrapper.get('time').attributes('datetime')).toBe('2026-04-07T09:12:00Z');
+    expect(wrapper.attributes('aria-label')).toBe('Release history');
+  });
+
+  it('supports custom marker and item slots in timeline', () => {
+    const wrapper = mount(TreeTimeline, {
+      props: {
+        items: [
+          { id: 'item-1', title: 'Event one', tone: 'warning' },
+        ],
+      },
+      slots: {
+        marker: '<span class="custom-marker">!</span>',
+        item: '<div class="custom-item">Custom timeline item</div>',
+      },
+    });
+
+    expect(wrapper.find('.custom-marker').exists()).toBe(true);
+    expect(wrapper.find('.custom-item').text()).toContain('Custom timeline item');
+  });
+
+  it('applies timeline size classes and omits connector on last item', () => {
+    const sm = mount(TreeTimeline, {
+      props: {
+        size: 'sm',
+        items: [{ title: 'Small item' }],
+      },
+    });
+    const lg = mount(TreeTimeline, {
+      props: {
+        size: 'lg',
+        items: [
+          { title: 'First item' },
+          { title: 'Second item' },
+        ],
+      },
+    });
+
+    expect(sm.classes()).toContain('tree-timeline--sm');
+    expect(sm.find('.tree-timeline__line').exists()).toBe(false);
+    expect(lg.classes()).toContain('tree-timeline--lg');
+    expect(lg.findAll('.tree-timeline__line')).toHaveLength(1);
   });
 
   it('renders pricing card with title, price, and features', () => {

@@ -47,6 +47,7 @@ If a public API changes, update the matching file here in the same change.
 - `COMPONENTS/confirm-dialog.yaml`
 - `COMPONENTS/empty-state.yaml`
 - `COMPONENTS/input.yaml`
+- `COMPONENTS/timeline.yaml`
 - `COMPONENTS/card.yaml`
 - `COMPONENTS/badge.yaml`
 - `COMPONENTS/spinner.yaml`

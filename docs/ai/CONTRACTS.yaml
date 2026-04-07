@@ -39,6 +39,7 @@ primary_exports:
   - TDivider
   - TTable
   - TTag
+  - TTimeline
 
 compatibility_aliases:
   TAlert: TreeAlert
@@ -74,6 +75,7 @@ compatibility_aliases:
   TDivider: TreeDivider
   TTable: TreeTable
   TTag: TreeTag
+  TTimeline: TreeTimeline
 
 shared_sizes:
   values: [sm, md, lg]
@@ -93,6 +95,7 @@ shared_sizes:
     - TModal
     - TSpinner
     - TSwitch
+    - TTimeline
     - TTabs
 
 shared_variants:
@@ -103,7 +106,7 @@ shared_props:
   variant:
     used_by: [TBadge, TButton, TCard]
   size:
-    used_by: [TBadge, TButton, TCard, TCheckbox, TCombobox, TConfirmDialog, TDatePicker, TDropdown, TInput, TModal, TRadio, TRadioGroup, TSelect, TSpinner, TTextarea]
+    used_by: [TBadge, TButton, TCard, TCheckbox, TCombobox, TConfirmDialog, TDatePicker, TDropdown, TInput, TModal, TRadio, TRadioGroup, TSelect, TSpinner, TTextarea, TTimeline]
   disabled:
     used_by: [TButton, TCheckbox, TCombobox, TConfirmDialog, TDatePicker, TDropdown, TInput, TModal, TRadio, TRadioGroup, TSelect, TSwitch, TTextarea, TTooltip]
   loading:

@@ -28,6 +28,7 @@
 .tree-card,
 .tree-badge,
 .tree-alert,
+.tree-empty-state,
 .tree-toast,
 .tree-pagination,
 .tree-tooltip__content {
@@ -635,6 +636,96 @@
 .tree-card__body {
   display: grid;
   gap: var(--tree-space-2);
+}
+
+.tree-empty-state {
+  display: grid;
+  justify-items: center;
+  gap: var(--tree-space-4);
+  width: 100%;
+  padding: var(--tree-space-5);
+  border: var(--tree-border-width-subtle) dashed var(--tree-color-border-default);
+  border-radius: var(--tree-radius-lg);
+  background: color-mix(in srgb, var(--tree-color-bg-subtle) 72%, var(--tree-color-bg-surface));
+  color: var(--tree-color-text-primary);
+  text-align: center;
+}
+
+.tree-empty-state--sm {
+  padding: var(--tree-space-4);
+  gap: var(--tree-space-3);
+}
+
+.tree-empty-state--lg {
+  padding: var(--tree-space-6);
+  gap: var(--tree-space-5);
+}
+
+.tree-empty-state__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: var(--tree-radius-pill);
+  background: var(--tree-color-brand-soft);
+  color: var(--tree-color-brand-primary);
+}
+
+.tree-empty-state--sm .tree-empty-state__icon {
+  width: 3rem;
+  height: 3rem;
+}
+
+.tree-empty-state--lg .tree-empty-state__icon {
+  width: 4rem;
+  height: 4rem;
+}
+
+.tree-empty-state__content {
+  display: grid;
+  gap: var(--tree-space-2);
+  justify-items: center;
+  width: min(100%, 32rem);
+}
+
+.tree-empty-state__title {
+  margin: 0;
+  font-size: var(--tree-font-size-xl);
+  font-weight: var(--tree-font-weight-semibold);
+  line-height: var(--tree-font-lineHeight-heading);
+  color: var(--tree-color-text-primary);
+}
+
+.tree-empty-state--sm .tree-empty-state__title {
+  font-size: var(--tree-font-size-lg);
+}
+
+.tree-empty-state--lg .tree-empty-state__title {
+  font-size: var(--tree-font-size-2xl);
+}
+
+.tree-empty-state__description {
+  margin: 0;
+  color: var(--tree-color-text-muted);
+  font-size: var(--tree-font-size-md);
+  line-height: var(--tree-font-lineHeight-body);
+}
+
+.tree-empty-state__body {
+  display: grid;
+  gap: var(--tree-space-2);
+  color: var(--tree-color-text-primary);
+  font-size: var(--tree-font-size-sm);
+  line-height: var(--tree-font-lineHeight-body);
+}
+
+.tree-empty-state__actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--tree-space-2);
+  margin-top: var(--tree-space-2);
 }
 
 .tree-badge {

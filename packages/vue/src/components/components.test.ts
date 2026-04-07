@@ -35,6 +35,7 @@ import TreeTabPanel from './TreeTabPanel.vue';
 import TreeToastProvider from './TreeToastProvider.vue';
 import TreeAvatar from './TreeAvatar.vue';
 import TreeDivider from './TreeDivider.vue';
+import TreeEmptyState from './TreeEmptyState.vue';
 import TreeTable from './TreeTable.vue';
 import TreeTag from './TreeTag.vue';
 import TreePricingCard from './TreePricingCard.vue';
@@ -2256,6 +2257,72 @@ describe('TTabs', () => {
     expect(wrapper.attributes('role')).toBe('separator');
     expect(wrapper.attributes('aria-orientation')).toBe('vertical');
     expect(wrapper.attributes('aria-label')).toBe('Section');
+  });
+
+  // ── EmptyState ──
+
+  it('renders empty state with title and description props', () => {
+    const wrapper = mount(TreeEmptyState, {
+      props: {
+        title: 'No releases yet',
+        description: 'Create your first release to start tracking milestones.',
+      },
+    });
+
+    expect(wrapper.classes()).toContain('tree-empty-state');
+    expect(wrapper.find('.tree-empty-state__title').text()).toBe('No releases yet');
+    expect(wrapper.find('.tree-empty-state__description').text()).toContain('Create your first release');
+    expect(wrapper.attributes('aria-labelledby')).toBeDefined();
+    expect(wrapper.attributes('aria-describedby')).toBeDefined();
+  });
+
+  it('renders icon, body, and actions slots in empty state', () => {
+    const wrapper = mount(TreeEmptyState, {
+      props: {
+        title: 'No projects',
+      },
+      slots: {
+        icon: '<span class="test-icon">icon</span>',
+        default: '<p class="test-body">Invite teammates to get started.</p>',
+        actions: '<button type="button" class="test-action">Invite</button>',
+      },
+    });
+
+    expect(wrapper.find('.tree-empty-state__icon').exists()).toBe(true);
+    expect(wrapper.find('.tree-empty-state__body').text()).toContain('Invite teammates');
+    expect(wrapper.find('.tree-empty-state__actions').text()).toContain('Invite');
+  });
+
+  it('supports polymorphic empty state root and size classes', () => {
+    const sm = mount(TreeEmptyState, {
+      props: {
+        as: 'article',
+        size: 'sm',
+        title: 'Small empty state',
+      },
+    });
+    const lg = mount(TreeEmptyState, {
+      props: {
+        size: 'lg',
+        title: 'Large empty state',
+      },
+    });
+
+    expect(sm.element.tagName).toBe('ARTICLE');
+    expect(sm.classes()).toContain('tree-empty-state--sm');
+    expect(lg.classes()).toContain('tree-empty-state--lg');
+  });
+
+  it('renders title and description slots when provided', () => {
+    const wrapper = mount(TreeEmptyState, {
+      slots: {
+        title: '<span>Custom title</span>',
+        description: '<span>Custom description</span>',
+      },
+    });
+
+    expect(wrapper.find('.tree-empty-state__title').text()).toBe('Custom title');
+    expect(wrapper.find('.tree-empty-state__description').text()).toBe('Custom description');
   });
 
   // ── Table ──

@@ -44,6 +44,7 @@ If a public API changes, update the matching file here in the same change.
 
 - `COMPONENTS/button.yaml`
 - `COMPONENTS/combobox.yaml`
+- `COMPONENTS/empty-state.yaml`
 - `COMPONENTS/input.yaml`
 - `COMPONENTS/card.yaml`
 - `COMPONENTS/badge.yaml`

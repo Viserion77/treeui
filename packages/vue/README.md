@@ -41,7 +41,7 @@ import '@treeui/vue/style.css'
 
 ### Display
 
-`TBadge` · `TAlert` · `TAvatar` · `TTag` · `TSpinner` · `TProgress` · `TSkeleton`
+`TBadge` · `TAlert` · `TAvatar` · `TEmptyState` · `TTag` · `TSpinner` · `TProgress` · `TSkeleton`
 
 ### Overlay & Interaction
 

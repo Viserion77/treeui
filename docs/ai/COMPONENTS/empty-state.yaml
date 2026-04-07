@@ -1,0 +1,51 @@
+name: TEmptyState
+legacy_alias: TreeEmptyState
+source_file: packages/vue/src/components/TreeEmptyState.vue
+package: "@treeui/vue"
+kind: feedback
+status: available
+purpose: "Structured empty, no-results, and first-run placeholder block with optional icon, body content, and actions."
+
+props:
+  as:
+    type: string
+    default: section
+  size:
+    type: TreeSize
+    default: md
+    values: [sm, md, lg]
+  title:
+    type: string
+    default: ""
+  description:
+    type: string
+    default: ""
+
+events: []
+
+slots:
+  - icon
+  - title
+  - description
+  - default
+  - actions
+
+a11y:
+  root_aria_labelledby_when_title_present: true
+  root_aria_describedby_when_description_present: true
+  icon_slot_marked_aria_hidden: true
+
+behavior:
+  renders_title_and_description_from_props_or_slots: true
+  default_slot_renders_supporting_body_content: true
+  actions_slot_renders_cta_group: true
+
+example: |
+  <TEmptyState
+    title="No matching results"
+    description="Try a different search term or clear one of the active filters."
+  >
+    <template #actions>
+      <TButton size="sm" variant="outline">Clear filters</TButton>
+    </template>
+  </TEmptyState>

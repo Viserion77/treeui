@@ -17,6 +17,7 @@ primary_exports:
   - TDatePicker
   - TDropdown
   - TDrawer
+  - TEmptyState
   - TFormField
   - TInput
   - TModal
@@ -50,6 +51,7 @@ compatibility_aliases:
   TDatePicker: TreeDatePicker
   TDropdown: TreeDropdown
   TDrawer: TreeDrawer
+  TEmptyState: TreeEmptyState
   TFormField: TreeFormField
   TInput: TreeInput
   TModal: TreeModal
@@ -80,6 +82,7 @@ shared_sizes:
     - TCombobox
     - TDatePicker
     - TDropdown
+    - TEmptyState
     - TFormField
     - TInput
     - TSelect

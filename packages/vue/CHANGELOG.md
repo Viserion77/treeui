@@ -1,5 +1,13 @@
 # @treeui/vue
 
+## 0.3.0
+
+### Minor Changes
+
+- Add new app-ready Vue components including `TCombobox`, `TConfirmDialog`, `TEmptyState`, `TTimeline`, and `TFileUpload`.
+
+  Expand the package surface with typed exports, stories, tests, and contract/docs coverage for the new components, including drag-and-drop and `Ctrl+V` paste support in `TFileUpload`.
+
 ## 0.2.1
 
 ### Patch Changes

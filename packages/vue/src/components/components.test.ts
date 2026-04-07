@@ -28,6 +28,7 @@ import TreeBreadcrumbItem from './TreeBreadcrumbItem.vue';
 import TreeDropdown from './TreeDropdown.vue';
 import TreeDrawer from './TreeDrawer.vue';
 import TreeContextMenu from './TreeContextMenu.vue';
+import TreeFileUpload from './TreeFileUpload.vue';
 import TreePopover from './TreePopover.vue';
 import TreeTabs from './TreeTabs.vue';
 import TreeTabList from './TreeTabList.vue';
@@ -124,6 +125,133 @@ describe('@treeui/vue', () => {
     expect(wrapper.text()).toContain('pre');
     expect(wrapper.text()).toContain('suf');
     expect(wrapper.get('input').attributes('aria-label')).toBe('Project name');
+  });
+
+  it('opens the file picker from keyboard and accepts input files', async () => {
+    const clickSpy = vi.spyOn(HTMLInputElement.prototype, 'click').mockImplementation(() => {});
+
+    const wrapper = mount(TreeFileUpload, {
+      props: {
+        label: 'Upload assets',
+      },
+    });
+
+    const dropzone = wrapper.get('.tree-file-upload__dropzone');
+    await dropzone.trigger('keydown', { key: 'Enter' });
+
+    expect(clickSpy).toHaveBeenCalledTimes(1);
+
+    const input = wrapper.get('input[type="file"]');
+    const file = new File(['brief'], 'brief.txt', { type: 'text/plain' });
+
+    Object.defineProperty(input.element, 'files', {
+      value: [file],
+      configurable: true,
+    });
+
+    await input.trigger('change');
+
+    expect(wrapper.emitted('update:modelValue')?.[0]).toEqual([[file]]);
+    expect(wrapper.emitted('files-accepted')?.[0]).toEqual([[file]]);
+
+    clickSpy.mockRestore();
+  });
+
+  it('handles drag and drop files', async () => {
+    const wrapper = mount(TreeFileUpload);
+    const dropzone = wrapper.get('.tree-file-upload__dropzone');
+    const file = new File(['image'], 'hero.png', { type: 'image/png' });
+    const dataTransfer = {
+      files: [file],
+      types: ['Files'],
+      dropEffect: '',
+    } as unknown as DataTransfer;
+
+    await dropzone.trigger('dragenter', { dataTransfer });
+
+    expect(wrapper.classes()).toContain('is-drag-active');
+
+    await dropzone.trigger('drop', { dataTransfer });
+
+    expect(wrapper.classes()).not.toContain('is-drag-active');
+    expect(wrapper.emitted('update:modelValue')?.[0]).toEqual([[file]]);
+  });
+
+  it('accepts pasted files while focused', async () => {
+    const wrapper = mount(TreeFileUpload);
+    const file = new File(['image'], 'pasted.png', { type: 'image/png' });
+    const pasteEvent = new Event('paste', {
+      bubbles: true,
+      cancelable: true,
+    });
+
+    Object.defineProperty(pasteEvent, 'clipboardData', {
+      value: {
+        items: [
+          {
+            kind: 'file',
+            getAsFile: () => file,
+          },
+        ],
+      },
+      configurable: true,
+    });
+
+    await wrapper.trigger('focusin');
+    document.dispatchEvent(pasteEvent);
+    await nextTick();
+
+    expect(pasteEvent.defaultPrevented).toBe(true);
+    expect(wrapper.emitted('update:modelValue')?.[0]).toEqual([[file]]);
+  });
+
+  it('rejects invalid type and oversized files in file upload', async () => {
+    const wrapper = mount(TreeFileUpload, {
+      props: {
+        accept: 'image/*',
+        maxFileSize: 3,
+      },
+    });
+
+    const dropzone = wrapper.get('.tree-file-upload__dropzone');
+    const invalidType = new File(['pdf'], 'report.pdf', { type: 'application/pdf' });
+    const oversized = new File(['12345'], 'screen.png', { type: 'image/png' });
+    const dataTransfer = {
+      files: [invalidType, oversized],
+      types: ['Files'],
+    } as unknown as DataTransfer;
+
+    await dropzone.trigger('drop', { dataTransfer });
+
+    const rejections = wrapper.emitted('files-rejected')?.[0]?.[0] as Array<{ reason: string }>;
+
+    expect(rejections).toHaveLength(2);
+    expect(rejections[0].reason).toBe('file-invalid-type');
+    expect(rejections[1].reason).toBe('file-too-large');
+    expect(wrapper.text()).toContain('report.pdf is not an accepted file type.');
+    expect(wrapper.text()).toContain('screen.png exceeds the 3 B limit.');
+  });
+
+  it('renders selected files and supports remove and clear actions', async () => {
+    const first = new File(['a'], 'alpha.txt', { type: 'text/plain' });
+    const second = new File(['b'], 'beta.txt', { type: 'text/plain' });
+
+    const wrapper = mount(TreeFileUpload, {
+      props: {
+        modelValue: [first, second],
+        filesLabel: 'Uploads',
+      },
+    });
+
+    expect(wrapper.text()).toContain('Uploads (2)');
+    expect(wrapper.text()).toContain('alpha.txt');
+    expect(wrapper.text()).toContain('beta.txt');
+
+    await wrapper.findAll('.tree-file-upload__remove')[0].trigger('click');
+    await wrapper.get('.tree-file-upload__clear').trigger('click');
+
+    expect(wrapper.emitted('update:modelValue')?.[0]).toEqual([[second]]);
+    expect(wrapper.emitted('update:modelValue')?.[1]).toEqual([[]]);
   });
 
   it('emits textarea updates and applies size class', async () => {

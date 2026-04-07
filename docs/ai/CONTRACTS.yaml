@@ -19,6 +19,7 @@ primary_exports:
   - TDropdown
   - TDrawer
   - TEmptyState
+  - TFileUpload
   - TFormField
   - TInput
   - TModal
@@ -55,6 +56,7 @@ compatibility_aliases:
   TDropdown: TreeDropdown
   TDrawer: TreeDrawer
   TEmptyState: TreeEmptyState
+  TFileUpload: TreeFileUpload
   TFormField: TreeFormField
   TInput: TreeInput
   TModal: TreeModal
@@ -88,6 +90,7 @@ shared_sizes:
     - TDatePicker
     - TDropdown
     - TEmptyState
+    - TFileUpload
     - TFormField
     - TInput
     - TSelect
@@ -106,11 +109,11 @@ shared_props:
   variant:
     used_by: [TBadge, TButton, TCard]
   size:
-    used_by: [TBadge, TButton, TCard, TCheckbox, TCombobox, TConfirmDialog, TDatePicker, TDropdown, TInput, TModal, TRadio, TRadioGroup, TSelect, TSpinner, TTextarea, TTimeline]
+    used_by: [TBadge, TButton, TCard, TCheckbox, TCombobox, TConfirmDialog, TDatePicker, TDropdown, TFileUpload, TInput, TModal, TRadio, TRadioGroup, TSelect, TSpinner, TTextarea, TTimeline]
   disabled:
-    used_by: [TButton, TCheckbox, TCombobox, TConfirmDialog, TDatePicker, TDropdown, TInput, TModal, TRadio, TRadioGroup, TSelect, TSwitch, TTextarea, TTooltip]
+    used_by: [TButton, TCheckbox, TCombobox, TConfirmDialog, TDatePicker, TDropdown, TFileUpload, TInput, TModal, TRadio, TRadioGroup, TSelect, TSwitch, TTextarea, TTooltip]
   loading:
-    used_by: [TButton, TCombobox, TConfirmDialog, TInput, TSelect, TTextarea]
+    used_by: [TButton, TCombobox, TConfirmDialog, TFileUpload, TInput, TSelect, TTextarea]
   as:
     used_by: [TButton, TCard]
   class:
@@ -118,7 +121,7 @@ shared_props:
 
 shared_events:
   update:modelValue:
-    used_by: [TCheckbox, TCombobox, TDatePicker, TInput, TRadioGroup, TSelect, TSwitch, TTextarea]
+    used_by: [TCheckbox, TCombobox, TDatePicker, TFileUpload, TInput, TRadioGroup, TSelect, TSwitch, TTextarea]
   update:open:
     used_by: [TCombobox, TConfirmDialog, TDatePicker, TDrawer, TDropdown, TModal, TSelect, TTooltip]
   open-change:
@@ -126,9 +129,9 @@ shared_events:
 
 shared_slots:
   default:
-    used_by: [TBadge, TButton, TCard, TConfirmDialog, TInput, TModal, TTooltip]
+    used_by: [TBadge, TButton, TCard, TConfirmDialog, TFileUpload, TInput, TModal, TTooltip]
   icon:
-    used_by: [TBadge, TButton]
+    used_by: [TBadge, TButton, TFileUpload]
   prefix:
     used_by: [TCombobox, TDatePicker, TInput]
   suffix:

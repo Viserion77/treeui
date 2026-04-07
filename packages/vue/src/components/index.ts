@@ -14,6 +14,11 @@ export { default as TDatePicker } from './TreeDatePicker.vue';
 export { default as TDrawer } from './TreeDrawer.vue';
 export { default as TDropdown } from './TreeDropdown.vue';
 export { default as TEmptyState } from './TreeEmptyState.vue';
+export { default as TFileUpload } from './TreeFileUpload.vue';
+export type {
+  TreeFileUploadRejection,
+  TreeFileUploadRejectionReason,
+} from './TreeFileUpload.vue';
 export { default as TRadio } from './TreeRadio.vue';
 export { default as TRadioGroup } from './TreeRadioGroup.vue';
 export { default as TSelect } from './TreeSelect.vue';
@@ -61,6 +66,7 @@ export { default as TreeDatePicker } from './TreeDatePicker.vue';
 export { default as TreeDrawer } from './TreeDrawer.vue';
 export { default as TreeDropdown } from './TreeDropdown.vue';
 export { default as TreeEmptyState } from './TreeEmptyState.vue';
+export { default as TreeFileUpload } from './TreeFileUpload.vue';
 export { default as TreeRadio } from './TreeRadio.vue';
 export { default as TreeRadioGroup } from './TreeRadioGroup.vue';
 export { default as TreeSelect } from './TreeSelect.vue';

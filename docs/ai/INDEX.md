@@ -46,6 +46,7 @@ If a public API changes, update the matching file here in the same change.
 - `COMPONENTS/combobox.yaml`
 - `COMPONENTS/confirm-dialog.yaml`
 - `COMPONENTS/empty-state.yaml`
+- `COMPONENTS/file-upload.yaml`
 - `COMPONENTS/input.yaml`
 - `COMPONENTS/timeline.yaml`
 - `COMPONENTS/card.yaml`

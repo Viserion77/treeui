@@ -22,6 +22,7 @@
 .tree-button,
 .tree-input,
 .tree-combobox,
+.tree-file-upload,
 .tree-checkbox,
 .tree-switch,
 .tree-select,
@@ -200,6 +201,256 @@
 
 .tree-input__slot {
   color: var(--tree-color-text-muted);
+}
+
+.tree-file-upload {
+  display: grid;
+  gap: var(--tree-space-3);
+  width: 100%;
+}
+
+.tree-file-upload__dropzone {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  gap: var(--tree-space-3);
+  width: 100%;
+  padding: var(--tree-space-5);
+  border: var(--tree-border-width-subtle) dashed var(--tree-color-border-default);
+  border-radius: var(--tree-radius-lg);
+  background: color-mix(in srgb, var(--tree-color-bg-subtle) 76%, var(--tree-color-bg-surface));
+  color: var(--tree-color-text-primary);
+  text-align: center;
+  cursor: pointer;
+  transition:
+    border-color var(--tree-motion-duration-fast) var(--tree-motion-easing-standard),
+    background-color var(--tree-motion-duration-fast) var(--tree-motion-easing-standard),
+    box-shadow var(--tree-motion-duration-fast) var(--tree-motion-easing-standard),
+    transform var(--tree-motion-duration-fast) var(--tree-motion-easing-standard);
+}
+
+.tree-file-upload__dropzone:hover {
+  transform: translateY(-1px);
+}
+
+.tree-file-upload__dropzone:focus-visible {
+  outline: none;
+  border-color: var(--tree-color-brand-primary);
+  box-shadow: 0 0 0 4px var(--tree-color-focus-ring);
+}
+
+.tree-file-upload.is-drag-active .tree-file-upload__dropzone {
+  border-color: var(--tree-color-brand-primary);
+  background: color-mix(in srgb, var(--tree-color-brand-soft) 55%, var(--tree-color-bg-surface));
+}
+
+.tree-file-upload.has-files .tree-file-upload__dropzone {
+  background: var(--tree-color-bg-surface);
+  border-style: solid;
+}
+
+.tree-file-upload.is-invalid .tree-file-upload__dropzone {
+  border-color: var(--tree-color-status-error);
+}
+
+.tree-file-upload.is-disabled .tree-file-upload__dropzone {
+  opacity: 0.68;
+  cursor: not-allowed;
+}
+
+.tree-file-upload__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 3rem;
+  height: 3rem;
+  border-radius: var(--tree-radius-pill);
+  background: var(--tree-color-brand-soft);
+  color: var(--tree-color-brand-primary);
+}
+
+.tree-file-upload__icon-mark {
+  font-size: 1.5rem;
+  font-weight: var(--tree-font-weight-semibold);
+  line-height: 1;
+}
+
+.tree-file-upload__content {
+  display: grid;
+  gap: var(--tree-space-2);
+  justify-items: center;
+  width: min(100%, 30rem);
+}
+
+.tree-file-upload__label {
+  margin: 0;
+  color: var(--tree-color-text-primary);
+  font-size: var(--tree-font-size-lg);
+  font-weight: var(--tree-font-weight-semibold);
+  line-height: var(--tree-font-lineHeight-heading);
+}
+
+.tree-file-upload__description {
+  margin: 0;
+  color: var(--tree-color-text-muted);
+  font-size: var(--tree-font-size-sm);
+  line-height: var(--tree-font-lineHeight-body);
+}
+
+.tree-file-upload__browse {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--tree-size-control-sm);
+  padding-inline: var(--tree-space-3);
+  border-radius: var(--tree-radius-pill);
+  background: var(--tree-color-bg-surface);
+  color: var(--tree-color-brand-primary);
+  font-size: var(--tree-font-size-sm);
+  font-weight: var(--tree-font-weight-medium);
+  box-shadow: inset 0 0 0 1px var(--tree-color-border-default);
+}
+
+.tree-file-upload__spinner {
+  position: absolute;
+  top: var(--tree-space-3);
+  right: var(--tree-space-3);
+}
+
+.tree-file-upload__feedback {
+  display: grid;
+  gap: var(--tree-space-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  color: var(--tree-color-status-error);
+  font-size: var(--tree-font-size-sm);
+  line-height: var(--tree-font-lineHeight-body);
+}
+
+.tree-file-upload__files {
+  display: grid;
+  gap: var(--tree-space-2);
+}
+
+.tree-file-upload__files-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--tree-space-2);
+}
+
+.tree-file-upload__files-label {
+  margin: 0;
+  color: var(--tree-color-text-primary);
+  font-size: var(--tree-font-size-sm);
+  font-weight: var(--tree-font-weight-medium);
+}
+
+.tree-file-upload__list {
+  display: grid;
+  gap: var(--tree-space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.tree-file-upload__file {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--tree-space-3);
+  width: 100%;
+  padding: var(--tree-space-3);
+  border: var(--tree-border-width-subtle) solid var(--tree-color-border-default);
+  border-radius: var(--tree-radius-md);
+  background: var(--tree-color-bg-surface);
+}
+
+.tree-file-upload__file-copy {
+  display: grid;
+  gap: 0.125rem;
+  min-width: 0;
+}
+
+.tree-file-upload__file-name,
+.tree-file-upload__file-meta {
+  margin: 0;
+}
+
+.tree-file-upload__file-name {
+  color: var(--tree-color-text-primary);
+  font-size: var(--tree-font-size-sm);
+  font-weight: var(--tree-font-weight-medium);
+  line-height: var(--tree-font-lineHeight-ui);
+  word-break: break-word;
+}
+
+.tree-file-upload__file-meta {
+  color: var(--tree-color-text-muted);
+  font-size: var(--tree-font-size-xs);
+  line-height: var(--tree-font-lineHeight-ui);
+}
+
+.tree-file-upload__clear,
+.tree-file-upload__remove {
+  border: 0;
+  padding: 0;
+  background: transparent;
+  color: var(--tree-color-brand-primary);
+  font-size: var(--tree-font-size-sm);
+  font-weight: var(--tree-font-weight-medium);
+  cursor: pointer;
+}
+
+.tree-file-upload__clear:disabled,
+.tree-file-upload__remove:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.tree-file-upload__clear:focus-visible,
+.tree-file-upload__remove:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 4px var(--tree-color-focus-ring);
+  border-radius: var(--tree-radius-sm);
+}
+
+.tree-file-upload__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--tree-space-2);
+}
+
+.tree-file-upload--sm {
+  gap: var(--tree-space-2);
+}
+
+.tree-file-upload--sm .tree-file-upload__dropzone {
+  padding: var(--tree-space-4);
+}
+
+.tree-file-upload--sm .tree-file-upload__icon {
+  width: 2.5rem;
+  height: 2.5rem;
+}
+
+.tree-file-upload--sm .tree-file-upload__label {
+  font-size: var(--tree-font-size-md);
+}
+
+.tree-file-upload--lg .tree-file-upload__dropzone {
+  padding: var(--tree-space-6);
+}
+
+.tree-file-upload--lg .tree-file-upload__icon {
+  width: 3.5rem;
+  height: 3.5rem;
+}
+
+.tree-file-upload--lg .tree-file-upload__label {
+  font-size: var(--tree-font-size-xl);
 }
 
 .tree-textarea {

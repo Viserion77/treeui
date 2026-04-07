@@ -1,0 +1,90 @@
+name: TFileUpload
+legacy_alias: TreeFileUpload
+source_file: packages/vue/src/components/TreeFileUpload.vue
+package: "@treeui/vue"
+kind: form
+status: available
+purpose: "Composable dropzone and file picker with browse, drag-and-drop, and Ctrl+V paste support."
+
+props:
+  modelValue:
+    type: File[]
+    default: "[]"
+  size:
+    type: TreeSize
+    default: md
+    values: [sm, md, lg]
+  disabled:
+    type: boolean
+    default: false
+  loading:
+    type: boolean
+    default: false
+  invalid:
+    type: boolean
+    default: false
+  accept:
+    type: string
+    default: ""
+  multiple:
+    type: boolean
+    default: true
+  maxFiles:
+    type: number
+    default: none
+  maxFileSize:
+    type: number
+    default: none
+  label:
+    type: string
+    default: Drop files here
+  description:
+    type: string
+    default: Click to browse, drag and drop, or paste with Ctrl+V.
+  buttonLabel:
+    type: string
+    default: Browse files
+  filesLabel:
+    type: string
+    default: Selected files
+  paste:
+    type: boolean
+    default: true
+  drop:
+    type: boolean
+    default: true
+  showFileList:
+    type: boolean
+    default: true
+
+events:
+  - update:modelValue
+  - files-accepted
+  - files-rejected
+
+slots:
+  - icon
+  - default
+  - file
+  - actions
+
+a11y:
+  dropzone_role: button
+  keyboard_activation: Enter_and_Space_open_the_file_picker
+  supports_paste_when_component_is_focused: true
+  file_feedback_announced_via_live_region: true
+
+behavior:
+  accepts_files_from_input_drop_and_paste: true
+  multiple_false_replaces_existing_selection: true
+  accept_maxFiles_and_maxFileSize_apply_to_all_entry_points: true
+  selected_files_can_be_removed_or_cleared: true
+
+example: |
+  <TFileUpload
+    v-model="files"
+    accept="image/*,.pdf"
+    :max-files="5"
+    :max-file-size="5 * 1024 * 1024"
+    label="Attach assets"
+  />

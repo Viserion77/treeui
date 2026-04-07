@@ -6,6 +6,7 @@ import TreeAlert from './TreeAlert.vue';
 import TreeCard from './TreeCard.vue';
 import TreeCheckbox from './TreeCheckbox.vue';
 import TreeCombobox from './TreeCombobox.vue';
+import TreeConfirmDialog from './TreeConfirmDialog.vue';
 import TreeDatePicker from './TreeDatePicker.vue';
 import TreeInput from './TreeInput.vue';
 import TreeTextarea from './TreeTextarea.vue';
@@ -881,6 +882,98 @@ describe('@treeui/vue', () => {
     await input.trigger('keydown', { key: 'Escape' });
 
     expect((input.element as HTMLInputElement).value).toBe('Banana');
+  });
+
+  // ── ConfirmDialog ──────────────────────────────────────
+
+  it('opens confirm dialog from trigger and emits confirm', async () => {
+    const wrapper = mount(TreeConfirmDialog, {
+      attachTo: document.body,
+      props: {
+        title: 'Delete component',
+        description: 'This action cannot be undone.',
+      },
+      slots: {
+        trigger: '<button type="button">Open confirm</button>',
+        default: '<p>Delete the current component from the registry.</p>',
+      },
+    });
+
+    await wrapper.get('button').trigger('click');
+    await nextTick();
+
+    expect(document.body.querySelector('[role="dialog"]')).not.toBeNull();
+
+    const buttons = Array.from(document.body.querySelectorAll('button'));
+    const confirmButton = buttons.find((button) => button.textContent?.includes('Confirm')) as HTMLButtonElement | undefined;
+
+    expect(confirmButton).toBeDefined();
+
+    confirmButton?.click();
+    await nextTick();
+
+    expect(wrapper.emitted('confirm')).toHaveLength(1);
+    expect(wrapper.emitted('update:open')?.at(-1)).toEqual([false]);
+    expect(document.body.querySelector('[role="dialog"]')).toBeNull();
+
+    wrapper.unmount();
+  });
+
+  it('emits cancel and keeps overlay clicks disabled by default', async () => {
+    const wrapper = mount(TreeConfirmDialog, {
+      attachTo: document.body,
+      props: {
+        title: 'Archive release',
+      },
+      slots: {
+        trigger: '<button type="button">Archive</button>',
+      },
+    });
+
+    await wrapper.get('button').trigger('click');
+    await nextTick();
+
+    const backdrop = document.body.querySelector('.tree-modal__backdrop') as HTMLDivElement | null;
+    backdrop?.click();
+    await nextTick();
+
+    expect(document.body.querySelector('[role="dialog"]')).not.toBeNull();
+
+    const buttons = Array.from(document.body.querySelectorAll('button'));
+    const cancelButton = buttons.find((button) => button.textContent?.includes('Cancel')) as HTMLButtonElement | undefined;
+
+    cancelButton?.click();
+    await nextTick();
+
+    expect(wrapper.emitted('cancel')).toHaveLength(1);
+    expect(document.body.querySelector('[role="dialog"]')).toBeNull();
+
+    wrapper.unmount();
+  });
+
+  it('applies confirm dialog defaults and loading state', () => {
+    const wrapper = mount(TreeConfirmDialog, {
+      attachTo: document.body,
+      props: {
+        defaultOpen: true,
+        title: 'Delete release',
+        loading: true,
+        confirmLabel: 'Delete now',
+        showCloseButton: true,
+      },
+      slots: {
+        icon: '<span class="confirm-icon">!</span>',
+      },
+    });
+
+    expect(wrapper.findComponent(TreeModal).props('closeOnOverlay')).toBe(false);
+    expect(wrapper.findComponent(TreeModal).props('showCloseButton')).toBe(true);
+    expect(document.body.querySelector('.tree-confirm-dialog__icon')).not.toBeNull();
+
+    const buttons = wrapper.findAllComponents(TreeButton);
+    expect(buttons[1].props('loading')).toBe(true);
+    expect(buttons[1].text()).toContain('Delete now');
+    expect(buttons[1].props('variant')).toBe('danger');
   });
 
   it('applies combobox states and sizes', () => {

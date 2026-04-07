@@ -45,7 +45,7 @@ import '@treeui/vue/style.css'
 
 ### Overlay & Interaction
 
-`TButton` · `TModal` · `TDrawer` · `TDropdown` · `TPopover` · `TTooltip` · `TContextMenu` · `TPagination` · `TToast` · `TToastProvider`
+`TButton` · `TModal` · `TConfirmDialog` · `TDrawer` · `TDropdown` · `TPopover` · `TTooltip` · `TContextMenu` · `TPagination` · `TToast` · `TToastProvider`
 
 ### Table composition
 

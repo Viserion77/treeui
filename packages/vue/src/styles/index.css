@@ -638,6 +638,43 @@
   gap: var(--tree-space-2);
 }
 
+.tree-confirm-dialog {
+  display: grid;
+  gap: var(--tree-space-4);
+}
+
+.tree-confirm-dialog--with-icon {
+  grid-template-columns: auto 1fr;
+  align-items: start;
+}
+
+.tree-confirm-dialog__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: var(--tree-radius-pill);
+  background: color-mix(in srgb, var(--tree-color-status-error) 12%, var(--tree-color-bg-surface));
+  color: var(--tree-color-status-error);
+}
+
+.tree-confirm-dialog__body {
+  display: grid;
+  gap: var(--tree-space-2);
+  color: var(--tree-color-text-primary);
+  font-size: var(--tree-font-size-sm);
+  line-height: var(--tree-font-lineHeight-body);
+}
+
+.tree-confirm-dialog__body > :first-child {
+  margin-top: 0;
+}
+
+.tree-confirm-dialog__body > :last-child {
+  margin-bottom: 0;
+}
+
 .tree-empty-state {
   display: grid;
   justify-items: center;

@@ -14,6 +14,7 @@ primary_exports:
   - TCard
   - TCheckbox
   - TCombobox
+  - TConfirmDialog
   - TDatePicker
   - TDropdown
   - TDrawer
@@ -48,6 +49,7 @@ compatibility_aliases:
   TCard: TreeCard
   TCheckbox: TreeCheckbox
   TCombobox: TreeCombobox
+  TConfirmDialog: TreeConfirmDialog
   TDatePicker: TreeDatePicker
   TDropdown: TreeDropdown
   TDrawer: TreeDrawer
@@ -80,6 +82,7 @@ shared_sizes:
     - TButton
     - TCard
     - TCombobox
+    - TConfirmDialog
     - TDatePicker
     - TDropdown
     - TEmptyState
@@ -100,11 +103,11 @@ shared_props:
   variant:
     used_by: [TBadge, TButton, TCard]
   size:
-    used_by: [TBadge, TButton, TCard, TCheckbox, TCombobox, TDatePicker, TDropdown, TInput, TModal, TRadio, TRadioGroup, TSelect, TSpinner, TTextarea]
+    used_by: [TBadge, TButton, TCard, TCheckbox, TCombobox, TConfirmDialog, TDatePicker, TDropdown, TInput, TModal, TRadio, TRadioGroup, TSelect, TSpinner, TTextarea]
   disabled:
-    used_by: [TButton, TCheckbox, TCombobox, TDatePicker, TDropdown, TInput, TModal, TRadio, TRadioGroup, TSelect, TSwitch, TTextarea, TTooltip]
+    used_by: [TButton, TCheckbox, TCombobox, TConfirmDialog, TDatePicker, TDropdown, TInput, TModal, TRadio, TRadioGroup, TSelect, TSwitch, TTextarea, TTooltip]
   loading:
-    used_by: [TButton, TCombobox, TInput, TSelect, TTextarea]
+    used_by: [TButton, TCombobox, TConfirmDialog, TInput, TSelect, TTextarea]
   as:
     used_by: [TButton, TCard]
   class:
@@ -114,13 +117,13 @@ shared_events:
   update:modelValue:
     used_by: [TCheckbox, TCombobox, TDatePicker, TInput, TRadioGroup, TSelect, TSwitch, TTextarea]
   update:open:
-    used_by: [TCombobox, TDatePicker, TDrawer, TDropdown, TModal, TSelect, TTooltip]
+    used_by: [TCombobox, TConfirmDialog, TDatePicker, TDrawer, TDropdown, TModal, TSelect, TTooltip]
   open-change:
-    used_by: [TCombobox, TDatePicker, TDrawer, TDropdown, TModal, TSelect, TTooltip]
+    used_by: [TCombobox, TConfirmDialog, TDatePicker, TDrawer, TDropdown, TModal, TSelect, TTooltip]
 
 shared_slots:
   default:
-    used_by: [TBadge, TButton, TCard, TInput, TModal, TTooltip]
+    used_by: [TBadge, TButton, TCard, TConfirmDialog, TInput, TModal, TTooltip]
   icon:
     used_by: [TBadge, TButton]
   prefix:
@@ -128,7 +131,7 @@ shared_slots:
   suffix:
     used_by: [TDatePicker, TInput]
   trigger:
-    used_by: [TDrawer, TModal, TTooltip]
+    used_by: [TConfirmDialog, TDrawer, TModal, TTooltip]
   content:
     used_by: [TDrawer, TModal, TTooltip]
   header:

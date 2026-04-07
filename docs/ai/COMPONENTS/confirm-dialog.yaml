@@ -1,0 +1,103 @@
+name: TConfirmDialog
+legacy_alias: TreeConfirmDialog
+source_file: packages/vue/src/components/TreeConfirmDialog.vue
+package: "@treeui/vue"
+kind: overlay
+status: available
+purpose: "High-level confirmation dialog built on the shared modal contract, with default confirm and cancel actions."
+
+props:
+  open:
+    type: boolean
+    default: controlled_optional
+  defaultOpen:
+    type: boolean
+    default: false
+  disabled:
+    type: boolean
+    default: false
+  size:
+    type: TreeSize
+    default: sm
+    values: [sm, md, lg]
+  title:
+    type: string
+    default: ""
+  description:
+    type: string
+    default: ""
+  confirmLabel:
+    type: string
+    default: Confirm
+  cancelLabel:
+    type: string
+    default: Cancel
+  confirmVariant:
+    type: TreeVariant
+    default: danger
+  confirmDisabled:
+    type: boolean
+    default: false
+  cancelDisabled:
+    type: boolean
+    default: false
+  loading:
+    type: boolean
+    default: false
+  closeOnEscape:
+    type: boolean
+    default: true
+  closeOnOverlay:
+    type: boolean
+    default: false
+  showCloseButton:
+    type: boolean
+    default: false
+  closeLabel:
+    type: string
+    default: Close dialog
+  closeOnConfirm:
+    type: boolean
+    default: true
+  closeOnCancel:
+    type: boolean
+    default: true
+
+events:
+  - confirm
+  - cancel
+  - update:open
+  - open-change
+
+slots:
+  - trigger
+  - icon
+  - default
+  - actions
+
+behavior:
+  built_on_modal_contract: true
+  default_confirm_button_variant: danger
+  overlay_click_disabled_by_default: true
+  close_button_hidden_by_default: true
+  loading_state_applies_to_confirm_button: true
+  default_actions_close_dialog_when_enabled: true
+
+a11y:
+  role: dialog
+  aria_modal: true
+  focus_trap: inherited_from_modal
+  restores_focus_on_close: inherited_from_modal
+  icon_slot_marked_aria_hidden: true
+
+example: |
+  <TConfirmDialog
+    title="Delete release"
+    description="This action cannot be undone."
+    confirm-label="Delete"
+    @confirm="deleteRelease()"
+  >
+    <template #trigger>
+      <TButton variant="danger">Delete</TButton>
+    </template>
+  </TConfirmDialog>

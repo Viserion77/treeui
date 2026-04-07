@@ -1,0 +1,89 @@
+name: TCombobox
+legacy_alias: TreeCombobox
+source_file: packages/vue/src/components/TreeCombobox.vue
+package: "@treeui/vue"
+kind: primitive
+status: available
+purpose: "Searchable combobox / autocomplete input with local filtering, controlled selection, and shared open-state behavior."
+
+props:
+  modelValue:
+    type: string
+    default: ""
+  options:
+    type: "TreeComboboxOption[]"
+    default: "[]"
+    note: "Array of { label: string; value: string; description?: string; keywords?: string[]; disabled?: boolean }"
+  open:
+    type: boolean
+    default: undefined
+  defaultOpen:
+    type: boolean
+    default: false
+  size:
+    type: TreeSize
+    default: md
+    values: [sm, md, lg]
+  disabled:
+    type: boolean
+    default: false
+  loading:
+    type: boolean
+    default: false
+  invalid:
+    type: boolean
+    default: false
+  placeholder:
+    type: string
+    default: ""
+  emptyText:
+    type: string
+    default: "No results found."
+
+events:
+  - update:modelValue
+  - update:open
+  - open-change
+  - input-change
+
+slots:
+  - prefix
+  - option
+  - empty
+
+forwards_attrs_to: input
+
+a11y:
+  role: combobox
+  trigger_aria_haspopup: listbox
+  trigger_aria_expanded: true
+  aria_autocomplete: list
+  aria_activedescendant_on_active_option: true
+  aria_invalid_when_invalid: true
+  aria_busy_when_loading: true
+  aria_selected_on_options: true
+  aria_disabled_on_disabled_options: true
+  keyboard_arrow_navigation: true
+  escape_closes_and_restores_previous_selection: true
+  enter_selects_active_option: true
+  home_end_navigation: true
+
+behavior:
+  update_payload_type: string
+  local_filtering_by_label_description_and_keywords: true
+  loading_does_not_disable_by_itself: true
+  outside_click_closes_dropdown: true
+  query_clears_selection_when_closed_empty: true
+  selected_value_restores_when_search_is_abandoned: true
+
+example: |
+  <TCombobox
+    aria-label="Assignee"
+    placeholder="Search people"
+    :options="[
+      { label: 'Annie Case', value: 'annie', keywords: ['design'] },
+      { label: 'John Smith', value: 'john', keywords: ['engineering'] },
+    ]"
+    :model-value="assignee"
+    @update:model-value="assignee = $event"
+  />

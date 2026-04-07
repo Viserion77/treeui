@@ -5,6 +5,7 @@ import TreeButton from './TreeButton.vue';
 import TreeAlert from './TreeAlert.vue';
 import TreeCard from './TreeCard.vue';
 import TreeCheckbox from './TreeCheckbox.vue';
+import TreeCombobox from './TreeCombobox.vue';
 import TreeDatePicker from './TreeDatePicker.vue';
 import TreeInput from './TreeInput.vue';
 import TreeTextarea from './TreeTextarea.vue';
@@ -739,6 +740,202 @@ describe('@treeui/vue', () => {
 
     expect(sm.classes()).toContain('tree-switch--sm');
     expect(lg.classes()).toContain('tree-switch--lg');
+  });
+
+  // ── Combobox ───────────────────────────────────────────
+
+  it('filters combobox options and emits model updates on selection', async () => {
+    const wrapper = mount(TreeCombobox, {
+      props: {
+        modelValue: '',
+        options: [
+          { label: 'Apple', value: 'apple', keywords: ['red'] },
+          { label: 'Banana', value: 'banana', keywords: ['yellow'] },
+          { label: 'Cherry', value: 'cherry', keywords: ['red'] },
+        ],
+      },
+      attrs: {
+        'aria-label': 'Fruit',
+      },
+    });
+
+    const input = wrapper.get('input');
+
+    expect(input.attributes('role')).toBe('combobox');
+    expect(input.attributes('aria-autocomplete')).toBe('list');
+
+    await input.trigger('focus');
+    await input.setValue('app');
+
+    expect(wrapper.emitted('input-change')?.[0]).toEqual(['app']);
+
+    const options = wrapper.findAll('[role="option"]');
+    expect(options).toHaveLength(1);
+    expect(options[0].text()).toContain('Apple');
+
+    await options[0].trigger('click');
+
+    expect(wrapper.emitted('update:modelValue')?.[0]).toEqual(['apple']);
+  });
+
+  it('supports keyboard navigation in the combobox', async () => {
+    const wrapper = mount(TreeCombobox, {
+      props: {
+        modelValue: '',
+        options: [
+          { label: 'Apple', value: 'apple' },
+          { label: 'Banana', value: 'banana' },
+          { label: 'Cherry', value: 'cherry', disabled: true },
+        ],
+      },
+      attrs: {
+        'aria-label': 'Fruit',
+      },
+    });
+
+    const input = wrapper.get('input');
+
+    await input.trigger('focus');
+    await nextTick();
+
+    let options = wrapper.findAll('.tree-combobox__option');
+    expect(options[0].classes()).toContain('is-active');
+    expect(input.attributes('aria-activedescendant')).toContain('apple');
+
+    await input.trigger('keydown', { key: 'ArrowDown' });
+    await nextTick();
+
+    options = wrapper.findAll('.tree-combobox__option');
+    expect(options[1].classes()).toContain('is-active');
+    expect(options[2].classes()).not.toContain('is-active');
+
+    await input.trigger('keydown', { key: 'Enter' });
+
+    expect(wrapper.emitted('update:modelValue')?.[0]).toEqual(['banana']);
+  });
+
+  it('renders the combobox empty state when nothing matches', async () => {
+    const wrapper = mount(TreeCombobox, {
+      props: {
+        modelValue: '',
+        options: [{ label: 'Apple', value: 'apple' }],
+        emptyText: 'Nothing found here.',
+      },
+      attrs: {
+        'aria-label': 'Fruit',
+      },
+    });
+
+    const input = wrapper.get('input');
+
+    await input.trigger('focus');
+    await input.setValue('zzz');
+    await nextTick();
+
+    expect(wrapper.find('.tree-combobox__empty').text()).toContain('Nothing found here.');
+  });
+
+  it('clears the combobox selection when the input is emptied and closed', async () => {
+    const wrapper = mount(TreeCombobox, {
+      props: {
+        modelValue: 'banana',
+        options: [
+          { label: 'Apple', value: 'apple' },
+          { label: 'Banana', value: 'banana' },
+        ],
+      },
+      attrs: {
+        'aria-label': 'Fruit',
+      },
+    });
+
+    const input = wrapper.get('input');
+
+    expect((input.element as HTMLInputElement).value).toBe('Banana');
+
+    await input.setValue('');
+    await input.trigger('keydown', { key: 'Tab' });
+
+    expect(wrapper.emitted('update:modelValue')?.[0]).toEqual(['']);
+  });
+
+  it('restores the previous combobox selection on escape', async () => {
+    const wrapper = mount(TreeCombobox, {
+      props: {
+        modelValue: 'banana',
+        options: [
+          { label: 'Apple', value: 'apple' },
+          { label: 'Banana', value: 'banana' },
+        ],
+      },
+      attrs: {
+        'aria-label': 'Fruit',
+      },
+    });
+
+    const input = wrapper.get('input');
+
+    await input.trigger('focus');
+    await input.setValue('app');
+    await input.trigger('keydown', { key: 'Escape' });
+
+    expect((input.element as HTMLInputElement).value).toBe('Banana');
+  });
+
+  it('applies combobox states and sizes', () => {
+    const invalid = mount(TreeCombobox, {
+      props: {
+        modelValue: '',
+        options: [],
+        invalid: true,
+      },
+      attrs: {
+        'aria-label': 'Invalid combobox',
+      },
+    });
+
+    expect(invalid.classes()).toContain('is-invalid');
+    expect(invalid.get('input').attributes('aria-invalid')).toBe('true');
+
+    const disabled = mount(TreeCombobox, {
+      props: {
+        modelValue: '',
+        options: [],
+        disabled: true,
+      },
+      attrs: {
+        'aria-label': 'Disabled combobox',
+      },
+    });
+
+    expect(disabled.classes()).toContain('is-disabled');
+    expect(disabled.get('input').attributes('disabled')).toBeDefined();
+
+    const loading = mount(TreeCombobox, {
+      props: {
+        modelValue: '',
+        options: [],
+        loading: true,
+      },
+      attrs: {
+        'aria-label': 'Loading combobox',
+      },
+    });
+
+    expect(loading.classes()).toContain('is-loading');
+    expect(loading.get('input').attributes('aria-busy')).toBe('true');
+
+    const sm = mount(TreeCombobox, {
+      props: { modelValue: '', options: [], size: 'sm' as const },
+      attrs: { 'aria-label': 'Small combobox' },
+    });
+    const lg = mount(TreeCombobox, {
+      props: { modelValue: '', options: [], size: 'lg' as const },
+      attrs: { 'aria-label': 'Large combobox' },
+    });
+
+    expect(sm.classes()).toContain('tree-combobox--sm');
+    expect(lg.classes()).toContain('tree-combobox--lg');
   });
 
   // ── Select ──────────────────────────────────────────────

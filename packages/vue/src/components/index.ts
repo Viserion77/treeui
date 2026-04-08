@@ -15,6 +15,8 @@ export { default as TDrawer } from './TreeDrawer.vue';
 export { default as TDropdown } from './TreeDropdown.vue';
 export { default as TEmptyState } from './TreeEmptyState.vue';
 export { default as TFileUpload } from './TreeFileUpload.vue';
+export { default as TMultiSelect } from './TreeMultiSelect.vue';
+export type { TreeMultiSelectOption } from './TreeMultiSelect.vue';
 export type {
   TreeFileUploadRejection,
   TreeFileUploadRejectionReason,
@@ -23,10 +25,26 @@ export { default as TRadio } from './TreeRadio.vue';
 export { default as TRadioGroup } from './TreeRadioGroup.vue';
 export { default as TSelect } from './TreeSelect.vue';
 export { default as TInput } from './TreeInput.vue';
+export { default as TNumberInput } from './TreeNumberInput.vue';
+export { default as TSelectableList } from './TreeSelectableList.vue';
+export type { TreeSelectableListItem } from './TreeSelectableList.vue';
+export { default as TTreeView } from './TreeTreeView.vue';
+export type { TreeTreeViewNode, TreeTreeViewSelectionMode } from './tree-view';
+export { default as TSteps } from './TreeSteps.vue';
+export { default as TStepper } from './TreeSteps.vue';
+export type { TreeStepItem, TreeStepOrientation, TreeStepStatus } from './TreeSteps.vue';
+export { default as TToggleGroup } from './TreeToggleGroup.vue';
+export type {
+  TreeToggleGroupOption,
+  TreeToggleGroupSelectionMode,
+  TreeToggleGroupVariant,
+} from './TreeToggleGroup.vue';
 export { default as TTextarea } from './TreeTextarea.vue';
 export { default as TModal } from './TreeModal.vue';
 export { default as TSkeleton } from './TreeSkeleton.vue';
 export { default as TSpinner } from './TreeSpinner.vue';
+export { default as TStat } from './TreeStat.vue';
+export type { TreeStatTone, TreeStatTrendDirection } from './TreeStat.vue';
 export { default as TSwitch } from './TreeSwitch.vue';
 export { default as TTooltip } from './TreeTooltip.vue';
 export { default as TFormField } from './TreeFormField.vue';
@@ -67,14 +85,22 @@ export { default as TreeDrawer } from './TreeDrawer.vue';
 export { default as TreeDropdown } from './TreeDropdown.vue';
 export { default as TreeEmptyState } from './TreeEmptyState.vue';
 export { default as TreeFileUpload } from './TreeFileUpload.vue';
+export { default as TreeMultiSelect } from './TreeMultiSelect.vue';
 export { default as TreeRadio } from './TreeRadio.vue';
 export { default as TreeRadioGroup } from './TreeRadioGroup.vue';
 export { default as TreeSelect } from './TreeSelect.vue';
 export { default as TreeInput } from './TreeInput.vue';
+export { default as TreeNumberInput } from './TreeNumberInput.vue';
+export { default as TreeSelectableList } from './TreeSelectableList.vue';
+export { default as TreeTreeView } from './TreeTreeView.vue';
+export { default as TreeSteps } from './TreeSteps.vue';
+export { default as TreeStepper } from './TreeSteps.vue';
+export { default as TreeToggleGroup } from './TreeToggleGroup.vue';
 export { default as TreeTextarea } from './TreeTextarea.vue';
 export { default as TreeModal } from './TreeModal.vue';
 export { default as TreeSkeleton } from './TreeSkeleton.vue';
 export { default as TreeSpinner } from './TreeSpinner.vue';
+export { default as TreeStat } from './TreeStat.vue';
 export { default as TreeSwitch } from './TreeSwitch.vue';
 export { default as TreeTooltip } from './TreeTooltip.vue';
 export { default as TreeFormField } from './TreeFormField.vue';

@@ -6,8 +6,18 @@ import { Meta, Title } from '@storybook/blocks';
 
 TreeUI ships components in milestones, grouped by dependency depth and product impact.
 Each milestone builds on the previous one while keeping the public API compact and composable.
+Not every repeated UI shape becomes a public export. When a pattern is mostly layout or styling,
+TreeUI prefers documenting a composition recipe on top of existing primitives.
 
 ---
+
+## Admission filter
+
+A repeated app pattern graduates into a public component when it:
+
+- adds reusable interaction, accessibility, or state behavior
+- carries domain-agnostic semantics that can travel across products
+- removes real API friction beyond what `TCard`, `TBadge`, `TButton`, and layout primitives already cover
 
 ## Current state — Public surface (shipped)
 
@@ -33,8 +43,10 @@ Close the highest-friction gaps for SaaS products, dashboards, admin panels, and
 
 | Component | Description |
 |---|---|
+| `TStat` | Compact metric block with label, value, and optional trend or meta content for dashboards and summaries |
 | `TMultiSelect` | Multiple selection for filters, tags, teams, permissions, and bulk actions |
 | `TNumberInput` | Numeric field with increment and decrement stepper controls, min/max, and step behavior |
+| `TSelectableList` | Persistent single-select list with active state, keyboard navigation, and flexible item slots for templates, events, guides, and goals |
 | `TTreeView` | Hierarchical navigation and nested selection for files, categories, and permissions |
 | `TSteps` / `TStepper` | Step-by-step progress pattern for onboarding, wizards, and setup flows |
 | `TToggleGroup` | Compact single and multi-select toggle buttons as a visual alternative to radios and checkboxes |
@@ -50,8 +62,36 @@ Add layout helpers and application shell building blocks without forcing a full 
 | `TSidebar` / `TNavMenu` | Collapsible lateral navigation for dashboards and workspace layouts |
 | `TNavbar` / `TAppBar` | Top-level application navigation and global action bar |
 | `TContainer` | Width-constrained layout wrapper for content sections |
-| `TGrid` | Semantic grid helper for dashboard cards, forms, and responsive layouts |
-| `TStack` | Vertical and horizontal spacing primitive for common flex layouts |
+| `TGrid` | Semantic grid helper for dashboard cards, stat groups, forms, and responsive layouts |
+| `TStack` | Vertical and horizontal spacing primitive for common flex layouts, section headers, and inline actions |
+
+---
+
+## Pattern track — Docs-first compositions
+
+Some repeated app UI should land as documented recipes instead of standalone exports.
+These patterns stay important, but TreeUI keeps them composable until they prove they need
+their own public API.
+
+| Suggested pattern | TreeUI direction |
+|---|---|
+| Stat group (`TreeStatGroup`) | Document as `TStat` + `TGrid`; no standalone `TStatGroup` planned |
+| Section header (`TreeSectionHeader`) | Document as heading + `TStack` + optional `TBadge` or `TButton`; no dedicated export planned |
+| Subpanel (`TreePanel`) | Prefer `TCard` composition, especially `variant="soft"`; revisit only if a distinct semantic API emerges |
+| Stacked card (`TreeStackCard`) | Use `TCard` slots plus `TTag`, `TBadge`, and actions; revisit later only if a stable slot contract repeats across products |
+| Eyebrow text (`TreeEyebrow`) | Keep as a typography recipe for now; revisit when TreeUI has a broader text primitive strategy |
+| Form stack (`TreeFormStack`) | Covered by `TStack`, `TGrid`, and `TFormField`; no extra layout wrapper planned |
+| Ranking (`TreeRanking`) | Defer as a narrower data-display recipe until the dashboard/data pack grows |
+| Action panel (`TreeActionPanel`) | Keep app-level for now; usually composes from `TAlert`, `TCard`, and `TButton` |
+
+---
+
+## Candidate review — Recent suggestions
+
+The recent component suggestions map well to TreeUI's direction when normalized into two buckets:
+
+- Promote portable primitives: `TStat` and `TSelectableList`
+- Keep higher-level page assemblies as documented recipes until a stronger shared API emerges
 
 ---
 
@@ -70,7 +110,7 @@ Some common UI terms are intentionally documented as aliases to existing pattern
 ## Future
 
 - `TCarousel` for focused media and card browsing patterns
-- Data visualization primitives for dashboards, including charts, sparklines, and big-number / stat blocks
+- Data visualization primitives for dashboards, including charts and sparklines
 - Additional framework packages (`@treeui/react`, `@treeui/svelte`) reusing the same token system, naming, accessibility guidance, and design language.
 - Motion/animation token expansion.
 - Right-to-left (RTL) layout support.

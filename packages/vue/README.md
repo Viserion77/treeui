@@ -33,15 +33,15 @@ import '@treeui/vue/style.css'
 
 ### Form
 
-`TInput` · `TTextarea` · `TCheckbox` · `TCombobox` · `TFileUpload` · `TRadio` · `TRadioGroup` · `TSelect` · `TDatePicker` · `TSwitch` · `TFormField` · `TMarkdownEditor`
+`TInput` · `TTextarea` · `TCheckbox` · `TCombobox` · `TFileUpload` · `TRadio` · `TRadioGroup` · `TSelect` · `TMultiSelect` · `TNumberInput` · `TDatePicker` · `TSwitch` · `TFormField` · `TToggleGroup` · `TMarkdownEditor`
 
 ### Layout
 
-`TAccordion` · `TAccordionItem` · `TCard` · `TDivider` · `TTable` · `TTabs` · `TTabList` · `TTab` · `TTabPanel` · `TBreadcrumb` · `TBreadcrumbItem` · `TPricing` · `TPricingCard`
+`TAccordion` · `TAccordionItem` · `TCard` · `TDivider` · `TTable` · `TTabs` · `TTabList` · `TTab` · `TTabPanel` · `TBreadcrumb` · `TBreadcrumbItem` · `TSelectableList` · `TTreeView` · `TSteps` / `TStepper` · `TPricing` · `TPricingCard`
 
 ### Display
 
-`TBadge` · `TAlert` · `TAvatar` · `TEmptyState` · `TTag` · `TTimeline` · `TSpinner` · `TProgress` · `TSkeleton`
+`TBadge` · `TAlert` · `TAvatar` · `TEmptyState` · `TTag` · `TTimeline` · `TSpinner` · `TProgress` · `TSkeleton` · `TStat`
 
 ### Overlay & Interaction
 

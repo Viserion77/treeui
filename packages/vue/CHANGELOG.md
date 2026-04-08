@@ -1,5 +1,18 @@
 # @treeui/vue
 
+## 0.6.0
+
+### Minor Changes
+
+- feat: Milestone 3 — Routing, Cards & Inline Links
+  - TNavMenu: add `to` and `icon` props to TreeNavMenuItem; render RouterLink when vue-router is available, button otherwise
+  - TCard: add `title` prop and `#actions` slot for built-in header semantics; `#header` slot remains as full override
+  - TCard: add `variant="inset"` for nested sub-sections inside other cards (subtle bg, no shadow, light border)
+  - TLink: new inline link component with `to` (RouterLink), `href` (anchor), `external`, `disabled`, and `variant` (default | muted | danger)
+  - Add `.tree-eyebrow` CSS utility class using existing typography tokens
+  - Add skeleton TablePlaceholder and CardPlaceholder composition recipes
+  - Create nav-menu.yaml and link.yaml AI contracts; update card.yaml and CONTRACTS.yaml
+
 ## 0.5.0
 
 ### Minor Changes

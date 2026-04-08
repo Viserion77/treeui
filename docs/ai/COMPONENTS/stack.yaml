@@ -1,0 +1,49 @@
+name: TStack
+legacy_alias: TreeStack
+source_file: packages/vue/src/components/TreeStack.vue
+package: "@treeui/vue"
+kind: layout
+status: available
+purpose: "One-dimensional spacing and alignment wrapper for vertical or horizontal compositions."
+
+props:
+  as:
+    type: string
+    default: div
+  direction:
+    type: TreeStackDirection
+    default: vertical
+    values: [vertical, horizontal]
+  gap:
+    type: string
+    default: var(--tree-space-4)
+  align:
+    type: string
+    default: stretch
+  justify:
+    type: string
+    default: flex-start
+  wrap:
+    type: boolean
+    default: false
+  reverse:
+    type: boolean
+    default: false
+
+slots:
+  - default
+
+behavior:
+  semantic_element_controlled_by_as: true
+  horizontal_and_vertical_variants: true
+  optional_wrapping: true
+  optional_reverse_order: true
+
+a11y:
+  - "Acts as a layout wrapper only; semantics come from `as` and children."
+
+example: |
+  <TStack gap="var(--tree-space-3)">
+    <h2>Section title</h2>
+    <p>Supporting copy</p>
+  </TStack>

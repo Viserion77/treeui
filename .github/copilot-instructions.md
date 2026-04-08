@@ -11,6 +11,7 @@ packages/tokens   → @treeui/tokens   — Design tokens, themes, CSS generation
 packages/utils    → @treeui/utils    — DOM, a11y, date, keyboard helpers (framework-agnostic)
 packages/icons    → @treeui/icons    — SVG icon registry as Vue components
 packages/vue      → @treeui/vue      — Vue 3 components, plugin, type exports
+packages/mcp      → @treeui/mcp      — TreeUI AI catalog and MCP server
 apps/docs         → @treeui/docs     — Storybook documentation and playground
 tooling/          — Shared ESLint, TypeScript, Docker configs
 docs/ai/          — Machine-oriented contracts (YAML) for API surface
@@ -24,11 +25,17 @@ Before making changes, load the relevant contract files in this order (stop when
 
 1. `docs/ai/INDEX.md` — load order and file map
 2. `docs/ai/CONTRACTS.yaml` — global API rules: shared props, events, slots, naming, overlay/form contracts
-3. `docs/ai/COMPONENTS/<name>.yaml` — per-component manifest (props, events, slots, a11y, behavior)
-4. `docs/ai/TOKENS.yaml` — only if styling, spacing, motion, or theming is involved
-5. `docs/ai/DECISIONS.md` — only if rationale or migration context matters
+3. `docs/ai/SELECTION.yaml` — component choice heuristics and alternatives
+4. `docs/ai/SETUP.yaml` — install, provider, and value-format rules for consumer apps
+5. `docs/ai/COMPONENTS/<name>.yaml` — per-component manifest (props, events, slots, a11y, behavior)
+6. `docs/ai/RECIPES.yaml` — composition guidance for multi-component features
+7. `docs/ai/TOKENS.yaml` — only if styling, spacing, motion, or theming is involved
+8. `docs/ai/DECISIONS.md` — only if rationale or migration context matters
 
 **If a public API changes, update the matching contract file in the same changeset.**
+
+If component-selection guidance changes, update `docs/ai/SELECTION.yaml` in the same change.
+If consumer-app wiring changes, update `docs/ai/SETUP.yaml` in the same change.
 
 ## Naming Conventions
 
@@ -55,6 +62,7 @@ Before making changes, load the relevant contract files in this order (stop when
 - **Card variants**: `outline | soft | solid`
 - **Form components**: use `modelValue` prop + `update:modelValue` emit for `v-model`
 - **Overlay components**: use `open`/`defaultOpen` props + `update:open`/`open-change` emits; use the `useControllableOpen` composable from `packages/vue/src/composables/`
+- **Date formats**: `TDatePicker` uses `YYYY-MM-DD`; `TDateTimePicker` uses `YYYY-MM-DDTHH:mm`
 
 ### Accessibility (required)
 
@@ -76,6 +84,7 @@ Before making changes, load the relevant contract files in this order (stop when
 7. Add tests in `packages/vue/src/components/components.test.ts`
 8. Create contract at `docs/ai/COMPONENTS/<name>.yaml`
 9. Update `docs/ai/CONTRACTS.yaml` with any new shared props/events/slots
+10. Update `docs/ai/SELECTION.yaml`, `docs/ai/SETUP.yaml`, or `docs/ai/RECIPES.yaml` if the new component affects choice, setup, or composition guidance
 
 ## Quality Gates
 
@@ -102,6 +111,8 @@ pnpm test:e2e      # Playwright (if interaction/a11y changed)
 | CSS generation | `packages/tokens/src/css.ts` |
 | Utilities | `packages/utils/src/index.ts` |
 | Icons | `packages/icons/src/index.ts` |
+| MCP package | `packages/mcp/` |
+| Agent guide | `AGENTS.md` |
 | Design principles | `DESIGN.md` |
 | Architecture | `ARCHITECTURE.md` |
 | Contribution guide | `CONTRIBUTING.md` |

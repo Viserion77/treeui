@@ -1,0 +1,57 @@
+name: TSelectableList
+legacy_alias: TreeSelectableList
+source_file: packages/vue/src/components/TreeSelectableList.vue
+package: "@treeui/vue"
+kind: selection
+status: available
+purpose: "Rich single-selection list for options with description and metadata."
+
+props:
+  modelValue:
+    type: string
+    default: undefined
+  defaultValue:
+    type: string
+    default: ""
+  items:
+    type: "TreeSelectableListItem[]"
+    default: "[]"
+    note: "Array of `{ label, value, description?, meta?, disabled? }`."
+  size:
+    type: TreeSize
+    default: md
+    values: [sm, md, lg]
+  disabled:
+    type: boolean
+    default: false
+  emptyText:
+    type: string
+    default: "No items available."
+
+events:
+  - update:modelValue
+
+slots:
+  - item
+  - empty
+
+a11y:
+  role: listbox
+  item_role: option
+  roving_focus: true
+  home_end_navigation: true
+  arrow_navigation: true
+  activation_keys_select_option: true
+
+behavior:
+  can_be_controlled_or_uncontrolled: true
+  supports_rich_row_rendering_via_slot: true
+  empty_state_text_supported: true
+
+example: |
+  <TSelectableList
+    aria-label="Templates"
+    :items="items"
+    :model-value="activeTemplate"
+    @update:model-value="activeTemplate = $event"
+  />

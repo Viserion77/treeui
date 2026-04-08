@@ -1,0 +1,57 @@
+name: TNavMenu
+legacy_alias: TreeNavMenu
+source_file: packages/vue/src/components/TreeNavMenu.vue
+package: "@treeui/vue"
+kind: navigation
+status: available
+purpose: "App-section navigation menu with roving focus, optional badges, and sidebar-aware collapsed mode."
+
+props:
+  modelValue:
+    type: string
+    default: undefined
+  defaultValue:
+    type: string
+    default: ""
+  items:
+    type: "TreeNavMenuItem[]"
+    default: "[]"
+    note: "Array of `{ label, value, shortLabel?, description?, badge?, disabled? }`."
+  size:
+    type: TreeSize
+    default: md
+    values: [sm, md, lg]
+  collapsed:
+    type: boolean
+    default: inherited_or_false
+  disabled:
+    type: boolean
+    default: false
+
+events:
+  - update:modelValue
+  - select
+
+slots:
+  - item
+  - empty
+
+a11y:
+  semantic_root: nav
+  roving_focus: true
+  home_end_navigation: true
+  arrow_navigation: true
+  activation_keys_select_item: true
+
+behavior:
+  can_be_controlled_or_uncontrolled: true
+  can_inherit_collapsed_state_from_sidebar: true
+  supports_rich_item_rendering_via_slot: true
+
+example: |
+  <TNavMenu
+    aria-label="Workspace sections"
+    :items="items"
+    :model-value="currentRoute"
+    @update:model-value="currentRoute = $event"
+  />

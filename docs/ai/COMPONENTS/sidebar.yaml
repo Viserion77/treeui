@@ -1,0 +1,74 @@
+name: TSidebar
+legacy_alias: TreeSidebar
+source_file: packages/vue/src/components/TreeSidebar.vue
+package: "@treeui/vue"
+kind: layout
+status: available
+purpose: "Persistent or collapsible side shell for app navigation and secondary workspace controls."
+
+props:
+  as:
+    type: string
+    default: aside
+  collapsed:
+    type: boolean
+    default: undefined
+  defaultCollapsed:
+    type: boolean
+    default: false
+  collapsible:
+    type: boolean
+    default: true
+  size:
+    type: TreeSize
+    default: md
+    values: [sm, md, lg]
+  side:
+    type: TreeSidebarSide
+    default: left
+    values: [left, right]
+  sticky:
+    type: boolean
+    default: false
+  bordered:
+    type: boolean
+    default: true
+  width:
+    type: string
+    default: 17.5rem
+  collapsedWidth:
+    type: string
+    default: 4.75rem
+  collapseLabel:
+    type: string
+    default: "Collapse sidebar"
+  expandLabel:
+    type: string
+    default: "Expand sidebar"
+
+events:
+  - update:collapsed
+  - collapse-change
+
+slots:
+  - header
+  - default
+  - footer
+  - toggle
+
+a11y:
+  default_semantic_root: aside
+  toggle_button_aria_expanded: true
+  toggle_button_aria_labelled_by_state: true
+
+behavior:
+  controlled_and_uncontrolled_collapsed_state: true
+  provides_collapsed_state_to_descendants: true
+  left_and_right_variants: true
+  exposes_slot_props_with_collapsed_state: true
+
+example: |
+  <TSidebar>
+    <template #header="{ collapsed }">{{ collapsed ? 'T' : 'TreeUI' }}</template>
+    <TNavMenu aria-label="Workspace navigation" :items="items" />
+  </TSidebar>

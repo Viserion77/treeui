@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "treeui": {
+      "type": "stdio",
+      "command": "pnpm",
+      "args": ["--filter", "@treeui/mcp", "start"]
+    }
+  }
+}

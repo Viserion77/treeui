@@ -1,0 +1,65 @@
+name: TTreeView
+legacy_alias: TreeTreeView
+source_file: packages/vue/src/components/TreeTreeView.vue
+package: "@treeui/vue"
+kind: selection
+status: available
+purpose: "Hierarchical tree view with expansion, keyboard navigation, and single or multiple selection."
+
+props:
+  modelValue:
+    type: "string | string[]"
+    default: undefined
+  defaultValue:
+    type: "string | string[]"
+    default: undefined
+  nodes:
+    type: "TreeTreeViewNode[]"
+    default: "[]"
+    note: "Array of `{ id, label, description?, meta?, disabled?, children? }`."
+  selectionMode:
+    type: TreeTreeViewSelectionMode
+    default: single
+    values: [single, multiple]
+  expanded:
+    type: "string[]"
+    default: undefined
+  defaultExpanded:
+    type: "string[]"
+    default: "[]"
+  disabled:
+    type: boolean
+    default: false
+  emptyText:
+    type: string
+    default: "No items available."
+
+events:
+  - update:modelValue
+  - update:expanded
+  - selection-change
+  - expanded-change
+
+slots: []
+
+a11y:
+  role: tree
+  nested_items_use_treeitem_pattern: true
+  keyboard_navigation_for_visible_nodes: true
+  supports_single_and_multiple_selection: true
+  expansion_and_selection_state_are_exposed: true
+
+behavior:
+  can_be_controlled_or_uncontrolled_for_selection: true
+  can_be_controlled_or_uncontrolled_for_expansion: true
+  visible_node_list_updates_from_expansion: true
+
+example: |
+  <TTreeView
+    aria-label="Workspace tree"
+    :nodes="nodes"
+    :expanded="expanded"
+    :model-value="selected"
+    @update:expanded="expanded = $event"
+    @update:model-value="selected = $event"
+  />

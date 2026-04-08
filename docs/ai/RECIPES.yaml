@@ -1,0 +1,114 @@
+version: 0.1
+package: "@treeui/vue"
+
+recipes:
+  - id: form-field-input
+    name: "Field with text input"
+    use_when:
+      - "A form control needs label, hint, and validation messaging."
+    compose:
+      - TFormField
+      - TInput
+    notes:
+      - "Match `htmlFor` on `TFormField` with the child `id`."
+      - "Mirror invalid state onto `TInput` when error text is shown."
+
+  - id: searchable-multi-choice
+    name: "Searchable multi-choice field"
+    use_when:
+      - "A form needs compact multi-select with filtering."
+    compose:
+      - TFormField
+      - TMultiSelect
+    notes:
+      - "Pass option keywords when search should match hidden synonyms."
+      - "Use `maxVisibleTags` to avoid oversized triggers."
+
+  - id: date-range-form
+    name: "Scheduling pair"
+    use_when:
+      - "A form needs start and end scheduling controls."
+    compose:
+      - TGrid
+      - TFormField
+      - TDateTimePicker
+    notes:
+      - "Keep both values in `YYYY-MM-DDTHH:mm` format."
+      - "Set end `min` from the selected start time when appropriate."
+
+  - id: sidebar-shell
+    name: "Sidebar application shell"
+    use_when:
+      - "The screen needs persistent section navigation."
+    compose:
+      - TSidebar
+      - TNavMenu
+      - TNavbar
+      - TContainer
+    notes:
+      - "Let `TNavMenu` inherit collapsed state from `TSidebar` when possible."
+
+  - id: stat-grid
+    name: "Dashboard metric grid"
+    use_when:
+      - "A dashboard needs KPI cards."
+    compose:
+      - TGrid
+      - TStat
+    notes:
+      - "Use `TCard` only when the stat needs additional arbitrary content."
+
+  - id: data-listing
+    name: "Data table with paging"
+    use_when:
+      - "A structured list needs external paging controls."
+    compose:
+      - TTable
+      - TPagination
+      - TStack
+    notes:
+      - "`TTable` stays focused on structured listing; filters and toolbars compose around it."
+
+  - id: confirm-destructive-action
+    name: "Destructive confirmation flow"
+    use_when:
+      - "The user is confirming a high-risk action."
+    compose:
+      - TConfirmDialog
+      - TButton
+      - TToast
+    notes:
+      - "Use `TToast` only for the post-confirm success feedback."
+
+  - id: anchored-help
+    name: "Anchored help affordance"
+    use_when:
+      - "A trigger needs short or medium contextual help."
+    compose:
+      - TTooltip
+      - TPopover
+    notes:
+      - "Use `TTooltip` for short, non-interactive help."
+      - "Escalate to `TPopover` when the content becomes interactive."
+
+  - id: pricing-section
+    name: "Pricing comparison section"
+    use_when:
+      - "Plans should be compared side by side."
+    compose:
+      - TPricing
+      - TPricingCard
+      - TBadge
+      - TButton
+    notes:
+      - "Use `highlighted` and `badge` on the recommended plan."
+
+  - id: hierarchy-picker
+    name: "Hierarchical selection"
+    use_when:
+      - "Selection works across nested groups or folders."
+    compose:
+      - TTreeView
+      - TFormField
+    notes:
+      - "Use `selectionMode=\"multiple\"` when permissions or tag assignment spans nested nodes."

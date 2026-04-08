@@ -1,0 +1,51 @@
+name: TGrid
+legacy_alias: TreeGrid
+source_file: packages/vue/src/components/TreeGrid.vue
+package: "@treeui/vue"
+kind: layout
+status: available
+purpose: "Responsive grid wrapper for cards, forms, stats, and other multi-column layouts."
+
+props:
+  as:
+    type: string
+    default: div
+  columns:
+    type: number
+    default: auto-fit
+  minItemWidth:
+    type: string
+    default: 16rem
+  gap:
+    type: string
+    default: var(--tree-space-4)
+  rowGap:
+    type: string
+    default: gap
+  align:
+    type: string
+    default: stretch
+  justify:
+    type: string
+    default: stretch
+  dense:
+    type: boolean
+    default: false
+
+slots:
+  - default
+
+behavior:
+  semantic_element_controlled_by_as: true
+  fixed_columns_supported: true
+  auto_fit_columns_supported: true
+  dense_mode_uses_grid_auto_flow_dense: true
+
+a11y:
+  - "Acts as a layout wrapper only; semantics come from child content and optional `as` prop."
+
+example: |
+  <TGrid min-item-width="14rem" gap="var(--tree-space-3)">
+    <TStat label="MRR" value="$48.2k" />
+    <TStat label="Users" value="18,420" />
+  </TGrid>

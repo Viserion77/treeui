@@ -1,0 +1,39 @@
+name: TContainer
+legacy_alias: TreeContainer
+source_file: packages/vue/src/components/TreeContainer.vue
+package: "@treeui/vue"
+kind: layout
+status: available
+purpose: "Width-constrained layout wrapper for readable page content and app sections."
+
+props:
+  as:
+    type: string
+    default: div
+  size:
+    type: TreeContainerSize
+    default: lg
+    values: [sm, md, lg, xl, full]
+  padded:
+    type: boolean
+    default: true
+  centered:
+    type: boolean
+    default: true
+
+slots:
+  - default
+
+behavior:
+  semantic_element_controlled_by_as: true
+  constrains_width_by_size: true
+  can_disable_padding: true
+  can_disable_auto_centering: true
+
+a11y:
+  - "Acts as a structural wrapper only; semantics come from the `as` prop and child content."
+
+example: |
+  <TContainer size="lg">
+    <section>Page content</section>
+  </TContainer>

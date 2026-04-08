@@ -1,0 +1,56 @@
+name: TToggleGroup
+legacy_alias: TreeToggleGroup
+source_file: packages/vue/src/components/TreeToggleGroup.vue
+package: "@treeui/vue"
+kind: selection
+status: available
+purpose: "Segmented button group for single or multiple visible choices."
+
+props:
+  modelValue:
+    type: "string | string[]"
+    default: undefined
+  options:
+    type: "TreeToggleGroupOption[]"
+    default: "[]"
+    note: "Array of `{ label, value, disabled? }`."
+  selectionMode:
+    type: TreeToggleGroupSelectionMode
+    default: single
+    values: [single, multiple]
+  size:
+    type: TreeSize
+    default: md
+    values: [sm, md, lg]
+  variant:
+    type: TreeToggleGroupVariant
+    default: outline
+    values: [outline, soft, solid]
+  disabled:
+    type: boolean
+    default: false
+
+events:
+  - update:modelValue
+
+slots:
+  - option
+
+a11y:
+  roving_focus: true
+  home_end_navigation: true
+  arrow_navigation: true
+  activation_keys_select_option: true
+
+behavior:
+  single_and_multiple_modes: true
+  variant_changes_visual_style_only: true
+  visible_option_set_expected: true
+
+example: |
+  <TToggleGroup
+    aria-label="Time range"
+    :options="rangeOptions"
+    model-value="week"
+    @update:model-value="range = $event"
+  />

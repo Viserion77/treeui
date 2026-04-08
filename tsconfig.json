@@ -10,7 +10,9 @@
       "@treeui/icons": ["./packages/icons/src/index.ts"],
       "@treeui/icons/*": ["./packages/icons/src/*"],
       "@treeui/vue": ["./packages/vue/src/index.ts"],
-      "@treeui/vue/*": ["./packages/vue/src/*"]
+      "@treeui/vue/*": ["./packages/vue/src/*"],
+      "@treeui/mcp": ["./packages/mcp/src/index.ts"],
+      "@treeui/mcp/*": ["./packages/mcp/src/*"]
     }
   },
   "include": [

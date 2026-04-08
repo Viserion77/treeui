@@ -1,0 +1,58 @@
+name: TSteps
+legacy_alias: TreeSteps
+source_file: packages/vue/src/components/TreeSteps.vue
+package: "@treeui/vue"
+kind: navigation
+status: available
+purpose: "Stepper component for visualizing workflow progress, with optional interactive selection."
+
+aliases:
+  - TStepper
+  - TreeStepper
+
+props:
+  modelValue:
+    type: string
+    default: undefined
+  defaultValue:
+    type: string
+    default: ""
+  items:
+    type: "TreeStepItem[]"
+    default: "[]"
+    note: "Array of `{ label, value, description?, meta?, status?, disabled? }`."
+  size:
+    type: TreeSize
+    default: md
+    values: [sm, md, lg]
+  orientation:
+    type: TreeStepOrientation
+    default: horizontal
+    values: [horizontal, vertical]
+  interactive:
+    type: boolean
+    default: false
+
+events:
+  - update:modelValue
+
+slots:
+  - item
+
+a11y:
+  semantic_root: ol
+  current_step_uses_aria_current_step: true
+  interactive_variant_uses_buttons: true
+
+behavior:
+  can_be_controlled_or_uncontrolled: true
+  status_can_be_explicit_or_computed: true
+  alias_export_available: true
+
+example: |
+  <TSteps
+    interactive
+    :items="steps"
+    :model-value="currentStep"
+    @update:model-value="currentStep = $event"
+  />

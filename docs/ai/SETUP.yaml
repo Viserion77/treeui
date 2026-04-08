@@ -1,0 +1,113 @@
+version: 0.1
+package: "@treeui/vue"
+
+install:
+  package_manager_examples:
+    pnpm: "pnpm add @treeui/vue"
+    npm: "npm install @treeui/vue"
+  required_imports:
+    - "@treeui/vue/style.css"
+
+vue_setup:
+  plugin_install:
+    import: "import TreeUIPlugin from '@treeui/vue'"
+    usage: "app.use(TreeUIPlugin)"
+  individual_imports:
+    import: "import { TButton, TInput, TModal } from '@treeui/vue'"
+  guidance:
+    - "Use the plugin when global registration is preferred."
+    - "Use named imports when tree-shaken local imports fit the consumer app better."
+    - "Prefer `T<Name>` imports in all new code."
+
+global_rules:
+  - "Always import `@treeui/vue/style.css` once in the consuming application."
+  - "Compatibility aliases such as `TreeButton` remain available but are not the preferred direction."
+  - "Form controls use `modelValue` + `update:modelValue`."
+  - "Overlay-style components generally support controlled and uncontrolled open state."
+  - "Date-only values use `YYYY-MM-DD`."
+  - "Date-time values use `YYYY-MM-DDTHH:mm`."
+
+component_setup:
+  TToast:
+    required:
+      - "Mount one `TToastProvider` near the application root before calling `useToast()` from feature components."
+    notes:
+      - "Use `useToast()` for programmatic notifications."
+      - "Choose provider `position` once per app shell unless a feature has a strong reason to differ."
+
+  TFormField:
+    required:
+      - "Wrap a control such as `TInput`, `TSelect`, `TCombobox`, `TCheckbox`, or `TDatePicker`."
+      - "Pass `htmlFor` matching the child control `id` when the child exposes one."
+    notes:
+      - "Set the child control invalid state separately when `error` is present."
+
+  TSelect:
+    notes:
+      - "Pass `options` as `{ label, value, disabled? }[]`."
+      - "Use `placeholder` when no selection has been made."
+
+  TCombobox:
+    notes:
+      - "Pass `options` as labeled items and keep labels human-readable because search matches visible fields."
+
+  TMultiSelect:
+    notes:
+      - "Pass `modelValue` as `string[]`."
+      - "Option search checks `label`, `description`, and `keywords`."
+      - "Use `maxVisibleTags` to control trigger density in compact layouts."
+
+  TToggleGroup:
+    notes:
+      - "Use `selectionMode=\"single\"` for segmented single choice."
+      - "Use `selectionMode=\"multiple\"` for small visible multi-choice sets."
+
+  TDatePicker:
+    notes:
+      - "Bind `modelValue` to a `YYYY-MM-DD` string."
+      - "Use `min` and `max` with the same format."
+
+  TDateTimePicker:
+    notes:
+      - "Bind `modelValue` to a `YYYY-MM-DDTHH:mm` string."
+      - "Use `step` in seconds. Values divisible by 60 produce minute increments."
+      - "Use `min` and `max` in the same date-time format."
+
+  TFileUpload:
+    notes:
+      - "Bind `modelValue` to `File[]`."
+      - "Use `accept`, `multiple`, and size limits in the app layer to constrain uploads."
+
+  TSidebar:
+    notes:
+      - "Pair with `TNavMenu` for app-section navigation."
+      - "Use controlled `collapsed` state when the app shell persists layout preferences."
+
+  TNavMenu:
+    notes:
+      - "When nested inside `TSidebar`, `collapsed` can be inherited from the sidebar provider."
+
+  TTreeView:
+    notes:
+      - "Use `nodes` shaped as `{ id, label, description?, meta?, disabled?, children? }[]`."
+      - "Control `expanded` separately when the parent app needs to persist open branches."
+
+  TSteps:
+    notes:
+      - "Pass explicit `status` per item only when the app should override the computed complete/current/upcoming logic."
+
+  TPricing:
+    notes:
+      - "Pass `plans` matching the same core fields used by `TPricingCard`."
+
+app_patterns:
+  providers:
+    - component: TToastProvider
+      placement: "application root or shell root"
+      reason: "Programmatic toast rendering"
+  common_compositions:
+    - "TFormField + input-like control"
+    - "TGrid + TStat"
+    - "TSidebar + TNavMenu"
+    - "TTable + TPagination"
+    - "TPricing + TPricingCard"

@@ -1,0 +1,80 @@
+name: TMultiSelect
+legacy_alias: TreeMultiSelect
+source_file: packages/vue/src/components/TreeMultiSelect.vue
+package: "@treeui/vue"
+kind: form
+status: available
+purpose: "Searchable multi-select control that renders selected values as tags."
+
+props:
+  modelValue:
+    type: "string[]"
+    default: "[]"
+  options:
+    type: "TreeMultiSelectOption[]"
+    default: "[]"
+    note: "Array of `{ label, value, description?, keywords?, disabled? }`."
+  open:
+    type: boolean
+    default: undefined
+  defaultOpen:
+    type: boolean
+    default: false
+  size:
+    type: TreeSize
+    default: md
+    values: [sm, md, lg]
+  disabled:
+    type: boolean
+    default: false
+  loading:
+    type: boolean
+    default: false
+  invalid:
+    type: boolean
+    default: false
+  placeholder:
+    type: string
+    default: ""
+  emptyText:
+    type: string
+    default: "No results found."
+  maxVisibleTags:
+    type: number
+    default: 2
+
+events:
+  - update:modelValue
+  - update:open
+  - open-change
+  - input-change
+
+slots:
+  - prefix
+  - tag
+  - option
+  - empty
+
+a11y:
+  role: combobox
+  listbox_popup: true
+  active_descendant_management: true
+  keyboard_arrow_navigation: true
+  escape_closes_listbox: true
+  backspace_tag_removal: true
+  aria_invalid_when_invalid: true
+  aria_busy_when_loading: true
+
+behavior:
+  selected_values_are_strings: true
+  query_filters_label_description_keywords: true
+  selected_values_render_as_tags: true
+  controlled_and_uncontrolled_open: true
+
+example: |
+  <TMultiSelect
+    aria-label="Teams"
+    :options="teamOptions"
+    :model-value="teams"
+    @update:model-value="teams = $event"
+  />

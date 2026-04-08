@@ -1,0 +1,542 @@
+version: 0.1
+package: "@treeui/vue"
+
+selection_principles:
+  - "Prefer the smallest component that matches the interaction and accessibility need."
+  - "Prefer `T<Name>` exports in new code. `Tree<Name>` aliases are compatibility-only."
+  - "Prefer docs-first composition before inventing new public components."
+  - "When a component has an in-flow and overlay alternative, choose the in-flow one unless anchored or modal behavior is required."
+
+decision_guides:
+  - id: single-choice
+    question: "Choose one value from a known set"
+    options:
+      - use: TToggleGroup
+        when:
+          - "The number of options is small and should stay visible."
+          - "Fast switching matters more than compactness."
+      - use: TSelect
+        when:
+          - "The choices can stay in a dropdown."
+          - "Search is not required."
+      - use: TCombobox
+        when:
+          - "The user needs filtering or type-to-search."
+          - "The option list can become long."
+      - use: TRadioGroup
+        when:
+          - "All options should be visible with classic form semantics."
+          - "You need explicit radio semantics in a form."
+      - use: TSelectableList
+        when:
+          - "The choice should be presented as richer rows with description or metadata."
+      - use: TTreeView
+        when:
+          - "The options are hierarchical."
+
+  - id: multiple-choice
+    question: "Choose multiple values"
+    options:
+      - use: TMultiSelect
+        when:
+          - "Selected values should collapse into tags."
+          - "The user needs filtering and a compact control."
+      - use: TToggleGroup
+        when:
+          - "The option set is small and visible."
+          - "A segmented-control style is appropriate."
+        notes:
+          - "Set `selectionMode=\"multiple\"`."
+      - use: TCheckbox
+        when:
+          - "The options can stay visible as a checklist."
+      - use: TTreeView
+        when:
+          - "Multi-selection must work across a hierarchy."
+          - "Set `selectionMode=\"multiple\"`."
+
+  - id: overlay-choice
+    question: "Show contextual or blocking UI above the page"
+    options:
+      - use: TTooltip
+        when:
+          - "The content is a short label or hint."
+          - "The panel should not be interactive."
+      - use: TPopover
+        when:
+          - "The content is anchored, custom, and non-blocking."
+          - "The panel can contain controls."
+      - use: TDropdown
+        when:
+          - "You need a lightweight action menu or menu-like list."
+      - use: TContextMenu
+        when:
+          - "The menu is triggered by right click or context action."
+      - use: TDrawer
+        when:
+          - "The task needs a larger side panel but should keep page context visible."
+      - use: TModal
+        when:
+          - "The task is blocking and requires focused attention."
+      - use: TConfirmDialog
+        when:
+          - "The user is confirming or canceling a destructive or high-risk action."
+
+  - id: feedback-choice
+    question: "Communicate status or feedback"
+    options:
+      - use: TAlert
+        when:
+          - "The message should stay visible in the page layout."
+      - use: TToast
+        when:
+          - "The message is ephemeral and should not shift layout."
+          - "A root `TToastProvider` is already mounted."
+      - use: TEmptyState
+        when:
+          - "The user needs a purposeful zero-state, not only a status message."
+      - use: TProgress
+        when:
+          - "You need a determinate progress indicator."
+      - use: TSpinner
+        when:
+          - "You need indeterminate loading feedback."
+      - use: TSkeleton
+        when:
+          - "You want loading placeholders that preserve layout."
+
+component_profiles:
+  TAccordion:
+    keywords: [accordion, collapsible, disclosure, details, faq]
+    use_when:
+      - "Sections expand and collapse inside the page flow."
+      - "Multiple disclosure items share one layout."
+    avoid_when:
+      - "You need tabbed navigation or route-level navigation."
+    alternatives:
+      - component: TTabs
+        when: "Only one panel should be active and the tab labels must stay visible."
+      - component: TTreeView
+        when: "The content is hierarchical rather than just collapsible."
+
+  TAlert:
+    keywords: [alert, banner, callout, inline feedback, status]
+    use_when:
+      - "Feedback should stay visible in-flow."
+      - "The message may contain actions or supporting content."
+    avoid_when:
+      - "The feedback should disappear automatically."
+    alternatives:
+      - component: TToast
+        when: "The message is ephemeral and should not affect layout."
+      - component: TEmptyState
+        when: "The screen has no data and needs stronger guidance."
+
+  TCard:
+    keywords: [card, panel, surface, section]
+    use_when:
+      - "You need a framed surface for related content."
+      - "The layout can be composed from slots instead of a dedicated domain component."
+    avoid_when:
+      - "You only need width constraint or spacing."
+    alternatives:
+      - component: TContainer
+        when: "The main need is width constraint."
+      - component: TStack
+        when: "The main need is spacing between children."
+
+  TCheckbox:
+    keywords: [checkbox, checklist, boolean, consent, multiple choice]
+    use_when:
+      - "Each option is independent."
+      - "You need standard checkbox form semantics."
+    avoid_when:
+      - "Exactly one option must be selected."
+    alternatives:
+      - component: TRadioGroup
+        when: "Only one option is valid."
+      - component: TSwitch
+        when: "The choice is a single immediate on/off state."
+
+  TCombobox:
+    keywords: [combobox, autocomplete, searchable select, search select]
+    use_when:
+      - "The user needs to filter or search a single-choice list."
+      - "A dropdown is appropriate, but plain select is too limited."
+    avoid_when:
+      - "Search is unnecessary and the option list is short."
+    alternatives:
+      - component: TSelect
+        when: "You only need a standard dropdown without filtering."
+      - component: TMultiSelect
+        when: "The user must select multiple values."
+
+  TContainer:
+    keywords: [container, page width, centered content, shell]
+    use_when:
+      - "You want consistent max width and horizontal page padding."
+      - "The page shell should stay full-width while content stays readable."
+    avoid_when:
+      - "You need internal spacing between children."
+    alternatives:
+      - component: TStack
+        when: "The main need is vertical or horizontal spacing."
+      - component: TGrid
+        when: "The main need is responsive columns."
+
+  TContextMenu:
+    keywords: [context menu, right click, row actions]
+    use_when:
+      - "Actions are triggered from context-click or long-press style behavior."
+    avoid_when:
+      - "The menu is triggered from a standard button."
+    alternatives:
+      - component: TDropdown
+        when: "A normal trigger button opens the menu."
+
+  TDatePicker:
+    keywords: [date, calendar, single day]
+    use_when:
+      - "The value is a date without time."
+    avoid_when:
+      - "Time selection matters."
+    alternatives:
+      - component: TDateTimePicker
+        when: "The value must include time."
+
+  TDateTimePicker:
+    keywords: [datetime, schedule, appointment, release window]
+    use_when:
+      - "The value must include both date and time."
+      - "The user should pick a schedule from one compact control."
+    avoid_when:
+      - "Only a day is needed."
+    alternatives:
+      - component: TDatePicker
+        when: "Only the date matters."
+
+  TDrawer:
+    keywords: [drawer, side panel, slide-over]
+    use_when:
+      - "The user needs a larger contextual panel while keeping page context visible."
+    avoid_when:
+      - "The task requires full modal focus or only a small anchored panel."
+    alternatives:
+      - component: TModal
+        when: "The task should be fully blocking."
+      - component: TPopover
+        when: "A compact anchored panel is enough."
+
+  TDropdown:
+    keywords: [dropdown, actions menu, menu button]
+    use_when:
+      - "A button should open a short list of actions or choices."
+    avoid_when:
+      - "The user is choosing a form value with v-model."
+    alternatives:
+      - component: TSelect
+        when: "The dropdown is a form control for selecting a value."
+      - component: TContextMenu
+        when: "The menu opens from a context action."
+
+  TEmptyState:
+    keywords: [empty state, zero state, no data]
+    use_when:
+      - "A screen or section has no content and needs guidance."
+    avoid_when:
+      - "You only need a brief inline warning."
+    alternatives:
+      - component: TAlert
+        when: "The layout already has content and only needs a message."
+
+  TFormField:
+    keywords: [form field, label, hint, validation, wrapper]
+    use_when:
+      - "You need consistent label, hint, and error layout around a control."
+    avoid_when:
+      - "You need the actual input control."
+    alternatives:
+      - component: TInput
+        when: "You need a text entry control."
+      - component: TSelect
+        when: "You need a dropdown control."
+
+  TGrid:
+    keywords: [grid, columns, dashboard, cards, responsive layout]
+    use_when:
+      - "Children should flow into responsive columns."
+      - "You need stat grids, card grids, or form rows."
+    avoid_when:
+      - "You only need one-dimensional spacing."
+    alternatives:
+      - component: TStack
+        when: "A single row or column is enough."
+
+  TInput:
+    keywords: [input, text field, text entry, single line]
+    use_when:
+      - "The value is short, plain, and single-line."
+    avoid_when:
+      - "The content is multiline, numeric, or markdown."
+    alternatives:
+      - component: TTextarea
+        when: "The content is multiline."
+      - component: TNumberInput
+        when: "The value is numeric."
+      - component: TMarkdownEditor
+        when: "Rich markdown authoring is needed."
+
+  TMarkdownEditor:
+    keywords: [markdown, rich text, editor, preview]
+    use_when:
+      - "The user needs markdown formatting, toolbar actions, or preview."
+    avoid_when:
+      - "A plain multiline text area is enough."
+    alternatives:
+      - component: TTextarea
+        when: "You only need multiline plain text."
+
+  TModal:
+    keywords: [modal, dialog, blocking, focused task]
+    use_when:
+      - "The user must complete or review something in a blocking dialog."
+    avoid_when:
+      - "Only a small hint or contextual panel is needed."
+    alternatives:
+      - component: TConfirmDialog
+        when: "The dialog is specifically about confirm/cancel."
+      - component: TDrawer
+        when: "A side panel fits better."
+      - component: TPopover
+        when: "An anchored non-blocking panel is enough."
+
+  TMultiSelect:
+    keywords: [multi select, tags, searchable multi choice]
+    use_when:
+      - "The user needs to select multiple values from a larger list."
+      - "Filtering and tag display improve the workflow."
+    avoid_when:
+      - "The option set is tiny and should always stay visible."
+    alternatives:
+      - component: TToggleGroup
+        when: "The multiple-choice set is very small and visible."
+      - component: TCheckbox
+        when: "The choices can stay visible as a checklist."
+      - component: TTreeView
+        when: "The choices are hierarchical."
+
+  TNavMenu:
+    keywords: [nav menu, sidebar nav, section nav]
+    use_when:
+      - "You need app-section navigation inside a shell or sidebar."
+    avoid_when:
+      - "You need tabs for small panel switching."
+    alternatives:
+      - component: TTabs
+        when: "The navigation swaps local panels instead of app sections."
+      - component: TBreadcrumb
+        when: "You are showing hierarchy, not selectable nav."
+
+  TNavbar:
+    keywords: [navbar, app bar, top bar, header]
+    use_when:
+      - "You need a top application bar with start, center, and end areas."
+    avoid_when:
+      - "You only need a content container."
+    alternatives:
+      - component: TContainer
+        when: "You only need width constraint."
+
+  TNumberInput:
+    keywords: [number input, numeric stepper, quantity]
+    use_when:
+      - "The value is numeric and increment/decrement controls help."
+    avoid_when:
+      - "The value is free-form text or non-numeric."
+    alternatives:
+      - component: TInput
+        when: "The value is not numeric."
+
+  TPagination:
+    keywords: [pagination, pages, list navigation]
+    use_when:
+      - "The app handles paging outside of `TTable`."
+    avoid_when:
+      - "The list is infinite-scroll or not paged."
+    alternatives:
+      - component: TTabs
+        when: "The interaction is switching panels, not pages."
+
+  TPopover:
+    keywords: [popover, anchored panel, non modal overlay]
+    use_when:
+      - "You need custom anchored content that can contain controls."
+    avoid_when:
+      - "The content is just a short hint."
+    alternatives:
+      - component: TTooltip
+        when: "Only a short hint or label is needed."
+      - component: TDropdown
+        when: "The content is primarily a menu of actions."
+
+  TSelectableList:
+    keywords: [selectable list, rich options, option list]
+    use_when:
+      - "Each option needs description or metadata."
+      - "Selection should feel like choosing a row rather than opening a dropdown."
+    avoid_when:
+      - "The options should live in a compact form control."
+    alternatives:
+      - component: TSelect
+        when: "A compact dropdown is better."
+      - component: TTreeView
+        when: "The options are hierarchical."
+
+  TSelect:
+    keywords: [select, dropdown, single choice]
+    use_when:
+      - "The user needs a compact single-choice dropdown."
+      - "Search is not required."
+    avoid_when:
+      - "Filtering or multi-selection is required."
+    alternatives:
+      - component: TCombobox
+        when: "Search or filtering is required."
+      - component: TMultiSelect
+        when: "Multiple values are required."
+
+  TSidebar:
+    keywords: [sidebar, app shell, collapsible nav rail]
+    use_when:
+      - "You need a persistent side shell, often with navigation."
+    avoid_when:
+      - "The panel should slide over temporary content."
+    alternatives:
+      - component: TDrawer
+        when: "The panel is temporary and overlays content."
+
+  TStack:
+    keywords: [stack, spacing, flex column, flex row]
+    use_when:
+      - "You need one-dimensional spacing and alignment."
+    avoid_when:
+      - "You need responsive columns."
+    alternatives:
+      - component: TGrid
+        when: "You need multi-column layout."
+
+  TStat:
+    keywords: [stat, metric, KPI, dashboard]
+    use_when:
+      - "A compact metric card with value, trend, and optional icon is needed."
+    avoid_when:
+      - "You need arbitrary content in a generic surface."
+    alternatives:
+      - component: TCard
+        when: "The content is not a metric."
+
+  TSteps:
+    keywords: [steps, stepper, progress steps, wizard]
+    use_when:
+      - "A workflow or staged process should be visible."
+    avoid_when:
+      - "You need generic tab panels or route navigation."
+    alternatives:
+      - component: TTabs
+        when: "The interaction is panel switching rather than process progression."
+
+  TSwitch:
+    keywords: [switch, toggle, on off]
+    use_when:
+      - "The state is a single immediate boolean toggle."
+    avoid_when:
+      - "The choice is one of multiple discrete options."
+    alternatives:
+      - component: TCheckbox
+        when: "The control participates in a form checklist or consent flow."
+      - component: TToggleGroup
+        when: "The user is choosing from multiple options."
+
+  TTable:
+    keywords: [table, rows, columns, structured data, listing]
+    use_when:
+      - "The content is tabular and benefits from rows and columns."
+    avoid_when:
+      - "The UI is hierarchical or card-based."
+    alternatives:
+      - component: TSelectableList
+        when: "The list is rich but not tabular."
+      - component: TTreeView
+        when: "The data is hierarchical."
+
+  TTabs:
+    keywords: [tabs, tab panels, segmented content]
+    use_when:
+      - "The user switches between a small set of panels in-place."
+    avoid_when:
+      - "The panels represent steps in a workflow or app navigation."
+    alternatives:
+      - component: TSteps
+        when: "The panels represent a process."
+      - component: TNavMenu
+        when: "The selection is app-section navigation."
+
+  TTextarea:
+    keywords: [textarea, multiline, long text]
+    use_when:
+      - "The value is multiline plain text."
+    avoid_when:
+      - "The authoring experience requires markdown formatting."
+    alternatives:
+      - component: TInput
+        when: "The value is short and single-line."
+      - component: TMarkdownEditor
+        when: "Markdown authoring is needed."
+
+  TToast:
+    keywords: [toast, snackbar, notification]
+    use_when:
+      - "Feedback should appear temporarily without shifting layout."
+    avoid_when:
+      - "The message must stay visible in-flow."
+    alternatives:
+      - component: TAlert
+        when: "The message should stay visible in the page."
+
+  TToggleGroup:
+    keywords: [toggle group, segmented control, visible options]
+    use_when:
+      - "The option set is small and should stay visible."
+      - "A segmented-button presentation is appropriate."
+    avoid_when:
+      - "The option set is large or searchable."
+    alternatives:
+      - component: TSelect
+        when: "A compact dropdown fits better."
+      - component: TCombobox
+        when: "Filtering is required."
+      - component: TMultiSelect
+        when: "Many multiple-choice options are required."
+
+  TTooltip:
+    keywords: [tooltip, hover help, short hint]
+    use_when:
+      - "You need a short, non-interactive hint anchored to another element."
+    avoid_when:
+      - "The overlay needs interactive content."
+    alternatives:
+      - component: TPopover
+        when: "The overlay needs interactive content."
+
+  TTreeView:
+    keywords: [tree, tree view, hierarchy, nested selection]
+    use_when:
+      - "The data is hierarchical."
+      - "Selection or expansion must work across nested nodes."
+    avoid_when:
+      - "The data is flat."
+    alternatives:
+      - component: TSelectableList
+        when: "The options are flat rich rows."
+      - component: TNavMenu
+        when: "The hierarchy is actually app navigation."

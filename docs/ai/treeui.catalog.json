@@ -1,0 +1,6106 @@
+{
+  "generatedAt": "2026-04-08T23:01:23.477Z",
+  "packageName": "@treeui/vue",
+  "packageVersion": "0.5.0",
+  "decisionGuides": [
+    {
+      "id": "single-choice",
+      "question": "Choose one value from a known set",
+      "options": [
+        {
+          "use": "TToggleGroup",
+          "when": [
+            "The number of options is small and should stay visible.",
+            "Fast switching matters more than compactness."
+          ],
+          "notes": []
+        },
+        {
+          "use": "TSelect",
+          "when": [
+            "The choices can stay in a dropdown.",
+            "Search is not required."
+          ],
+          "notes": []
+        },
+        {
+          "use": "TCombobox",
+          "when": [
+            "The user needs filtering or type-to-search.",
+            "The option list can become long."
+          ],
+          "notes": []
+        },
+        {
+          "use": "TRadioGroup",
+          "when": [
+            "All options should be visible with classic form semantics.",
+            "You need explicit radio semantics in a form."
+          ],
+          "notes": []
+        },
+        {
+          "use": "TSelectableList",
+          "when": [
+            "The choice should be presented as richer rows with description or metadata."
+          ],
+          "notes": []
+        },
+        {
+          "use": "TTreeView",
+          "when": [
+            "The options are hierarchical."
+          ],
+          "notes": []
+        }
+      ]
+    },
+    {
+      "id": "multiple-choice",
+      "question": "Choose multiple values",
+      "options": [
+        {
+          "use": "TMultiSelect",
+          "when": [
+            "Selected values should collapse into tags.",
+            "The user needs filtering and a compact control."
+          ],
+          "notes": []
+        },
+        {
+          "use": "TToggleGroup",
+          "when": [
+            "The option set is small and visible.",
+            "A segmented-control style is appropriate."
+          ],
+          "notes": [
+            "Set `selectionMode=\"multiple\"`."
+          ]
+        },
+        {
+          "use": "TCheckbox",
+          "when": [
+            "The options can stay visible as a checklist."
+          ],
+          "notes": []
+        },
+        {
+          "use": "TTreeView",
+          "when": [
+            "Multi-selection must work across a hierarchy.",
+            "Set `selectionMode=\"multiple\"`."
+          ],
+          "notes": []
+        }
+      ]
+    },
+    {
+      "id": "overlay-choice",
+      "question": "Show contextual or blocking UI above the page",
+      "options": [
+        {
+          "use": "TTooltip",
+          "when": [
+            "The content is a short label or hint.",
+            "The panel should not be interactive."
+          ],
+          "notes": []
+        },
+        {
+          "use": "TPopover",
+          "when": [
+            "The content is anchored, custom, and non-blocking.",
+            "The panel can contain controls."
+          ],
+          "notes": []
+        },
+        {
+          "use": "TDropdown",
+          "when": [
+            "You need a lightweight action menu or menu-like list."
+          ],
+          "notes": []
+        },
+        {
+          "use": "TContextMenu",
+          "when": [
+            "The menu is triggered by right click or context action."
+          ],
+          "notes": []
+        },
+        {
+          "use": "TDrawer",
+          "when": [
+            "The task needs a larger side panel but should keep page context visible."
+          ],
+          "notes": []
+        },
+        {
+          "use": "TModal",
+          "when": [
+            "The task is blocking and requires focused attention."
+          ],
+          "notes": []
+        },
+        {
+          "use": "TConfirmDialog",
+          "when": [
+            "The user is confirming or canceling a destructive or high-risk action."
+          ],
+          "notes": []
+        }
+      ]
+    },
+    {
+      "id": "feedback-choice",
+      "question": "Communicate status or feedback",
+      "options": [
+        {
+          "use": "TAlert",
+          "when": [
+            "The message should stay visible in the page layout."
+          ],
+          "notes": []
+        },
+        {
+          "use": "TToast",
+          "when": [
+            "The message is ephemeral and should not shift layout.",
+            "A root `TToastProvider` is already mounted."
+          ],
+          "notes": []
+        },
+        {
+          "use": "TEmptyState",
+          "when": [
+            "The user needs a purposeful zero-state, not only a status message."
+          ],
+          "notes": []
+        },
+        {
+          "use": "TProgress",
+          "when": [
+            "You need a determinate progress indicator."
+          ],
+          "notes": []
+        },
+        {
+          "use": "TSpinner",
+          "when": [
+            "You need indeterminate loading feedback."
+          ],
+          "notes": []
+        },
+        {
+          "use": "TSkeleton",
+          "when": [
+            "You want loading placeholders that preserve layout."
+          ],
+          "notes": []
+        }
+      ]
+    }
+  ],
+  "recipes": [
+    {
+      "id": "form-field-input",
+      "name": "Field with text input",
+      "useWhen": [
+        "A form control needs label, hint, and validation messaging."
+      ],
+      "compose": [
+        "TFormField",
+        "TInput"
+      ],
+      "notes": [
+        "Match `htmlFor` on `TFormField` with the child `id`.",
+        "Mirror invalid state onto `TInput` when error text is shown."
+      ]
+    },
+    {
+      "id": "searchable-multi-choice",
+      "name": "Searchable multi-choice field",
+      "useWhen": [
+        "A form needs compact multi-select with filtering."
+      ],
+      "compose": [
+        "TFormField",
+        "TMultiSelect"
+      ],
+      "notes": [
+        "Pass option keywords when search should match hidden synonyms.",
+        "Use `maxVisibleTags` to avoid oversized triggers."
+      ]
+    },
+    {
+      "id": "date-range-form",
+      "name": "Scheduling pair",
+      "useWhen": [
+        "A form needs start and end scheduling controls."
+      ],
+      "compose": [
+        "TGrid",
+        "TFormField",
+        "TDateTimePicker"
+      ],
+      "notes": [
+        "Keep both values in `YYYY-MM-DDTHH:mm` format.",
+        "Set end `min` from the selected start time when appropriate."
+      ]
+    },
+    {
+      "id": "sidebar-shell",
+      "name": "Sidebar application shell",
+      "useWhen": [
+        "The screen needs persistent section navigation."
+      ],
+      "compose": [
+        "TSidebar",
+        "TNavMenu",
+        "TNavbar",
+        "TContainer"
+      ],
+      "notes": [
+        "Let `TNavMenu` inherit collapsed state from `TSidebar` when possible."
+      ]
+    },
+    {
+      "id": "stat-grid",
+      "name": "Dashboard metric grid",
+      "useWhen": [
+        "A dashboard needs KPI cards."
+      ],
+      "compose": [
+        "TGrid",
+        "TStat"
+      ],
+      "notes": [
+        "Use `TCard` only when the stat needs additional arbitrary content."
+      ]
+    },
+    {
+      "id": "data-listing",
+      "name": "Data table with paging",
+      "useWhen": [
+        "A structured list needs external paging controls."
+      ],
+      "compose": [
+        "TTable",
+        "TPagination",
+        "TStack"
+      ],
+      "notes": [
+        "`TTable` stays focused on structured listing; filters and toolbars compose around it."
+      ]
+    },
+    {
+      "id": "confirm-destructive-action",
+      "name": "Destructive confirmation flow",
+      "useWhen": [
+        "The user is confirming a high-risk action."
+      ],
+      "compose": [
+        "TConfirmDialog",
+        "TButton",
+        "TToast"
+      ],
+      "notes": [
+        "Use `TToast` only for the post-confirm success feedback."
+      ]
+    },
+    {
+      "id": "anchored-help",
+      "name": "Anchored help affordance",
+      "useWhen": [
+        "A trigger needs short or medium contextual help."
+      ],
+      "compose": [
+        "TTooltip",
+        "TPopover"
+      ],
+      "notes": [
+        "Use `TTooltip` for short, non-interactive help.",
+        "Escalate to `TPopover` when the content becomes interactive."
+      ]
+    },
+    {
+      "id": "pricing-section",
+      "name": "Pricing comparison section",
+      "useWhen": [
+        "Plans should be compared side by side."
+      ],
+      "compose": [
+        "TPricing",
+        "TPricingCard",
+        "TBadge",
+        "TButton"
+      ],
+      "notes": [
+        "Use `highlighted` and `badge` on the recommended plan."
+      ]
+    },
+    {
+      "id": "hierarchy-picker",
+      "name": "Hierarchical selection",
+      "useWhen": [
+        "Selection works across nested groups or folders."
+      ],
+      "compose": [
+        "TTreeView",
+        "TFormField"
+      ],
+      "notes": [
+        "Use `selectionMode=\"multiple\"` when permissions or tag assignment spans nested nodes."
+      ]
+    }
+  ],
+  "setup": {
+    "install": {
+      "packageManagerExamples": {
+        "pnpm": "pnpm add @treeui/vue",
+        "npm": "npm install @treeui/vue"
+      },
+      "requiredImports": [
+        "@treeui/vue/style.css"
+      ]
+    },
+    "vueSetup": {
+      "pluginInstall": {
+        "import": "import TreeUIPlugin from '@treeui/vue'",
+        "usage": "app.use(TreeUIPlugin)"
+      },
+      "individualImports": {
+        "import": "import { TButton, TInput, TModal } from '@treeui/vue'"
+      },
+      "guidance": [
+        "Use the plugin when global registration is preferred.",
+        "Use named imports when tree-shaken local imports fit the consumer app better.",
+        "Prefer `T<Name>` imports in all new code."
+      ]
+    },
+    "globalRules": [
+      "Always import `@treeui/vue/style.css` once in the consuming application.",
+      "Compatibility aliases such as `TreeButton` remain available but are not the preferred direction.",
+      "Form controls use `modelValue` + `update:modelValue`.",
+      "Overlay-style components generally support controlled and uncontrolled open state.",
+      "Date-only values use `YYYY-MM-DD`.",
+      "Date-time values use `YYYY-MM-DDTHH:mm`."
+    ],
+    "componentSetup": {
+      "TToast": {
+        "required": [
+          "Mount one `TToastProvider` near the application root before calling `useToast()` from feature components."
+        ],
+        "notes": [
+          "Use `useToast()` for programmatic notifications.",
+          "Choose provider `position` once per app shell unless a feature has a strong reason to differ."
+        ]
+      },
+      "TFormField": {
+        "required": [
+          "Wrap a control such as `TInput`, `TSelect`, `TCombobox`, `TCheckbox`, or `TDatePicker`.",
+          "Pass `htmlFor` matching the child control `id` when the child exposes one."
+        ],
+        "notes": [
+          "Set the child control invalid state separately when `error` is present."
+        ]
+      },
+      "TSelect": {
+        "required": [],
+        "notes": [
+          "Pass `options` as `{ label, value, disabled? }[]`.",
+          "Use `placeholder` when no selection has been made."
+        ]
+      },
+      "TCombobox": {
+        "required": [],
+        "notes": [
+          "Pass `options` as labeled items and keep labels human-readable because search matches visible fields."
+        ]
+      },
+      "TMultiSelect": {
+        "required": [],
+        "notes": [
+          "Pass `modelValue` as `string[]`.",
+          "Option search checks `label`, `description`, and `keywords`.",
+          "Use `maxVisibleTags` to control trigger density in compact layouts."
+        ]
+      },
+      "TToggleGroup": {
+        "required": [],
+        "notes": [
+          "Use `selectionMode=\"single\"` for segmented single choice.",
+          "Use `selectionMode=\"multiple\"` for small visible multi-choice sets."
+        ]
+      },
+      "TDatePicker": {
+        "required": [],
+        "notes": [
+          "Bind `modelValue` to a `YYYY-MM-DD` string.",
+          "Use `min` and `max` with the same format."
+        ]
+      },
+      "TDateTimePicker": {
+        "required": [],
+        "notes": [
+          "Bind `modelValue` to a `YYYY-MM-DDTHH:mm` string.",
+          "Use `step` in seconds. Values divisible by 60 produce minute increments.",
+          "Use `min` and `max` in the same date-time format."
+        ]
+      },
+      "TFileUpload": {
+        "required": [],
+        "notes": [
+          "Bind `modelValue` to `File[]`.",
+          "Use `accept`, `multiple`, and size limits in the app layer to constrain uploads."
+        ]
+      },
+      "TSidebar": {
+        "required": [],
+        "notes": [
+          "Pair with `TNavMenu` for app-section navigation.",
+          "Use controlled `collapsed` state when the app shell persists layout preferences."
+        ]
+      },
+      "TNavMenu": {
+        "required": [],
+        "notes": [
+          "When nested inside `TSidebar`, `collapsed` can be inherited from the sidebar provider."
+        ]
+      },
+      "TTreeView": {
+        "required": [],
+        "notes": [
+          "Use `nodes` shaped as `{ id, label, description?, meta?, disabled?, children? }[]`.",
+          "Control `expanded` separately when the parent app needs to persist open branches."
+        ]
+      },
+      "TSteps": {
+        "required": [],
+        "notes": [
+          "Pass explicit `status` per item only when the app should override the computed complete/current/upcoming logic."
+        ]
+      },
+      "TPricing": {
+        "required": [],
+        "notes": [
+          "Pass `plans` matching the same core fields used by `TPricingCard`."
+        ]
+      }
+    },
+    "appPatterns": {
+      "providers": [
+        {
+          "component": "TToastProvider",
+          "placement": "application root or shell root",
+          "reason": "Programmatic toast rendering"
+        }
+      ],
+      "commonCompositions": [
+        "TFormField + input-like control",
+        "TGrid + TStat",
+        "TSidebar + TNavMenu",
+        "TTable + TPagination",
+        "TPricing + TPricingCard"
+      ]
+    }
+  },
+  "components": [
+    {
+      "name": "TAccordion",
+      "legacyAlias": "TreeAccordion",
+      "aliases": [
+        "TreeAccordion"
+      ],
+      "package": "@treeui/vue",
+      "kind": "disclosure",
+      "category": "Data Display",
+      "status": "available",
+      "purpose": "Organized content sections with expandable/collapsible behavior. Supports single-open and multi-open modes.\n",
+      "sourceFile": "packages/vue/src/components/TreeAccordion.vue",
+      "storyFile": "apps/docs/src/stories/Accordion.stories.ts",
+      "storyTitle": "Components/Data Display/Accordion",
+      "manifestFile": "docs/ai/COMPONENTS/accordion.yaml",
+      "props": [],
+      "events": [],
+      "slots": [],
+      "a11y": [
+        "roles: {\"trigger\":\"heading > button\",\"panel\":\"region\"}",
+        "attributes: {\"trigger\":[\"aria-expanded (reflects open state)\",\"aria-controls (references panel id)\"],\"panel\":[\"role=\\\"region\\\"\",\"aria-labelledby (references trigger id)\"]}",
+        "keyboard: [{\"key\":\"Enter / Space\",\"action\":\"Toggle the focused item\"},{\"key\":\"ArrowDown\",\"action\":\"Move focus to the next item trigger\"},{\"key\":\"ArrowUp\",\"action\":\"Move focus to the previous item trigger\"},{\"key\":\"Home\",\"action\":\"Move focus to the first item trigger\"},{\"key\":\"End\",\"action\":\"Move focus to the last item trigger\"}]"
+      ],
+      "behavior": [],
+      "selection": {
+        "keywords": [
+          "accordion",
+          "collapsible",
+          "disclosure",
+          "details",
+          "faq"
+        ],
+        "useWhen": [
+          "Sections expand and collapse inside the page flow.",
+          "Multiple disclosure items share one layout."
+        ],
+        "avoidWhen": [
+          "You need tabbed navigation or route-level navigation."
+        ],
+        "alternatives": [
+          {
+            "component": "TTabs",
+            "when": "Only one panel should be active and the tab labels must stay visible."
+          },
+          {
+            "component": "TTreeView",
+            "when": "The content is hierarchical rather than just collapsible."
+          }
+        ]
+      },
+      "setup": {
+        "required": [],
+        "notes": []
+      },
+      "recipes": []
+    },
+    {
+      "name": "TAlert",
+      "legacyAlias": "TreeAlert",
+      "aliases": [
+        "TreeAlert"
+      ],
+      "package": "@treeui/vue",
+      "kind": "feedback",
+      "category": "Feedback",
+      "status": "available",
+      "purpose": "Inline status banner for info, success, warning, and danger messages.",
+      "sourceFile": "packages/vue/src/components/TreeAlert.vue",
+      "storyFile": "apps/docs/src/stories/Alert.stories.ts",
+      "storyTitle": "Components/Feedback/Alert",
+      "manifestFile": "docs/ai/COMPONENTS/alert.yaml",
+      "props": [
+        {
+          "name": "variant",
+          "type": "'info' | 'success' | 'warning' | 'danger'",
+          "default": "info",
+          "values": [
+            "info",
+            "success",
+            "warning",
+            "danger"
+          ]
+        },
+        {
+          "name": "size",
+          "type": "TreeSize",
+          "default": "md",
+          "values": [
+            "sm",
+            "md",
+            "lg"
+          ]
+        },
+        {
+          "name": "dismissible",
+          "type": "boolean",
+          "default": "false"
+        }
+      ],
+      "events": [
+        {
+          "name": "dismiss",
+          "description": "Emitted when the dismiss button is clicked.",
+          "payload": "none"
+        }
+      ],
+      "slots": [
+        {
+          "name": "default",
+          "description": "Alert message content."
+        },
+        {
+          "name": "icon",
+          "description": "Optional leading icon; rendered with aria-hidden."
+        },
+        {
+          "name": "dismiss-icon",
+          "description": "Custom dismiss button content; replaces the default × icon."
+        }
+      ],
+      "a11y": [
+        "role: alert",
+        "icon_slot_marked_aria_hidden: true",
+        "dismiss_button_aria_label: Dismiss",
+        "keyboard: Tab to dismiss button, Enter/Space to activate"
+      ],
+      "behavior": [],
+      "selection": {
+        "keywords": [
+          "alert",
+          "banner",
+          "callout",
+          "inline feedback",
+          "status"
+        ],
+        "useWhen": [
+          "Feedback should stay visible in-flow.",
+          "The message may contain actions or supporting content."
+        ],
+        "avoidWhen": [
+          "The feedback should disappear automatically."
+        ],
+        "alternatives": [
+          {
+            "component": "TToast",
+            "when": "The message is ephemeral and should not affect layout."
+          },
+          {
+            "component": "TEmptyState",
+            "when": "The screen has no data and needs stronger guidance."
+          }
+        ]
+      },
+      "setup": {
+        "required": [],
+        "notes": []
+      },
+      "recipes": []
+    },
+    {
+      "name": "TAvatar",
+      "legacyAlias": "TreeAvatar",
+      "aliases": [
+        "TreeAvatar"
+      ],
+      "package": "@treeui/vue",
+      "category": "Data Display",
+      "description": "User image with fallback initials and optional status indicator dot.",
+      "sourceFile": "packages/vue/src/components/TreeAvatar.vue",
+      "storyFile": "apps/docs/src/stories/Avatar.stories.ts",
+      "storyTitle": "Components/Data Display/Avatar",
+      "manifestFile": "docs/ai/COMPONENTS/avatar.yaml",
+      "props": [
+        {
+          "name": "src",
+          "type": "string",
+          "required": false,
+          "description": "URL of the avatar image."
+        },
+        {
+          "name": "alt",
+          "type": "string",
+          "default": "\"\"",
+          "description": "Accessible label for the avatar. Also used to derive initials if `initials` is not set."
+        },
+        {
+          "name": "initials",
+          "type": "string",
+          "required": false,
+          "description": "Explicit initials to display when no image is provided. Overrides derived initials from `alt`."
+        },
+        {
+          "name": "size",
+          "type": "TreeSize",
+          "default": "md",
+          "values": [
+            "sm",
+            "md",
+            "lg"
+          ]
+        },
+        {
+          "name": "status",
+          "type": "TreeAvatarStatus",
+          "required": false,
+          "values": [
+            "online",
+            "offline",
+            "busy",
+            "away"
+          ],
+          "description": "Shows a colored status dot on the avatar."
+        }
+      ],
+      "events": [],
+      "slots": [
+        {
+          "name": "default",
+          "description": "Optional overlay content inside the avatar."
+        }
+      ],
+      "a11y": [
+        "role: img",
+        "aria-label: Derived from `alt` prop.",
+        "status_dot: Has its own `aria-label` with the status value."
+      ],
+      "behavior": [],
+      "selection": {
+        "keywords": [],
+        "useWhen": [],
+        "avoidWhen": [],
+        "alternatives": []
+      },
+      "setup": {
+        "required": [],
+        "notes": []
+      },
+      "recipes": []
+    },
+    {
+      "name": "TBadge",
+      "legacyAlias": "TreeBadge",
+      "aliases": [
+        "TreeBadge"
+      ],
+      "package": "@treeui/vue",
+      "kind": "display",
+      "category": "Data Display",
+      "status": "available",
+      "purpose": "Compact status or metadata label with optional icon.",
+      "sourceFile": "packages/vue/src/components/TreeBadge.vue",
+      "storyFile": "apps/docs/src/stories/Badge.stories.ts",
+      "storyTitle": "Components/Data Display/Badge",
+      "manifestFile": "docs/ai/COMPONENTS/badge.yaml",
+      "props": [
+        {
+          "name": "variant",
+          "type": "TreeVariant",
+          "default": "soft",
+          "values": [
+            "solid",
+            "outline",
+            "ghost",
+            "soft",
+            "danger"
+          ]
+        },
+        {
+          "name": "size",
+          "type": "TreeSize",
+          "default": "md",
+          "values": [
+            "sm",
+            "md",
+            "lg"
+          ]
+        }
+      ],
+      "events": [],
+      "slots": [
+        {
+          "name": "icon"
+        },
+        {
+          "name": "default"
+        }
+      ],
+      "a11y": [
+        "interactive_by_default: false",
+        "icon_slot_marked_aria_hidden: true"
+      ],
+      "behavior": [],
+      "selection": {
+        "keywords": [],
+        "useWhen": [],
+        "avoidWhen": [],
+        "alternatives": []
+      },
+      "setup": {
+        "required": [],
+        "notes": []
+      },
+      "recipes": [
+        "pricing-section"
+      ]
+    },
+    {
+      "name": "TBreadcrumb",
+      "legacyAlias": "TreeBreadcrumb",
+      "aliases": [
+        "TreeBreadcrumb"
+      ],
+      "package": "@treeui/vue",
+      "kind": "navigation",
+      "category": "Navigation",
+      "status": "available",
+      "purpose": "Hierarchical navigation trail showing the user's current location within a site or application.",
+      "sourceFile": "packages/vue/src/components/TreeBreadcrumb.vue",
+      "storyFile": "apps/docs/src/stories/Breadcrumb.stories.ts",
+      "storyTitle": "Components/Navigation/Breadcrumb",
+      "manifestFile": "docs/ai/COMPONENTS/breadcrumb.yaml",
+      "props": [
+        {
+          "name": "separator",
+          "type": "string",
+          "default": "/",
+          "description": "Character or string used to separate breadcrumb items."
+        }
+      ],
+      "events": [],
+      "slots": [
+        {
+          "name": "default"
+        }
+      ],
+      "a11y": [
+        "element: nav",
+        "aria_label: Breadcrumb",
+        "current_page_aria_current: page",
+        "uses_ol_for_ordered_list: true",
+        "interactive_by_default: false"
+      ],
+      "behavior": [],
+      "selection": {
+        "keywords": [],
+        "useWhen": [],
+        "avoidWhen": [],
+        "alternatives": []
+      },
+      "setup": {
+        "required": [],
+        "notes": []
+      },
+      "recipes": []
+    },
+    {
+      "name": "TButton",
+      "legacyAlias": "TreeButton",
+      "aliases": [
+        "TreeButton"
+      ],
+      "package": "@treeui/vue",
+      "kind": "primitive",
+      "category": "Actions",
+      "status": "available",
+      "purpose": "Clickable action trigger with variants, sizes, optional polymorphism, and loading state.",
+      "sourceFile": "packages/vue/src/components/TreeButton.vue",
+      "storyFile": "apps/docs/src/stories/Button.stories.ts",
+      "storyTitle": "Components/Actions/Button",
+      "manifestFile": "docs/ai/COMPONENTS/button.yaml",
+      "props": [
+        {
+          "name": "as",
+          "type": "string",
+          "default": "button"
+        },
+        {
+          "name": "variant",
+          "type": "TreeVariant",
+          "default": "solid",
+          "values": [
+            "solid",
+            "outline",
+            "ghost",
+            "soft",
+            "danger"
+          ]
+        },
+        {
+          "name": "size",
+          "type": "TreeSize",
+          "default": "md",
+          "values": [
+            "sm",
+            "md",
+            "lg"
+          ]
+        },
+        {
+          "name": "disabled",
+          "type": "boolean",
+          "default": "false"
+        },
+        {
+          "name": "loading",
+          "type": "boolean",
+          "default": "false",
+          "note": "loading implies disabled behavior"
+        },
+        {
+          "name": "type",
+          "type": "button | submit | reset",
+          "default": "button"
+        }
+      ],
+      "events": [
+        {
+          "name": "click"
+        }
+      ],
+      "slots": [
+        {
+          "name": "icon"
+        },
+        {
+          "name": "default"
+        }
+      ],
+      "a11y": [
+        "native_button_by_default: true",
+        "aria_busy_when_loading: true",
+        "aria_disabled_for_non_button: true",
+        "tabindex_minus_one_when_non_button_disabled: true"
+      ],
+      "behavior": [
+        "blocks_click_when_disabled_or_loading: true",
+        "renders_spinner_when_loading: true"
+      ],
+      "selection": {
+        "keywords": [],
+        "useWhen": [],
+        "avoidWhen": [],
+        "alternatives": []
+      },
+      "setup": {
+        "required": [],
+        "notes": []
+      },
+      "recipes": [
+        "confirm-destructive-action",
+        "pricing-section"
+      ]
+    },
+    {
+      "name": "TCard",
+      "legacyAlias": "TreeCard",
+      "aliases": [
+        "TreeCard"
+      ],
+      "package": "@treeui/vue",
+      "kind": "layout",
+      "category": "Data Display",
+      "status": "available",
+      "purpose": "Surface container with optional header and footer slots.",
+      "sourceFile": "packages/vue/src/components/TreeCard.vue",
+      "storyFile": "apps/docs/src/stories/Card.stories.ts",
+      "storyTitle": "Components/Data Display/Card",
+      "manifestFile": "docs/ai/COMPONENTS/card.yaml",
+      "props": [
+        {
+          "name": "as",
+          "type": "string",
+          "default": "section"
+        },
+        {
+          "name": "variant",
+          "type": "TreeCardVariant",
+          "default": "outline",
+          "values": [
+            "outline",
+            "soft",
+            "solid"
+          ]
+        },
+        {
+          "name": "size",
+          "type": "TreeSize",
+          "default": "md",
+          "values": [
+            "sm",
+            "md",
+            "lg"
+          ]
+        }
+      ],
+      "events": [],
+      "slots": [
+        {
+          "name": "header"
+        },
+        {
+          "name": "default"
+        },
+        {
+          "name": "footer"
+        }
+      ],
+      "a11y": [],
+      "behavior": [
+        "body_wrapper_class: tree-card__body"
+      ],
+      "selection": {
+        "keywords": [
+          "card",
+          "panel",
+          "surface",
+          "section"
+        ],
+        "useWhen": [
+          "You need a framed surface for related content.",
+          "The layout can be composed from slots instead of a dedicated domain component."
+        ],
+        "avoidWhen": [
+          "You only need width constraint or spacing."
+        ],
+        "alternatives": [
+          {
+            "component": "TContainer",
+            "when": "The main need is width constraint."
+          },
+          {
+            "component": "TStack",
+            "when": "The main need is spacing between children."
+          }
+        ]
+      },
+      "setup": {
+        "required": [],
+        "notes": []
+      },
+      "recipes": []
+    },
+    {
+      "name": "TCheckbox",
+      "legacyAlias": "TreeCheckbox",
+      "aliases": [
+        "TreeCheckbox"
+      ],
+      "package": "@treeui/vue",
+      "kind": "primitive",
+      "category": "Data Entry",
+      "status": "available",
+      "purpose": "Boolean toggle with indeterminate state; supports v-model via modelValue.",
+      "sourceFile": "packages/vue/src/components/TreeCheckbox.vue",
+      "storyFile": "apps/docs/src/stories/Checkbox.stories.ts",
+      "storyTitle": "Components/Data Entry/Checkbox",
+      "manifestFile": "docs/ai/COMPONENTS/checkbox.yaml",
+      "props": [
+        {
+          "name": "modelValue",
+          "type": "boolean",
+          "default": "false"
+        },
+        {
+          "name": "size",
+          "type": "TreeSize",
+          "default": "md",
+          "values": [
+            "sm",
+            "md",
+            "lg"
+          ]
+        },
+        {
+          "name": "disabled",
+          "type": "boolean",
+          "default": "false"
+        },
+        {
+          "name": "indeterminate",
+          "type": "boolean",
+          "default": "false"
+        },
+        {
+          "name": "invalid",
+          "type": "boolean",
+          "default": "false"
+        }
+      ],
+      "events": [
+        {
+          "name": "update:modelValue"
+        }
+      ],
+      "slots": [
+        {
+          "name": "default"
+        }
+      ],
+      "a11y": [
+        "role: native_checkbox",
+        "aria_checked_mixed_when_indeterminate: true",
+        "aria_invalid_when_invalid: true",
+        "focus_visible_on_control: true",
+        "clickable_target_44x44: true"
+      ],
+      "behavior": [
+        "update_payload_type: boolean",
+        "indeterminate_clears_on_user_toggle: false",
+        "label_click_toggles_checkbox: true"
+      ],
+      "selection": {
+        "keywords": [
+          "checkbox",
+          "checklist",
+          "boolean",
+          "consent",
+          "multiple choice"
+        ],
+        "useWhen": [
+          "Each option is independent.",
+          "You need standard checkbox form semantics."
+        ],
+        "avoidWhen": [
+          "Exactly one option must be selected."
+        ],
+        "alternatives": [
+          {
+            "component": "TRadioGroup",
+            "when": "Only one option is valid."
+          },
+          {
+            "component": "TSwitch",
+            "when": "The choice is a single immediate on/off state."
+          }
+        ]
+      },
+      "setup": {
+        "required": [],
+        "notes": []
+      },
+      "recipes": []
+    },
+    {
+      "name": "TCombobox",
+      "legacyAlias": "TreeCombobox",
+      "aliases": [
+        "TreeCombobox"
+      ],
+      "package": "@treeui/vue",
+      "kind": "primitive",
+      "category": "Data Entry",
+      "status": "available",
+      "purpose": "Searchable combobox / autocomplete input with local filtering, controlled selection, and shared open-state behavior.",
+      "sourceFile": "packages/vue/src/components/TreeCombobox.vue",
+      "storyFile": "apps/docs/src/stories/Combobox.stories.ts",
+      "storyTitle": "Components/Data Entry/Combobox",
+      "manifestFile": "docs/ai/COMPONENTS/combobox.yaml",
+      "props": [
+        {
+          "name": "modelValue",
+          "type": "string",
+          "default": ""
+        },
+        {
+          "name": "options",
+          "type": "TreeComboboxOption[]",
+          "default": "[]",
+          "note": "Array of { label: string; value: string; description?: string; keywords?: string[]; disabled?: boolean }"
+        },
+        {
+          "name": "open",
+          "type": "boolean",
+          "default": "undefined"
+        },
+        {
+          "name": "defaultOpen",
+          "type": "boolean",
+          "default": "false"
+        },
+        {
+          "name": "size",
+          "type": "TreeSize",
+          "default": "md",
+          "values": [
+            "sm",
+            "md",
+            "lg"
+          ]
+        },
+        {
+          "name": "disabled",
+          "type": "boolean",
+          "default": "false"
+        },
+        {
+          "name": "loading",
+          "type": "boolean",
+          "default": "false"
+        },
+        {
+          "name": "invalid",
+          "type": "boolean",
+          "default": "false"
+        },
+        {
+          "name": "placeholder",
+          "type": "string",
+          "default": ""
+        },
+        {
+          "name": "emptyText",
+          "type": "string",
+          "default": "No results found."
+        }
+      ],
+      "events": [
+        {
+          "name": "update:modelValue"
+        },
+        {
+          "name": "update:open"
+        },
+        {
+          "name": "open-change"
+        },
+        {
+          "name": "input-change"
+        }
+      ],
+      "slots": [
+        {
+          "name": "prefix"
+        },
+        {
+          "name": "option"
+        },
+        {
+          "name": "empty"
+        }
+      ],
+      "a11y": [
+        "role: combobox",
+        "trigger_aria_haspopup: listbox",
+        "trigger_aria_expanded: true",
+        "aria_autocomplete: list",
+        "aria_activedescendant_on_active_option: true",
+        "aria_invalid_when_invalid: true",
+        "aria_busy_when_loading: true",
+        "aria_selected_on_options: true",
+        "aria_disabled_on_disabled_options: true",
+        "keyboard_arrow_navigation: true",
+        "escape_closes_and_restores_previous_selection: true",
+        "enter_selects_active_option: true",
+        "home_end_navigation: true"
+      ],
+      "behavior": [
+        "update_payload_type: string",
+        "local_filtering_by_label_description_and_keywords: true",
+        "loading_does_not_disable_by_itself: true",
+        "outside_click_closes_dropdown: true",
+        "query_clears_selection_when_closed_empty: true",
+        "selected_value_restores_when_search_is_abandoned: true"
+      ],
+      "selection": {
+        "keywords": [
+          "combobox",
+          "autocomplete",
+          "searchable select",
+          "search select"
+        ],
+        "useWhen": [
+          "The user needs to filter or search a single-choice list.",
+          "A dropdown is appropriate, but plain select is too limited."
+        ],
+        "avoidWhen": [
+          "Search is unnecessary and the option list is short."
+        ],
+        "alternatives": [
+          {
+            "component": "TSelect",
+            "when": "You only need a standard dropdown without filtering."
+          },
+          {
+            "component": "TMultiSelect",
+            "when": "The user must select multiple values."
+          }
+        ]
+      },
+      "setup": {
+        "required": [],
+        "notes": [
+          "Pass `options` as labeled items and keep labels human-readable because search matches visible fields."
+        ]
+      },
+      "recipes": []
+    },
+    {
+      "name": "TConfirmDialog",
+      "legacyAlias": "TreeConfirmDialog",
+      "aliases": [
+        "TreeConfirmDialog"
+      ],
+      "package": "@treeui/vue",
+      "kind": "overlay",
+      "category": "Overlay",
+      "status": "available",
+      "purpose": "High-level confirmation dialog built on the shared modal contract, with default confirm and cancel actions.",
+      "sourceFile": "packages/vue/src/components/TreeConfirmDialog.vue",
+      "storyFile": "apps/docs/src/stories/ConfirmDialog.stories.ts",
+      "storyTitle": "Components/Overlay/ConfirmDialog",
+      "manifestFile": "docs/ai/COMPONENTS/confirm-dialog.yaml",
+      "props": [
+        {
+          "name": "open",
+          "type": "boolean",
+          "default": "controlled_optional"
+        },
+        {
+          "name": "defaultOpen",
+          "type": "boolean",
+          "default": "false"
+        },
+        {
+          "name": "disabled",
+          "type": "boolean",
+          "default": "false"
+        },
+        {
+          "name": "size",
+          "type": "TreeSize",
+          "default": "sm",
+          "values": [
+            "sm",
+            "md",
+            "lg"
+          ]
+        },
+        {
+          "name": "title",
+          "type": "string",
+          "default": ""
+        },
+        {
+          "name": "description",
+          "type": "string",
+          "default": ""
+        },
+        {
+          "name": "confirmLabel",
+          "type": "string",
+          "default": "Confirm"
+        },
+        {
+          "name": "cancelLabel",
+          "type": "string",
+          "default": "Cancel"
+        },
+        {
+          "name": "confirmVariant",
+          "type": "TreeVariant",
+          "default": "danger"
+        },
+        {
+          "name": "confirmDisabled",
+          "type": "boolean",
+          "default": "false"
+        },
+        {
+          "name": "cancelDisabled",
+          "type": "boolean",
+          "default": "false"
+        },
+        {
+          "name": "loading",
+          "type": "boolean",
+          "default": "false"
+        },
+        {
+          "name": "closeOnEscape",
+          "type": "boolean",
+          "default": "true"
+        },
+        {
+          "name": "closeOnOverlay",
+          "type": "boolean",
+          "default": "false"
+        },
+        {
+          "name": "showCloseButton",
+          "type": "boolean",
+          "default": "false"
+        },
+        {
+          "name": "closeLabel",
+          "type": "string",
+          "default": "Close dialog"
+        },
+        {
+          "name": "closeOnConfirm",
+          "type": "boolean",
+          "default": "true"
+        },
+        {
+          "name": "closeOnCancel",
+          "type": "boolean",
+          "default": "true"
+        }
+      ],
+      "events": [
+        {
+          "name": "confirm"
+        },
+        {
+          "name": "cancel"
+        },
+        {
+          "name": "update:open"
+        },
+        {
+          "name": "open-change"
+        }
+      ],
+      "slots": [
+        {
+          "name": "trigger"
+        },
+        {
+          "name": "icon"
+        },
+        {
+          "name": "default"
+        },
+        {
+          "name": "actions"
+        }
+      ],
+      "a11y": [
+        "role: dialog",
+        "aria_modal: true",
+        "focus_trap: inherited_from_modal",
+        "restores_focus_on_close: inherited_from_modal",
+        "icon_slot_marked_aria_hidden: true"
+      ],
+      "behavior": [
+        "built_on_modal_contract: true",
+        "default_confirm_button_variant: danger",
+        "overlay_click_disabled_by_default: true",
+        "close_button_hidden_by_default: true",
+        "loading_state_applies_to_confirm_button: true",
+        "default_actions_close_dialog_when_enabled: true"
+      ],
+      "selection": {
+        "keywords": [],
+        "useWhen": [],
+        "avoidWhen": [],
+        "alternatives": []
+      },
+      "setup": {
+        "required": [],
+        "notes": []
+      },
+      "recipes": [
+        "confirm-destructive-action"
+      ]
+    },
+    {
+      "name": "TContainer",
+      "legacyAlias": "TreeContainer",
+      "aliases": [
+        "TreeContainer"
+      ],
+      "package": "@treeui/vue",
+      "kind": "layout",
+      "category": "Layout",
+      "status": "available",
+      "purpose": "Width-constrained layout wrapper for readable page content and app sections.",
+      "sourceFile": "packages/vue/src/components/TreeContainer.vue",
+      "storyFile": "apps/docs/src/stories/Container.stories.ts",
+      "storyTitle": "Components/Layout/Container",
+      "manifestFile": "docs/ai/COMPONENTS/container.yaml",
+      "props": [
+        {
+          "name": "as",
+          "type": "string",
+          "default": "div"
+        },
+        {
+          "name": "size",
+          "type": "TreeContainerSize",
+          "default": "lg",
+          "values": [
+            "sm",
+            "md",
+            "lg",
+            "xl",
+            "full"
+          ]
+        },
+        {
+          "name": "padded",
+          "type": "boolean",
+          "default": "true"
+        },
+        {
+          "name": "centered",
+          "type": "boolean",
+          "default": "true"
+        }
+      ],
+      "events": [],
+      "slots": [
+        {
+          "name": "default"
+        }
+      ],
+      "a11y": [
+        "Acts as a structural wrapper only; semantics come from the `as` prop and child content."
+      ],
+      "behavior": [
+        "semantic_element_controlled_by_as: true",
+        "constrains_width_by_size: true",
+        "can_disable_padding: true",
+        "can_disable_auto_centering: true"
+      ],
+      "selection": {
+        "keywords": [
+          "container",
+          "page width",
+          "centered content",
+          "shell"
+        ],
+        "useWhen": [
+          "You want consistent max width and horizontal page padding.",
+          "The page shell should stay full-width while content stays readable."
+        ],
+        "avoidWhen": [
+          "You need internal spacing between children."
+        ],
+        "alternatives": [
+          {
+            "component": "TStack",
+            "when": "The main need is vertical or horizontal spacing."
+          },
+          {
+            "component": "TGrid",
+            "when": "The main need is responsive columns."
+          }
+        ]
+      },
+      "setup": {
+        "required": [],
+        "notes": []
+      },
+      "recipes": [
+        "sidebar-shell"
+      ]
+    },
+    {
+      "name": "TContextMenu",
+      "legacyAlias": "TreeContextMenu",
+      "aliases": [
+        "TreeContextMenu"
+      ],
+      "package": "@treeui/vue",
+      "category": "Overlay",
+      "status": "stable",
+      "storyFile": "apps/docs/src/stories/ContextMenu.stories.ts",
+      "storyTitle": "Components/Overlay/ContextMenu",
+      "manifestFile": "docs/ai/COMPONENTS/context-menu.yaml",
+      "props": [
+        {
+          "name": "items",
+          "type": "TreeContextMenuItem[]",
+          "default": "[]",
+          "description": "Menu items to render."
+        },
+        {
+          "name": "open",
+          "type": "boolean | undefined",
+          "default": "undefined",
+          "description": "Controlled open state (v-model:open)."
+        },
+        {
+          "name": "defaultOpen",
+          "type": "boolean",
+          "default": "false",
+          "description": "Uncontrolled initial open state."
+        },
+        {
+          "name": "disabled",
+          "type": "boolean",
+          "default": "false",
+          "description": "Prevents the context menu from opening."
+        },
+        {
+          "name": "size",
+          "type": "TreeSize",
+          "default": "md",
+          "description": "Item sizing variant."
+        }
+      ],
+      "events": [
+        {
+          "name": "select",
+          "description": "Emitted when a menu item is selected.",
+          "payload": "[value: string]"
+        },
+        {
+          "name": "update:open",
+          "description": "Emitted when open state changes (v-model support).",
+          "payload": "[value: boolean]"
+        },
+        {
+          "name": "open-change",
+          "description": "Emitted when open state changes.",
+          "payload": "[value: boolean]"
+        }
+      ],
+      "slots": [
+        {
+          "name": "default",
+          "description": "Content that acts as the right-click trigger area."
+        },
+        {
+          "name": "item",
+          "description": "Custom rendering for each menu item."
+        }
+      ],
+      "a11y": [
+        "role: menu (on the floating list)",
+        "items_role: menuitem",
+        "keyboard: [\"Right-click / contextmenu event opens menu at cursor\",\"ArrowDown / ArrowUp navigates items\",\"Home / End jumps to first / last enabled item\",\"Enter / Space selects focused item\",\"Escape closes menu and restores focus\"]",
+        "aria: [\"aria-disabled on disabled items\",\"aria-label on menu element\"]",
+        "focus: [\"First enabled item receives focus on open\",\"Focus restored to trigger area on close\"]"
+      ],
+      "behavior": [
+        "Opens at cursor position on right-click (contextmenu event).",
+        "Uses Teleport to body to escape stacking contexts.",
+        "Closes on click outside, Escape key, or item selection.",
+        "Prevents native browser context menu on trigger area.",
+        "Uses position fixed for viewport-relative placement."
+      ],
+      "selection": {
+        "keywords": [
+          "context menu",
+          "right click",
+          "row actions"
+        ],
+        "useWhen": [
+          "Actions are triggered from context-click or long-press style behavior."
+        ],
+        "avoidWhen": [
+          "The menu is triggered from a standard button."
+        ],
+        "alternatives": [
+          {
+            "component": "TDropdown",
+            "when": "A normal trigger button opens the menu."
+          }
+        ]
+      },
+      "setup": {
+        "required": [],
+        "notes": []
+      },
+      "recipes": []
+    },
+    {
+      "name": "TDatePicker",
+      "legacyAlias": "TreeDatePicker",
+      "aliases": [
+        "TreeDatePicker"
+      ],
+      "package": "@treeui/vue",
+      "kind": "form_overlay",
+      "category": "Data Entry",
+      "status": "available",
+      "purpose": "Date input with calendar popover and keyboard navigation.",
+      "sourceFile": "packages/vue/src/components/TreeDatePicker.vue",
+      "storyFile": "apps/docs/src/stories/DatePicker.stories.ts",
+      "storyTitle": "Components/Data Entry/DatePicker",
+      "manifestFile": "docs/ai/COMPONENTS/date-picker.yaml",
+      "props": [
+        {
+          "name": "modelValue",
+          "type": "string",
+          "default": ""
+        },
+        {
+          "name": "open",
+          "type": "boolean",
+          "default": "controlled_optional"
+        },
+        {
+          "name": "defaultOpen",
+          "type": "boolean",
+          "default": "false"
+        },
+        {
+          "name": "size",
+          "type": "TreeSize",
+          "default": "md",
+          "values": [
+            "sm",
+            "md",
+            "lg"
+          ]
+        },
+        {
+          "name": "disabled",
+          "type": "boolean",
+          "default": "false"
+        },
+        {
+          "name": "invalid",
+          "type": "boolean",
+          "default": "false"
+        },
+        {
+          "name": "placeholder",
+          "type": "string",
+          "default": "Select date"
+        },
+        {
+          "name": "locale",
+          "type": "string",
+          "default": "en-US"
+        },
+        {
+          "name": "min",
+          "type": "string",
+          "default": ""
+        },
+        {
+          "name": "max",
+          "type": "string",
+          "default": ""
+        },
+        {
+          "name": "weekStartsOn",
+          "type": "number",
+          "default": "0",
+          "values": [
+            "0",
+            "1",
+            "2",
+            "3",
+            "4",
+            "5",
+            "6"
+          ]
+        },
+        {
+          "name": "id",
+          "type": "string",
+          "default": "auto"
+        }
+      ],
+      "events": [
+        {
+          "name": "update:modelValue"
+        },
+        {
+          "name": "update:open"
+        },
+        {
+          "name": "open-change"
+        },
+        {
+          "name": "select"
+        }
+      ],
+      "slots": [
+        {
+          "name": "prefix"
+        },
+        {
+          "name": "suffix"
+        }
+      ],
+      "a11y": [
+        "trigger_has_popup_dialog: true",
+        "calendar_uses_grid_roles: true",
+        "escape_closes: true",
+        "returns_focus_to_trigger_after_selection: true"
+      ],
+      "behavior": [
+        "selection_closes_popover: true",
+        "hidden_input_created_when_name_attr_present: true",
+        "out_of_range_dates_disabled: true"
+      ],
+      "selection": {
+        "keywords": [
+          "date",
+          "calendar",
+          "single day"
+        ],
+        "useWhen": [
+          "The value is a date without time."
+        ],
+        "avoidWhen": [
+          "Time selection matters."
+        ],
+        "alternatives": [
+          {
+            "component": "TDateTimePicker",
+            "when": "The value must include time."
+          }
+        ]
+      },
+      "setup": {
+        "required": [],
+        "notes": [
+          "Bind `modelValue` to a `YYYY-MM-DD` string.",
+          "Use `min` and `max` with the same format."
+        ]
+      },
+      "recipes": []
+    },
+    {
+      "name": "TDateTimePicker",
+      "legacyAlias": "TreeDateTimePicker",
+      "aliases": [
+        "TreeDateTimePicker"
+      ],
+      "package": "@treeui/vue",
+      "kind": "form",
+      "category": "Data Entry",
+      "status": "available",
+      "purpose": "Date and time picker with a calendar grid, time selection, and overlay trigger.",
+      "sourceFile": "packages/vue/src/components/TreeDateTimePicker.vue",
+      "storyFile": "apps/docs/src/stories/DateTimePicker.stories.ts",
+      "storyTitle": "Components/Data Entry/DateTimePicker",
+      "manifestFile": "docs/ai/COMPONENTS/date-time-picker.yaml",
+      "props": [
+        {
+          "name": "modelValue",
+          "type": "string",
+          "default": "",
+          "note": "Uses `YYYY-MM-DDTHH:mm`."
+        },
+        {
+          "name": "open",
+          "type": "boolean",
+          "default": "undefined"
+        },
+        {
+          "name": "defaultOpen",
+          "type": "boolean",
+          "default": "false"
+        },
+        {
+          "name": "size",
+          "type": "TreeSize",
+          "default": "md",
+          "values": [
+            "sm",
+            "md",
+            "lg"
+          ]
+        },
+        {
+          "name": "disabled",
+          "type": "boolean",
+          "default": "false"
+        },
+        {
+          "name": "loading",
+          "type": "boolean",
+          "default": "false"
+        },
+        {
+          "name": "invalid",
+          "type": "boolean",
+          "default": "false"
+        },
+        {
+          "name": "placeholder",
+          "type": "string",
+          "default": "Select date and time"
+        },
+        {
+          "name": "locale",
+          "type": "string",
+          "default": "en-US"
+        },
+        {
+          "name": "min",
+          "type": "string",
+          "default": ""
+        },
+        {
+          "name": "max",
+          "type": "string",
+          "default": ""
+        },
+        {
+          "name": "weekStartsOn",
+          "type": "0 | 1 | 2 | 3 | 4 | 5 | 6",
+          "default": "0"
+        },
+        {
+          "name": "id",
+          "type": "string",
+          "default": "auto"
+        },
+        {
+          "name": "step",
+          "type": "number",
+          "default": "60",
+          "note": "Seconds between time options."
+        }
+      ],
+      "events": [
+        {
+          "name": "update:modelValue"
+        },
+        {
+          "name": "update:open"
+        },
+        {
+          "name": "open-change"
+        },
+        {
+          "name": "change"
+        },
+        {
+          "name": "select"
+        }
+      ],
+      "slots": [],
+      "a11y": [
+        "role: dialog",
+        "trigger_aria_haspopup: dialog",
+        "trigger_aria_expanded: true",
+        "focus_restores_on_close: true",
+        "keyboard_calendar_navigation: true",
+        "escape_closes_overlay: true",
+        "aria_invalid_when_invalid: true",
+        "aria_busy_when_loading: true"
+      ],
+      "behavior": [
+        "controlled_and_uncontrolled_open: true",
+        "value_format: YYYY-MM-DDTHH:mm",
+        "min_and_max_limit_available_values: true",
+        "time_options_generated_from_step: true"
+      ],
+      "selection": {
+        "keywords": [
+          "datetime",
+          "schedule",
+          "appointment",
+          "release window"
+        ],
+        "useWhen": [
+          "The value must include both date and time.",
+          "The user should pick a schedule from one compact control."
+        ],
+        "avoidWhen": [
+          "Only a day is needed."
+        ],
+        "alternatives": [
+          {
+            "component": "TDatePicker",
+            "when": "Only the date matters."
+          }
+        ]
+      },
+      "setup": {
+        "required": [],
+        "notes": [
+          "Bind `modelValue` to a `YYYY-MM-DDTHH:mm` string.",
+          "Use `step` in seconds. Values divisible by 60 produce minute increments.",
+          "Use `min` and `max` in the same date-time format."
+        ]
+      },
+      "recipes": [
+        "date-range-form"
+      ]
+    },
+    {
+      "name": "TDivider",
+      "legacyAlias": "TreeDivider",
+      "aliases": [
+        "TreeDivider"
+      ],
+      "package": "@treeui/vue",
+      "category": "Layout",
+      "description": "Horizontal or vertical visual separator.",
+      "sourceFile": "packages/vue/src/components/TreeDivider.vue",
+      "storyFile": "apps/docs/src/stories/Divider.stories.ts",
+      "storyTitle": "Components/Layout/Divider",
+      "manifestFile": "docs/ai/COMPONENTS/divider.yaml",
+      "props": [
+        {
+          "name": "orientation",
+          "type": "string",
+          "default": "horizontal",
+          "values": [
+            "horizontal",
+            "vertical"
+          ]
+        },
+        {
+          "name": "decorative",
+          "type": "boolean",
+          "default": "true",
+          "description": "When true, renders role='none' (purely visual). When false, renders as role='separator'."
+        },
+        {
+          "name": "label",
+          "type": "string",
+          "required": false,
+          "description": "Accessible label for non-decorative dividers."
+        }
+      ],
+      "events": [],
+      "slots": [],
+      "a11y": [
+        "role: none (decorative) or separator (semantic)",
+        "aria-orientation: Set when non-decorative.",
+        "aria-label: Set from `label` prop when non-decorative."
+      ],
+      "behavior": [],
+      "selection": {
+        "keywords": [],
+        "useWhen": [],
+        "avoidWhen": [],
+        "alternatives": []
+      },
+      "setup": {
+        "required": [],
+        "notes": []
+      },
+      "recipes": []
+    },
+    {
+      "name": "TDrawer",
+      "legacyAlias": "TreeDrawer",
+      "aliases": [
+        "TreeDrawer"
+      ],
+      "package": "@treeui/vue",
+      "kind": "overlay",
+      "category": "Overlay",
+      "status": "available",
+      "purpose": "Side-anchored panel for secondary content, navigation, or forms.",
+      "sourceFile": "packages/vue/src/components/TreeDrawer.vue",
+      "storyFile": "apps/docs/src/stories/Drawer.stories.ts",
+      "storyTitle": "Components/Overlay/Drawer",
+      "manifestFile": "docs/ai/COMPONENTS/drawer.yaml",
+      "props": [
+        {
+          "name": "open",
+          "type": "boolean",
+          "default": "controlled_optional"
+        },
+        {
+          "name": "defaultOpen",
+          "type": "boolean",
+          "default": "false"
+        },
+        {
+          "name": "disabled",
+          "type": "boolean",
+          "default": "false"
+        },
+        {
+          "name": "size",
+          "type": "TreeSize",
+          "default": "md",
+          "values": [
+            "sm",
+            "md",
+            "lg"
+          ]
+        },
+        {
+          "name": "side",
+          "type": "TreeDrawerSide",
+          "default": "right",
+          "values": [
+            "top",
+            "right",
+            "bottom",
+            "left"
+          ]
+        },
+        {
+          "name": "title",
+          "type": "string",
+          "default": ""
+        },
+        {
+          "name": "description",
+          "type": "string",
+          "default": ""
+        },
+        {
+          "name": "closeOnEscape",
+          "type": "boolean",
+          "default": "true"
+        },
+        {
+          "name": "closeOnOverlay",
+          "type": "boolean",
+          "default": "true"
+        },
+        {
+          "name": "showCloseButton",
+          "type": "boolean",
+          "default": "true"
+        },
+        {
+          "name": "closeLabel",
+          "type": "string",
+          "default": "Close drawer"
+        },
+        {
+          "name": "id",
+          "type": "string",
+          "default": "auto"
+        }
+      ],
+      "events": [
+        {
+          "name": "update:open"
+        },
+        {
+          "name": "open-change"
+        }
+      ],
+      "slots": [
+        {
+          "name": "trigger"
+        },
+        {
+          "name": "header"
+        },
+        {
+          "name": "default"
+        },
+        {
+          "name": "content"
+        },
+        {
+          "name": "footer"
+        }
+      ],
+      "a11y": [
+        "role: dialog",
+        "aria_modal: true",
+        "focus_trap: true",
+        "restores_focus_on_close: true",
+        "escape_closes_when_enabled: true"
+      ],
+      "behavior": [
+        "uses_teleport_to_body: true",
+        "locks_body_scroll_while_open: true",
+        "overlay_click_closes_when_enabled: true",
+        "close_button_optional: true",
+        "slides_in_from_side: true"
+      ],
+      "selection": {
+        "keywords": [
+          "drawer",
+          "side panel",
+          "slide-over"
+        ],
+        "useWhen": [
+          "The user needs a larger contextual panel while keeping page context visible."
+        ],
+        "avoidWhen": [
+          "The task requires full modal focus or only a small anchored panel."
+        ],
+        "alternatives": [
+          {
+            "component": "TModal",
+            "when": "The task should be fully blocking."
+          },
+          {
+            "component": "TPopover",
+            "when": "A compact anchored panel is enough."
+          }
+        ]
+      },
+      "setup": {
+        "required": [],
+        "notes": []
+      },
+      "recipes": []
+    },
+    {
+      "name": "TDropdown",
+      "legacyAlias": "TreeDropdown",
+      "aliases": [
+        "TreeDropdown"
+      ],
+      "package": "@treeui/vue",
+      "kind": "overlay",
+      "category": "Overlay",
+      "status": "available",
+      "purpose": "Trigger + floating menu with keyboard navigation for action lists.",
+      "sourceFile": "packages/vue/src/components/TreeDropdown.vue",
+      "storyFile": "apps/docs/src/stories/Dropdown.stories.ts",
+      "storyTitle": "Components/Overlay/Dropdown",
+      "manifestFile": "docs/ai/COMPONENTS/dropdown.yaml",
+      "props": [
+        {
+          "name": "items",
+          "type": "TreeDropdownItem[]",
+          "default": "[]",
+          "note": "Array of { label: string; value: string; disabled?: boolean }"
+        },
+        {
+          "name": "open",
+          "type": "boolean",
+          "default": "undefined"
+        },
+        {
+          "name": "defaultOpen",
+          "type": "boolean",
+          "default": "false"
+        },
+        {
+          "name": "disabled",
+          "type": "boolean",
+          "default": "false"
+        },
+        {
+          "name": "size",
+          "type": "TreeSize",
+          "default": "md",
+          "values": [
+            "sm",
+            "md",
+            "lg"
+          ]
+        },
+        {
+          "name": "label",
+          "type": "string",
+          "default": ""
+        }
+      ],
+      "events": [
+        {
+          "name": "select"
+        },
+        {
+          "name": "update:open"
+        },
+        {
+          "name": "open-change"
+        }
+      ],
+      "slots": [
+        {
+          "name": "trigger"
+        },
+        {
+          "name": "item"
+        }
+      ],
+      "a11y": [
+        "role: menu",
+        "trigger_aria_haspopup: menu",
+        "trigger_aria_expanded: true",
+        "aria_disabled_on_disabled_items: true",
+        "focus_visible_on_trigger: true",
+        "keyboard_arrow_navigation: true",
+        "escape_closes_menu: true",
+        "enter_space_selects_item: true",
+        "home_end_navigation: true"
+      ],
+      "behavior": [
+        "outside_click_closes_menu: true",
+        "focus_restores_on_close: true",
+        "chevron_rotates_when_open: true"
+      ],
+      "selection": {
+        "keywords": [
+          "dropdown",
+          "actions menu",
+          "menu button"
+        ],
+        "useWhen": [
+          "A button should open a short list of actions or choices."
+        ],
+        "avoidWhen": [
+          "The user is choosing a form value with v-model."
+        ],
+        "alternatives": [
+          {
+            "component": "TSelect",
+            "when": "The dropdown is a form control for selecting a value."
+          },
+          {
+            "component": "TContextMenu",
+            "when": "The menu opens from a context action."
+          }
+        ]
+      },
+      "setup": {
+        "required": [],
+        "notes": []
+      },
+      "recipes": []
+    },
+    {
+      "name": "TEmptyState",
+      "legacyAlias": "TreeEmptyState",
+      "aliases": [
+        "TreeEmptyState"
+      ],
+      "package": "@treeui/vue",
+      "kind": "feedback",
+      "category": "Feedback",
+      "status": "available",
+      "purpose": "Structured empty, no-results, and first-run placeholder block with optional icon, body content, and actions.",
+      "sourceFile": "packages/vue/src/components/TreeEmptyState.vue",
+      "storyFile": "apps/docs/src/stories/EmptyState.stories.ts",
+      "storyTitle": "Components/Feedback/EmptyState",
+      "manifestFile": "docs/ai/COMPONENTS/empty-state.yaml",
+      "props": [
+        {
+          "name": "as",
+          "type": "string",
+          "default": "section"
+        },
+        {
+          "name": "size",
+          "type": "TreeSize",
+          "default": "md",
+          "values": [
+            "sm",
+            "md",
+            "lg"
+          ]
+        },
+        {
+          "name": "title",
+          "type": "string",
+          "default": ""
+        },
+        {
+          "name": "description",
+          "type": "string",
+          "default": ""
+        }
+      ],
+      "events": [],
+      "slots": [
+        {
+          "name": "icon"
+        },
+        {
+          "name": "title"
+        },
+        {
+          "name": "description"
+        },
+        {
+          "name": "default"
+        },
+        {
+          "name": "actions"
+        }
+      ],
+      "a11y": [
+        "root_aria_labelledby_when_title_present: true",
+        "root_aria_describedby_when_description_present: true",
+        "icon_slot_marked_aria_hidden: true"
+      ],
+      "behavior": [
+        "renders_title_and_description_from_props_or_slots: true",
+        "default_slot_renders_supporting_body_content: true",
+        "actions_slot_renders_cta_group: true"
+      ],
+      "selection": {
+        "keywords": [
+          "empty state",
+          "zero state",
+          "no data"
+        ],
+        "useWhen": [
+          "A screen or section has no content and needs guidance."
+        ],
+        "avoidWhen": [
+          "You only need a brief inline warning."
+        ],
+        "alternatives": [
+          {
+            "component": "TAlert",
+            "when": "The layout already has content and only needs a message."
+          }
+        ]
+      },
+      "setup": {
+        "required": [],
+        "notes": []
+      },
+      "recipes": []
+    },
+    {
+      "name": "TFileUpload",
+      "legacyAlias": "TreeFileUpload",
+      "aliases": [
+        "TreeFileUpload"
+      ],
+      "package": "@treeui/vue",
+      "kind": "form",
+      "category": "Form",
+      "status": "available",
+      "purpose": "Composable dropzone and file picker with browse, drag-and-drop, and Ctrl+V paste support.",
+      "sourceFile": "packages/vue/src/components/TreeFileUpload.vue",
+      "storyFile": "apps/docs/src/stories/FileUpload.stories.ts",
+      "storyTitle": "Components/Form/FileUpload",
+      "manifestFile": "docs/ai/COMPONENTS/file-upload.yaml",
+      "props": [
+        {
+          "name": "modelValue",
+          "type": "File[]",
+          "default": "[]"
+        },
+        {
+          "name": "size",
+          "type": "TreeSize",
+          "default": "md",
+          "values": [
+            "sm",
+            "md",
+            "lg"
+          ]
+        },
+        {
+          "name": "disabled",
+          "type": "boolean",
+          "default": "false"
+        },
+        {
+          "name": "loading",
+          "type": "boolean",
+          "default": "false"
+        },
+        {
+          "name": "invalid",
+          "type": "boolean",
+          "default": "false"
+        },
+        {
+          "name": "accept",
+          "type": "string",
+          "default": ""
+        },
+        {
+          "name": "multiple",
+          "type": "boolean",
+          "default": "true"
+        },
+        {
+          "name": "maxFiles",
+          "type": "number",
+          "default": "none"
+        },
+        {
+          "name": "maxFileSize",
+          "type": "number",
+          "default": "none"
+        },
+        {
+          "name": "label",
+          "type": "string",
+          "default": "Drop files here"
+        },
+        {
+          "name": "description",
+          "type": "string",
+          "default": "Click to browse, drag and drop, or paste with Ctrl+V."
+        },
+        {
+          "name": "buttonLabel",
+          "type": "string",
+          "default": "Browse files"
+        },
+        {
+          "name": "filesLabel",
+          "type": "string",
+          "default": "Selected files"
+        },
+        {
+          "name": "paste",
+          "type": "boolean",
+          "default": "true"
+        },
+        {
+          "name": "drop",
+          "type": "boolean",
+          "default": "true"
+        },
+        {
+          "name": "showFileList",
+          "type": "boolean",
+          "default": "true"
+        }
+      ],
+      "events": [
+        {
+          "name": "update:modelValue"
+        },
+        {
+          "name": "files-accepted"
+        },
+        {
+          "name": "files-rejected"
+        }
+      ],
+      "slots": [
+        {
+          "name": "icon"
+        },
+        {
+          "name": "default"
+        },
+        {
+          "name": "file"
+        },
+        {
+          "name": "actions"
+        }
+      ],
+      "a11y": [
+        "dropzone_role: button",
+        "keyboard_activation: Enter_and_Space_open_the_file_picker",
+        "supports_paste_when_component_is_focused: true",
+        "file_feedback_announced_via_live_region: true"
+      ],
+      "behavior": [
+        "accepts_files_from_input_drop_and_paste: true",
+        "multiple_false_replaces_existing_selection: true",
+        "accept_maxFiles_and_maxFileSize_apply_to_all_entry_points: true",
+        "selected_files_can_be_removed_or_cleared: true"
+      ],
+      "selection": {
+        "keywords": [],
+        "useWhen": [],
+        "avoidWhen": [],
+        "alternatives": []
+      },
+      "setup": {
+        "required": [],
+        "notes": [
+          "Bind `modelValue` to `File[]`.",
+          "Use `accept`, `multiple`, and size limits in the app layer to constrain uploads."
+        ]
+      },
+      "recipes": []
+    },
+    {
+      "name": "TFormField",
+      "legacyAlias": "TreeFormField",
+      "aliases": [
+        "TreeFormField"
+      ],
+      "package": "@treeui/vue",
+      "category": "Data Entry",
+      "status": "milestone-1",
+      "description": "Label + input wrapper with error and hint slots. Provides consistent layout, labelling, and validation messaging for any form control.\n",
+      "sourceFile": "packages/vue/src/components/TreeFormField.vue",
+      "storyFile": "apps/docs/src/stories/FormField.stories.ts",
+      "storyTitle": "Components/Data Entry/FormField",
+      "manifestFile": "docs/ai/COMPONENTS/form-field.yaml",
+      "props": [
+        {
+          "name": "label",
+          "type": "string",
+          "required": false,
+          "description": "Text content for the field label."
+        },
+        {
+          "name": "htmlFor",
+          "type": "string",
+          "required": false,
+          "description": "The id of the associated form control, used on the <label> for attribute."
+        },
+        {
+          "name": "error",
+          "type": "string",
+          "required": false,
+          "description": "Error message to display. When present, the hint is hidden and the field gets is-invalid state."
+        },
+        {
+          "name": "hint",
+          "type": "string",
+          "required": false,
+          "description": "Hint or help text displayed below the control. Hidden when error is present."
+        },
+        {
+          "name": "required",
+          "type": "boolean",
+          "default": "false",
+          "description": "Adds a visual required indicator (*) next to the label."
+        },
+        {
+          "name": "disabled",
+          "type": "boolean",
+          "default": "false",
+          "description": "Applies disabled styling (reduced opacity) to the entire field."
+        },
+        {
+          "name": "size",
+          "type": "TreeSize",
+          "default": "md",
+          "values": [
+            "sm",
+            "md",
+            "lg"
+          ],
+          "description": "Controls the label font size."
+        }
+      ],
+      "events": [],
+      "slots": [
+        {
+          "name": "default",
+          "description": "The form control (e.g. TInput, TCheckbox, TSelect)."
+        },
+        {
+          "name": "label",
+          "description": "Custom label content. Overrides the label prop text."
+        },
+        {
+          "name": "error",
+          "description": "Custom error content. Overrides the error prop text."
+        },
+        {
+          "name": "hint",
+          "description": "Custom hint content. Overrides the hint prop text."
+        }
+      ],
+      "a11y": [
+        "Uses native <label> element with for attribute for input association.",
+        "Error messages are wrapped in role='alert' for screen reader announcements.",
+        "Required indicator (*) is aria-hidden to avoid redundant announcements; use aria-required on the input itself.",
+        "Error takes precedence over hint to avoid conflicting messages."
+      ],
+      "behavior": [],
+      "selection": {
+        "keywords": [
+          "form field",
+          "label",
+          "hint",
+          "validation",
+          "wrapper"
+        ],
+        "useWhen": [
+          "You need consistent label, hint, and error layout around a control."
+        ],
+        "avoidWhen": [
+          "You need the actual input control."
+        ],
+        "alternatives": [
+          {
+            "component": "TInput",
+            "when": "You need a text entry control."
+          },
+          {
+            "component": "TSelect",
+            "when": "You need a dropdown control."
+          }
+        ]
+      },
+      "setup": {
+        "required": [
+          "Wrap a control such as `TInput`, `TSelect`, `TCombobox`, `TCheckbox`, or `TDatePicker`.",
+          "Pass `htmlFor` matching the child control `id` when the child exposes one."
+        ],
+        "notes": [
+          "Set the child control invalid state separately when `error` is present."
+        ]
+      },
+      "recipes": [
+        "form-field-input",
+        "searchable-multi-choice",
+        "date-range-form",
+        "hierarchy-picker"
+      ]
+    },
+    {
+      "name": "TGrid",
+      "legacyAlias": "TreeGrid",
+      "aliases": [
+        "TreeGrid"
+      ],
+      "package": "@treeui/vue",
+      "kind": "layout",
+      "category": "Layout",
+      "status": "available",
+      "purpose": "Responsive grid wrapper for cards, forms, stats, and other multi-column layouts.",
+      "sourceFile": "packages/vue/src/components/TreeGrid.vue",
+      "storyFile": "apps/docs/src/stories/Grid.stories.ts",
+      "storyTitle": "Components/Layout/Grid",
+      "manifestFile": "docs/ai/COMPONENTS/grid.yaml",
+      "props": [
+        {
+          "name": "as",
+          "type": "string",
+          "default": "div"
+        },
+        {
+          "name": "columns",
+          "type": "number",
+          "default": "auto-fit"
+        },
+        {
+          "name": "minItemWidth",
+          "type": "string",
+          "default": "16rem"
+        },
+        {
+          "name": "gap",
+          "type": "string",
+          "default": "var(--tree-space-4)"
+        },
+        {
+          "name": "rowGap",
+          "type": "string",
+          "default": "gap"
+        },
+        {
+          "name": "align",
+          "type": "string",
+          "default": "stretch"
+        },
+        {
+          "name": "justify",
+          "type": "string",
+          "default": "stretch"
+        },
+        {
+          "name": "dense",
+          "type": "boolean",
+          "default": "false"
+        }
+      ],
+      "events": [],
+      "slots": [
+        {
+          "name": "default"
+        }
+      ],
+      "a11y": [
+        "Acts as a layout wrapper only; semantics come from child content and optional `as` prop."
+      ],
+      "behavior": [
+        "semantic_element_controlled_by_as: true",
+        "fixed_columns_supported: true",
+        "auto_fit_columns_supported: true",
+        "dense_mode_uses_grid_auto_flow_dense: true"
+      ],
+      "selection": {
+        "keywords": [
+          "grid",
+          "columns",
+          "dashboard",
+          "cards",
+          "responsive layout"
+        ],
+        "useWhen": [
+          "Children should flow into responsive columns.",
+          "You need stat grids, card grids, or form rows."
+        ],
+        "avoidWhen": [
+          "You only need one-dimensional spacing."
+        ],
+        "alternatives": [
+          {
+            "component": "TStack",
+            "when": "A single row or column is enough."
+          }
+        ]
+      },
+      "setup": {
+        "required": [],
+        "notes": []
+      },
+      "recipes": [
+        "date-range-form",
+        "stat-grid"
+      ]
+    },
+    {
+      "name": "TInput",
+      "legacyAlias": "TreeInput",
+      "aliases": [
+        "TreeInput"
+      ],
+      "package": "@treeui/vue",
+      "kind": "primitive",
+      "category": "Data Entry",
+      "status": "available",
+      "purpose": "Text input with size, loading, invalid, and prefix or suffix slots.",
+      "sourceFile": "packages/vue/src/components/TreeInput.vue",
+      "storyFile": "apps/docs/src/stories/Input.stories.ts",
+      "storyTitle": "Components/Data Entry/Input",
+      "manifestFile": "docs/ai/COMPONENTS/input.yaml",
+      "props": [
+        {
+          "name": "modelValue",
+          "type": "string | number",
+          "default": ""
+        },
+        {
+          "name": "size",
+          "type": "TreeSize",
+          "default": "md",
+          "values": [
+            "sm",
+            "md",
+            "lg"
+          ]
+        },
+        {
+          "name": "disabled",
+          "type": "boolean",
+          "default": "false"
+        },
+        {
+          "name": "loading",
+          "type": "boolean",
+          "default": "false"
+        },
+        {
+          "name": "invalid",
+          "type": "boolean",
+          "default": "false"
+        },
+        {
+          "name": "type",
+          "type": "string",
+          "default": "text"
+        },
+        {
+          "name": "placeholder",
+          "type": "string",
+          "default": ""
+        }
+      ],
+      "events": [
+        {
+          "name": "update:modelValue"
+        }
+      ],
+      "slots": [
+        {
+          "name": "prefix"
+        },
+        {
+          "name": "suffix"
+        }
+      ],
+      "a11y": [
+        "aria_invalid_when_invalid: true",
+        "loading_uses_status_spinner: true"
+      ],
+      "behavior": [
+        "update_payload_type: string",
+        "loading_does_not_disable_by_itself: true"
+      ],
+      "selection": {
+        "keywords": [
+          "input",
+          "text field",
+          "text entry",
+          "single line"
+        ],
+        "useWhen": [
+          "The value is short, plain, and single-line."
+        ],
+        "avoidWhen": [
+          "The content is multiline, numeric, or markdown."
+        ],
+        "alternatives": [
+          {
+            "component": "TTextarea",
+            "when": "The content is multiline."
+          },
+          {
+            "component": "TNumberInput",
+            "when": "The value is numeric."
+          },
+          {
+            "component": "TMarkdownEditor",
+            "when": "Rich markdown authoring is needed."
+          }
+        ]
+      },
+      "setup": {
+        "required": [],
+        "notes": []
+      },
+      "recipes": [
+        "form-field-input"
+      ]
+    },
+    {
+      "name": "TMarkdownEditor",
+      "legacyAlias": "TreeMarkdownEditor",
+      "aliases": [
+        "TreeMarkdownEditor"
+      ],
+      "package": "@treeui/vue",
+      "category": "Form",
+      "status": "stable",
+      "description": "A rich Markdown editor with live preview, toolbar formatting, keyboard shortcuts, and image paste/drop upload support.\n",
+      "storyFile": "apps/docs/src/stories/MarkdownEditor.stories.ts",
+      "storyTitle": "Components/Form/MarkdownEditor",
+      "manifestFile": "docs/ai/COMPONENTS/markdown-editor.yaml",
+      "props": [
+        {
+          "name": "modelValue",
+          "type": "string",
+          "default": "''",
+          "description": "Markdown content (v-model)"
+        },
+        {
+          "name": "size",
+          "type": "TreeSize",
+          "default": "md",
+          "values": [
+            "sm",
+            "md",
+            "lg"
+          ]
+        },
+        {
+          "name": "disabled",
+          "type": "boolean",
+          "default": "false"
+        },
+        {
+          "name": "placeholder",
+          "type": "string",
+          "default": "'Write your markdown here...'"
+        },
+        {
+          "name": "uploadImage",
+          "type": "(file: File) => Promise<string>",
+          "default": "undefined",
+          "description": "Async function that receives a File and returns the uploaded image URL. When not provided, pasting an image inserts an empty markdown image tag.\n"
+        }
+      ],
+      "events": [
+        {
+          "name": "update:modelValue",
+          "description": "Emitted on every content change for v-model binding.",
+          "payload": "[\"string\"]"
+        },
+        {
+          "name": "image-upload",
+          "description": "Emitted after a successful image upload with the file and resulting URL.",
+          "payload": "[\"File\",\"string\"]"
+        },
+        {
+          "name": "image-upload-error",
+          "description": "Emitted when image upload fails.",
+          "payload": "[\"File\",\"Error\"]"
+        }
+      ],
+      "slots": [
+        {
+          "name": "toolbar",
+          "description": "Extra content appended to the toolbar."
+        }
+      ],
+      "a11y": [
+        "Toolbar has role=\"toolbar\" with aria-label.",
+        "Tab buttons use role=\"tab\" and aria-selected.",
+        "Preview pane has aria-label=\"Markdown preview\".",
+        "Upload status bar uses role=\"status\" and aria-live=\"polite\".",
+        "All toolbar buttons have title attributes describing the action.",
+        "Textarea has aria-label for screen readers."
+      ],
+      "behavior": [],
+      "selection": {
+        "keywords": [
+          "markdown",
+          "rich text",
+          "editor",
+          "preview"
+        ],
+        "useWhen": [
+          "The user needs markdown formatting, toolbar actions, or preview."
+        ],
+        "avoidWhen": [
+          "A plain multiline text area is enough."
+        ],
+        "alternatives": [
+          {
+            "component": "TTextarea",
+            "when": "You only need multiline plain text."
+          }
+        ]
+      },
+      "setup": {
+        "required": [],
+        "notes": []
+      },
+      "recipes": []
+    },
+    {
+      "name": "TModal",
+      "legacyAlias": "TreeModal",
+      "aliases": [
+        "TreeModal"
+      ],
+      "package": "@treeui/vue",
+      "kind": "overlay",
+      "category": "Overlay",
+      "status": "available",
+      "purpose": "Accessible modal dialog for focused tasks and confirmations.",
+      "sourceFile": "packages/vue/src/components/TreeModal.vue",
+      "storyFile": "apps/docs/src/stories/Modal.stories.ts",
+      "storyTitle": "Components/Overlay/Modal",
+      "manifestFile": "docs/ai/COMPONENTS/modal.yaml",
+      "props": [
+        {
+          "name": "open",
+          "type": "boolean",
+          "default": "controlled_optional"
+        },
+        {
+          "name": "defaultOpen",
+          "type": "boolean",
+          "default": "false"
+        },
+        {
+          "name": "disabled",
+          "type": "boolean",
+          "default": "false"
+        },
+        {
+          "name": "size",
+          "type": "TreeSize",
+          "default": "md",
+          "values": [
+            "sm",
+            "md",
+            "lg"
+          ]
+        },
+        {
+          "name": "title",
+          "type": "string",
+          "default": ""
+        },
+        {
+          "name": "description",
+          "type": "string",
+          "default": ""
+        },
+        {
+          "name": "closeOnEscape",
+          "type": "boolean",
+          "default": "true"
+        },
+        {
+          "name": "closeOnOverlay",
+          "type": "boolean",
+          "default": "true"
+        },
+        {
+          "name": "showCloseButton",
+          "type": "boolean",
+          "default": "true"
+        },
+        {
+          "name": "closeLabel",
+          "type": "string",
+          "default": "Close modal"
+        },
+        {
+          "name": "id",
+          "type": "string",
+          "default": "auto"
+        }
+      ],
+      "events": [
+        {
+          "name": "update:open"
+        },
+        {
+          "name": "open-change"
+        }
+      ],
+      "slots": [
+        {
+          "name": "trigger"
+        },
+        {
+          "name": "header"
+        },
+        {
+          "name": "default"
+        },
+        {
+          "name": "content"
+        },
+        {
+          "name": "footer"
+        }
+      ],
+      "a11y": [
+        "role: dialog",
+        "aria_modal: true",
+        "focus_trap: true",
+        "restores_focus_on_close: true",
+        "escape_closes_when_enabled: true"
+      ],
+      "behavior": [
+        "uses_teleport_to_body: true",
+        "locks_body_scroll_while_open: true",
+        "overlay_click_closes_when_enabled: true",
+        "close_button_optional: true"
+      ],
+      "selection": {
+        "keywords": [
+          "modal",
+          "dialog",
+          "blocking",
+          "focused task"
+        ],
+        "useWhen": [
+          "The user must complete or review something in a blocking dialog."
+        ],
+        "avoidWhen": [
+          "Only a small hint or contextual panel is needed."
+        ],
+        "alternatives": [
+          {
+            "component": "TConfirmDialog",
+            "when": "The dialog is specifically about confirm/cancel."
+          },
+          {
+            "component": "TDrawer",
+            "when": "A side panel fits better."
+          },
+          {
+            "component": "TPopover",
+            "when": "An anchored non-blocking panel is enough."
+          }
+        ]
+      },
+      "setup": {
+        "required": [],
+        "notes": []
+      },
+      "recipes": []
+    },
+    {
+      "name": "TMultiSelect",
+      "legacyAlias": "TreeMultiSelect",
+      "aliases": [
+        "TreeMultiSelect"
+      ],
+      "package": "@treeui/vue",
+      "kind": "form",
+      "category": "Data Entry",
+      "status": "available",
+      "purpose": "Searchable multi-select control that renders selected values as tags.",
+      "sourceFile": "packages/vue/src/components/TreeMultiSelect.vue",
+      "storyFile": "apps/docs/src/stories/MultiSelect.stories.ts",
+      "storyTitle": "Components/Data Entry/MultiSelect",
+      "manifestFile": "docs/ai/COMPONENTS/multi-select.yaml",
+      "props": [
+        {
+          "name": "modelValue",
+          "type": "string[]",
+          "default": "[]"
+        },
+        {
+          "name": "options",
+          "type": "TreeMultiSelectOption[]",
+          "default": "[]",
+          "note": "Array of `{ label, value, description?, keywords?, disabled? }`."
+        },
+        {
+          "name": "open",
+          "type": "boolean",
+          "default": "undefined"
+        },
+        {
+          "name": "defaultOpen",
+          "type": "boolean",
+          "default": "false"
+        },
+        {
+          "name": "size",
+          "type": "TreeSize",
+          "default": "md",
+          "values": [
+            "sm",
+            "md",
+            "lg"
+          ]
+        },
+        {
+          "name": "disabled",
+          "type": "boolean",
+          "default": "false"
+        },
+        {
+          "name": "loading",
+          "type": "boolean",
+          "default": "false"
+        },
+        {
+          "name": "invalid",
+          "type": "boolean",
+          "default": "false"
+        },
+        {
+          "name": "placeholder",
+          "type": "string",
+          "default": ""
+        },
+        {
+          "name": "emptyText",
+          "type": "string",
+          "default": "No results found."
+        },
+        {
+          "name": "maxVisibleTags",
+          "type": "number",
+          "default": "2"
+        }
+      ],
+      "events": [
+        {
+          "name": "update:modelValue"
+        },
+        {
+          "name": "update:open"
+        },
+        {
+          "name": "open-change"
+        },
+        {
+          "name": "input-change"
+        }
+      ],
+      "slots": [
+        {
+          "name": "prefix"
+        },
+        {
+          "name": "tag"
+        },
+        {
+          "name": "option"
+        },
+        {
+          "name": "empty"
+        }
+      ],
+      "a11y": [
+        "role: combobox",
+        "listbox_popup: true",
+        "active_descendant_management: true",
+        "keyboard_arrow_navigation: true",
+        "escape_closes_listbox: true",
+        "backspace_tag_removal: true",
+        "aria_invalid_when_invalid: true",
+        "aria_busy_when_loading: true"
+      ],
+      "behavior": [
+        "selected_values_are_strings: true",
+        "query_filters_label_description_keywords: true",
+        "selected_values_render_as_tags: true",
+        "controlled_and_uncontrolled_open: true"
+      ],
+      "selection": {
+        "keywords": [
+          "multi select",
+          "tags",
+          "searchable multi choice"
+        ],
+        "useWhen": [
+          "The user needs to select multiple values from a larger list.",
+          "Filtering and tag display improve the workflow."
+        ],
+        "avoidWhen": [
+          "The option set is tiny and should always stay visible."
+        ],
+        "alternatives": [
+          {
+            "component": "TToggleGroup",
+            "when": "The multiple-choice set is very small and visible."
+          },
+          {
+            "component": "TCheckbox",
+            "when": "The choices can stay visible as a checklist."
+          },
+          {
+            "component": "TTreeView",
+            "when": "The choices are hierarchical."
+          }
+        ]
+      },
+      "setup": {
+        "required": [],
+        "notes": [
+          "Pass `modelValue` as `string[]`.",
+          "Option search checks `label`, `description`, and `keywords`.",
+          "Use `maxVisibleTags` to control trigger density in compact layouts."
+        ]
+      },
+      "recipes": [
+        "searchable-multi-choice"
+      ]
+    },
+    {
+      "name": "TNavbar",
+      "legacyAlias": "TreeAppBar",
+      "aliases": [
+        "TAppBar",
+        "TreeAppBar",
+        "TreeNavbar"
+      ],
+      "package": "@treeui/vue",
+      "kind": "layout",
+      "category": "Layout",
+      "status": "available",
+      "purpose": "Top application bar with start, center, and end content areas.",
+      "sourceFile": "packages/vue/src/components/TreeNavbar.vue",
+      "storyFile": "apps/docs/src/stories/Navbar.stories.ts",
+      "storyTitle": "Components/Layout/Navbar",
+      "manifestFile": "docs/ai/COMPONENTS/navbar.yaml",
+      "props": [
+        {
+          "name": "as",
+          "type": "string",
+          "default": "header"
+        },
+        {
+          "name": "size",
+          "type": "TreeSize",
+          "default": "md",
+          "values": [
+            "sm",
+            "md",
+            "lg"
+          ]
+        },
+        {
+          "name": "sticky",
+          "type": "boolean",
+          "default": "false"
+        },
+        {
+          "name": "bordered",
+          "type": "boolean",
+          "default": "true"
+        },
+        {
+          "name": "elevated",
+          "type": "boolean",
+          "default": "false"
+        }
+      ],
+      "events": [],
+      "slots": [
+        {
+          "name": "start"
+        },
+        {
+          "name": "center"
+        },
+        {
+          "name": "default"
+        },
+        {
+          "name": "end"
+        }
+      ],
+      "a11y": [
+        "Use `as=\"nav\"` or nested navigation landmarks when the app bar itself is navigation.",
+        "Acts as a structural wrapper; semantics come from `as` and child content."
+      ],
+      "behavior": [
+        "semantic_element_controlled_by_as: true",
+        "sticky_variant_available: true",
+        "alias_export_available: true"
+      ],
+      "selection": {
+        "keywords": [
+          "navbar",
+          "app bar",
+          "top bar",
+          "header"
+        ],
+        "useWhen": [
+          "You need a top application bar with start, center, and end areas."
+        ],
+        "avoidWhen": [
+          "You only need a content container."
+        ],
+        "alternatives": [
+          {
+            "component": "TContainer",
+            "when": "You only need width constraint."
+          }
+        ]
+      },
+      "setup": {
+        "required": [],
+        "notes": []
+      },
+      "recipes": [
+        "sidebar-shell"
+      ]
+    },
+    {
+      "name": "TNavMenu",
+      "legacyAlias": "TreeNavMenu",
+      "aliases": [
+        "TreeNavMenu"
+      ],
+      "package": "@treeui/vue",
+      "kind": "navigation",
+      "category": "Layout",
+      "status": "available",
+      "purpose": "App-section navigation menu with roving focus, optional badges, and sidebar-aware collapsed mode.",
+      "sourceFile": "packages/vue/src/components/TreeNavMenu.vue",
+      "storyFile": "apps/docs/src/stories/NavMenu.stories.ts",
+      "storyTitle": "Components/Layout/NavMenu",
+      "manifestFile": "docs/ai/COMPONENTS/nav-menu.yaml",
+      "props": [
+        {
+          "name": "modelValue",
+          "type": "string",
+          "default": "undefined"
+        },
+        {
+          "name": "defaultValue",
+          "type": "string",
+          "default": ""
+        },
+        {
+          "name": "items",
+          "type": "TreeNavMenuItem[]",
+          "default": "[]",
+          "note": "Array of `{ label, value, shortLabel?, description?, badge?, disabled? }`."
+        },
+        {
+          "name": "size",
+          "type": "TreeSize",
+          "default": "md",
+          "values": [
+            "sm",
+            "md",
+            "lg"
+          ]
+        },
+        {
+          "name": "collapsed",
+          "type": "boolean",
+          "default": "inherited_or_false"
+        },
+        {
+          "name": "disabled",
+          "type": "boolean",
+          "default": "false"
+        }
+      ],
+      "events": [
+        {
+          "name": "update:modelValue"
+        },
+        {
+          "name": "select"
+        }
+      ],
+      "slots": [
+        {
+          "name": "item"
+        },
+        {
+          "name": "empty"
+        }
+      ],
+      "a11y": [
+        "semantic_root: nav",
+        "roving_focus: true",
+        "home_end_navigation: true",
+        "arrow_navigation: true",
+        "activation_keys_select_item: true"
+      ],
+      "behavior": [
+        "can_be_controlled_or_uncontrolled: true",
+        "can_inherit_collapsed_state_from_sidebar: true",
+        "supports_rich_item_rendering_via_slot: true"
+      ],
+      "selection": {
+        "keywords": [
+          "nav menu",
+          "sidebar nav",
+          "section nav"
+        ],
+        "useWhen": [
+          "You need app-section navigation inside a shell or sidebar."
+        ],
+        "avoidWhen": [
+          "You need tabs for small panel switching."
+        ],
+        "alternatives": [
+          {
+            "component": "TTabs",
+            "when": "The navigation swaps local panels instead of app sections."
+          },
+          {
+            "component": "TBreadcrumb",
+            "when": "You are showing hierarchy, not selectable nav."
+          }
+        ]
+      },
+      "setup": {
+        "required": [],
+        "notes": [
+          "When nested inside `TSidebar`, `collapsed` can be inherited from the sidebar provider."
+        ]
+      },
+      "recipes": [
+        "sidebar-shell"
+      ]
+    },
+    {
+      "name": "TNumberInput",
+      "legacyAlias": "TreeNumberInput",
+      "aliases": [
+        "TreeNumberInput"
+      ],
+      "package": "@treeui/vue",
+      "kind": "form",
+      "category": "Data Entry",
+      "status": "available",
+      "purpose": "Numeric input with optional increment and decrement controls.",
+      "sourceFile": "packages/vue/src/components/TreeNumberInput.vue",
+      "storyFile": "apps/docs/src/stories/NumberInput.stories.ts",
+      "storyTitle": "Components/Data Entry/NumberInput",
+      "manifestFile": "docs/ai/COMPONENTS/number-input.yaml",
+      "props": [
+        {
+          "name": "modelValue",
+          "type": "number | null"
+        },
+        {
+          "name": "min",
+          "type": "number",
+          "default": "undefined"
+        },
+        {
+          "name": "max",
+          "type": "number",
+          "default": "undefined"
+        },
+        {
+          "name": "step",
+          "type": "number",
+          "default": "1"
+        },
+        {
+          "name": "size",
+          "type": "TreeSize",
+          "default": "md",
+          "values": [
+            "sm",
+            "md",
+            "lg"
+          ]
+        },
+        {
+          "name": "disabled",
+          "type": "boolean",
+          "default": "false"
+        },
+        {
+          "name": "invalid",
+          "type": "boolean",
+          "default": "false"
+        },
+        {
+          "name": "placeholder",
+          "type": "string",
+          "default": ""
+        },
+        {
+          "name": "controls",
+          "type": "boolean",
+          "default": "true"
+        }
+      ],
+      "events": [
+        {
+          "name": "update:modelValue"
+        }
+      ],
+      "slots": [],
+      "a11y": [
+        "native_input_type: number",
+        "keyboard_arrow_up_down: true",
+        "home_sets_min_when_present: true",
+        "end_sets_max_when_present: true",
+        "aria_invalid_when_invalid: true"
+      ],
+      "behavior": [
+        "empty_value_is_null: true",
+        "values_clamped_to_min_and_max: true",
+        "decimal_steps_supported: true",
+        "control_buttons_optional: true"
+      ],
+      "selection": {
+        "keywords": [
+          "number input",
+          "numeric stepper",
+          "quantity"
+        ],
+        "useWhen": [
+          "The value is numeric and increment/decrement controls help."
+        ],
+        "avoidWhen": [
+          "The value is free-form text or non-numeric."
+        ],
+        "alternatives": [
+          {
+            "component": "TInput",
+            "when": "The value is not numeric."
+          }
+        ]
+      },
+      "setup": {
+        "required": [],
+        "notes": []
+      },
+      "recipes": []
+    },
+    {
+      "name": "TPagination",
+      "legacyAlias": "TreePagination",
+      "aliases": [
+        "TreePagination"
+      ],
+      "package": "@treeui/vue",
+      "kind": "primitive",
+      "category": "Navigation",
+      "status": "available",
+      "purpose": "Page controls with previous/next navigation, numbered page buttons, and ellipsis for large page ranges. Supports v-model for the active page.\n",
+      "sourceFile": "packages/vue/src/components/TreePagination.vue",
+      "storyFile": "apps/docs/src/stories/Pagination.stories.ts",
+      "storyTitle": "Components/Navigation/Pagination",
+      "manifestFile": "docs/ai/COMPONENTS/pagination.yaml",
+      "props": [
+        {
+          "name": "modelValue",
+          "type": "number",
+          "default": "1",
+          "description": "Current active page (1-based). Use with v-model."
+        },
+        {
+          "name": "totalPages",
+          "type": "number",
+          "required": true,
+          "description": "Total number of pages."
+        },
+        {
+          "name": "siblings",
+          "type": "number",
+          "default": "1",
+          "description": "Number of sibling page buttons shown around the current page."
+        },
+        {
+          "name": "size",
+          "type": "TreeSize",
+          "default": "md",
+          "values": [
+            "sm",
+            "md",
+            "lg"
+          ],
+          "description": "Size variant for the pagination controls."
+        },
+        {
+          "name": "disabled",
+          "type": "boolean",
+          "default": "false",
+          "description": "Disables all pagination controls."
+        },
+        {
+          "name": "label",
+          "type": "string",
+          "default": "Pagination",
+          "description": "Accessible label for the nav element."
+        }
+      ],
+      "events": [
+        {
+          "name": "update:modelValue",
+          "description": "Emitted when the active page changes. Enables v-model binding.",
+          "payload": "[page: number]"
+        }
+      ],
+      "slots": [
+        {
+          "name": "previous",
+          "description": "Custom content for the previous button."
+        },
+        {
+          "name": "next",
+          "description": "Custom content for the next button."
+        }
+      ],
+      "a11y": [
+        "semantic_nav: true",
+        "aria_label: Configurable via label prop, defaults to 'Pagination'",
+        "aria_current_page: Applied to the active page button",
+        "disabled_buttons: Previous disabled on first page, next disabled on last page",
+        "keyboard_support: [\"Tab/Shift+Tab to navigate between buttons\",\"Enter/Space to activate a page button\"]",
+        "touch_targets: 44×44px minimum via ::after pseudo-element",
+        "focus_visible: box-shadow focus ring on all interactive buttons"
+      ],
+      "behavior": [
+        "ellipsis: Shown when page range exceeds visible siblings around the current page",
+        "clamping: Page value is clamped between 1 and totalPages",
+        "no_emit_on_same_page: Does not emit when clicking the already-active page"
+      ],
+      "selection": {
+        "keywords": [
+          "pagination",
+          "pages",
+          "list navigation"
+        ],
+        "useWhen": [
+          "The app handles paging outside of `TTable`."
+        ],
+        "avoidWhen": [
+          "The list is infinite-scroll or not paged."
+        ],
+        "alternatives": [
+          {
+            "component": "TTabs",
+            "when": "The interaction is switching panels, not pages."
+          }
+        ]
+      },
+      "setup": {
+        "required": [],
+        "notes": []
+      },
+      "recipes": [
+        "data-listing"
+      ]
+    },
+    {
+      "name": "TPopover",
+      "legacyAlias": "TreePopover",
+      "aliases": [
+        "TreePopover"
+      ],
+      "package": "@treeui/vue",
+      "category": "Overlay",
+      "status": "stable",
+      "description": "Rich floating content panel anchored to a trigger element. Opened by click, dismissed by outside click or Escape. Supports four placement sides with alignment options.\n",
+      "storyFile": "apps/docs/src/stories/Popover.stories.ts",
+      "storyTitle": "Components/Overlay/Popover",
+      "manifestFile": "docs/ai/COMPONENTS/popover.yaml",
+      "props": [
+        {
+          "name": "open",
+          "type": "boolean",
+          "description": "Controlled open state (v-model:open)"
+        },
+        {
+          "name": "defaultOpen",
+          "type": "boolean",
+          "description": "Initial open state for uncontrolled usage"
+        },
+        {
+          "name": "disabled",
+          "type": "boolean",
+          "description": "Prevents opening"
+        },
+        {
+          "name": "side",
+          "type": "'top' | 'right' | 'bottom' | 'left'",
+          "description": "Placement side relative to trigger"
+        },
+        {
+          "name": "align",
+          "type": "'start' | 'center' | 'end'",
+          "description": "Alignment along the placement axis"
+        },
+        {
+          "name": "id",
+          "type": "string",
+          "description": "Custom id for the content panel"
+        }
+      ],
+      "events": [
+        {
+          "name": "update:open",
+          "description": "Emitted when open state changes (enables v-model:open)",
+          "payload": "[{\"value\":\"boolean\"}]"
+        },
+        {
+          "name": "open-change",
+          "description": "Emitted when open state changes (non-v-model usage)",
+          "payload": "[{\"value\":\"boolean\"}]"
+        }
+      ],
+      "slots": [
+        {
+          "name": "trigger",
+          "description": "Custom trigger element. Receives current open state."
+        },
+        {
+          "name": "default",
+          "description": "Popover content displayed inside the floating panel."
+        }
+      ],
+      "a11y": [
+        "role: dialog",
+        "attrs: [\"aria-haspopup=\\\"dialog\\\" on trigger\",\"aria-expanded on trigger\",\"aria-controls linking trigger to content\",\"tabindex=\\\"-1\\\" on content for focus management\"]",
+        "keyboard: [\"Click or Enter/Space on trigger toggles popover\",\"Escape closes popover and restores focus to trigger\",\"Tab navigates within popover content\"]",
+        "focus: [\"On open, focuses first focusable element inside content (or content itself)\",\"On Escape close, restores focus to trigger\"]",
+        "dismiss: [\"Outside click closes popover\",\"Escape key closes popover\"]"
+      ],
+      "behavior": [],
+      "selection": {
+        "keywords": [
+          "popover",
+          "anchored panel",
+          "non modal overlay"
+        ],
+        "useWhen": [
+          "You need custom anchored content that can contain controls."
+        ],
+        "avoidWhen": [
+          "The content is just a short hint."
+        ],
+        "alternatives": [
+          {
+            "component": "TTooltip",
+            "when": "Only a short hint or label is needed."
+          },
+          {
+            "component": "TDropdown",
+            "when": "The content is primarily a menu of actions."
+          }
+        ]
+      },
+      "setup": {
+        "required": [],
+        "notes": []
+      },
+      "recipes": [
+        "anchored-help"
+      ]
+    },
+    {
+      "name": "TPricing",
+      "legacyAlias": "TreePricing",
+      "aliases": [
+        "TreePricing"
+      ],
+      "package": "@treeui/vue",
+      "status": "stable",
+      "description": "Grid wrapper that renders multiple PricingCard components from an array of plan objects.\n",
+      "storyFile": "apps/docs/src/stories/Pricing.stories.ts",
+      "storyTitle": "Starter",
+      "manifestFile": "docs/ai/COMPONENTS/pricing.yaml",
+      "props": [
+        {
+          "name": "plans",
+          "type": "PricingPlan[]",
+          "required": true,
+          "description": "Array of plan objects. Each plan supports the same props as PricingCard (title, description, price, currency, period, features, highlighted, badge, buttonText, disabled).\n"
+        },
+        {
+          "name": "size",
+          "type": "TreeSize",
+          "default": "md",
+          "description": "Size applied to all child pricing cards."
+        },
+        {
+          "name": "columns",
+          "type": "number",
+          "required": false,
+          "description": "Number of grid columns. Defaults to the number of plans.\n"
+        }
+      ],
+      "events": [
+        {
+          "name": "select",
+          "description": "Emitted when any plan's CTA is clicked. Provides the plan data and index.",
+          "payload": "[plan: PricingPlan, index: number]"
+        }
+      ],
+      "slots": [
+        {
+          "name": "plan",
+          "description": "Custom rendering for each plan card.",
+          "note": "{ plan: PricingPlan, index: number }"
+        }
+      ],
+      "a11y": [
+        "Uses role=\"list\" on grid container.",
+        "Each plan is wrapped in role=\"listitem\"."
+      ],
+      "behavior": [],
+      "selection": {
+        "keywords": [],
+        "useWhen": [],
+        "avoidWhen": [],
+        "alternatives": []
+      },
+      "setup": {
+        "required": [],
+        "notes": [
+          "Pass `plans` matching the same core fields used by `TPricingCard`."
+        ]
+      },
+      "recipes": [
+        "pricing-section"
+      ]
+    },
+    {
+      "name": "TPricingCard",
+      "legacyAlias": "TreePricingCard",
+      "aliases": [
+        "TreePricingCard"
+      ],
+      "package": "@treeui/vue",
+      "category": "Data Display",
+      "status": "stable",
+      "description": "A card component for displaying pricing plans with title, price, features list, and call-to-action button. Supports highlighted state and badges.\n",
+      "storyFile": "apps/docs/src/stories/PricingCard.stories.ts",
+      "storyTitle": "Components/Data Display/PricingCard",
+      "manifestFile": "docs/ai/COMPONENTS/pricing.yaml",
+      "props": [
+        {
+          "name": "title",
+          "type": "string",
+          "required": true,
+          "description": "Plan name displayed in the card header."
+        },
+        {
+          "name": "description",
+          "type": "string",
+          "required": false,
+          "description": "Short plan description below the title."
+        },
+        {
+          "name": "price",
+          "type": "string | number",
+          "required": true,
+          "description": "The price value to display."
+        },
+        {
+          "name": "currency",
+          "type": "string",
+          "default": "$",
+          "description": "Currency symbol displayed before the price."
+        },
+        {
+          "name": "period",
+          "type": "string",
+          "required": false,
+          "description": "Billing period text (e.g., \"/month\", \"/year\")."
+        },
+        {
+          "name": "features",
+          "type": "PricingFeature[]",
+          "default": "[]",
+          "description": "Array of features to display. Each feature has `text: string` and optional `included: boolean` (defaults to true). Excluded features are shown with strikethrough.\n"
+        },
+        {
+          "name": "highlighted",
+          "type": "boolean",
+          "default": "false",
+          "description": "When true, the card gets a prominent border and shadow to indicate the recommended plan.\n"
+        },
+        {
+          "name": "badge",
+          "type": "string",
+          "required": false,
+          "description": "Badge text displayed above the card (e.g., \"Most popular\")."
+        },
+        {
+          "name": "buttonText",
+          "type": "string",
+          "required": false,
+          "description": "CTA button label. If omitted and no action slot, footer is hidden."
+        },
+        {
+          "name": "size",
+          "type": "TreeSize",
+          "default": "md",
+          "description": "Card size — affects padding, font sizes."
+        },
+        {
+          "name": "disabled",
+          "type": "boolean",
+          "default": "false",
+          "description": "Disables the CTA button."
+        }
+      ],
+      "events": [
+        {
+          "name": "select",
+          "description": "Emitted when the CTA button is clicked.",
+          "payload": "[]"
+        }
+      ],
+      "slots": [
+        {
+          "name": "header",
+          "description": "Custom header content replacing title and description."
+        },
+        {
+          "name": "price",
+          "description": "Custom price display replacing currency, amount, and period."
+        },
+        {
+          "name": "features",
+          "description": "Custom features list replacing the built-in feature list."
+        },
+        {
+          "name": "action",
+          "description": "Custom CTA area replacing the built-in button."
+        },
+        {
+          "name": "badge",
+          "description": "Custom badge content replacing the built-in badge."
+        }
+      ],
+      "a11y": [
+        "Uses semantic <article> element as root.",
+        "Uses <h3> for plan title.",
+        "Feature list uses role=\"list\" with <ul>/<li>.",
+        "Feature icons are aria-hidden=\"true\".",
+        "CTA button inherits TreeButton a11y (disabled, aria-busy)."
+      ],
+      "behavior": [],
+      "selection": {
+        "keywords": [],
+        "useWhen": [],
+        "avoidWhen": [],
+        "alternatives": []
+      },
+      "setup": {
+        "required": [],
+        "notes": []
+      },
+      "recipes": [
+        "pricing-section"
+      ]
+    },
+    {
+      "name": "TProgress",
+      "legacyAlias": "TreeProgress",
+      "aliases": [
+        "TreeProgress"
+      ],
+      "package": "@treeui/vue",
+      "category": "Feedback",
+      "status": "draft",
+      "description": "Determinate and indeterminate progress indicator. Supports linear bar and circular ring variants.\n",
+      "storyFile": "apps/docs/src/stories/Progress.stories.ts",
+      "storyTitle": "Components/Feedback/Progress",
+      "manifestFile": "docs/ai/COMPONENTS/progress.yaml",
+      "props": [
+        {
+          "name": "value",
+          "type": "number",
+          "required": false,
+          "description": "Current progress value (0–max). Omit for indeterminate."
+        },
+        {
+          "name": "max",
+          "type": "number",
+          "default": "100",
+          "description": "Maximum value."
+        },
+        {
+          "name": "size",
+          "type": "TreeSize",
+          "default": "md",
+          "values": [
+            "sm",
+            "md",
+            "lg"
+          ]
+        },
+        {
+          "name": "label",
+          "type": "string",
+          "default": "Progress",
+          "description": "Accessible label read by screen readers."
+        }
+      ],
+      "events": [],
+      "slots": [],
+      "a11y": [
+        "role: progressbar",
+        "attributes: [\"aria-valuenow (omitted when indeterminate)\",\"aria-valuemin (always 0)\",\"aria-valuemax (always 100)\",\"aria-label\"]",
+        "keyboard:",
+        "notes: Indeterminate state omits aria-valuenow so assistive tech announces the bar as indeterminate."
+      ],
+      "behavior": [],
+      "selection": {
+        "keywords": [],
+        "useWhen": [],
+        "avoidWhen": [],
+        "alternatives": []
+      },
+      "setup": {
+        "required": [],
+        "notes": []
+      },
+      "recipes": []
+    },
+    {
+      "name": "TRadio",
+      "legacyAlias": "TreeRadio",
+      "aliases": [
+        "TreeRadio"
+      ],
+      "package": "@treeui/vue",
+      "kind": "primitive",
+      "status": "available",
+      "purpose": "Single radio option within a TRadioGroup; renders a native radio input.",
+      "sourceFile": "packages/vue/src/components/TreeRadio.vue",
+      "manifestFile": "docs/ai/COMPONENTS/radio.yaml",
+      "props": [
+        {
+          "name": "value",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "disabled",
+          "type": "boolean",
+          "default": "false"
+        },
+        {
+          "name": "invalid",
+          "type": "boolean",
+          "default": "false"
+        },
+        {
+          "name": "size",
+          "type": "TreeSize",
+          "default": "inherited_from_group",
+          "values": [
+            "sm",
+            "md",
+            "lg"
+          ]
+        }
+      ],
+      "events": [],
+      "slots": [
+        {
+          "name": "default"
+        }
+      ],
+      "a11y": [
+        "role: native_radio",
+        "aria_checked: true",
+        "aria_invalid_when_invalid: true",
+        "focus_visible_on_control: true",
+        "clickable_target_44x44: true"
+      ],
+      "behavior": [
+        "inherits_group_disabled: true",
+        "inherits_group_invalid: true",
+        "inherits_group_size: true",
+        "inherits_group_name: true",
+        "label_click_selects_radio: true"
+      ],
+      "selection": {
+        "keywords": [],
+        "useWhen": [],
+        "avoidWhen": [],
+        "alternatives": []
+      },
+      "setup": {
+        "required": [],
+        "notes": []
+      },
+      "recipes": []
+    },
+    {
+      "name": "TRadioGroup",
+      "legacyAlias": "TreeRadioGroup",
+      "aliases": [
+        "TreeRadioGroup"
+      ],
+      "package": "@treeui/vue",
+      "kind": "primitive",
+      "category": "Data Entry",
+      "status": "available",
+      "purpose": "Container for TRadio options; manages v-model for single-select from a group.",
+      "sourceFile": "packages/vue/src/components/TreeRadioGroup.vue",
+      "storyFile": "apps/docs/src/stories/Radio.stories.ts",
+      "storyTitle": "Components/Data Entry/Radio",
+      "manifestFile": "docs/ai/COMPONENTS/radio.yaml",
+      "props": [
+        {
+          "name": "modelValue",
+          "type": "string",
+          "default": "undefined"
+        },
+        {
+          "name": "name",
+          "type": "string",
+          "default": "undefined"
+        },
+        {
+          "name": "disabled",
+          "type": "boolean",
+          "default": "false"
+        },
+        {
+          "name": "invalid",
+          "type": "boolean",
+          "default": "false"
+        },
+        {
+          "name": "size",
+          "type": "TreeSize",
+          "default": "md",
+          "values": [
+            "sm",
+            "md",
+            "lg"
+          ]
+        }
+      ],
+      "events": [
+        {
+          "name": "update:modelValue"
+        }
+      ],
+      "slots": [
+        {
+          "name": "default"
+        }
+      ],
+      "a11y": [
+        "role: radiogroup",
+        "keyboard: Arrow keys move between radios within the group"
+      ],
+      "behavior": [
+        "update_payload_type: string",
+        "provides_context_to_children: true",
+        "children_component: TRadio"
+      ],
+      "selection": {
+        "keywords": [],
+        "useWhen": [],
+        "avoidWhen": [],
+        "alternatives": []
+      },
+      "setup": {
+        "required": [],
+        "notes": []
+      },
+      "recipes": []
+    },
+    {
+      "name": "TSelect",
+      "legacyAlias": "TreeSelect",
+      "aliases": [
+        "TreeSelect"
+      ],
+      "package": "@treeui/vue",
+      "kind": "primitive",
+      "category": "Data Entry",
+      "status": "available",
+      "purpose": "Custom styled dropdown select with listbox; controlled and uncontrolled via v-model and open/defaultOpen.",
+      "sourceFile": "packages/vue/src/components/TreeSelect.vue",
+      "storyFile": "apps/docs/src/stories/Select.stories.ts",
+      "storyTitle": "Components/Data Entry/Select",
+      "manifestFile": "docs/ai/COMPONENTS/select.yaml",
+      "props": [
+        {
+          "name": "modelValue",
+          "type": "string",
+          "default": ""
+        },
+        {
+          "name": "options",
+          "type": "TreeSelectOption[]",
+          "default": "[]",
+          "note": "Array of { label: string; value: string; disabled?: boolean }"
+        },
+        {
+          "name": "open",
+          "type": "boolean",
+          "default": "undefined"
+        },
+        {
+          "name": "defaultOpen",
+          "type": "boolean",
+          "default": "false"
+        },
+        {
+          "name": "size",
+          "type": "TreeSize",
+          "default": "md",
+          "values": [
+            "sm",
+            "md",
+            "lg"
+          ]
+        },
+        {
+          "name": "disabled",
+          "type": "boolean",
+          "default": "false"
+        },
+        {
+          "name": "loading",
+          "type": "boolean",
+          "default": "false"
+        },
+        {
+          "name": "invalid",
+          "type": "boolean",
+          "default": "false"
+        },
+        {
+          "name": "placeholder",
+          "type": "string",
+          "default": ""
+        }
+      ],
+      "events": [
+        {
+          "name": "update:modelValue"
+        },
+        {
+          "name": "update:open"
+        },
+        {
+          "name": "open-change"
+        }
+      ],
+      "slots": [
+        {
+          "name": "prefix"
+        }
+      ],
+      "a11y": [
+        "role: listbox",
+        "trigger_aria_haspopup: listbox",
+        "trigger_aria_expanded: true",
+        "aria_invalid_when_invalid: true",
+        "aria_busy_when_loading: true",
+        "aria_selected_on_options: true",
+        "aria_disabled_on_disabled_options: true",
+        "focus_visible_on_trigger: true",
+        "keyboard_arrow_navigation: true",
+        "escape_closes_dropdown: true",
+        "enter_space_selects_option: true",
+        "home_end_navigation: true"
+      ],
+      "behavior": [
+        "update_payload_type: string",
+        "loading_does_not_disable_by_itself: true",
+        "placeholder_shown_as_muted_text: true",
+        "chevron_rotates_when_open: true",
+        "check_icon_on_selected_option: true",
+        "outside_click_closes_dropdown: true",
+        "focus_restores_on_close: true"
+      ],
+      "selection": {
+        "keywords": [
+          "select",
+          "dropdown",
+          "single choice"
+        ],
+        "useWhen": [
+          "The user needs a compact single-choice dropdown.",
+          "Search is not required."
+        ],
+        "avoidWhen": [
+          "Filtering or multi-selection is required."
+        ],
+        "alternatives": [
+          {
+            "component": "TCombobox",
+            "when": "Search or filtering is required."
+          },
+          {
+            "component": "TMultiSelect",
+            "when": "Multiple values are required."
+          }
+        ]
+      },
+      "setup": {
+        "required": [],
+        "notes": [
+          "Pass `options` as `{ label, value, disabled? }[]`.",
+          "Use `placeholder` when no selection has been made."
+        ]
+      },
+      "recipes": []
+    },
+    {
+      "name": "TSelectableList",
+      "legacyAlias": "TreeSelectableList",
+      "aliases": [
+        "TreeSelectableList"
+      ],
+      "package": "@treeui/vue",
+      "kind": "selection",
+      "category": "Navigation & Disclosure",
+      "status": "available",
+      "purpose": "Rich single-selection list for options with description and metadata.",
+      "sourceFile": "packages/vue/src/components/TreeSelectableList.vue",
+      "storyFile": "apps/docs/src/stories/SelectableList.stories.ts",
+      "storyTitle": "Components/Navigation & Disclosure/SelectableList",
+      "manifestFile": "docs/ai/COMPONENTS/selectable-list.yaml",
+      "props": [
+        {
+          "name": "modelValue",
+          "type": "string",
+          "default": "undefined"
+        },
+        {
+          "name": "defaultValue",
+          "type": "string",
+          "default": ""
+        },
+        {
+          "name": "items",
+          "type": "TreeSelectableListItem[]",
+          "default": "[]",
+          "note": "Array of `{ label, value, description?, meta?, disabled? }`."
+        },
+        {
+          "name": "size",
+          "type": "TreeSize",
+          "default": "md",
+          "values": [
+            "sm",
+            "md",
+            "lg"
+          ]
+        },
+        {
+          "name": "disabled",
+          "type": "boolean",
+          "default": "false"
+        },
+        {
+          "name": "emptyText",
+          "type": "string",
+          "default": "No items available."
+        }
+      ],
+      "events": [
+        {
+          "name": "update:modelValue"
+        }
+      ],
+      "slots": [
+        {
+          "name": "item"
+        },
+        {
+          "name": "empty"
+        }
+      ],
+      "a11y": [
+        "role: listbox",
+        "item_role: option",
+        "roving_focus: true",
+        "home_end_navigation: true",
+        "arrow_navigation: true",
+        "activation_keys_select_option: true"
+      ],
+      "behavior": [
+        "can_be_controlled_or_uncontrolled: true",
+        "supports_rich_row_rendering_via_slot: true",
+        "empty_state_text_supported: true"
+      ],
+      "selection": {
+        "keywords": [
+          "selectable list",
+          "rich options",
+          "option list"
+        ],
+        "useWhen": [
+          "Each option needs description or metadata.",
+          "Selection should feel like choosing a row rather than opening a dropdown."
+        ],
+        "avoidWhen": [
+          "The options should live in a compact form control."
+        ],
+        "alternatives": [
+          {
+            "component": "TSelect",
+            "when": "A compact dropdown is better."
+          },
+          {
+            "component": "TTreeView",
+            "when": "The options are hierarchical."
+          }
+        ]
+      },
+      "setup": {
+        "required": [],
+        "notes": []
+      },
+      "recipes": []
+    },
+    {
+      "name": "TSidebar",
+      "legacyAlias": "TreeSidebar",
+      "aliases": [
+        "TreeSidebar"
+      ],
+      "package": "@treeui/vue",
+      "kind": "layout",
+      "category": "Layout",
+      "status": "available",
+      "purpose": "Persistent or collapsible side shell for app navigation and secondary workspace controls.",
+      "sourceFile": "packages/vue/src/components/TreeSidebar.vue",
+      "storyFile": "apps/docs/src/stories/Sidebar.stories.ts",
+      "storyTitle": "Components/Layout/Sidebar",
+      "manifestFile": "docs/ai/COMPONENTS/sidebar.yaml",
+      "props": [
+        {
+          "name": "as",
+          "type": "string",
+          "default": "aside"
+        },
+        {
+          "name": "collapsed",
+          "type": "boolean",
+          "default": "undefined"
+        },
+        {
+          "name": "defaultCollapsed",
+          "type": "boolean",
+          "default": "false"
+        },
+        {
+          "name": "collapsible",
+          "type": "boolean",
+          "default": "true"
+        },
+        {
+          "name": "size",
+          "type": "TreeSize",
+          "default": "md",
+          "values": [
+            "sm",
+            "md",
+            "lg"
+          ]
+        },
+        {
+          "name": "side",
+          "type": "TreeSidebarSide",
+          "default": "left",
+          "values": [
+            "left",
+            "right"
+          ]
+        },
+        {
+          "name": "sticky",
+          "type": "boolean",
+          "default": "false"
+        },
+        {
+          "name": "bordered",
+          "type": "boolean",
+          "default": "true"
+        },
+        {
+          "name": "width",
+          "type": "string",
+          "default": "17.5rem"
+        },
+        {
+          "name": "collapsedWidth",
+          "type": "string",
+          "default": "4.75rem"
+        },
+        {
+          "name": "collapseLabel",
+          "type": "string",
+          "default": "Collapse sidebar"
+        },
+        {
+          "name": "expandLabel",
+          "type": "string",
+          "default": "Expand sidebar"
+        }
+      ],
+      "events": [
+        {
+          "name": "update:collapsed"
+        },
+        {
+          "name": "collapse-change"
+        }
+      ],
+      "slots": [
+        {
+          "name": "header"
+        },
+        {
+          "name": "default"
+        },
+        {
+          "name": "footer"
+        },
+        {
+          "name": "toggle"
+        }
+      ],
+      "a11y": [
+        "default_semantic_root: aside",
+        "toggle_button_aria_expanded: true",
+        "toggle_button_aria_labelled_by_state: true"
+      ],
+      "behavior": [
+        "controlled_and_uncontrolled_collapsed_state: true",
+        "provides_collapsed_state_to_descendants: true",
+        "left_and_right_variants: true",
+        "exposes_slot_props_with_collapsed_state: true"
+      ],
+      "selection": {
+        "keywords": [
+          "sidebar",
+          "app shell",
+          "collapsible nav rail"
+        ],
+        "useWhen": [
+          "You need a persistent side shell, often with navigation."
+        ],
+        "avoidWhen": [
+          "The panel should slide over temporary content."
+        ],
+        "alternatives": [
+          {
+            "component": "TDrawer",
+            "when": "The panel is temporary and overlays content."
+          }
+        ]
+      },
+      "setup": {
+        "required": [],
+        "notes": [
+          "Pair with `TNavMenu` for app-section navigation.",
+          "Use controlled `collapsed` state when the app shell persists layout preferences."
+        ]
+      },
+      "recipes": [
+        "sidebar-shell"
+      ]
+    },
+    {
+      "name": "TSkeleton",
+      "legacyAlias": "TreeSkeleton",
+      "aliases": [
+        "TreeSkeleton"
+      ],
+      "package": "@treeui/vue",
+      "kind": "feedback",
+      "category": "Feedback",
+      "status": "available",
+      "purpose": "Placeholder shimmer for loading states. Renders an animated block that indicates content is being loaded.",
+      "sourceFile": "packages/vue/src/components/TreeSkeleton.vue",
+      "storyFile": "apps/docs/src/stories/Skeleton.stories.ts",
+      "storyTitle": "Components/Feedback/Skeleton",
+      "manifestFile": "docs/ai/COMPONENTS/skeleton.yaml",
+      "props": [
+        {
+          "name": "width",
+          "type": "string",
+          "default": "\"100%\"",
+          "description": "CSS width of the skeleton element."
+        },
+        {
+          "name": "height",
+          "type": "string",
+          "default": "undefined",
+          "description": "CSS height of the skeleton element."
+        },
+        {
+          "name": "animation",
+          "type": "\"pulse\" | \"wave\" | \"none\"",
+          "default": "pulse",
+          "values": [
+            "pulse",
+            "wave",
+            "none"
+          ],
+          "description": "Animation style for the shimmer effect."
+        }
+      ],
+      "events": [],
+      "slots": [
+        {
+          "name": "default",
+          "description": "When provided, skeleton wraps children and hides them while loading prop is true."
+        }
+      ],
+      "a11y": [
+        "aria_hidden: true",
+        "aria_busy_on_parent: recommended",
+        "role: none",
+        "notes: Skeleton is purely decorative. Use aria-busy on the parent container."
+      ],
+      "behavior": [],
+      "selection": {
+        "keywords": [],
+        "useWhen": [],
+        "avoidWhen": [],
+        "alternatives": []
+      },
+      "setup": {
+        "required": [],
+        "notes": []
+      },
+      "recipes": []
+    },
+    {
+      "name": "TSpinner",
+      "legacyAlias": "TreeSpinner",
+      "aliases": [
+        "TreeSpinner"
+      ],
+      "package": "@treeui/vue",
+      "kind": "feedback",
+      "category": "Feedback",
+      "status": "available",
+      "purpose": "Accessible loading indicator.",
+      "sourceFile": "packages/vue/src/components/TreeSpinner.vue",
+      "storyFile": "apps/docs/src/stories/Spinner.stories.ts",
+      "storyTitle": "Components/Feedback/Spinner",
+      "manifestFile": "docs/ai/COMPONENTS/spinner.yaml",
+      "props": [
+        {
+          "name": "size",
+          "type": "TreeSize",
+          "default": "md",
+          "values": [
+            "sm",
+            "md",
+            "lg"
+          ]
+        },
+        {
+          "name": "label",
+          "type": "string",
+          "default": "Loading"
+        }
+      ],
+      "events": [],
+      "slots": [],
+      "a11y": [
+        "role: status",
+        "aria_label_from_label_prop: true",
+        "includes_visually_hidden_label: true"
+      ],
+      "behavior": [],
+      "selection": {
+        "keywords": [],
+        "useWhen": [],
+        "avoidWhen": [],
+        "alternatives": []
+      },
+      "setup": {
+        "required": [],
+        "notes": []
+      },
+      "recipes": []
+    },
+    {
+      "name": "TStack",
+      "legacyAlias": "TreeStack",
+      "aliases": [
+        "TreeStack"
+      ],
+      "package": "@treeui/vue",
+      "kind": "layout",
+      "category": "Layout",
+      "status": "available",
+      "purpose": "One-dimensional spacing and alignment wrapper for vertical or horizontal compositions.",
+      "sourceFile": "packages/vue/src/components/TreeStack.vue",
+      "storyFile": "apps/docs/src/stories/Stack.stories.ts",
+      "storyTitle": "Components/Layout/Stack",
+      "manifestFile": "docs/ai/COMPONENTS/stack.yaml",
+      "props": [
+        {
+          "name": "as",
+          "type": "string",
+          "default": "div"
+        },
+        {
+          "name": "direction",
+          "type": "TreeStackDirection",
+          "default": "vertical",
+          "values": [
+            "vertical",
+            "horizontal"
+          ]
+        },
+        {
+          "name": "gap",
+          "type": "string",
+          "default": "var(--tree-space-4)"
+        },
+        {
+          "name": "align",
+          "type": "string",
+          "default": "stretch"
+        },
+        {
+          "name": "justify",
+          "type": "string",
+          "default": "flex-start"
+        },
+        {
+          "name": "wrap",
+          "type": "boolean",
+          "default": "false"
+        },
+        {
+          "name": "reverse",
+          "type": "boolean",
+          "default": "false"
+        }
+      ],
+      "events": [],
+      "slots": [
+        {
+          "name": "default"
+        }
+      ],
+      "a11y": [
+        "Acts as a layout wrapper only; semantics come from `as` and children."
+      ],
+      "behavior": [
+        "semantic_element_controlled_by_as: true",
+        "horizontal_and_vertical_variants: true",
+        "optional_wrapping: true",
+        "optional_reverse_order: true"
+      ],
+      "selection": {
+        "keywords": [
+          "stack",
+          "spacing",
+          "flex column",
+          "flex row"
+        ],
+        "useWhen": [
+          "You need one-dimensional spacing and alignment."
+        ],
+        "avoidWhen": [
+          "You need responsive columns."
+        ],
+        "alternatives": [
+          {
+            "component": "TGrid",
+            "when": "You need multi-column layout."
+          }
+        ]
+      },
+      "setup": {
+        "required": [],
+        "notes": []
+      },
+      "recipes": [
+        "data-listing"
+      ]
+    },
+    {
+      "name": "TStat",
+      "legacyAlias": "TreeStat",
+      "aliases": [
+        "TreeStat"
+      ],
+      "package": "@treeui/vue",
+      "kind": "data-display",
+      "category": "Data Display",
+      "status": "available",
+      "purpose": "Compact KPI display with label, value, trend, metadata, and optional icon.",
+      "sourceFile": "packages/vue/src/components/TreeStat.vue",
+      "storyFile": "apps/docs/src/stories/Stat.stories.ts",
+      "storyTitle": "Components/Data Display/Stat",
+      "manifestFile": "docs/ai/COMPONENTS/stat.yaml",
+      "props": [
+        {
+          "name": "label",
+          "type": "string",
+          "default": ""
+        },
+        {
+          "name": "value",
+          "type": "string | number",
+          "default": ""
+        },
+        {
+          "name": "trend",
+          "type": "string",
+          "default": ""
+        },
+        {
+          "name": "meta",
+          "type": "string",
+          "default": ""
+        },
+        {
+          "name": "tone",
+          "type": "TreeStatTone",
+          "default": "neutral",
+          "values": [
+            "neutral",
+            "success",
+            "warning",
+            "danger",
+            "info"
+          ]
+        },
+        {
+          "name": "trendDirection",
+          "type": "TreeStatTrendDirection",
+          "default": "neutral",
+          "values": [
+            "up",
+            "down",
+            "neutral"
+          ]
+        }
+      ],
+      "events": [],
+      "slots": [
+        {
+          "name": "icon"
+        },
+        {
+          "name": "label"
+        },
+        {
+          "name": "value"
+        },
+        {
+          "name": "trend"
+        },
+        {
+          "name": "meta"
+        }
+      ],
+      "a11y": [
+        "Use clear label text so the metric remains understandable to assistive technologies.",
+        "Trend indicator symbols are decorative when slot content already explains the change."
+      ],
+      "behavior": [
+        "value_and_trend_are_optional: true",
+        "icon_slot_adds_visual_emphasis: true",
+        "trend_indicator_changes_with_direction: true"
+      ],
+      "selection": {
+        "keywords": [
+          "stat",
+          "metric",
+          "KPI",
+          "dashboard"
+        ],
+        "useWhen": [
+          "A compact metric card with value, trend, and optional icon is needed."
+        ],
+        "avoidWhen": [
+          "You need arbitrary content in a generic surface."
+        ],
+        "alternatives": [
+          {
+            "component": "TCard",
+            "when": "The content is not a metric."
+          }
+        ]
+      },
+      "setup": {
+        "required": [],
+        "notes": []
+      },
+      "recipes": [
+        "stat-grid"
+      ]
+    },
+    {
+      "name": "TSteps",
+      "legacyAlias": "TreeStepper",
+      "aliases": [
+        "TStepper",
+        "TreeStepper",
+        "TreeSteps"
+      ],
+      "package": "@treeui/vue",
+      "kind": "navigation",
+      "category": "Navigation & Disclosure",
+      "status": "available",
+      "purpose": "Stepper component for visualizing workflow progress, with optional interactive selection.",
+      "sourceFile": "packages/vue/src/components/TreeSteps.vue",
+      "storyFile": "apps/docs/src/stories/Steps.stories.ts",
+      "storyTitle": "Components/Navigation & Disclosure/Steps",
+      "manifestFile": "docs/ai/COMPONENTS/steps.yaml",
+      "props": [
+        {
+          "name": "modelValue",
+          "type": "string",
+          "default": "undefined"
+        },
+        {
+          "name": "defaultValue",
+          "type": "string",
+          "default": ""
+        },
+        {
+          "name": "items",
+          "type": "TreeStepItem[]",
+          "default": "[]",
+          "note": "Array of `{ label, value, description?, meta?, status?, disabled? }`."
+        },
+        {
+          "name": "size",
+          "type": "TreeSize",
+          "default": "md",
+          "values": [
+            "sm",
+            "md",
+            "lg"
+          ]
+        },
+        {
+          "name": "orientation",
+          "type": "TreeStepOrientation",
+          "default": "horizontal",
+          "values": [
+            "horizontal",
+            "vertical"
+          ]
+        },
+        {
+          "name": "interactive",
+          "type": "boolean",
+          "default": "false"
+        }
+      ],
+      "events": [
+        {
+          "name": "update:modelValue"
+        }
+      ],
+      "slots": [
+        {
+          "name": "item"
+        }
+      ],
+      "a11y": [
+        "semantic_root: ol",
+        "current_step_uses_aria_current_step: true",
+        "interactive_variant_uses_buttons: true"
+      ],
+      "behavior": [
+        "can_be_controlled_or_uncontrolled: true",
+        "status_can_be_explicit_or_computed: true",
+        "alias_export_available: true"
+      ],
+      "selection": {
+        "keywords": [
+          "steps",
+          "stepper",
+          "progress steps",
+          "wizard"
+        ],
+        "useWhen": [
+          "A workflow or staged process should be visible."
+        ],
+        "avoidWhen": [
+          "You need generic tab panels or route navigation."
+        ],
+        "alternatives": [
+          {
+            "component": "TTabs",
+            "when": "The interaction is panel switching rather than process progression."
+          }
+        ]
+      },
+      "setup": {
+        "required": [],
+        "notes": [
+          "Pass explicit `status` per item only when the app should override the computed complete/current/upcoming logic."
+        ]
+      },
+      "recipes": []
+    },
+    {
+      "name": "TSwitch",
+      "legacyAlias": "TreeSwitch",
+      "aliases": [
+        "TreeSwitch"
+      ],
+      "package": "@treeui/vue",
+      "kind": "primitive",
+      "category": "Data Entry",
+      "status": "available",
+      "purpose": "On/off toggle; semantic alternative to checkbox for settings. Supports v-model via modelValue.",
+      "sourceFile": "packages/vue/src/components/TreeSwitch.vue",
+      "storyFile": "apps/docs/src/stories/Switch.stories.ts",
+      "storyTitle": "Components/Data Entry/Switch",
+      "manifestFile": "docs/ai/COMPONENTS/switch.yaml",
+      "props": [
+        {
+          "name": "modelValue",
+          "type": "boolean",
+          "default": "false"
+        },
+        {
+          "name": "size",
+          "type": "TreeSize",
+          "default": "md",
+          "values": [
+            "sm",
+            "md",
+            "lg"
+          ]
+        },
+        {
+          "name": "disabled",
+          "type": "boolean",
+          "default": "false"
+        },
+        {
+          "name": "invalid",
+          "type": "boolean",
+          "default": "false"
+        }
+      ],
+      "events": [
+        {
+          "name": "update:modelValue"
+        }
+      ],
+      "slots": [
+        {
+          "name": "default"
+        }
+      ],
+      "a11y": [
+        "role: switch",
+        "aria_checked: true",
+        "aria_invalid_when_invalid: true",
+        "focus_visible_on_track: true",
+        "clickable_target_44x44: true"
+      ],
+      "behavior": [
+        "update_payload_type: boolean",
+        "label_click_toggles_switch: true"
+      ],
+      "selection": {
+        "keywords": [
+          "switch",
+          "toggle",
+          "on off"
+        ],
+        "useWhen": [
+          "The state is a single immediate boolean toggle."
+        ],
+        "avoidWhen": [
+          "The choice is one of multiple discrete options."
+        ],
+        "alternatives": [
+          {
+            "component": "TCheckbox",
+            "when": "The control participates in a form checklist or consent flow."
+          },
+          {
+            "component": "TToggleGroup",
+            "when": "The user is choosing from multiple options."
+          }
+        ]
+      },
+      "setup": {
+        "required": [],
+        "notes": []
+      },
+      "recipes": []
+    },
+    {
+      "name": "TTable",
+      "legacyAlias": "TreeTable",
+      "aliases": [
+        "TreeTable"
+      ],
+      "package": "@treeui/vue",
+      "category": "Data Display",
+      "description": "Sortable, accessible data table with column definitions and row data.",
+      "sourceFile": "packages/vue/src/components/TreeTable.vue",
+      "storyFile": "apps/docs/src/stories/Table.stories.ts",
+      "storyTitle": "Components/Data Display/Table",
+      "manifestFile": "docs/ai/COMPONENTS/table.yaml",
+      "props": [
+        {
+          "name": "columns",
+          "type": "TreeTableColumn[]",
+          "required": true,
+          "description": "Array of column definitions with key, label, sortable, align, and width."
+        },
+        {
+          "name": "rows",
+          "type": "Record<string, unknown>[]",
+          "required": true,
+          "description": "Array of row data objects keyed by column keys."
+        },
+        {
+          "name": "size",
+          "type": "TreeSize",
+          "default": "md",
+          "values": [
+            "sm",
+            "md",
+            "lg"
+          ]
+        },
+        {
+          "name": "sortBy",
+          "type": "TreeTableSortState",
+          "required": false,
+          "description": "Controlled sort state. When provided, overrides internal sort tracking."
+        }
+      ],
+      "events": [
+        {
+          "name": "sort",
+          "description": "Emitted when a sortable column header is clicked.",
+          "payload": "TreeTableSortState"
+        }
+      ],
+      "slots": [
+        {
+          "name": "cell-{key}",
+          "description": "Custom cell renderer for a specific column. Receives `{ row, value }`."
+        },
+        {
+          "name": "header-{key}",
+          "description": "Custom header renderer for a specific column. Receives `{ column }`."
+        },
+        {
+          "name": "empty",
+          "description": "Content shown when rows array is empty."
+        }
+      ],
+      "a11y": [
+        "role: grid",
+        "aria-sort: Set on sortable column headers (ascending, descending, none).",
+        "keyboard: Sortable headers are focusable and activated with Enter or Space.",
+        "scope: col on all th elements."
+      ],
+      "behavior": [],
+      "selection": {
+        "keywords": [
+          "table",
+          "rows",
+          "columns",
+          "structured data",
+          "listing"
+        ],
+        "useWhen": [
+          "The content is tabular and benefits from rows and columns."
+        ],
+        "avoidWhen": [
+          "The UI is hierarchical or card-based."
+        ],
+        "alternatives": [
+          {
+            "component": "TSelectableList",
+            "when": "The list is rich but not tabular."
+          },
+          {
+            "component": "TTreeView",
+            "when": "The data is hierarchical."
+          }
+        ]
+      },
+      "setup": {
+        "required": [],
+        "notes": []
+      },
+      "recipes": [
+        "data-listing"
+      ]
+    },
+    {
+      "name": "TTabs",
+      "legacyAlias": "TreeTabs",
+      "aliases": [
+        "TreeTabs"
+      ],
+      "package": "@treeui/vue",
+      "kind": "navigation",
+      "category": "Navigation",
+      "status": "available",
+      "purpose": "Tabbed panel navigation with full keyboard support and automatic/manual activation modes.",
+      "sourceFile": "packages/vue/src/components/TreeTabs.vue",
+      "storyFile": "apps/docs/src/stories/Tabs.stories.ts",
+      "storyTitle": "Components/Navigation/Tabs",
+      "manifestFile": "docs/ai/COMPONENTS/tabs.yaml",
+      "props": [
+        {
+          "name": "modelValue",
+          "type": "string",
+          "default": "",
+          "note": "The value of the currently active tab. Use with v-model."
+        },
+        {
+          "name": "defaultValue",
+          "type": "string",
+          "default": "",
+          "note": "Initial active tab when uncontrolled."
+        },
+        {
+          "name": "size",
+          "type": "TreeSize",
+          "default": "md",
+          "values": [
+            "sm",
+            "md",
+            "lg"
+          ]
+        },
+        {
+          "name": "activationMode",
+          "type": "'automatic' | 'manual'",
+          "default": "automatic",
+          "note": "automatic: tab activates on focus. manual: tab activates on Enter/Space."
+        },
+        {
+          "name": "disabled",
+          "type": "boolean",
+          "default": "false",
+          "note": "Disables every tab in the list."
+        }
+      ],
+      "events": [
+        {
+          "name": "update:modelValue"
+        }
+      ],
+      "slots": [
+        {
+          "name": "unnamed"
+        }
+      ],
+      "a11y": [
+        "role: tablist_on_tab_container",
+        "keyboard_arrow_navigation: true",
+        "home_end_navigation: true",
+        "focus_visible_on_tabs: true",
+        "aria_selected_on_active_tab: true",
+        "aria_controls_aria_labelledby_pairing: true"
+      ],
+      "behavior": [
+        "arrow_left_right_moves_focus: true",
+        "home_focuses_first_tab: true",
+        "end_focuses_last_tab: true",
+        "automatic_mode_activates_on_focus: true",
+        "manual_mode_activates_on_enter_space: true",
+        "disabled_tabs_are_skipped: true",
+        "only_active_panel_rendered: true"
+      ],
+      "selection": {
+        "keywords": [
+          "tabs",
+          "tab panels",
+          "segmented content"
+        ],
+        "useWhen": [
+          "The user switches between a small set of panels in-place."
+        ],
+        "avoidWhen": [
+          "The panels represent steps in a workflow or app navigation."
+        ],
+        "alternatives": [
+          {
+            "component": "TSteps",
+            "when": "The panels represent a process."
+          },
+          {
+            "component": "TNavMenu",
+            "when": "The selection is app-section navigation."
+          }
+        ]
+      },
+      "setup": {
+        "required": [],
+        "notes": []
+      },
+      "recipes": []
+    },
+    {
+      "name": "TTag",
+      "legacyAlias": "TreeTag",
+      "aliases": [
+        "TreeTag"
+      ],
+      "package": "@treeui/vue",
+      "category": "Data Display",
+      "description": "Removable label/chip for filters and selections.",
+      "sourceFile": "packages/vue/src/components/TreeTag.vue",
+      "storyFile": "apps/docs/src/stories/Tag.stories.ts",
+      "storyTitle": "Components/Data Display/Tag",
+      "manifestFile": "docs/ai/COMPONENTS/tag.yaml",
+      "props": [
+        {
+          "name": "variant",
+          "type": "TreeTagVariant",
+          "default": "soft",
+          "values": [
+            "solid",
+            "outline",
+            "soft"
+          ]
+        },
+        {
+          "name": "size",
+          "type": "TreeSize",
+          "default": "md",
+          "values": [
+            "sm",
+            "md",
+            "lg"
+          ]
+        },
+        {
+          "name": "removable",
+          "type": "boolean",
+          "default": "false",
+          "description": "Shows a remove/close button."
+        },
+        {
+          "name": "disabled",
+          "type": "boolean",
+          "default": "false",
+          "description": "Disables interaction and dims the tag."
+        }
+      ],
+      "events": [
+        {
+          "name": "remove",
+          "description": "Emitted when the remove button is clicked (not emitted when disabled)."
+        }
+      ],
+      "slots": [
+        {
+          "name": "default",
+          "description": "Tag label content."
+        },
+        {
+          "name": "icon",
+          "description": "Optional leading icon."
+        }
+      ],
+      "a11y": [
+        "remove_button: Has aria-label=\"Remove\" and is keyboard-focusable.",
+        "disabled_state: Applied via is-disabled class and native disabled on remove button.",
+        "icon: Marked aria-hidden=\"true\"."
+      ],
+      "behavior": [],
+      "selection": {
+        "keywords": [],
+        "useWhen": [],
+        "avoidWhen": [],
+        "alternatives": []
+      },
+      "setup": {
+        "required": [],
+        "notes": []
+      },
+      "recipes": []
+    },
+    {
+      "name": "TTextarea",
+      "legacyAlias": "TreeTextarea",
+      "aliases": [
+        "TreeTextarea"
+      ],
+      "package": "@treeui/vue",
+      "kind": "primitive",
+      "category": "Data Entry",
+      "status": "available",
+      "purpose": "Multi-line text field with size, loading, invalid states, and auto-grow option.",
+      "sourceFile": "packages/vue/src/components/TreeTextarea.vue",
+      "storyFile": "apps/docs/src/stories/Textarea.stories.ts",
+      "storyTitle": "Components/Data Entry/Textarea",
+      "manifestFile": "docs/ai/COMPONENTS/textarea.yaml",
+      "props": [
+        {
+          "name": "modelValue",
+          "type": "string",
+          "default": ""
+        },
+        {
+          "name": "size",
+          "type": "TreeSize",
+          "default": "md",
+          "values": [
+            "sm",
+            "md",
+            "lg"
+          ]
+        },
+        {
+          "name": "disabled",
+          "type": "boolean",
+          "default": "false"
+        },
+        {
+          "name": "loading",
+          "type": "boolean",
+          "default": "false"
+        },
+        {
+          "name": "invalid",
+          "type": "boolean",
+          "default": "false"
+        },
+        {
+          "name": "placeholder",
+          "type": "string",
+          "default": ""
+        },
+        {
+          "name": "rows",
+          "type": "number",
+          "default": "3"
+        },
+        {
+          "name": "autoGrow",
+          "type": "boolean",
+          "default": "false"
+        }
+      ],
+      "events": [
+        {
+          "name": "update:modelValue"
+        }
+      ],
+      "slots": [],
+      "a11y": [
+        "aria_invalid_when_invalid: true",
+        "loading_uses_status_spinner: true"
+      ],
+      "behavior": [
+        "update_payload_type: string",
+        "loading_does_not_disable_by_itself: true",
+        "auto_grow_resizes_on_input: true"
+      ],
+      "selection": {
+        "keywords": [
+          "textarea",
+          "multiline",
+          "long text"
+        ],
+        "useWhen": [
+          "The value is multiline plain text."
+        ],
+        "avoidWhen": [
+          "The authoring experience requires markdown formatting."
+        ],
+        "alternatives": [
+          {
+            "component": "TInput",
+            "when": "The value is short and single-line."
+          },
+          {
+            "component": "TMarkdownEditor",
+            "when": "Markdown authoring is needed."
+          }
+        ]
+      },
+      "setup": {
+        "required": [],
+        "notes": []
+      },
+      "recipes": []
+    },
+    {
+      "name": "TTimeline",
+      "legacyAlias": "TreeTimeline",
+      "aliases": [
+        "TreeTimeline"
+      ],
+      "package": "@treeui/vue",
+      "kind": "data_display",
+      "status": "available",
+      "purpose": "Vertical timeline for activity history, audits, release events, and chronological product updates.",
+      "sourceFile": "packages/vue/src/components/TreeTimeline.vue",
+      "storyFile": "apps/docs/src/stories/Timeline.stories.ts",
+      "storyTitle": "Release queued for review",
+      "manifestFile": "docs/ai/COMPONENTS/timeline.yaml",
+      "props": [
+        {
+          "name": "items",
+          "type": "TreeTimelineItem[]",
+          "default": "[]",
+          "note": "Array of { id?: string | number; title: string; description?: string; meta?: string; timestamp?: string; datetime?: string; tone?: 'neutral' | 'brand' | 'success' | 'warning' | 'danger' }"
+        },
+        {
+          "name": "size",
+          "type": "TreeSize",
+          "default": "md",
+          "values": [
+            "sm",
+            "md",
+            "lg"
+          ]
+        }
+      ],
+      "events": [],
+      "slots": [
+        {
+          "name": "marker"
+        },
+        {
+          "name": "item"
+        }
+      ],
+      "a11y": [
+        "root_semantics: Renders as an ordered list (`ol`) by default.",
+        "decorative_marker_hidden_from_assistive_tech: true",
+        "timestamp_uses_time_element_when_provided: true"
+      ],
+      "behavior": [
+        "items_render_in_order_given: true",
+        "line_hidden_on_last_item: true",
+        "marker_tone_defaults_to_neutral: true"
+      ],
+      "selection": {
+        "keywords": [],
+        "useWhen": [],
+        "avoidWhen": [],
+        "alternatives": []
+      },
+      "setup": {
+        "required": [],
+        "notes": []
+      },
+      "recipes": []
+    },
+    {
+      "name": "TToast",
+      "legacyAlias": "TreeToast",
+      "aliases": [
+        "TreeToast"
+      ],
+      "package": "@treeui/vue",
+      "kind": "feedback",
+      "status": "available",
+      "purpose": "Ephemeral notification stack driven by a composable. Renders toast items inside a positioned container with auto-dismiss and manual close.",
+      "sourceFile": "packages/vue/src/components/TreeToast.vue",
+      "manifestFile": "docs/ai/COMPONENTS/toast.yaml",
+      "props": [],
+      "events": [
+        {
+          "name": "close"
+        }
+      ],
+      "slots": [],
+      "a11y": [
+        "role: status",
+        "aria_live: polite",
+        "aria_relevant: additions removals",
+        "aria_labelledby: auto_title_id",
+        "aria_describedby: auto_description_id",
+        "close_button_label: Dismiss notification"
+      ],
+      "behavior": [
+        "uses_teleport_to_body: true",
+        "auto_dismiss_after_duration: true",
+        "duration_zero_is_persistent: true",
+        "max_limits_visible_toasts: true",
+        "newest_toasts_appear_last: true"
+      ],
+      "selection": {
+        "keywords": [
+          "toast",
+          "snackbar",
+          "notification"
+        ],
+        "useWhen": [
+          "Feedback should appear temporarily without shifting layout."
+        ],
+        "avoidWhen": [
+          "The message must stay visible in-flow."
+        ],
+        "alternatives": [
+          {
+            "component": "TAlert",
+            "when": "The message should stay visible in the page."
+          }
+        ]
+      },
+      "setup": {
+        "required": [
+          "Mount one `TToastProvider` near the application root before calling `useToast()` from feature components."
+        ],
+        "notes": [
+          "Use `useToast()` for programmatic notifications.",
+          "Choose provider `position` once per app shell unless a feature has a strong reason to differ."
+        ]
+      },
+      "recipes": [
+        "confirm-destructive-action"
+      ]
+    },
+    {
+      "name": "TToggleGroup",
+      "legacyAlias": "TreeToggleGroup",
+      "aliases": [
+        "TreeToggleGroup"
+      ],
+      "package": "@treeui/vue",
+      "kind": "selection",
+      "category": "Data Entry",
+      "status": "available",
+      "purpose": "Segmented button group for single or multiple visible choices.",
+      "sourceFile": "packages/vue/src/components/TreeToggleGroup.vue",
+      "storyFile": "apps/docs/src/stories/ToggleGroup.stories.ts",
+      "storyTitle": "Components/Data Entry/ToggleGroup",
+      "manifestFile": "docs/ai/COMPONENTS/toggle-group.yaml",
+      "props": [
+        {
+          "name": "modelValue",
+          "type": "string | string[]",
+          "default": "undefined"
+        },
+        {
+          "name": "options",
+          "type": "TreeToggleGroupOption[]",
+          "default": "[]",
+          "note": "Array of `{ label, value, disabled? }`."
+        },
+        {
+          "name": "selectionMode",
+          "type": "TreeToggleGroupSelectionMode",
+          "default": "single",
+          "values": [
+            "single",
+            "multiple"
+          ]
+        },
+        {
+          "name": "size",
+          "type": "TreeSize",
+          "default": "md",
+          "values": [
+            "sm",
+            "md",
+            "lg"
+          ]
+        },
+        {
+          "name": "variant",
+          "type": "TreeToggleGroupVariant",
+          "default": "outline",
+          "values": [
+            "outline",
+            "soft",
+            "solid"
+          ]
+        },
+        {
+          "name": "disabled",
+          "type": "boolean",
+          "default": "false"
+        }
+      ],
+      "events": [
+        {
+          "name": "update:modelValue"
+        }
+      ],
+      "slots": [
+        {
+          "name": "option"
+        }
+      ],
+      "a11y": [
+        "roving_focus: true",
+        "home_end_navigation: true",
+        "arrow_navigation: true",
+        "activation_keys_select_option: true"
+      ],
+      "behavior": [
+        "single_and_multiple_modes: true",
+        "variant_changes_visual_style_only: true",
+        "visible_option_set_expected: true"
+      ],
+      "selection": {
+        "keywords": [
+          "toggle group",
+          "segmented control",
+          "visible options"
+        ],
+        "useWhen": [
+          "The option set is small and should stay visible.",
+          "A segmented-button presentation is appropriate."
+        ],
+        "avoidWhen": [
+          "The option set is large or searchable."
+        ],
+        "alternatives": [
+          {
+            "component": "TSelect",
+            "when": "A compact dropdown fits better."
+          },
+          {
+            "component": "TCombobox",
+            "when": "Filtering is required."
+          },
+          {
+            "component": "TMultiSelect",
+            "when": "Many multiple-choice options are required."
+          }
+        ]
+      },
+      "setup": {
+        "required": [],
+        "notes": [
+          "Use `selectionMode=\"single\"` for segmented single choice.",
+          "Use `selectionMode=\"multiple\"` for small visible multi-choice sets."
+        ]
+      },
+      "recipes": []
+    },
+    {
+      "name": "TTooltip",
+      "legacyAlias": "TreeTooltip",
+      "aliases": [
+        "TreeTooltip"
+      ],
+      "package": "@treeui/vue",
+      "kind": "overlay",
+      "category": "Overlay",
+      "status": "available",
+      "purpose": "Small contextual overlay shown on hover or focus.",
+      "sourceFile": "packages/vue/src/components/TreeTooltip.vue",
+      "storyFile": "apps/docs/src/stories/Tooltip.stories.ts",
+      "storyTitle": "Components/Overlay/Tooltip",
+      "manifestFile": "docs/ai/COMPONENTS/tooltip.yaml",
+      "props": [
+        {
+          "name": "open",
+          "type": "boolean",
+          "default": "controlled_optional"
+        },
+        {
+          "name": "defaultOpen",
+          "type": "boolean",
+          "default": "false"
+        },
+        {
+          "name": "disabled",
+          "type": "boolean",
+          "default": "false"
+        },
+        {
+          "name": "content",
+          "type": "string",
+          "default": ""
+        },
+        {
+          "name": "side",
+          "type": "TreeTooltipSide",
+          "default": "top",
+          "values": [
+            "top",
+            "right",
+            "bottom",
+            "left"
+          ]
+        },
+        {
+          "name": "delay",
+          "type": "number",
+          "default": "80"
+        },
+        {
+          "name": "id",
+          "type": "string",
+          "default": "auto"
+        }
+      ],
+      "events": [
+        {
+          "name": "update:open"
+        },
+        {
+          "name": "open-change"
+        }
+      ],
+      "slots": [
+        {
+          "name": "trigger"
+        },
+        {
+          "name": "default"
+        },
+        {
+          "name": "content"
+        }
+      ],
+      "a11y": [
+        "role: tooltip",
+        "uses_aria_describedby_when_open: true",
+        "opens_on_focus: true",
+        "opens_on_hover: true"
+      ],
+      "behavior": [
+        "closes_on_blur: true",
+        "closes_on_mouseleave: true",
+        "uses_delay_for_pointer_open: true"
+      ],
+      "selection": {
+        "keywords": [
+          "tooltip",
+          "hover help",
+          "short hint"
+        ],
+        "useWhen": [
+          "You need a short, non-interactive hint anchored to another element."
+        ],
+        "avoidWhen": [
+          "The overlay needs interactive content."
+        ],
+        "alternatives": [
+          {
+            "component": "TPopover",
+            "when": "The overlay needs interactive content."
+          }
+        ]
+      },
+      "setup": {
+        "required": [],
+        "notes": []
+      },
+      "recipes": [
+        "anchored-help"
+      ]
+    },
+    {
+      "name": "TTreeView",
+      "legacyAlias": "TreeTreeView",
+      "aliases": [
+        "TreeTreeView"
+      ],
+      "package": "@treeui/vue",
+      "kind": "selection",
+      "category": "Navigation & Disclosure",
+      "status": "available",
+      "purpose": "Hierarchical tree view with expansion, keyboard navigation, and single or multiple selection.",
+      "sourceFile": "packages/vue/src/components/TreeTreeView.vue",
+      "storyFile": "apps/docs/src/stories/TreeView.stories.ts",
+      "storyTitle": "Components/Navigation & Disclosure/TreeView",
+      "manifestFile": "docs/ai/COMPONENTS/tree-view.yaml",
+      "props": [
+        {
+          "name": "modelValue",
+          "type": "string | string[]",
+          "default": "undefined"
+        },
+        {
+          "name": "defaultValue",
+          "type": "string | string[]",
+          "default": "undefined"
+        },
+        {
+          "name": "nodes",
+          "type": "TreeTreeViewNode[]",
+          "default": "[]",
+          "note": "Array of `{ id, label, description?, meta?, disabled?, children? }`."
+        },
+        {
+          "name": "selectionMode",
+          "type": "TreeTreeViewSelectionMode",
+          "default": "single",
+          "values": [
+            "single",
+            "multiple"
+          ]
+        },
+        {
+          "name": "expanded",
+          "type": "string[]",
+          "default": "undefined"
+        },
+        {
+          "name": "defaultExpanded",
+          "type": "string[]",
+          "default": "[]"
+        },
+        {
+          "name": "disabled",
+          "type": "boolean",
+          "default": "false"
+        },
+        {
+          "name": "emptyText",
+          "type": "string",
+          "default": "No items available."
+        }
+      ],
+      "events": [
+        {
+          "name": "update:modelValue"
+        },
+        {
+          "name": "update:expanded"
+        },
+        {
+          "name": "selection-change"
+        },
+        {
+          "name": "expanded-change"
+        }
+      ],
+      "slots": [],
+      "a11y": [
+        "role: tree",
+        "nested_items_use_treeitem_pattern: true",
+        "keyboard_navigation_for_visible_nodes: true",
+        "supports_single_and_multiple_selection: true",
+        "expansion_and_selection_state_are_exposed: true"
+      ],
+      "behavior": [
+        "can_be_controlled_or_uncontrolled_for_selection: true",
+        "can_be_controlled_or_uncontrolled_for_expansion: true",
+        "visible_node_list_updates_from_expansion: true"
+      ],
+      "selection": {
+        "keywords": [
+          "tree",
+          "tree view",
+          "hierarchy",
+          "nested selection"
+        ],
+        "useWhen": [
+          "The data is hierarchical.",
+          "Selection or expansion must work across nested nodes."
+        ],
+        "avoidWhen": [
+          "The data is flat."
+        ],
+        "alternatives": [
+          {
+            "component": "TSelectableList",
+            "when": "The options are flat rich rows."
+          },
+          {
+            "component": "TNavMenu",
+            "when": "The hierarchy is actually app navigation."
+          }
+        ]
+      },
+      "setup": {
+        "required": [],
+        "notes": [
+          "Use `nodes` shaped as `{ id, label, description?, meta?, disabled?, children? }[]`.",
+          "Control `expanded` separately when the parent app needs to persist open branches."
+        ]
+      },
+      "recipes": [
+        "hierarchy-picker"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,50 @@
+name: TNavbar
+legacy_alias: TreeNavbar
+source_file: packages/vue/src/components/TreeNavbar.vue
+package: "@treeui/vue"
+kind: layout
+status: available
+purpose: "Top application bar with start, center, and end content areas."
+
+aliases:
+  - TAppBar
+  - TreeAppBar
+
+props:
+  as:
+    type: string
+    default: header
+  size:
+    type: TreeSize
+    default: md
+    values: [sm, md, lg]
+  sticky:
+    type: boolean
+    default: false
+  bordered:
+    type: boolean
+    default: true
+  elevated:
+    type: boolean
+    default: false
+
+slots:
+  - start
+  - center
+  - default
+  - end
+
+behavior:
+  semantic_element_controlled_by_as: true
+  sticky_variant_available: true
+  alias_export_available: true
+
+a11y:
+  - "Use `as=\"nav\"` or nested navigation landmarks when the app bar itself is navigation."
+  - "Acts as a structural wrapper; semantics come from `as` and child content."
+
+example: |
+  <TNavbar>
+    <template #start><strong>TreeUI</strong></template>
+    <template #end><TButton size="sm">Invite</TButton></template>
+  </TNavbar>

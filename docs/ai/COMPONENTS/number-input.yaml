@@ -1,0 +1,64 @@
+name: TNumberInput
+legacy_alias: TreeNumberInput
+source_file: packages/vue/src/components/TreeNumberInput.vue
+package: "@treeui/vue"
+kind: form
+status: available
+purpose: "Numeric input with optional increment and decrement controls."
+
+props:
+  modelValue:
+    type: "number | null"
+    default: null
+  min:
+    type: number
+    default: undefined
+  max:
+    type: number
+    default: undefined
+  step:
+    type: number
+    default: 1
+  size:
+    type: TreeSize
+    default: md
+    values: [sm, md, lg]
+  disabled:
+    type: boolean
+    default: false
+  invalid:
+    type: boolean
+    default: false
+  placeholder:
+    type: string
+    default: ""
+  controls:
+    type: boolean
+    default: true
+
+events:
+  - update:modelValue
+
+slots: []
+
+a11y:
+  native_input_type: number
+  keyboard_arrow_up_down: true
+  home_sets_min_when_present: true
+  end_sets_max_when_present: true
+  aria_invalid_when_invalid: true
+
+behavior:
+  empty_value_is_null: true
+  values_clamped_to_min_and_max: true
+  decimal_steps_supported: true
+  control_buttons_optional: true
+
+example: |
+  <TNumberInput
+    aria-label="Seats"
+    :model-value="seats"
+    :min="0"
+    :max="20"
+    @update:model-value="seats = $event"
+  />

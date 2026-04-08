@@ -47,6 +47,7 @@ packages/tokens    Framework-agnostic design tokens and themes
 packages/utils     Shared accessibility and interaction helpers
 packages/icons     Curated icon registry and defaults
 packages/vue       Vue 3 component package and plugin entry
+packages/mcp       TreeUI AI catalog and MCP server for coding agents
 tooling            Docker, ESLint, and TypeScript shared config
 ```
 
@@ -56,9 +57,33 @@ tooling            Docker, ESLint, and TypeScript shared config
 - `ARCHITECTURE.md`: package boundaries and portability rules
 - `DESIGN.md`: design principles and review checklist
 - `CONTRIBUTING.md`: contributor workflow, quality gates, and release notes
+- `AGENTS.md`: repo-level guidance for coding agents
+- `CLAUDE.md`: Claude Code-specific pointer to the same guidance
+- `.github/copilot-instructions.md`: GitHub Copilot repository instructions
+- `.mcp.json`: project-scoped TreeUI MCP server config for Claude Code
 - `docs/ai/`: compact, canonical contracts for tools and automation
+- `packages/mcp/`: generated catalog plus the `@treeui/mcp` server package
 
 The human-facing product docs and component playground live in Storybook under `apps/docs`.
+
+## AI Integrations
+
+TreeUI now ships a repo-native AI context layer for coding agents and consumer projects:
+
+- canonical machine-oriented contracts in `docs/ai/*.yaml`
+- a generated normalized catalog at `docs/ai/treeui.catalog.json`
+- a local MCP server in `packages/mcp`
+- repo guidance in `AGENTS.md`, `CLAUDE.md`, and `.github/copilot-instructions.md`
+
+Common commands:
+
+```bash
+pnpm ai:catalog
+pnpm mcp:test
+pnpm mcp:start
+```
+
+If you open this repository in Claude Code, `.mcp.json` points the project at the local `treeui` MCP server automatically after dependencies are installed.
 
 ## Contributing
 

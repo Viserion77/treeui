@@ -1,0 +1,48 @@
+name: TStat
+legacy_alias: TreeStat
+source_file: packages/vue/src/components/TreeStat.vue
+package: "@treeui/vue"
+kind: data-display
+status: available
+purpose: "Compact KPI display with label, value, trend, metadata, and optional icon."
+
+props:
+  label:
+    type: string
+    default: ""
+  value:
+    type: "string | number"
+    default: ""
+  trend:
+    type: string
+    default: ""
+  meta:
+    type: string
+    default: ""
+  tone:
+    type: TreeStatTone
+    default: neutral
+    values: [neutral, success, warning, danger, info]
+  trendDirection:
+    type: TreeStatTrendDirection
+    default: neutral
+    values: [up, down, neutral]
+
+slots:
+  - icon
+  - label
+  - value
+  - trend
+  - meta
+
+behavior:
+  value_and_trend_are_optional: true
+  icon_slot_adds_visual_emphasis: true
+  trend_indicator_changes_with_direction: true
+
+a11y:
+  - "Use clear label text so the metric remains understandable to assistive technologies."
+  - "Trend indicator symbols are decorative when slot content already explains the change."
+
+example: |
+  <TStat label="MRR" value="$48.2k" trend="12.4%" tone="success" trend-direction="up" />

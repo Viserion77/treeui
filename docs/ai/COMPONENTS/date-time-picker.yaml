@@ -1,0 +1,86 @@
+name: TDateTimePicker
+legacy_alias: TreeDateTimePicker
+source_file: packages/vue/src/components/TreeDateTimePicker.vue
+package: "@treeui/vue"
+kind: form
+status: available
+purpose: "Date and time picker with a calendar grid, time selection, and overlay trigger."
+
+props:
+  modelValue:
+    type: string
+    default: ""
+    note: "Uses `YYYY-MM-DDTHH:mm`."
+  open:
+    type: boolean
+    default: undefined
+  defaultOpen:
+    type: boolean
+    default: false
+  size:
+    type: TreeSize
+    default: md
+    values: [sm, md, lg]
+  disabled:
+    type: boolean
+    default: false
+  loading:
+    type: boolean
+    default: false
+  invalid:
+    type: boolean
+    default: false
+  placeholder:
+    type: string
+    default: "Select date and time"
+  locale:
+    type: string
+    default: en-US
+  min:
+    type: string
+    default: ""
+  max:
+    type: string
+    default: ""
+  weekStartsOn:
+    type: "0 | 1 | 2 | 3 | 4 | 5 | 6"
+    default: 0
+  id:
+    type: string
+    default: auto
+  step:
+    type: number
+    default: 60
+    note: "Seconds between time options."
+
+events:
+  - update:modelValue
+  - update:open
+  - open-change
+  - change
+  - select
+
+slots: []
+
+a11y:
+  role: dialog
+  trigger_aria_haspopup: dialog
+  trigger_aria_expanded: true
+  focus_restores_on_close: true
+  keyboard_calendar_navigation: true
+  escape_closes_overlay: true
+  aria_invalid_when_invalid: true
+  aria_busy_when_loading: true
+
+behavior:
+  controlled_and_uncontrolled_open: true
+  value_format: YYYY-MM-DDTHH:mm
+  min_and_max_limit_available_values: true
+  time_options_generated_from_step: true
+
+example: |
+  <TDateTimePicker
+    aria-label="Release window"
+    :model-value="releaseAt"
+    @update:model-value="releaseAt = $event"
+  />

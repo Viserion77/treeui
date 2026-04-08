@@ -1,0 +1,33 @@
+{
+  "name": "@treeui/mcp",
+  "version": "0.1.0",
+  "description": "Model Context Protocol server and AI catalog for TreeUI.",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "bin": {
+    "treeui-mcp": "./dist/cli.js"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "generate:catalog": "node --import tsx scripts/generate-catalog.ts",
+    "build": "pnpm run generate:catalog && pnpm exec rimraf dist && pnpm exec tsup src/index.ts src/cli.ts --format esm,cjs --dts",
+    "start": "node --import tsx src/cli.ts",
+    "test": "pnpm -w exec vitest run packages/mcp/src/catalog.test.ts packages/mcp/src/server.test.ts",
+    "typecheck": "pnpm exec tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.17.4",
+    "yaml": "^2.8.1"
+  }
+}

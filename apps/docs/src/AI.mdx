@@ -1,0 +1,59 @@
+import { Meta, Title } from '@storybook/addon-docs/blocks';
+
+<Meta title="Foundation/AI Integrations" />
+
+<Title>AI Integrations</Title>
+
+TreeUI ships a dedicated machine-oriented layer so coding agents can choose the right component,
+wire it correctly, and stay aligned with the public API surface.
+
+## What exists in the repo
+
+- `docs/ai/` contains compact YAML contracts for component APIs, setup rules, selection guidance, and recipes.
+- `docs/ai/treeui.catalog.json` is the generated normalized catalog.
+- `packages/mcp` contains the local `@treeui/mcp` server package.
+- `AGENTS.md`, `CLAUDE.md`, and `.github/copilot-instructions.md` guide repository-aware agents.
+- `.mcp.json` points Claude Code at the local TreeUI MCP server in this repository.
+
+## Why the MCP exists
+
+The MCP is designed for coding agents working in other projects that consume TreeUI.
+It helps with two recurring problems:
+
+1. choosing the right TreeUI component
+2. configuring the component correctly in a Vue 3 app
+
+## Catalog sources
+
+The generated catalog is built from these canonical sources:
+
+- `docs/ai/CONTRACTS.yaml`
+- `docs/ai/SELECTION.yaml`
+- `docs/ai/SETUP.yaml`
+- `docs/ai/RECIPES.yaml`
+- `docs/ai/COMPONENTS/*.yaml`
+
+If TreeUI public behavior changes, update those files in the same change.
+
+## Local commands
+
+```bash
+pnpm ai:catalog
+pnpm mcp:start
+```
+
+## MCP capabilities
+
+The TreeUI MCP exposes:
+
+- component search
+- component recommendation for a task
+- setup guidance lookup
+- recipe search
+- JSON resources for the full catalog, setup rules, recipes, and per-component metadata
+
+## Agent-specific notes
+
+- Claude Code can use `.mcp.json` in this repository for a project-scoped local server.
+- GitHub Copilot benefits from `.github/copilot-instructions.md` and can also use MCP tools when the client supports them.
+- Codex and similar agents can rely on `AGENTS.md`, the generated catalog, and the published MCP package.

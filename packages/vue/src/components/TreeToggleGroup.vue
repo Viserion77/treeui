@@ -13,11 +13,11 @@ export interface TreeToggleGroupOption {
   disabled?: boolean;
 }
 
-const treeToggleGroupSelectionModes = ['single', 'multiple'] as const;
-const treeToggleGroupVariants = ['outline', 'soft', 'solid'] as const;
+const _treeToggleGroupSelectionModes = ['single', 'multiple'] as const;
+const _treeToggleGroupVariants = ['outline', 'soft', 'solid'] as const;
 
-export type TreeToggleGroupSelectionMode = (typeof treeToggleGroupSelectionModes)[number];
-export type TreeToggleGroupVariant = (typeof treeToggleGroupVariants)[number];
+export type TreeToggleGroupSelectionMode = (typeof _treeToggleGroupSelectionModes)[number];
+export type TreeToggleGroupVariant = (typeof _treeToggleGroupVariants)[number];
 
 const props = withDefaults(
   defineProps<{
@@ -223,6 +223,7 @@ watch(
   >
     <button
       v-for="(option, index) in options"
+      :id="`${baseId}-${option.value}`"
       :ref="(element) => setButtonRef(element, option.value)"
       :key="option.value"
       type="button"
@@ -236,7 +237,6 @@ watch(
       :aria-pressed="selectionMode === 'multiple' ? isSelected(option.value) : undefined"
       :tabindex="option.disabled || disabled ? -1 : getTabIndex(index)"
       :disabled="disabled || option.disabled"
-      :id="`${baseId}-${option.value}`"
       @click="selectValue(option.value)"
       @keydown="onOptionKeydown($event, index)"
       @focus="focusedIndex = index"

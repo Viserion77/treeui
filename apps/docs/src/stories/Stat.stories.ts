@@ -32,7 +32,7 @@ type Story = StoryObj<typeof meta>;
 export const Playground: Story = {
   render: (args: Record<string, unknown>) => ({
     components: { CheckIcon, TStat },
-    setup: () => ({ args }),
+    setup: () => ({ args, iconProps }),
     template: `
       <div style="width: 360px;">
         <TStat v-bind="args">
@@ -48,6 +48,7 @@ export const Playground: Story = {
 export const DashboardGrid: Story = {
   render: () => ({
     components: { CheckIcon, InfoIcon, TStat },
+    setup: () => ({ iconProps }),
     template: `
       <div style="display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));">
         <TStat label="Active users" value="18,420" trend="8.1%" tone="success" trend-direction="up">

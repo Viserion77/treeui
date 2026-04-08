@@ -5,11 +5,11 @@ defineOptions({
   inheritAttrs: false,
 });
 
-const treeStatTones = ['neutral', 'success', 'warning', 'danger', 'info'] as const;
-const treeStatTrendDirections = ['up', 'down', 'neutral'] as const;
+const _treeStatTones = ['neutral', 'success', 'warning', 'danger', 'info'] as const;
+const _treeStatTrendDirections = ['up', 'down', 'neutral'] as const;
 
-export type TreeStatTone = (typeof treeStatTones)[number];
-export type TreeStatTrendDirection = (typeof treeStatTrendDirections)[number];
+export type TreeStatTone = (typeof _treeStatTones)[number];
+export type TreeStatTrendDirection = (typeof _treeStatTrendDirections)[number];
 
 const props = withDefaults(
   defineProps<{

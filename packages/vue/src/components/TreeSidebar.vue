@@ -9,9 +9,9 @@ defineOptions({
   inheritAttrs: false,
 });
 
-const treeSidebarSides = ['left', 'right'] as const;
+const _treeSidebarSides = ['left', 'right'] as const;
 
-export type TreeSidebarSide = (typeof treeSidebarSides)[number];
+export type TreeSidebarSide = (typeof _treeSidebarSides)[number];
 
 const ChevronLeftIcon = getTreeIcon('chevron-left');
 const ChevronRightIcon = getTreeIcon('chevron-right');

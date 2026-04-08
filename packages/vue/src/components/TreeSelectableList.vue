@@ -211,6 +211,7 @@ watch(
     <template v-if="items.length > 0">
       <button
         v-for="(item, index) in items"
+        :id="`${baseId}-${item.value}`"
         :ref="(element) => setItemRef(element, item.value)"
         :key="item.value"
         type="button"
@@ -220,7 +221,6 @@ watch(
           'is-disabled': disabled || item.disabled,
         }"
         role="option"
-        :id="`${baseId}-${item.value}`"
         :aria-selected="isSelected(item.value)"
         :tabindex="disabled || item.disabled ? -1 : getTabIndex(index)"
         :disabled="disabled || item.disabled"
@@ -234,7 +234,10 @@ watch(
           :selected="isSelected(item.value)"
           :focused="focusedIndex === index"
         >
-          <span class="tree-selectable-list__indicator" aria-hidden="true" />
+          <span
+            class="tree-selectable-list__indicator"
+            aria-hidden="true"
+          />
 
           <span class="tree-selectable-list__copy">
             <span class="tree-selectable-list__label">{{ item.label }}</span>

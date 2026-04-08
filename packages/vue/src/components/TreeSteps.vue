@@ -16,11 +16,11 @@ export interface TreeStepItem {
   disabled?: boolean;
 }
 
-const treeStepStatuses = ['complete', 'current', 'upcoming', 'error'] as const;
-const treeStepOrientations = ['horizontal', 'vertical'] as const;
+const _treeStepStatuses = ['complete', 'current', 'upcoming', 'error'] as const;
+const _treeStepOrientations = ['horizontal', 'vertical'] as const;
 
-export type TreeStepStatus = (typeof treeStepStatuses)[number];
-export type TreeStepOrientation = (typeof treeStepOrientations)[number];
+export type TreeStepStatus = (typeof _treeStepStatuses)[number];
+export type TreeStepOrientation = (typeof _treeStepOrientations)[number];
 
 const CheckIcon = getTreeIcon('check');
 

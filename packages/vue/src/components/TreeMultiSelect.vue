@@ -452,6 +452,7 @@ onBeforeUnmount(() => {
             :key="option.value"
           >
             <button
+              :id="`${listboxId}-option-${option.value}`"
               type="button"
               class="tree-multi-select__option"
               :class="{
@@ -460,7 +461,6 @@ onBeforeUnmount(() => {
                 'is-disabled': option.disabled,
               }"
               role="option"
-              :id="`${listboxId}-option-${option.value}`"
               :aria-selected="isSelected(option.value)"
               :aria-disabled="option.disabled || undefined"
               :disabled="option.disabled"

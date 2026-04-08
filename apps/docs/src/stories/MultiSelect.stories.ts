@@ -41,7 +41,7 @@ export const Playground: Story = {
     components: { SearchIcon, TMultiSelect },
     setup: () => {
       const value = ref(args.modelValue as string[]);
-      return { args, value };
+      return { args, value, iconProps };
     },
     template: `
       <div style="width: 360px; display: grid; gap: 0.75rem;">

@@ -5,9 +5,9 @@ defineOptions({
   inheritAttrs: false,
 });
 
-const treeStackDirections = ['vertical', 'horizontal'] as const;
+const _treeStackDirections = ['vertical', 'horizontal'] as const;
 
-export type TreeStackDirection = (typeof treeStackDirections)[number];
+export type TreeStackDirection = (typeof _treeStackDirections)[number];
 
 const props = withDefaults(
   defineProps<{

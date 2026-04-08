@@ -37,7 +37,7 @@ import '@treeui/vue/style.css'
 
 ### Layout
 
-`TAccordion` · `TAccordionItem` · `TCard` · `TDivider` · `TTable` · `TTabs` · `TTabList` · `TTab` · `TTabPanel` · `TBreadcrumb` · `TBreadcrumbItem` · `TSelectableList` · `TTreeView` · `TSteps` / `TStepper` · `TPricing` · `TPricingCard`
+`TContainer` · `TGrid` · `TStack` · `TSidebar` · `TNavMenu` · `TNavbar` / `TAppBar` · `TAccordion` · `TAccordionItem` · `TCard` · `TDivider` · `TTable` · `TTabs` · `TTabList` · `TTab` · `TTabPanel` · `TBreadcrumb` · `TBreadcrumbItem` · `TSelectableList` · `TTreeView` · `TSteps` / `TStepper` · `TPricing` · `TPricingCard`
 
 ### Display
 

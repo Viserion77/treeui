@@ -5,9 +5,9 @@ defineOptions({
   inheritAttrs: false,
 });
 
-const treeContainerSizes = ['sm', 'md', 'lg', 'xl', 'full'] as const;
+const _treeContainerSizes = ['sm', 'md', 'lg', 'xl', 'full'] as const;
 
-export type TreeContainerSize = (typeof treeContainerSizes)[number];
+export type TreeContainerSize = (typeof _treeContainerSizes)[number];
 
 const props = withDefaults(
   defineProps<{

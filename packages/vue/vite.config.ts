@@ -19,6 +19,7 @@ export default defineConfig({
     lib: {
       entry: resolveFromPackage('./src/index.ts'),
       name: 'TreeUIVue',
+      cssFileName: 'style',
       fileName: (format) => format === 'cjs' ? 'index.cjs' : 'index.js',
       formats: ['es', 'cjs'],
     },

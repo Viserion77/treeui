@@ -9,6 +9,12 @@ const items = [
   { label: 'Settings', value: 'settings', description: 'Workspace preferences', disabled: true, shortLabel: 'S' },
 ];
 
+const routeItems = [
+  { label: 'Dashboard', value: 'dashboard', to: '/dashboard', shortLabel: 'D' },
+  { label: 'Members', value: 'members', to: '/members', badge: '24', shortLabel: 'M' },
+  { label: 'Settings', value: 'settings', to: '/settings', shortLabel: 'S' },
+];
+
 const meta = {
   title: 'Components/Layout/NavMenu',
   component: TNavMenu,
@@ -100,6 +106,32 @@ export const CustomItems: Story = {
             </span>
           </template>
         </TNavMenu>
+      </div>
+    `,
+  }),
+};
+
+export const WithRoutes: Story = {
+  render: () => ({
+    components: { TNavMenu },
+    setup: () => ({
+      value: ref('dashboard'),
+      routeItems,
+    }),
+    template: `
+      <div style="width: 320px; display: grid; gap: 0.75rem;">
+        <p style="font-size: var(--tree-font-size-sm); color: var(--tree-color-text-muted); margin: 0;">
+          Items with <code>to</code> render as RouterLink when vue-router is available, otherwise as native links.
+        </p>
+        <TNavMenu
+          aria-label="Route nav"
+          :items="routeItems"
+          :model-value="value"
+          @update:model-value="value = $event"
+        />
+        <div style="font-size: var(--tree-font-size-sm); color: var(--tree-color-text-muted);">
+          Selected: {{ value }}
+        </div>
       </div>
     `,
   }),

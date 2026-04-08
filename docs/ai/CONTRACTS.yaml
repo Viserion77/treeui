@@ -41,6 +41,7 @@ primary_exports:
   - TTable
   - TTag
   - TTimeline
+  - TLink
 
 compatibility_aliases:
   TAlert: TreeAlert
@@ -78,6 +79,7 @@ compatibility_aliases:
   TTable: TreeTable
   TTag: TreeTag
   TTimeline: TreeTimeline
+  TLink: TreeLink
 
 shared_sizes:
   values: [sm, md, lg]
@@ -103,7 +105,7 @@ shared_sizes:
 
 shared_variants:
   action_values: [solid, outline, ghost, soft, danger]
-  card_values: [outline, soft, solid]
+  card_values: [outline, soft, solid, inset]
 
 shared_props:
   variant:

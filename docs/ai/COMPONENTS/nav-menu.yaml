@@ -4,7 +4,7 @@ source_file: packages/vue/src/components/TreeNavMenu.vue
 package: "@treeui/vue"
 kind: navigation
 status: available
-purpose: "App-section navigation menu with roving focus, optional badges, and sidebar-aware collapsed mode."
+purpose: "Vertical navigation menu with selection state, keyboard navigation, optional RouterLink rendering, and sidebar integration."
 
 props:
   modelValue:
@@ -16,7 +16,7 @@ props:
   items:
     type: "TreeNavMenuItem[]"
     default: "[]"
-    note: "Array of `{ label, value, shortLabel?, description?, badge?, disabled? }`."
+    note: "Array of `{ label, value, shortLabel?, description?, icon?, to?, badge?, disabled? }`."
   size:
     type: TreeSize
     default: md
@@ -27,6 +27,18 @@ props:
   disabled:
     type: boolean
     default: false
+
+item_interface:
+  name: TreeNavMenuItem
+  fields:
+    label: { type: string, required: true }
+    value: { type: string, required: true }
+    shortLabel: { type: string, required: false }
+    description: { type: string, required: false }
+    icon: { type: Component, required: false, description: "Vue component rendered as icon. Replaces the marker when provided." }
+    to: { type: "string | Record<string, unknown>", required: false, description: "Route target. When provided and vue-router is available, renders RouterLink instead of button." }
+    badge: { type: "string | number", required: false }
+    disabled: { type: boolean, required: false }
 
 events:
   - update:modelValue
@@ -42,11 +54,18 @@ a11y:
   home_end_navigation: true
   arrow_navigation: true
   activation_keys_select_item: true
+  aria_current: "page on selected item"
+  aria_disabled: "on link items when disabled"
 
 behavior:
   can_be_controlled_or_uncontrolled: true
   can_inherit_collapsed_state_from_sidebar: true
   supports_rich_item_rendering_via_slot: true
+
+routing:
+  description: "When an item has a `to` prop and vue-router is installed, TNavMenu renders a RouterLink. Otherwise it renders a button."
+  peer_dependency: "vue-router (optional)"
+  fallback: "button element"
 
 example: |
   <TNavMenu

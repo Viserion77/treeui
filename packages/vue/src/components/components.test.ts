@@ -45,6 +45,8 @@ import TreeTimeline from './TreeTimeline.vue';
 import TreePricingCard from './TreePricingCard.vue';
 import TreePricing from './TreePricing.vue';
 import TreeMarkdownEditor from './TreeMarkdownEditor.vue';
+import TreeLink from './TreeLink.vue';
+import TreeNavMenu from './TreeNavMenu.vue';
 import { useToast } from '../composables/useToast';
 
 describe('@treeui/vue', () => {
@@ -305,6 +307,130 @@ describe('@treeui/vue', () => {
 
     expect(wrapper.find('.tree-card__header').exists()).toBe(true);
     expect(wrapper.find('.tree-card__footer').exists()).toBe(true);
+  });
+
+  it('renders card with title prop and actions slot', () => {
+    const wrapper = mount(TreeCard, {
+      props: { title: 'Pool Semanal' },
+      slots: {
+        actions: '<button>Fechar</button>',
+        default: '<p>Content here</p>',
+      },
+    });
+
+    expect(wrapper.find('.tree-card__title').text()).toBe('Pool Semanal');
+    expect(wrapper.find('.tree-card__actions').exists()).toBe(true);
+    expect(wrapper.find('.tree-card__header').exists()).toBe(true);
+  });
+
+  it('renders card inset variant', () => {
+    const wrapper = mount(TreeCard, {
+      props: { variant: 'inset' },
+      slots: { default: '<p>Sub-section</p>' },
+    });
+
+    expect(wrapper.classes()).toContain('tree-card--inset');
+  });
+
+  it('renders card header slot as override when both title and header are provided', () => {
+    const wrapper = mount(TreeCard, {
+      props: { title: 'Ignored' },
+      slots: {
+        header: '<strong>Custom Header</strong>',
+        default: '<p>Content</p>',
+      },
+    });
+
+    expect(wrapper.find('.tree-card__header').exists()).toBe(true);
+    expect(wrapper.find('.tree-card__title').exists()).toBe(false);
+    expect(wrapper.find('strong').text()).toBe('Custom Header');
+  });
+
+  it('renders link with default variant and href', () => {
+    const wrapper = mount(TreeLink, {
+      props: { href: '/docs' },
+      slots: { default: 'Documentation' },
+    });
+
+    expect(wrapper.element.tagName).toBe('A');
+    expect(wrapper.attributes('href')).toBe('/docs');
+    expect(wrapper.classes()).toContain('tree-link');
+    expect(wrapper.classes()).toContain('tree-link--default');
+    expect(wrapper.text()).toBe('Documentation');
+  });
+
+  it('renders link as span when disabled', () => {
+    const wrapper = mount(TreeLink, {
+      props: { href: '/docs', disabled: true },
+      slots: { default: 'Disabled link' },
+    });
+
+    expect(wrapper.element.tagName).toBe('SPAN');
+    expect(wrapper.classes()).toContain('is-disabled');
+    expect(wrapper.attributes('aria-disabled')).toBe('true');
+    expect(wrapper.attributes('tabindex')).toBe('-1');
+  });
+
+  it('renders external link with target and rel', () => {
+    const wrapper = mount(TreeLink, {
+      props: { href: 'https://example.com', external: true },
+      slots: { default: 'External' },
+    });
+
+    expect(wrapper.attributes('target')).toBe('_blank');
+    expect(wrapper.attributes('rel')).toBe('noopener noreferrer');
+  });
+
+  it('renders link variant classes', () => {
+    const muted = mount(TreeLink, {
+      props: { href: '#', variant: 'muted' as const },
+      slots: { default: 'Muted' },
+    });
+    expect(muted.classes()).toContain('tree-link--muted');
+
+    const danger = mount(TreeLink, {
+      props: { href: '#', variant: 'danger' as const },
+      slots: { default: 'Danger' },
+    });
+    expect(danger.classes()).toContain('tree-link--danger');
+  });
+
+  it('renders nav menu items and emits selection', async () => {
+    const wrapper = mount(TreeNavMenu, {
+      props: {
+        items: [
+          { label: 'Home', value: 'home' },
+          { label: 'Settings', value: 'settings' },
+        ],
+        modelValue: 'home',
+      },
+      attrs: { 'aria-label': 'Main nav' },
+    });
+
+    expect(wrapper.find('nav').exists()).toBe(true);
+    expect(wrapper.findAll('.tree-nav-menu__item')).toHaveLength(2);
+
+    const firstItem = wrapper.find('.tree-nav-menu__item.is-selected');
+    expect(firstItem.exists()).toBe(true);
+    expect(firstItem.attributes('aria-current')).toBe('page');
+
+    await wrapper.findAll('.tree-nav-menu__item')[1].trigger('click');
+    expect(wrapper.emitted('update:modelValue')?.[0]).toEqual(['settings']);
+  });
+
+  it('renders nav menu item with icon when provided', () => {
+    const IconStub = { template: '<svg />' };
+    const wrapper = mount(TreeNavMenu, {
+      props: {
+        items: [
+          { label: 'Dashboard', value: 'dash', icon: IconStub },
+        ],
+      },
+      attrs: { 'aria-label': 'Nav' },
+    });
+
+    expect(wrapper.find('.tree-nav-menu__icon').exists()).toBe(true);
+    expect(wrapper.find('.tree-nav-menu__marker').exists()).toBe(false);
   });
 
   it('renders badge variants', () => {

@@ -27,6 +27,8 @@ export type {
 } from './TreeFileUpload.vue';
 export { default as TNavbar } from './TreeNavbar.vue';
 export { default as TAppBar } from './TreeNavbar.vue';
+export { default as TLink } from './TreeLink.vue';
+export type { TreeLinkVariant } from './TreeLink.vue';
 export { default as TNavMenu } from './TreeNavMenu.vue';
 export type { TreeNavMenuItem } from './TreeNavMenu.vue';
 export { default as TRadio } from './TreeRadio.vue';
@@ -103,6 +105,7 @@ export { default as TreeGrid } from './TreeGrid.vue';
 export { default as TreeMultiSelect } from './TreeMultiSelect.vue';
 export { default as TreeNavbar } from './TreeNavbar.vue';
 export { default as TreeAppBar } from './TreeNavbar.vue';
+export { default as TreeLink } from './TreeLink.vue';
 export { default as TreeNavMenu } from './TreeNavMenu.vue';
 export { default as TreeRadio } from './TreeRadio.vue';
 export { default as TreeRadioGroup } from './TreeRadioGroup.vue';

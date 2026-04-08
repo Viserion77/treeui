@@ -74,3 +74,25 @@ export const CardPlaceholder: Story = {
     `,
   }),
 };
+
+export const TablePlaceholder: Story = {
+  render: () => ({
+    components: { TSkeleton },
+    template: `
+      <div style="display: flex; flex-direction: column; gap: 0; max-width: 36rem; border: 1px solid #e5e5e5; border-radius: 0.5rem; overflow: hidden;">
+        <div style="display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 1rem; padding: 0.75rem 1rem; background: #fafafa;">
+          <TSkeleton width="60%" height="0.75em" />
+          <TSkeleton width="50%" height="0.75em" />
+          <TSkeleton width="50%" height="0.75em" />
+          <TSkeleton width="40%" height="0.75em" />
+        </div>
+        <div v-for="row in 5" :key="row" style="display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 1rem; padding: 0.75rem 1rem; border-top: 1px solid #e5e5e5;">
+          <TSkeleton width="80%" height="1em" />
+          <TSkeleton width="60%" height="1em" />
+          <TSkeleton width="50%" height="1em" />
+          <TSkeleton width="40%" height="1em" />
+        </div>
+      </div>
+    `,
+  }),
+};

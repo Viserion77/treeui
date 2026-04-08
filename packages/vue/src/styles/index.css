@@ -972,9 +972,36 @@
   border-color: transparent;
 }
 
+.tree-card--inset {
+  background: var(--tree-color-bg-subtle);
+  border-color: var(--tree-color-border-default);
+  box-shadow: none;
+}
+
 .tree-card__header,
 .tree-card__footer {
   color: var(--tree-color-text-muted);
+}
+
+.tree-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--tree-space-3);
+}
+
+.tree-card__title {
+  font-size: var(--tree-font-size-lg);
+  font-weight: var(--tree-font-weight-semibold);
+  line-height: var(--tree-font-lineHeight-heading);
+  color: var(--tree-color-text-primary);
+}
+
+.tree-card__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--tree-space-2);
+  flex-shrink: 0;
 }
 
 .tree-card__body {
@@ -5514,6 +5541,17 @@
   transform: none;
 }
 
+.tree-nav-menu__icon {
+  width: var(--tree-icon-size-md);
+  height: var(--tree-icon-size-md);
+  flex-shrink: 0;
+  color: var(--tree-color-text-muted);
+}
+
+.tree-nav-menu__item.is-selected .tree-nav-menu__icon {
+  color: var(--tree-color-brand-primary);
+}
+
 .tree-nav-menu__marker {
   display: inline-flex;
   align-items: center;
@@ -5579,4 +5617,75 @@
 .tree-nav-menu__empty {
   padding: var(--tree-space-3);
   text-align: center;
+}
+
+a.tree-nav-menu__item {
+  text-decoration: none;
+  color: inherit;
+}
+
+a.tree-nav-menu__item.is-disabled {
+  pointer-events: none;
+}
+
+/* ─── Link ─── */
+
+.tree-link {
+  font-family: inherit;
+  font-weight: var(--tree-font-weight-medium);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2px;
+  cursor: pointer;
+  transition:
+    color var(--tree-motion-duration-fast) var(--tree-motion-easing-standard),
+    text-decoration-color var(--tree-motion-duration-fast) var(--tree-motion-easing-standard);
+}
+
+.tree-link:focus-visible {
+  outline: none;
+  border-radius: var(--tree-radius-sm);
+  box-shadow: 0 0 0 2px var(--tree-color-focus-ring);
+}
+
+.tree-link--default {
+  color: var(--tree-color-brand-primary);
+}
+
+.tree-link--default:hover {
+  color: var(--tree-color-brand-hover);
+}
+
+.tree-link--muted {
+  color: var(--tree-color-text-muted);
+}
+
+.tree-link--muted:hover {
+  color: var(--tree-color-text-primary);
+}
+
+.tree-link--danger {
+  color: var(--tree-color-status-error);
+}
+
+.tree-link--danger:hover {
+  opacity: 0.85;
+}
+
+.tree-link.is-disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  text-decoration: none;
+}
+
+/* ─── Eyebrow utility ─── */
+
+.tree-eyebrow {
+  font-family: var(--tree-font-family-sans);
+  font-size: var(--tree-font-size-xs);
+  font-weight: var(--tree-font-weight-medium);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  line-height: var(--tree-font-lineHeight-ui);
+  color: var(--tree-color-text-muted);
 }

@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-04-08T23:01:23.477Z",
+  "generatedAt": "2026-04-08T23:46:08.472Z",
   "packageName": "@treeui/vue",
   "packageVersion": "0.5.0",
   "decisionGuides": [
@@ -987,7 +987,8 @@
           "values": [
             "outline",
             "soft",
-            "solid"
+            "solid",
+            "inset"
           ]
         },
         {
@@ -999,12 +1000,21 @@
             "md",
             "lg"
           ]
+        },
+        {
+          "name": "title",
+          "type": "string",
+          "default": "undefined",
+          "description": "Optional card heading rendered inside the header area."
         }
       ],
       "events": [],
       "slots": [
         {
           "name": "header"
+        },
+        {
+          "name": "actions"
         },
         {
           "name": "default"
@@ -2913,6 +2923,81 @@
       ]
     },
     {
+      "name": "TLink",
+      "legacyAlias": "TreeLink",
+      "aliases": [
+        "TreeLink"
+      ],
+      "package": "@treeui/vue",
+      "kind": "navigation",
+      "category": "Navigation",
+      "status": "available",
+      "purpose": "Inline link with consistent styling, optional RouterLink rendering, and external link support.",
+      "sourceFile": "packages/vue/src/components/TreeLink.vue",
+      "storyFile": "apps/docs/src/stories/Link.stories.ts",
+      "storyTitle": "Components/Navigation/Link",
+      "manifestFile": "docs/ai/COMPONENTS/link.yaml",
+      "props": [
+        {
+          "name": "to",
+          "type": "string | Record<string, unknown>",
+          "default": "undefined",
+          "description": "Route target. When provided and vue-router is available, renders RouterLink."
+        },
+        {
+          "name": "href",
+          "type": "string",
+          "default": "undefined",
+          "description": "Native href for anchor elements. Ignored when `to` is provided with vue-router."
+        },
+        {
+          "name": "external",
+          "type": "boolean",
+          "default": "false",
+          "description": "Opens link in new tab with rel='noopener noreferrer'."
+        },
+        {
+          "name": "disabled",
+          "type": "boolean",
+          "default": "false"
+        },
+        {
+          "name": "variant",
+          "type": "TreeLinkVariant",
+          "default": "default",
+          "values": [
+            "default",
+            "muted",
+            "danger"
+          ]
+        }
+      ],
+      "events": [],
+      "slots": [
+        {
+          "name": "default"
+        }
+      ],
+      "a11y": [
+        "semantic_element: a (or RouterLink, or span when disabled)",
+        "aria_disabled: set when disabled",
+        "tabindex: -1 when disabled",
+        "focus_visible: true"
+      ],
+      "behavior": [],
+      "selection": {
+        "keywords": [],
+        "useWhen": [],
+        "avoidWhen": [],
+        "alternatives": []
+      },
+      "setup": {
+        "required": [],
+        "notes": []
+      },
+      "recipes": []
+    },
+    {
       "name": "TMarkdownEditor",
       "legacyAlias": "TreeMarkdownEditor",
       "aliases": [
@@ -3439,7 +3524,7 @@
       "kind": "navigation",
       "category": "Layout",
       "status": "available",
-      "purpose": "App-section navigation menu with roving focus, optional badges, and sidebar-aware collapsed mode.",
+      "purpose": "Vertical navigation menu with selection state, keyboard navigation, optional RouterLink rendering, and sidebar integration.",
       "sourceFile": "packages/vue/src/components/TreeNavMenu.vue",
       "storyFile": "apps/docs/src/stories/NavMenu.stories.ts",
       "storyTitle": "Components/Layout/NavMenu",
@@ -3459,7 +3544,7 @@
           "name": "items",
           "type": "TreeNavMenuItem[]",
           "default": "[]",
-          "note": "Array of `{ label, value, shortLabel?, description?, badge?, disabled? }`."
+          "note": "Array of `{ label, value, shortLabel?, description?, icon?, to?, badge?, disabled? }`."
         },
         {
           "name": "size",
@@ -3503,7 +3588,9 @@
         "roving_focus: true",
         "home_end_navigation: true",
         "arrow_navigation: true",
-        "activation_keys_select_item: true"
+        "activation_keys_select_item: true",
+        "aria_current: page on selected item",
+        "aria_disabled: on link items when disabled"
       ],
       "behavior": [
         "can_be_controlled_or_uncontrolled: true",

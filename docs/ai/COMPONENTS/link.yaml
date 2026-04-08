@@ -1,0 +1,44 @@
+name: TLink
+legacy_alias: TreeLink
+source_file: packages/vue/src/components/TreeLink.vue
+package: "@treeui/vue"
+kind: navigation
+status: available
+purpose: "Inline link with consistent styling, optional RouterLink rendering, and external link support."
+
+props:
+  to:
+    type: "string | Record<string, unknown>"
+    default: undefined
+    description: "Route target. When provided and vue-router is available, renders RouterLink."
+  href:
+    type: string
+    default: undefined
+    description: "Native href for anchor elements. Ignored when `to` is provided with vue-router."
+  external:
+    type: boolean
+    default: false
+    description: "Opens link in new tab with rel='noopener noreferrer'."
+  disabled:
+    type: boolean
+    default: false
+  variant:
+    type: TreeLinkVariant
+    default: default
+    values: [default, muted, danger]
+
+events: []
+
+slots:
+  - default
+
+a11y:
+  semantic_element: "a (or RouterLink, or span when disabled)"
+  aria_disabled: "set when disabled"
+  tabindex: "-1 when disabled"
+  focus_visible: true
+
+routing:
+  description: "When `to` is provided and vue-router is installed, renders RouterLink. When only `href` is provided, renders native anchor. When disabled, renders span."
+  peer_dependency: "vue-router (optional)"
+  fallback: "native anchor element"

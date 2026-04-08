@@ -86,12 +86,14 @@ their own public API. The recipes now live in docs as guidance rather than new p
 |---|---|---|
 | Stat group (`TreeStatGroup`) | Document as `TStat` + `TGrid`; no standalone `TStatGroup` planned | Delivered as docs recipe |
 | Section header (`TreeSectionHeader`) | Document as heading + `TStack` + optional `TBadge` or `TButton`; no dedicated export planned | Delivered as docs recipe |
-| Subpanel (`TreePanel`) | Prefer `TCard` composition, especially `variant="soft"`; revisit only if a distinct semantic API emerges | Delivered as docs recipe |
+| Subpanel (`TreePanel`) | Prefer `TCard` composition, especially `variant="soft"`; see also planned `TCard variant="inset"` for nested sub-sections | Delivered as docs recipe |
 | Stacked card (`TreeStackCard`) | Use `TCard` slots plus `TTag`, `TBadge`, and actions; revisit later only if a stable slot contract repeats across products | Delivered as docs recipe |
-| Eyebrow text (`TreeEyebrow`) | Keep as a typography recipe for now; revisit when TreeUI has a broader text primitive strategy | Delivered as docs recipe |
+| Eyebrow text (`TreeEyebrow`) | Keep as a typography recipe for now; `.tree-eyebrow` utility class planned using existing tokens | Delivered as docs recipe |
 | Form stack (`TreeFormStack`) | Covered by `TStack`, `TGrid`, and `TFormField`; no extra layout wrapper planned | Delivered as docs recipe |
 | Ranking (`TreeRanking`) | Defer as a narrower data-display recipe until the dashboard/data pack grows | Delivered as docs recipe |
 | Action panel (`TreeActionPanel`) | Keep app-level for now; usually composes from `TAlert`, `TCard`, and `TButton` | Delivered as docs recipe |
+| Skeleton compositions (`SkeletonCard`, `SkeletonTable`) | Compose multiple `TSkeleton` primitives for card and table placeholders; no compound `variant` prop planned | Delivered as docs recipe |
+| Form stack (`TStack as="form"`) | Already works via `TStack` with `as="form"` and native `@submit`; document as supported pattern | Planned as docs recipe |
 
 ---
 
@@ -101,6 +103,32 @@ The recent component suggestions now map to two resolved buckets:
 
 - Promote portable primitives: `TStat` and `TSelectableList` shipped
 - Keep higher-level page assemblies as documented recipes in `Foundation/Patterns` and `Patterns/Recipes`
+
+---
+
+## Milestone 3 — Routing, Cards & Inline Links
+
+Status: shipped.
+
+Address the most common friction points reported by consumer apps: native routing in navigation,
+richer card semantics, and a missing inline link primitive.
+
+| Component / Enhancement | Description |
+|---|---|
+| `TNavMenu` RouterLink support | Extend `TreeNavMenuItem` with optional `to` and `icon` props; render `<RouterLink>` when `to` is present, `<button>` otherwise; `vue-router` as optional peer dependency; create missing `nav-menu.yaml` contract |
+| `TCard` `title` prop + `#actions` slot | Add optional `title` prop that renders a heading inside the header area and an `#actions` slot displayed inline with the title; `#header` slot remains available as a full override; retrocompatible |
+| `TCard` `variant="inset"` | New card variant for nested sub-sections inside other cards: subtle background, no shadow, light border; update `TreeCardVariant` in `contracts.ts` and `card.yaml` |
+| `TLink` | New inline link component with `to` (RouterLink), `href` (native anchor), `external` (opens in new tab), and `disabled` props; applies consistent link styling using primary color tokens |
+
+---
+
+## Docs & discovery improvements
+
+These items require no new components — only better documentation of existing capabilities.
+
+- **`TTimeline` `#item` slot**: improve scoped slot documentation — already supports full per-item customization via `{ item, index }`, covering badges, tags, and custom content per entry
+- **`TContainer` `size="md"`**: clarify in docs that `size="md"` (max-width ~960px) already ships — no code change needed
+- **`TStack` `as="form"`**: document that `as="form"` is a supported pattern for form layouts with native event forwarding via `@submit.prevent`
 
 ---
 

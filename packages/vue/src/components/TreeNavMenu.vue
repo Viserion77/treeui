@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { getNextEnabledIndex, isActivationKey } from '@treeui/utils';
-import { computed, inject, nextTick, ref, useAttrs, watch, type ComponentPublicInstance } from 'vue';
+import { computed, inject, nextTick, ref, resolveComponent, useAttrs, watch, type Component, type ComponentPublicInstance } from 'vue';
 import type { TreeSize } from '../types/contracts';
 import { treeSidebarInjectionKey } from './sidebar';
 
@@ -13,6 +13,8 @@ export interface TreeNavMenuItem {
   value: string;
   shortLabel?: string;
   description?: string;
+  icon?: Component;
+  to?: string | Record<string, unknown>;
   badge?: string | number;
   disabled?: boolean;
 }
@@ -54,10 +56,26 @@ defineSlots<{
 const attrs = useAttrs();
 const sidebar = inject(treeSidebarInjectionKey, null);
 const internalValue = ref(props.defaultValue);
-const itemRefs = ref<Map<string, HTMLButtonElement>>(new Map());
+const itemRefs = ref<Map<string, HTMLElement>>(new Map());
 
 const selectedValue = computed(() => props.modelValue ?? internalValue.value);
 const resolvedCollapsed = computed(() => props.collapsed ?? sidebar?.collapsed.value ?? false);
+
+const hasRouterLink = computed(() => {
+  try {
+    const resolved = resolveComponent('RouterLink');
+    return typeof resolved !== 'string';
+  } catch {
+    return false;
+  }
+});
+
+const itemTag = (item: TreeNavMenuItem) => {
+  if (item.to && hasRouterLink.value) {
+    return resolveComponent('RouterLink') as Component;
+  }
+  return 'button';
+};
 
 const getInitialFocusedIndex = () => {
   const selectedIndex = props.items.findIndex((item) =>
@@ -94,9 +112,9 @@ const isSelected = (value: string) => selectedValue.value === value;
 
 const setItemRef = (element: Element | ComponentPublicInstance | null, value: string) => {
   const resolvedElement =
-    element instanceof HTMLButtonElement
+    element instanceof HTMLElement
       ? element
-      : element && '$el' in element && element.$el instanceof HTMLButtonElement
+      : element && '$el' in element && element.$el instanceof HTMLElement
         ? element.$el
         : null;
 
@@ -213,15 +231,18 @@ watch(
         :key="item.value"
         class="tree-nav-menu__entry"
       >
-        <button
-          :ref="(element) => setItemRef(element, item.value)"
-          type="button"
+        <component
+          :is="itemTag(item)"
+          :ref="(element: Element | ComponentPublicInstance | null) => setItemRef(element, item.value)"
+          :type="item.to ? undefined : 'button'"
+          :to="item.to || undefined"
           class="tree-nav-menu__item"
           :class="{
             'is-selected': isSelected(item.value),
             'is-disabled': disabled || item.disabled,
           }"
-          :disabled="disabled || item.disabled"
+          :disabled="(!item.to && (disabled || item.disabled)) || undefined"
+          :aria-disabled="(item.to && (disabled || item.disabled)) || undefined"
           :aria-current="isSelected(item.value) ? 'page' : undefined"
           :tabindex="disabled || item.disabled ? -1 : getTabIndex(index)"
           :title="resolvedCollapsed ? item.label : undefined"
@@ -236,7 +257,14 @@ watch(
             :focused="focusedIndex === index"
             :collapsed="resolvedCollapsed"
           >
+            <component
+              :is="item.icon"
+              v-if="item.icon"
+              class="tree-nav-menu__icon"
+              aria-hidden="true"
+            />
             <span
+              v-else
               class="tree-nav-menu__marker"
               aria-hidden="true"
             >
@@ -260,7 +288,7 @@ watch(
               {{ item.badge }}
             </span>
           </slot>
-        </button>
+        </component>
       </li>
     </ul>
 

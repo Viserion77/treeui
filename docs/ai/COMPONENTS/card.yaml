@@ -13,16 +13,21 @@ props:
   variant:
     type: TreeCardVariant
     default: outline
-    values: [outline, soft, solid]
+    values: [outline, soft, solid, inset]
   size:
     type: TreeSize
     default: md
     values: [sm, md, lg]
+  title:
+    type: string
+    default: undefined
+    description: "Optional card heading rendered inside the header area."
 
 events: []
 
 slots:
   - header
+  - actions
   - default
   - footer
 

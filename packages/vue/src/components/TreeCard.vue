@@ -7,11 +7,13 @@ const props = withDefaults(
     as?: string;
     variant?: TreeCardVariant;
     size?: TreeSize;
+    title?: string;
   }>(),
   {
     as: 'section',
     variant: 'outline',
     size: 'md',
+    title: undefined,
   },
 );
 
@@ -20,6 +22,8 @@ const classes = computed(() => [
   `tree-card--${props.variant}`,
   `tree-card--${props.size}`,
 ]);
+
+const hasHeader = computed(() => !!props.title);
 </script>
 
 <template>
@@ -28,10 +32,23 @@ const classes = computed(() => [
     :class="classes"
   >
     <header
-      v-if="$slots.header"
+      v-if="$slots.header || hasHeader || $slots.actions"
       class="tree-card__header"
     >
-      <slot name="header" />
+      <slot name="header">
+        <span
+          v-if="title"
+          class="tree-card__title"
+        >
+          {{ title }}
+        </span>
+        <span
+          v-if="$slots.actions"
+          class="tree-card__actions"
+        >
+          <slot name="actions" />
+        </span>
+      </slot>
     </header>
     <div class="tree-card__body">
       <slot />

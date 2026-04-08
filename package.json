@@ -8,8 +8,10 @@
     "clean": "pnpm -w exec rimraf coverage playwright-report test-results apps/docs/storybook-static \"packages/*/dist\"",
     "dev": "pnpm docs:dev",
     "docs:dev": "pnpm build:packages && pnpm --filter @treeui/docs docs:dev",
-    "docs:build": "pnpm build:packages && pnpm --filter @treeui/docs docs:build",
-    "docs:serve": "pnpm exec http-server apps/docs/storybook-static -p 6006 -a 0.0.0.0 -c-1",
+    "build:docs": "pnpm --filter @treeui/docs docs:build",
+    "docs:build": "pnpm build:packages && pnpm build:docs",
+    "docs:serve": "node scripts/serve-static.mjs apps/docs/storybook-static 6006 0.0.0.0",
+    "docs:serve:ci": "node scripts/serve-static.mjs apps/docs/storybook-static 6006 127.0.0.1",
     "build:packages": "pnpm --filter @treeui/tokens build && pnpm --filter @treeui/utils build && pnpm --filter @treeui/icons build && pnpm --filter @treeui/vue build",
     "build": "pnpm docs:build",
     "lint": "pnpm -w exec eslint . --max-warnings 0",
@@ -20,7 +22,7 @@
     "screenshots:only": "pnpm -w exec tsx scripts/screenshot-components.ts --skip-build",
     "changeset": "pnpm -w exec changeset",
     "version-packages": "pnpm -w exec changeset version",
-    "release": "pnpm build && pnpm -w exec changeset publish"
+    "release": "pnpm build:packages && pnpm -w exec changeset publish"
   },
   "devDependencies": {
     "@changesets/cli": "^2.29.2",

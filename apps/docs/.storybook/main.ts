@@ -7,6 +7,7 @@ const packageDistStylePath = fileURLToPath(
 
 const config: StorybookConfig = {
   stories: ['../src/**/*.mdx', '../src/**/*.stories.ts'],
+  staticDirs: ['../public'],
   addons: [
     {
       name: '@storybook/addon-docs',
@@ -23,9 +24,6 @@ const config: StorybookConfig = {
   framework: {
     name: '@storybook/vue3-vite',
     options: {},
-  },
-  docs: {
-    autodocs: 'tag',
   },
   viteFinal(config) {
     config.resolve ??= {};

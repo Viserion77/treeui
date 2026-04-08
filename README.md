@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="./apps/docs/public/treeui-logo.png" alt="TreeUI logo" width="160" />
+</p>
+
 # TreeUI
 
 Clean components for modern Vue products.
@@ -67,20 +71,20 @@ The project uses [Changesets](https://github.com/changesets/changesets) for auto
 ### Pipeline
 
 ```
-PR / push → CI (lint, typecheck, tests, build, e2e)
+Pull request → CI (lint, typecheck, tests, package build, Storybook build, e2e)
   ↓ merge to main
-Changesets Action creates "Version Packages" PR (auto-bump + CHANGELOG)
-  ↓ merge version PR
-Publish to npm + Deploy Storybook to GitHub Pages
+CI reuses the same artifacts
+  ↓
+Changesets Action creates "Version Packages" PR or publishes to npm
+  +
+Deploy Storybook to GitHub Pages
 ```
 
 ### Workflows
 
 | Workflow | Trigger | Purpose |
 |---|---|---|
-| **CI** | PR + push to `main` | Lint, typecheck, unit tests, build, e2e |
-| **Release** | Push to `main` | Creates version PR or publishes to npm (runs after CI passes) |
-| **Deploy Docs** | Push to `main` | Builds and deploys Storybook to GitHub Pages (runs after CI passes) |
+| **CI** | PR + push to `main` | Runs validation once, builds package and Storybook artifacts once, then reuses them for e2e, npm release, and GitHub Pages deploy |
 
 ### Creating a changeset
 

@@ -127,12 +127,12 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: storybook-static
-          path: .
+          path: storybook-static
 
       - name: Upload pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: apps/docs/storybook-static
+          path: storybook-static
 
   deploy-pages:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'

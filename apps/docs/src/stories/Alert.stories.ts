@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/vue3';
+import type { Meta, StoryObj } from '@storybook/vue3-vite';
 import { TAlert } from '@treeui/vue';
 import { InfoIcon, iconProps } from './icon-helpers';
 

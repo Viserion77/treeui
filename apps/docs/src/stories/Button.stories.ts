@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/vue3';
+import type { Meta, StoryObj } from '@storybook/vue3-vite';
 import { TButton } from '@treeui/vue';
 import { CheckIcon, iconProps } from './icon-helpers';
 

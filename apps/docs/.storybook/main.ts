@@ -1,11 +1,23 @@
-import { resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import type { StorybookConfig } from '@storybook/vue3-vite';
+
+const packageDistStylePath = fileURLToPath(
+  new URL('../../../packages/vue/dist/style.css', import.meta.url),
+);
 
 const config: StorybookConfig = {
   stories: ['../src/**/*.mdx', '../src/**/*.stories.ts'],
   addons: [
-    '@storybook/addon-essentials',
-    '@storybook/addon-docs',
+    {
+      name: '@storybook/addon-docs',
+      options: {
+        mdxPluginOptions: {
+          mdxCompileOptions: {
+            providerImportSource: '@storybook/addon-docs/mdx-react-shim',
+          },
+        },
+      },
+    },
     '@storybook/addon-a11y',
   ],
   framework: {
@@ -19,11 +31,10 @@ const config: StorybookConfig = {
     config.resolve ??= {};
     config.resolve.alias = {
       ...(config.resolve.alias as Record<string, string>),
-      '@treeui/vue/style.css': resolve(__dirname, '../../../packages/vue/dist/style.css'),
+      '@treeui/vue/style.css': packageDistStylePath,
     };
     return config;
   },
 };
 
 export default config;
-

@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/vue3';
+import type { Meta, StoryObj } from '@storybook/vue3-vite';
 import { TTimeline } from '@treeui/vue';
 import type { TreeTimelineItem } from '@treeui/vue';
 import { CheckIcon, InfoIcon, iconProps } from './icon-helpers';

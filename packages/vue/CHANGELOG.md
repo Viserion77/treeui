@@ -1,5 +1,17 @@
 # @treeui/vue
 
+## 0.4.0
+
+### Minor Changes
+
+- Ship the app-ready surface from Milestone 1 and Milestone 2, including the new application primitives
+  and layout helpers such as `TStat`, `TMultiSelect`, `TNumberInput`, `TSelectableList`, `TTreeView`,
+  `TSteps` / `TStepper`, `TToggleGroup`, `TContainer`, `TGrid`, `TStack`, `TSidebar`, `TNavMenu`,
+  and `TNavbar` / `TAppBar`.
+
+  Refresh the docs with shipped roadmap status, explicit alias and naming conventions, docs-first pattern recipes,
+  and updated release guidance.
+
 ## 0.3.0
 
 ### Minor Changes

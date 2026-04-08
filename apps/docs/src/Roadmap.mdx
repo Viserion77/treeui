@@ -21,13 +21,18 @@ A repeated app pattern graduates into a public component when it:
 
 ## Current state — Public surface (shipped)
 
+Milestone 1 and Milestone 2 now ship as part of the public TreeUI surface.
+The next round of work moves from closing core component gaps to documenting composition recipes,
+hardening conventions, and choosing the next future-facing milestone.
+
 | Area | Components |
 |---|---|
-| Form | `TInput`, `TTextarea`, `TCheckbox`, `TCombobox`, `TFileUpload`, `TRadio`, `TRadioGroup`, `TSelect`, `TDatePicker`, `TSwitch`, `TFormField`, `TMarkdownEditor` |
+| Form | `TInput`, `TTextarea`, `TCheckbox`, `TCombobox`, `TFileUpload`, `TRadio`, `TRadioGroup`, `TSelect`, `TMultiSelect`, `TNumberInput`, `TDatePicker`, `TSwitch`, `TFormField`, `TToggleGroup`, `TMarkdownEditor` |
+| Layout & shell | `TContainer`, `TGrid`, `TStack`, `TSidebar`, `TNavMenu`, `TNavbar`, `TAppBar` |
 | Feedback & status | `TAlert`, `TToast`, `TToastProvider`, `TProgress`, `TSkeleton`, `TSpinner` |
-| Navigation & disclosure | `TTabs`, `TAccordion`, `TAccordionItem`, `TDropdown`, `TPagination`, `TBreadcrumb`, `TBreadcrumbItem` |
+| Navigation & disclosure | `TTabs`, `TAccordion`, `TAccordionItem`, `TDropdown`, `TPagination`, `TBreadcrumb`, `TBreadcrumbItem`, `TSelectableList`, `TTreeView`, `TSteps`, `TStepper` |
 | Overlay & interaction | `TModal`, `TConfirmDialog`, `TDrawer`, `TPopover`, `TTooltip`, `TContextMenu` |
-| Data & display | `TAvatar`, `TBadge`, `TCard`, `TDivider`, `TEmptyState`, `TTable`, `TTag`, `TTimeline`, `TPricing`, `TPricingCard` |
+| Data & display | `TAvatar`, `TBadge`, `TCard`, `TDivider`, `TEmptyState`, `TTable`, `TTag`, `TTimeline`, `TPricing`, `TPricingCard`, `TStat` |
 
 ---
 
@@ -38,6 +43,8 @@ A repeated app pattern graduates into a public component when it:
 ---
 
 ## Milestone 1 — Application Primitives
+
+Status: shipped.
 
 Close the highest-friction gaps for SaaS products, dashboards, admin panels, and internal tools.
 
@@ -55,6 +62,8 @@ Close the highest-friction gaps for SaaS products, dashboards, admin panels, and
 
 ## Milestone 2 — App Shell & Layout
 
+Status: shipped.
+
 Add layout helpers and application shell building blocks without forcing a full page framework.
 
 | Component | Description |
@@ -71,39 +80,48 @@ Add layout helpers and application shell building blocks without forcing a full 
 
 Some repeated app UI should land as documented recipes instead of standalone exports.
 These patterns stay important, but TreeUI keeps them composable until they prove they need
-their own public API.
+their own public API. The recipes now live in docs as guidance rather than new package surface.
 
-| Suggested pattern | TreeUI direction |
-|---|---|
-| Stat group (`TreeStatGroup`) | Document as `TStat` + `TGrid`; no standalone `TStatGroup` planned |
-| Section header (`TreeSectionHeader`) | Document as heading + `TStack` + optional `TBadge` or `TButton`; no dedicated export planned |
-| Subpanel (`TreePanel`) | Prefer `TCard` composition, especially `variant="soft"`; revisit only if a distinct semantic API emerges |
-| Stacked card (`TreeStackCard`) | Use `TCard` slots plus `TTag`, `TBadge`, and actions; revisit later only if a stable slot contract repeats across products |
-| Eyebrow text (`TreeEyebrow`) | Keep as a typography recipe for now; revisit when TreeUI has a broader text primitive strategy |
-| Form stack (`TreeFormStack`) | Covered by `TStack`, `TGrid`, and `TFormField`; no extra layout wrapper planned |
-| Ranking (`TreeRanking`) | Defer as a narrower data-display recipe until the dashboard/data pack grows |
-| Action panel (`TreeActionPanel`) | Keep app-level for now; usually composes from `TAlert`, `TCard`, and `TButton` |
+| Suggested pattern | TreeUI direction | Delivery status |
+|---|---|---|
+| Stat group (`TreeStatGroup`) | Document as `TStat` + `TGrid`; no standalone `TStatGroup` planned | Delivered as docs recipe |
+| Section header (`TreeSectionHeader`) | Document as heading + `TStack` + optional `TBadge` or `TButton`; no dedicated export planned | Delivered as docs recipe |
+| Subpanel (`TreePanel`) | Prefer `TCard` composition, especially `variant="soft"`; revisit only if a distinct semantic API emerges | Delivered as docs recipe |
+| Stacked card (`TreeStackCard`) | Use `TCard` slots plus `TTag`, `TBadge`, and actions; revisit later only if a stable slot contract repeats across products | Delivered as docs recipe |
+| Eyebrow text (`TreeEyebrow`) | Keep as a typography recipe for now; revisit when TreeUI has a broader text primitive strategy | Delivered as docs recipe |
+| Form stack (`TreeFormStack`) | Covered by `TStack`, `TGrid`, and `TFormField`; no extra layout wrapper planned | Delivered as docs recipe |
+| Ranking (`TreeRanking`) | Defer as a narrower data-display recipe until the dashboard/data pack grows | Delivered as docs recipe |
+| Action panel (`TreeActionPanel`) | Keep app-level for now; usually composes from `TAlert`, `TCard`, and `TButton` | Delivered as docs recipe |
 
 ---
 
 ## Candidate review — Recent suggestions
 
-The recent component suggestions map well to TreeUI's direction when normalized into two buckets:
+The recent component suggestions now map to two resolved buckets:
 
-- Promote portable primitives: `TStat` and `TSelectableList`
-- Keep higher-level page assemblies as documented recipes until a stronger shared API emerges
+- Promote portable primitives: `TStat` and `TSelectableList` shipped
+- Keep higher-level page assemblies as documented recipes in `Foundation/Patterns` and `Patterns/Recipes`
 
 ---
 
-## Alias-only concepts
+## Aliases & conventions
+
+TreeUI keeps naming intentionally predictable across docs and exports:
+
+- Primary public names use the `T` prefix.
+- `Tree<Name>` exports remain available for compatibility and migration.
+- `TNavbar` / `TAppBar` and `TSteps` / `TStepper` are export aliases for the same implementation.
+- Common product terms like `Snackbar` stay documentation aliases only and do not create duplicate exports.
 
 Some common UI terms are intentionally documented as aliases to existing patterns rather than planned as separate components.
 
-| Common term | TreeUI pattern |
-|---|---|
-| `Snackbar` / `Notification` | Use `TToast` |
-| `Banner` | Use `TAlert` |
-| `Collapsible` / `Details` | Use `TAccordion` in single mode with `collapsible` enabled |
+| Common term | TreeUI pattern | Convention |
+|---|---|---|
+| `Snackbar` / `Notification` | Use `TToast` | Semantic alias only |
+| `Banner` | Use `TAlert` | Semantic alias only |
+| `Collapsible` / `Details` | Use `TAccordion` in single mode with `collapsible` enabled | Semantic alias only |
+| `App bar` | Use `TNavbar` or `TAppBar` | Export alias pair |
+| `Stepper` | Use `TSteps` or `TStepper` | Export alias pair |
 
 ---
 

@@ -1,0 +1,190 @@
+import { Meta, Title } from '@storybook/blocks';
+
+<Meta title="Foundation/Patterns" />
+
+<Title>Patterns</Title>
+
+TreeUI treats some repeated app UI as composition recipes instead of standalone exports.
+These patterns matter, but they stay docs-first until they prove they need their own semantic API,
+state model, or accessibility contract.
+
+Rendered examples for the same recipes live in the `Patterns/Recipes` story group.
+
+## Pattern track status
+
+| Pattern | Compose from |
+|---|---|
+| Stat group | `TGrid` + `TStat` |
+| Section header | heading + `TStack` + optional `TBadge` / `TButton` |
+| Subpanel | `TCard`, especially `variant="soft"` |
+| Stacked card | `TCard` slots + `TTag` / `TBadge` / actions |
+| Eyebrow text | Typography recipe using existing text and spacing tokens |
+| Form stack | `TStack` + `TGrid` + `TFormField` |
+| Ranking | `TTable` or `TSelectableList` + `TBadge` / `TTag` |
+| Action panel | `TAlert` + `TCard` + `TButton` |
+
+## Stat group
+
+Use when a dashboard or admin surface needs a compact block of metrics with equal visual weight.
+
+```vue
+<TGrid min-item-width="14rem" gap="var(--tree-space-4)">
+  <TStat label="MRR" value="$48.2k" trend="12.4%" tone="success" trend-direction="up" />
+  <TStat label="Activation" value="68%" trend="4.1%" tone="info" trend-direction="up" />
+  <TStat label="Tickets" value="31" trend="6 urgent" tone="warning" trend-direction="neutral" />
+</TGrid>
+```
+
+## Section header
+
+Use when a page section needs a title, support copy, and one or two actions without introducing a wrapper component.
+
+```vue
+<TStack gap="var(--tree-space-3)">
+  <div style="display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap;">
+    <div style="display: grid; gap: 0.35rem;">
+      <strong>Workspace members</strong>
+      <span style="color: var(--tree-color-text-muted); font-size: var(--tree-font-size-sm);">
+        Manage access, roles, and invitations.
+      </span>
+    </div>
+
+    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+      <TBadge size="sm">12 active</TBadge>
+      <TButton size="sm">Invite member</TButton>
+    </div>
+  </div>
+</TStack>
+```
+
+## Subpanel
+
+Use when content needs a quieter container inside a larger page section or shell.
+
+```vue
+<TCard variant="soft">
+  <template #header>
+    <strong>Deployment notes</strong>
+  </template>
+
+  <p style="margin: 0;">
+    Keep this area for scoped guidance, warnings, or support content that should feel secondary to the main canvas.
+  </p>
+
+  <template #footer>
+    <TButton size="sm" variant="outline">Open checklist</TButton>
+  </template>
+</TCard>
+```
+
+## Stacked card
+
+Use when a card repeats the same header, metadata, and action rhythm across lists, boards, or dashboards.
+
+```vue
+<TCard>
+  <template #header>
+    <div style="display: grid; gap: 0.5rem;">
+      <div style="display: flex; align-items: center; justify-content: space-between; gap: 1rem;">
+        <strong>Q2 launch brief</strong>
+        <TBadge size="sm">Draft</TBadge>
+      </div>
+
+      <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+        <TTag size="sm">Launch</TTag>
+        <TTag size="sm">GTM</TTag>
+      </div>
+    </div>
+  </template>
+
+  <p style="margin: 0;">
+    Keep the body free-form, but preserve a stable header and footer rhythm so repeated cards still feel cohesive.
+  </p>
+
+  <template #footer>
+    <div style="display: flex; justify-content: flex-end; gap: 0.5rem;">
+      <TButton size="sm" variant="ghost">Preview</TButton>
+      <TButton size="sm" variant="outline">Edit</TButton>
+    </div>
+  </template>
+</TCard>
+```
+
+## Eyebrow text
+
+Use when a small label helps orient the user before a larger title or content block.
+
+```vue
+<div style="display: grid; gap: 0.5rem;">
+  <span
+    style="
+      color: var(--tree-color-text-muted);
+      font-size: var(--tree-font-size-xs);
+      font-weight: var(--tree-font-weight-medium);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    "
+  >
+    Launch sequence
+  </span>
+  <strong>Prepare the customer rollout</strong>
+</div>
+```
+
+## Form stack
+
+Use when forms need predictable vertical rhythm and responsive grouping without another form-layout abstraction.
+
+```vue
+<TStack gap="var(--tree-space-4)">
+  <TGrid min-item-width="14rem" gap="var(--tree-space-3)">
+    <TFormField label="Name">
+      <TInput />
+    </TFormField>
+
+    <TFormField label="Email">
+      <TInput />
+    </TFormField>
+  </TGrid>
+
+  <TFormField label="Launch notes" hint="Summarize rollout details for support and product.">
+    <TTextarea />
+  </TFormField>
+</TStack>
+```
+
+## Ranking
+
+Use when the UI is really about ordered comparison rather than a new component family.
+
+```vue
+<TCard>
+  <template #header>
+    <strong>Top opportunities</strong>
+  </template>
+
+  <TTable :columns="columns" :rows="rows" />
+</TCard>
+```
+
+For smaller ranked sets with richer row templates, use `TSelectableList` instead of `TTable`.
+
+## Action panel
+
+Use when an area combines context, status, and a small cluster of actions around a single decision.
+
+```vue
+<TCard>
+  <TStack gap="var(--tree-space-4)">
+    <TAlert variant="warning">
+      Publishing now will notify every workspace member.
+    </TAlert>
+
+    <div style="display: flex; justify-content: flex-end; gap: 0.5rem; flex-wrap: wrap;">
+      <TButton variant="ghost">Cancel</TButton>
+      <TButton variant="outline">Preview</TButton>
+      <TButton>Publish</TButton>
+    </div>
+  </TStack>
+</TCard>
+```

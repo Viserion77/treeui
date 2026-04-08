@@ -27,6 +27,29 @@ The package stays intentionally composable, so teams can assemble forms, overlay
 
 `TAvatar` · `TBadge` · `TCard` · `TDivider` · `TEmptyState` · `TProgress` · `TSkeleton` · `TSpinner` · `TStat` · `TTable` · `TTag` · `TTimeline` · `TPricing` · `TPricingCard`
 
+## Conventions
+
+- Primary docs use the `T` prefix for public exports.
+- `Tree<Name>` aliases remain available for compatibility and migration.
+- `TNavbar` / `TAppBar` and `TSteps` / `TStepper` are public alias pairs for the same implementations.
+- Terms like `Snackbar`, `Banner`, and `Collapsible` stay semantic aliases in docs rather than extra exports.
+- Page assemblies that are mostly layout stay docs-first recipes until repeated behavior proves they need a dedicated API.
+
+## Docs-first compositions
+
+TreeUI keeps the following app patterns documented as recipes instead of adding more public exports:
+
+| Pattern | Compose from |
+|---|---|
+| Stat group | `TGrid` + `TStat` |
+| Section header | heading + `TStack` + optional `TBadge` / `TButton` |
+| Subpanel | `TCard`, especially `variant="soft"` |
+| Stacked card | `TCard` slots + `TTag` / `TBadge` / actions |
+| Eyebrow text | typography recipe using existing tokens |
+| Form stack | `TStack` + `TGrid` + `TFormField` |
+| Ranking | `TTable` or `TSelectableList` |
+| Action panel | `TAlert` + `TCard` + `TButton` |
+
 ## Composition Notes
 
 `TTable` stays intentionally focused on structured listing. Filtering, bulk actions, pagination, and data fetching compose around it in the app layer, with `TPagination` used separately when needed.
@@ -45,3 +68,5 @@ These semantic aliases are documentation guidance only. They do not add extra ex
 | `Snackbar` / `Notification` | `TToast` |
 | `Banner` | `TAlert` |
 | `Collapsible` / `Details` | `TAccordion` with `type="single"` and `collapsible` |
+| `App bar` | `TNavbar` / `TAppBar` |
+| `Stepper` | `TSteps` / `TStepper` |

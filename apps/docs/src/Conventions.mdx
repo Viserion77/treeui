@@ -1,0 +1,48 @@
+import { Meta, Title } from '@storybook/blocks';
+
+<Meta title="Foundation/Conventions" />
+
+<Title>Conventions</Title>
+
+TreeUI keeps naming, aliases, and promotion rules predictable so teams can move from docs to code
+without guessing which term maps to which export.
+
+## Export naming
+
+- Primary public exports use the `T` prefix, such as `TButton`, `TNavbar`, and `TSteps`.
+- `Tree<Name>` exports remain available for compatibility and migration, but new docs prefer the `T` names.
+- Some concepts intentionally expose two public names for the same implementation when both terms are common in products.
+
+| Export pair | TreeUI guidance |
+|---|---|
+| `TNavbar` / `TAppBar` | Prefer the name that matches the product vocabulary; both map to the same component |
+| `TSteps` / `TStepper` | Use either term in app code, but document the pattern consistently within a product |
+
+## Semantic aliases
+
+Semantic aliases are documentation shortcuts only. They do not add new exports to `@treeui/vue`.
+
+| Common product term | Use in TreeUI | Notes |
+|---|---|---|
+| `Snackbar` / `Notification` | `TToast` | Feedback that appears outside the page flow |
+| `Banner` | `TAlert` | Inline status or warning content in the page flow |
+| `Collapsible` / `Details` | `TAccordion` in single mode with `collapsible` enabled | Disclosure behavior stays on the accordion primitive |
+| `Stat group` | `TGrid` + `TStat` | Recipe, not a standalone export |
+| `Section header` | heading + `TStack` + optional `TBadge` or `TButton` | Recipe, not a standalone export |
+
+## Composition conventions
+
+- Reach for `TContainer`, `TGrid`, and `TStack` before inventing a page-specific layout wrapper.
+- Prefer slots and small primitives over extra wrapper components when behavior already exists.
+- Keep filtering, bulk actions, empty states, and pagination composed around `TTable` instead of inside it.
+- Keep app-shell assemblies, dashboard groups, and editorial page patterns docs-first until repeated semantics or accessibility behavior appear.
+
+## Promotion rules
+
+A repeated UI pattern should become a public component only when it:
+
+- adds reusable interaction, accessibility, or state behavior
+- carries domain-agnostic semantics that travel across products
+- reduces real API friction beyond what existing primitives already cover
+
+When a pattern is mostly layout, naming, or styling, TreeUI prefers documenting a recipe in docs instead of adding another export.

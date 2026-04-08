@@ -78,6 +78,13 @@ document.documentElement.setAttribute('data-tree-theme', 'dark')
 
 All components are also exported with the `Tree` prefix (e.g. `TreeButton`, `TreeInput`) for backwards compatibility.
 
+## Conventions
+
+- Primary docs and examples use the `T` prefix for public exports.
+- `Tree<Name>` aliases remain available for migration and compatibility.
+- `TNavbar` / `TAppBar` and `TSteps` / `TStepper` are alias pairs for the same implementations.
+- Page-level assemblies that are mostly layout stay documented as recipes until they need a dedicated semantic API.
+
 ## Semantic aliases in docs
 
 Some docs use familiar product terms as aliases for existing TreeUI patterns. These are documentation aliases only, not extra exports.
@@ -85,6 +92,21 @@ Some docs use familiar product terms as aliases for existing TreeUI patterns. Th
 - `Snackbar` / `Notification` -> `TToast`
 - `Banner` -> `TAlert`
 - `Collapsible` / `Details` -> `TAccordion` with `type="single"` and `collapsible`
+- `App bar` -> `TNavbar` / `TAppBar`
+- `Stepper` -> `TSteps` / `TStepper`
+
+## Docs-first patterns
+
+Some repeated app UI intentionally stays documented as composition guidance instead of becoming extra exports:
+
+- Stat groups: `TGrid` + `TStat`
+- Section headers: heading + `TStack` + optional `TBadge` or `TButton`
+- Subpanels: `TCard`, especially `variant="soft"`
+- Stacked cards: `TCard` slots + `TTag` / `TBadge` / actions
+- Eyebrow text: typography recipe using existing tokens
+- Form stacks: `TStack` + `TGrid` + `TFormField`
+- Rankings: `TTable` or `TSelectableList`
+- Action panels: `TAlert` + `TCard` + `TButton`
 
 ## TypeScript
 

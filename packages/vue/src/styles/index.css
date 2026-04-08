@@ -203,6 +203,98 @@
   color: var(--tree-color-text-muted);
 }
 
+.tree-date-time-picker__content {
+  width: min(22rem, 100vw - 2rem);
+  gap: var(--tree-space-4);
+}
+
+.tree-date-time-picker__calendar {
+  display: grid;
+  gap: var(--tree-space-3);
+}
+
+.tree-date-time-picker__summary,
+.tree-date-time-picker__time,
+.tree-date-time-picker__footer {
+  padding-top: var(--tree-space-3);
+  border-top: var(--tree-border-width-subtle) solid var(--tree-color-border-default);
+}
+
+.tree-date-time-picker__summary {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.tree-date-time-picker__eyebrow {
+  margin: 0;
+  color: var(--tree-color-text-muted);
+  font-size: var(--tree-font-size-xs);
+  font-weight: var(--tree-font-weight-medium);
+  letter-spacing: 0.08em;
+  line-height: var(--tree-font-lineHeight-ui);
+  text-transform: uppercase;
+}
+
+.tree-date-time-picker__summary-value {
+  margin: 0;
+  color: var(--tree-color-text-primary);
+  font-size: var(--tree-font-size-sm);
+  font-weight: var(--tree-font-weight-semibold);
+  line-height: var(--tree-font-lineHeight-ui);
+}
+
+.tree-date-time-picker__time {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--tree-space-3);
+}
+
+.tree-date-time-picker__time-field {
+  display: grid;
+  gap: var(--tree-space-1);
+}
+
+.tree-date-time-picker__time-label {
+  color: var(--tree-color-text-muted);
+  font-size: var(--tree-font-size-xs);
+  font-weight: var(--tree-font-weight-medium);
+  line-height: var(--tree-font-lineHeight-ui);
+  text-transform: uppercase;
+}
+
+.tree-date-time-picker__select {
+  appearance: none;
+  min-height: 2.5rem;
+  width: 100%;
+  padding: 0 var(--tree-space-3);
+  border: var(--tree-border-width-subtle) solid var(--tree-color-border-default);
+  border-radius: var(--tree-radius-md);
+  background: var(--tree-color-bg-surface);
+  color: var(--tree-color-text-primary);
+  font: inherit;
+  transition:
+    border-color var(--tree-motion-duration-fast) var(--tree-motion-easing-standard),
+    box-shadow var(--tree-motion-duration-fast) var(--tree-motion-easing-standard),
+    background-color var(--tree-motion-duration-fast) var(--tree-motion-easing-standard);
+}
+
+.tree-date-time-picker__select:focus-visible {
+  outline: none;
+  border-color: var(--tree-color-brand-primary);
+  box-shadow: 0 0 0 4px var(--tree-color-focus-ring);
+}
+
+.tree-date-time-picker__select:disabled {
+  opacity: 0.68;
+  cursor: not-allowed;
+}
+
+.tree-date-time-picker__footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--tree-space-2);
+}
+
 .tree-file-upload {
   display: grid;
   gap: var(--tree-space-3);

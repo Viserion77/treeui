@@ -8,6 +8,7 @@ import TreeCheckbox from './TreeCheckbox.vue';
 import TreeCombobox from './TreeCombobox.vue';
 import TreeConfirmDialog from './TreeConfirmDialog.vue';
 import TreeDatePicker from './TreeDatePicker.vue';
+import TreeDateTimePicker from './TreeDateTimePicker.vue';
 import TreeInput from './TreeInput.vue';
 import TreeTextarea from './TreeTextarea.vue';
 import TreeModal from './TreeModal.vue';
@@ -416,6 +417,79 @@ describe('@treeui/vue', () => {
     await nextTick();
 
     expect(wrapper.find('[role="dialog"]').exists()).toBe(false);
+
+    wrapper.unmount();
+  });
+
+  it('opens the custom datetime picker, lets users pick a slot, and emits the shared open contract', async () => {
+    const wrapper = mount(TreeDateTimePicker, {
+      props: {
+        modelValue: '2026-04-08T14:30',
+        step: 900,
+      },
+      attrs: {
+        'aria-label': 'Release window',
+        name: 'releaseWindow',
+      },
+      slots: {
+        prefix: '<span>prefix</span>',
+        suffix: '<span>suffix</span>',
+      },
+      attachTo: document.body,
+    });
+
+    await wrapper.get('button[aria-label="Release window"]').trigger('click');
+    await nextTick();
+
+    expect(wrapper.classes()).toContain('tree-date-time-picker');
+    expect(wrapper.emitted('update:open')?.[0]).toEqual([true]);
+    expect(wrapper.find('[role="dialog"]').exists()).toBe(true);
+    expect(wrapper.get('input[type="hidden"]').attributes('name')).toBe('releaseWindow');
+    expect(wrapper.text()).toContain('prefix');
+    expect(wrapper.text()).toContain('suffix');
+
+    await wrapper.get('[data-date="2026-04-10"]').trigger('click');
+    await wrapper.get('select[aria-label="Select hour"]').setValue('16');
+    await wrapper.get('select[aria-label="Select minute"]').setValue('45');
+    await wrapper.get('.tree-date-time-picker__footer .tree-button--solid').trigger('click');
+    await nextTick();
+
+    expect(wrapper.emitted('update:modelValue')?.[0]).toEqual(['2026-04-10T16:45']);
+    expect(wrapper.emitted('change')?.[0]).toEqual(['2026-04-10T16:45']);
+    expect(wrapper.emitted('select')?.[0]).toEqual(['2026-04-10T16:45']);
+    expect(wrapper.emitted('open-change')?.[1]).toEqual([false]);
+
+    wrapper.unmount();
+  });
+
+  it('disables out-of-range days and times in the datetime picker surface', async () => {
+    const wrapper = mount(TreeDateTimePicker, {
+      props: {
+        modelValue: '2026-04-08T14:30',
+        min: '2026-04-08T14:30',
+        max: '2026-04-08T16:00',
+        step: 900,
+      },
+      attrs: {
+        'aria-label': 'Window',
+      },
+      attachTo: document.body,
+    });
+
+    await wrapper.get('button[aria-label="Window"]').trigger('click');
+    await nextTick();
+
+    expect(wrapper.get('[data-date="2026-04-07"]').attributes('disabled')).toBeDefined();
+    expect(
+      wrapper
+        .get('select[aria-label="Select hour"] option[value="13"]')
+        .attributes('disabled'),
+    ).toBeDefined();
+    expect(
+      wrapper
+        .get('select[aria-label="Select hour"] option[value="15"]')
+        .attributes('disabled'),
+    ).toBeUndefined();
 
     wrapper.unmount();
   });

@@ -33,7 +33,7 @@ import '@treeui/vue/style.css'
 
 ### Form
 
-`TInput` · `TTextarea` · `TCheckbox` · `TCombobox` · `TFileUpload` · `TRadio` · `TRadioGroup` · `TSelect` · `TMultiSelect` · `TNumberInput` · `TDatePicker` · `TSwitch` · `TFormField` · `TToggleGroup` · `TMarkdownEditor`
+`TInput` · `TTextarea` · `TCheckbox` · `TCombobox` · `TFileUpload` · `TRadio` · `TRadioGroup` · `TSelect` · `TMultiSelect` · `TNumberInput` · `TDatePicker` · `TDateTimePicker` · `TSwitch` · `TFormField` · `TToggleGroup` · `TMarkdownEditor`
 
 ### Layout
 

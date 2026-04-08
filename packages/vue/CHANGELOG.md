@@ -1,5 +1,11 @@
 # @treeui/vue
 
+## 0.5.0
+
+### Minor Changes
+
+- Add `TDateTimePicker` with a custom TreeUI-styled date and time surface, plus public exports, Storybook docs, showcase coverage, and component tests.
+
 ## 0.4.0
 
 ### Minor Changes

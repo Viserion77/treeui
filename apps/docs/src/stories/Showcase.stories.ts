@@ -16,6 +16,7 @@ import {
   TContainer,
   TContextMenu,
   TDatePicker,
+  TDateTimePicker,
   TDivider,
   TDrawer,
   TDropdown,
@@ -324,6 +325,7 @@ export const Gallery: Story = {
       TContainer,
       TContextMenu,
       TDatePicker,
+      TDateTimePicker,
       TDivider,
       TDrawer,
       TDropdown,
@@ -556,6 +558,12 @@ export const Gallery: Story = {
                   </TFormField>
                   <TFormField label="Ship date">
                     <TDatePicker aria-label="Ship date" :model-value="dateValue" @update:model-value="dateValue = $event" />
+                  </TFormField>
+                  <TFormField label="Release window">
+                    <TDateTimePicker
+                      aria-label="Release window"
+                      model-value="2026-04-21T16:30"
+                    />
                   </TFormField>
                   <TFormField label="Notes">
                     <TTextarea aria-label="Notes" model-value="Release-ready docs with quick scan coverage." />
@@ -917,6 +925,7 @@ export const SizesAndStates: Story = {
       TContainer,
       TGrid,
       TInput,
+      TDateTimePicker,
       TMultiSelect,
       TNumberInput,
       TSelect,
@@ -1010,11 +1019,12 @@ export const SizesAndStates: Story = {
               </div>
 
               <div :style="panelStyle">
-                <p :style="eyebrowStyle">Numbers and status</p>
+                <p :style="eyebrowStyle">Numbers, date, and status</p>
                 <div style="display: grid; gap: 0.75rem;">
                   <TNumberInput aria-label="Small number" size="sm" :model-value="2" />
                   <TNumberInput aria-label="Medium number" size="md" :model-value="6" />
                   <TNumberInput aria-label="Large number" size="lg" :model-value="10" />
+                  <TDateTimePicker aria-label="Meeting time" size="md" model-value="2026-04-08T14:30" />
                   <div style="display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap;">
                     <TBadge size="sm">Small</TBadge>
                     <TBadge>Medium</TBadge>
@@ -1062,6 +1072,7 @@ export const UsageExamples: Story = {
       TFormField,
       TGrid,
       TInput,
+      TDateTimePicker,
       TMarkdownEditor,
       TMultiSelect,
       TNavMenu,
@@ -1184,6 +1195,10 @@ export const UsageExamples: Story = {
 
                   <TFormField label="Assigned teams">
                     <TMultiSelect aria-label="Assigned teams" :options="richOptions" :model-value="['design-systems', 'platform']" />
+                  </TFormField>
+
+                  <TFormField label="Release window">
+                    <TDateTimePicker aria-label="Release window" model-value="2026-04-21T16:30" />
                   </TFormField>
 
                   <TFormField label="Review cadence">

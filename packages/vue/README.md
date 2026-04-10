@@ -10,6 +10,8 @@ pnpm add @treeui/vue
 npm install @treeui/vue
 ```
 
+Install `@treeui/tokens` only when you need direct access to the token package or want to use the theme CSS outside the Vue component layer.
+
 ## Setup
 
 ```ts
@@ -22,12 +24,22 @@ app.use(TreeUI)
 app.mount('#app')
 ```
 
+If your app uses toasts, mount `TToastProvider` once near the root before calling `useToast()`.
+
 Or import components individually:
 
 ```ts
 import { TButton, TInput, TModal } from '@treeui/vue'
 import '@treeui/vue/style.css'
 ```
+
+## Consumer checklist
+
+- Install `@treeui/vue`
+- Import `@treeui/vue/style.css` once
+- Use `app.use(TreeUI)` or named imports
+- Mount `TToastProvider` once near the app root if you use `useToast()`
+- Use `TFormField` as the wrapper for labels, hints, and errors
 
 ## Components
 
@@ -50,6 +62,8 @@ import '@treeui/vue/style.css'
 ### Table composition
 
 `TTable` stays focused on structured listing. Filters, toolbars, bulk actions, and pagination are intended to be composed around it, with `TPagination` used separately when needed.
+
+Use `#cell-<key>` and `#header-<key>` slots when a column needs derived content or custom markup.
 
 ## Theming
 
@@ -84,6 +98,11 @@ All components are also exported with the `Tree` prefix (e.g. `TreeButton`, `Tre
 - `Tree<Name>` aliases remain available for migration and compatibility.
 - `TNavbar` / `TAppBar` and `TSteps` / `TStepper` are alias pairs for the same implementations.
 - Page-level assemblies that are mostly layout stay documented as recipes until they need a dedicated semantic API.
+- Overlays such as `TModal`, `TDrawer`, and `TPopover` support controlled open state; `TModal` works with `v-model:open`.
+- `TSelect` accepts `string` or `number` values.
+- `TBreadcrumbItem` accepts `href` for anchors and `to` for vue-router projects.
+- `TBadge` keeps visual variants and can add semantic meaning with `tone`.
+- `TStat` includes a `loading` state for built-in placeholders.
 
 ## Semantic aliases in docs
 
@@ -107,6 +126,10 @@ Some repeated app UI intentionally stays documented as composition guidance inst
 - Form stacks: `TStack` + `TGrid` + `TFormField`
 - Rankings: `TTable` or `TSelectableList`
 - Action panels: `TAlert` + `TCard` + `TButton`
+- Color fields: `TFormField` + native `input[type="color"]`
+- Tag inputs: `TFormField` + `TInput` + removable `TTag`
+- Router-backed tabs: `TTabs` + app route state
+- Charts: `TCard` + `TStack` + your preferred chart library
 
 ## TypeScript
 

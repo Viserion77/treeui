@@ -94,6 +94,10 @@ behavior:
   disabled_tabs_are_skipped: true
   only_active_panel_rendered: true
 
+notes:
+  - "Use TTabs for in-place panel switching."
+  - "When the selected tab should deep-link to router state, sync `v-model` in the app layer. Prefer TNavMenu when it becomes route navigation."
+
 example: |
   <TTabs default-value="tab1">
     <TTabList>

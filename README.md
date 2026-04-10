@@ -98,7 +98,7 @@ The project uses [Changesets](https://github.com/changesets/changesets) for auto
 ```
 Pull request → CI (lint, typecheck, tests, package build, Storybook build, e2e)
   ↓ merge to main
-CI reuses the same artifacts
+Release job rebuilds and verifies npm tarballs
   ↓
 Changesets Action creates "Version Packages" PR or publishes to npm
   +
@@ -109,7 +109,7 @@ Deploy Storybook to GitHub Pages
 
 | Workflow | Trigger | Purpose |
 |---|---|---|
-| **CI** | PR + push to `main` | Runs validation once, builds package and Storybook artifacts once, then reuses them for e2e, npm release, and GitHub Pages deploy |
+| **CI** | PR + push to `main` | Runs validation, builds Storybook for Pages, and rebuilds/verifies npm tarballs before publishing |
 
 ### Creating a changeset
 

@@ -7,6 +7,9 @@ install:
     npm: "npm install @treeui/vue"
   required_imports:
     - "@treeui/vue/style.css"
+  optional_packages:
+    - package: "@treeui/tokens"
+      use_when: "The app needs direct access to TreeUI tokens or theme CSS outside the Vue component package."
 
 vue_setup:
   plugin_install:
@@ -44,7 +47,7 @@ component_setup:
 
   TSelect:
     notes:
-      - "Pass `options` as `{ label, value, disabled? }[]`."
+      - "Pass `options` as `{ label, value, disabled? }[]` where `value` can be `string` or `number`."
       - "Use `placeholder` when no selection has been made."
 
   TCombobox:
@@ -99,6 +102,15 @@ component_setup:
   TPricing:
     notes:
       - "Pass `plans` matching the same core fields used by `TPricingCard`."
+
+  TModal:
+    notes:
+      - "Use `v-model:open` for the idiomatic Vue controlled pattern."
+
+  TBreadcrumb:
+    notes:
+      - "Use `href` for native links."
+      - "Use `to` when the app has vue-router and breadcrumb items should render RouterLink."
 
 app_patterns:
   providers:

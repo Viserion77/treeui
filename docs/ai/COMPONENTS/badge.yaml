@@ -11,6 +11,11 @@ props:
     type: TreeVariant
     default: soft
     values: [solid, outline, ghost, soft, danger]
+  tone:
+    type: TreeBadgeTone
+    default: neutral
+    values: [neutral, success, warning, danger, info]
+    description: "Optional semantic tone layered on top of the visual variant."
   size:
     type: TreeSize
     default: md
@@ -26,4 +31,4 @@ a11y:
   interactive_by_default: false
   icon_slot_marked_aria_hidden: true
 
-example: '<TBadge variant="soft">Stable foundation</TBadge>'
+example: '<TBadge variant="soft" tone="success">Stable foundation</TBadge>'

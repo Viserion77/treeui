@@ -1137,6 +1137,17 @@
 }
 
 .tree-badge {
+  --tree-badge-solid-bg: var(--tree-color-brand-primary);
+  --tree-badge-solid-text: var(--tree-color-brand-contrast);
+  --tree-badge-outline-bg: var(--tree-color-bg-surface);
+  --tree-badge-outline-text: var(--tree-color-text-primary);
+  --tree-badge-outline-border: var(--tree-color-border-default);
+  --tree-badge-ghost-bg: transparent;
+  --tree-badge-ghost-text: var(--tree-color-text-muted);
+  --tree-badge-soft-bg: var(--tree-color-brand-soft);
+  --tree-badge-soft-text: var(--tree-color-brand-primary);
+  --tree-badge-danger-bg: color-mix(in srgb, var(--tree-color-status-error) 16%, var(--tree-color-bg-surface));
+  --tree-badge-danger-text: var(--tree-color-status-error);
   display: inline-flex;
   align-items: center;
   gap: var(--tree-space-2);
@@ -1146,6 +1157,48 @@
   padding-inline: var(--tree-space-3);
   font-weight: var(--tree-font-weight-medium);
   line-height: 1;
+}
+
+.tree-badge--tone-success {
+  --tree-badge-solid-bg: var(--tree-color-status-success);
+  --tree-badge-outline-text: var(--tree-color-status-success);
+  --tree-badge-outline-border: color-mix(in srgb, var(--tree-color-status-success) 36%, var(--tree-color-border-default));
+  --tree-badge-ghost-text: var(--tree-color-status-success);
+  --tree-badge-soft-bg: color-mix(in srgb, var(--tree-color-status-success) 14%, var(--tree-color-bg-surface));
+  --tree-badge-soft-text: var(--tree-color-status-success);
+  --tree-badge-danger-bg: color-mix(in srgb, var(--tree-color-status-success) 18%, var(--tree-color-bg-surface));
+  --tree-badge-danger-text: var(--tree-color-status-success);
+}
+
+.tree-badge--tone-warning {
+  --tree-badge-solid-bg: var(--tree-color-status-warning);
+  --tree-badge-outline-text: var(--tree-color-status-warning);
+  --tree-badge-outline-border: color-mix(in srgb, var(--tree-color-status-warning) 36%, var(--tree-color-border-default));
+  --tree-badge-ghost-text: var(--tree-color-status-warning);
+  --tree-badge-soft-bg: color-mix(in srgb, var(--tree-color-status-warning) 14%, var(--tree-color-bg-surface));
+  --tree-badge-soft-text: var(--tree-color-status-warning);
+  --tree-badge-danger-bg: color-mix(in srgb, var(--tree-color-status-warning) 18%, var(--tree-color-bg-surface));
+  --tree-badge-danger-text: var(--tree-color-status-warning);
+}
+
+.tree-badge--tone-danger {
+  --tree-badge-solid-bg: var(--tree-color-status-error);
+  --tree-badge-outline-text: var(--tree-color-status-error);
+  --tree-badge-outline-border: color-mix(in srgb, var(--tree-color-status-error) 36%, var(--tree-color-border-default));
+  --tree-badge-ghost-text: var(--tree-color-status-error);
+  --tree-badge-soft-bg: color-mix(in srgb, var(--tree-color-status-error) 14%, var(--tree-color-bg-surface));
+  --tree-badge-soft-text: var(--tree-color-status-error);
+}
+
+.tree-badge--tone-info {
+  --tree-badge-solid-bg: var(--tree-color-status-info);
+  --tree-badge-outline-text: var(--tree-color-status-info);
+  --tree-badge-outline-border: color-mix(in srgb, var(--tree-color-status-info) 36%, var(--tree-color-border-default));
+  --tree-badge-ghost-text: var(--tree-color-status-info);
+  --tree-badge-soft-bg: color-mix(in srgb, var(--tree-color-status-info) 14%, var(--tree-color-bg-surface));
+  --tree-badge-soft-text: var(--tree-color-status-info);
+  --tree-badge-danger-bg: color-mix(in srgb, var(--tree-color-status-info) 18%, var(--tree-color-bg-surface));
+  --tree-badge-danger-text: var(--tree-color-status-info);
 }
 
 .tree-badge--sm {
@@ -1164,29 +1217,29 @@
 }
 
 .tree-badge--solid {
-  background: var(--tree-color-brand-primary);
-  color: var(--tree-color-brand-contrast);
+  background: var(--tree-badge-solid-bg);
+  color: var(--tree-badge-solid-text);
 }
 
 .tree-badge--outline {
-  background: var(--tree-color-bg-surface);
-  color: var(--tree-color-text-primary);
-  border-color: var(--tree-color-border-default);
+  background: var(--tree-badge-outline-bg);
+  color: var(--tree-badge-outline-text);
+  border-color: var(--tree-badge-outline-border);
 }
 
 .tree-badge--ghost {
-  background: transparent;
-  color: var(--tree-color-text-muted);
+  background: var(--tree-badge-ghost-bg);
+  color: var(--tree-badge-ghost-text);
 }
 
 .tree-badge--soft {
-  background: var(--tree-color-brand-soft);
-  color: var(--tree-color-brand-primary);
+  background: var(--tree-badge-soft-bg);
+  color: var(--tree-badge-soft-text);
 }
 
 .tree-badge--danger {
-  background: color-mix(in srgb, var(--tree-color-status-error) 16%, var(--tree-color-bg-surface));
-  color: var(--tree-color-status-error);
+  background: var(--tree-badge-danger-bg);
+  color: var(--tree-badge-danger-text);
 }
 
 .tree-spinner {
@@ -4416,6 +4469,33 @@
   display: grid;
   gap: var(--tree-space-2);
   min-width: 0;
+}
+
+.tree-stat__loading {
+  display: grid;
+  gap: var(--tree-space-3);
+  width: 100%;
+}
+
+.tree-stat__loading-label,
+.tree-stat__loading-value,
+.tree-stat__loading-trend {
+  width: 100%;
+}
+
+.tree-stat__loading-label {
+  max-width: 9rem;
+  height: 0.875rem;
+}
+
+.tree-stat__loading-value {
+  max-width: 7rem;
+  height: 2rem;
+}
+
+.tree-stat__loading-trend {
+  max-width: 10rem;
+  height: 0.875rem;
 }
 
 .tree-stat__topline,

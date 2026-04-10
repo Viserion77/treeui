@@ -11,13 +11,13 @@ defineOptions({
 
 export interface TreeSelectOption {
   label: string;
-  value: string;
+  value: string | number;
   disabled?: boolean;
 }
 
 const props = withDefaults(
   defineProps<{
-    modelValue?: string;
+    modelValue?: string | number;
     options?: TreeSelectOption[];
     open?: boolean;
     defaultOpen?: boolean;
@@ -41,7 +41,7 @@ const props = withDefaults(
 );
 
 const emit = defineEmits<{
-  'update:modelValue': [value: string];
+  'update:modelValue': [value: string | number];
   'update:open': [value: boolean];
   'open-change': [value: boolean];
 }>();
@@ -50,7 +50,7 @@ const attrs = useAttrs();
 const listboxId = createId('tree-select');
 const rootRef = ref<HTMLElement | null>(null);
 const triggerRef = ref<HTMLButtonElement | null>(null);
-const optionRefs = ref<Map<string, HTMLElement>>(new Map());
+const optionRefs = ref<Map<string | number, HTMLElement>>(new Map());
 const focusedIndex = ref(-1);
 
 const triggerAttrs = computed(() => {
@@ -127,7 +127,7 @@ const focusOption = (index: number) => {
   el?.focus();
 };
 
-const setOptionRef = (el: Element | null, value: string) => {
+const setOptionRef = (el: Element | null, value: string | number) => {
   if (el instanceof HTMLElement) {
     optionRefs.value.set(value, el);
   } else {
@@ -211,6 +211,10 @@ const onDocumentPointerDown = (event: PointerEvent) => {
   closeDropdown();
 };
 
+const hasSelection = computed(() =>
+  props.modelValue !== '' && props.modelValue !== null && props.modelValue !== undefined,
+);
+
 watch(isOpen, (value) => {
   if (value) {
     document.addEventListener('pointerdown', onDocumentPointerDown);
@@ -253,7 +257,7 @@ onBeforeUnmount(() => {
       </span>
       <span
         class="tree-select__value"
-        :data-placeholder="!modelValue ? true : undefined"
+        :data-placeholder="!hasSelection ? true : undefined"
       >
         {{ selectedLabel || placeholder }}
       </span>

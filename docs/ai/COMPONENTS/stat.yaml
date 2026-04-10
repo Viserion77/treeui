@@ -27,6 +27,9 @@ props:
     type: TreeStatTrendDirection
     default: neutral
     values: [up, down, neutral]
+  loading:
+    type: boolean
+    default: false
 
 slots:
   - icon
@@ -39,6 +42,7 @@ behavior:
   value_and_trend_are_optional: true
   icon_slot_adds_visual_emphasis: true
   trend_indicator_changes_with_direction: true
+  loading_renders_internal_skeleton_placeholders: true
 
 a11y:
   - "Use clear label text so the metric remains understandable to assistive technologies."

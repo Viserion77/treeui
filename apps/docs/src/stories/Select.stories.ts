@@ -10,6 +10,13 @@ const fruitOptions = [
   { label: 'Orange', value: 'orange' },
 ];
 
+const monthOptions = [
+  { label: 'January', value: 1 },
+  { label: 'February', value: 2 },
+  { label: 'March', value: 3 },
+  { label: 'April', value: 4 },
+];
+
 const meta = {
   title: 'Components/Data Entry/Select',
   component: TSelect,
@@ -108,6 +115,29 @@ export const DisabledOptions: Story = {
     template: `
       <div style="width: 320px;">
         <TSelect aria-label="Plan" placeholder="Choose a plan" :options="options" />
+      </div>
+    `,
+  }),
+};
+
+export const NumericValues: Story = {
+  render: () => ({
+    components: { TSelect },
+    setup: () => ({
+      month: ref(1),
+      monthOptions,
+    }),
+    template: `
+      <div style="width: 320px; display: grid; gap: 0.75rem;">
+        <TSelect
+          aria-label="Month"
+          :options="monthOptions"
+          :model-value="month"
+          @update:model-value="month = $event"
+        />
+        <div style="font-size: var(--tree-font-size-sm); color: var(--tree-color-text-muted);">
+          Selected month: {{ month }}
+        </div>
       </div>
     `,
   }),

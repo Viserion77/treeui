@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { getNextEnabledIndex, isActivationKey } from '@treeui/utils';
-import { computed, inject, nextTick, ref, resolveComponent, useAttrs, watch, type Component, type ComponentPublicInstance } from 'vue';
+import { computed, getCurrentInstance, inject, nextTick, ref, useAttrs, watch, type Component, type ComponentPublicInstance } from 'vue';
 import type { TreeSize } from '../types/contracts';
 import { treeSidebarInjectionKey } from './sidebar';
 
@@ -57,22 +57,18 @@ const attrs = useAttrs();
 const sidebar = inject(treeSidebarInjectionKey, null);
 const internalValue = ref(props.defaultValue);
 const itemRefs = ref<Map<string, HTMLElement>>(new Map());
+const instance = getCurrentInstance();
 
 const selectedValue = computed(() => props.modelValue ?? internalValue.value);
 const resolvedCollapsed = computed(() => props.collapsed ?? sidebar?.collapsed.value ?? false);
 
-const hasRouterLink = computed(() => {
-  try {
-    const resolved = resolveComponent('RouterLink');
-    return typeof resolved !== 'string';
-  } catch {
-    return false;
-  }
-});
+const routerLinkComponent = computed<Component | null>(() => (
+  (instance?.appContext.components.RouterLink as Component | undefined) ?? null
+));
 
 const itemTag = (item: TreeNavMenuItem) => {
-  if (item.to && hasRouterLink.value) {
-    return resolveComponent('RouterLink') as Component;
+  if (item.to && routerLinkComponent.value) {
+    return routerLinkComponent.value;
   }
   return 'button';
 };

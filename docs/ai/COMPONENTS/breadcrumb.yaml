@@ -30,20 +30,29 @@ sub_components:
     source_file: packages/vue/src/components/TreeBreadcrumbItem.vue
     purpose: "Individual breadcrumb link or current-page indicator."
     props:
+      to:
+        type: "string | Record<string, unknown>"
+        required: false
+        description: "Route target. When provided and vue-router is available, renders RouterLink."
       href:
         type: string
         required: false
-        description: "URL the breadcrumb item links to. Omit for the current/last item."
+        description: "URL the breadcrumb item links to. Used as the anchor fallback when `to` is not provided."
       current:
         type: boolean
         default: false
-        description: "Marks this item as the current page. Automatically set if it's the last item without href."
+        description: "Marks this item as the current page. Automatically set if it's the last item without a renderable link target."
     slots:
       - default
         note: "Label text for the breadcrumb item."
     a11y:
-      renders_anchor_when_href_present: true
+      renders_anchor_when_link_target_present: true
       renders_span_with_aria_current_page_when_current: true
+
+routing:
+  description: "TBreadcrumbItem accepts `to` for vue-router projects and falls back to native anchors when only `href` or a string `to` is available."
+  peer_dependency: "vue-router (optional)"
+  fallback: "native anchor element"
 
 notes:
   - "Renders a <nav> with aria-label='Breadcrumb' wrapping an <ol>."
@@ -53,7 +62,7 @@ notes:
 
 example: |
   <TBreadcrumb>
-    <TBreadcrumbItem href="/">Home</TBreadcrumbItem>
-    <TBreadcrumbItem href="/products">Products</TBreadcrumbItem>
+    <TBreadcrumbItem to="/">Home</TBreadcrumbItem>
+    <TBreadcrumbItem to="/products">Products</TBreadcrumbItem>
     <TBreadcrumbItem>Current Page</TBreadcrumbItem>
   </TBreadcrumb>

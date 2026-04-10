@@ -447,6 +447,22 @@ describe('@treeui/vue', () => {
     expect(wrapper.text()).toContain('Critical');
   });
 
+  it('supports semantic badge tones without changing the visual variant API', () => {
+    const wrapper = mount(TreeBadge, {
+      props: {
+        variant: 'soft',
+        tone: 'success',
+      },
+      slots: {
+        default: 'Healthy',
+      },
+    });
+
+    expect(wrapper.classes()).toContain('tree-badge--soft');
+    expect(wrapper.classes()).toContain('tree-badge--tone-success');
+    expect(wrapper.text()).toContain('Healthy');
+  });
+
   it('exposes an accessible loading label on the spinner', () => {
     const wrapper = mount(TreeSpinner, {
       props: {
@@ -1371,7 +1387,7 @@ describe('@treeui/vue', () => {
           { label: 'Apple', value: 'apple' },
           { label: 'Banana', value: 'banana' },
         ],
-        'onUpdate:modelValue': (v: string) => v,
+        'onUpdate:modelValue': (v: string | number) => v,
       },
       attrs: {
         'aria-label': 'Fruit',
@@ -1405,6 +1421,21 @@ describe('@treeui/vue', () => {
 
     expect(wrapper.get('.tree-select__value').text()).toBe('Choose fruit');
     expect(wrapper.get('.tree-select__value').attributes('data-placeholder')).toBeDefined();
+  });
+
+  it('supports numeric select values without treating zero as placeholder', () => {
+    const wrapper = mount(TreeSelect, {
+      props: {
+        modelValue: 0,
+        options: [
+          { label: 'January', value: 0 },
+          { label: 'February', value: 1 },
+        ],
+      },
+    });
+
+    expect(wrapper.get('.tree-select__value').text()).toBe('January');
+    expect(wrapper.get('.tree-select__value').attributes('data-placeholder')).toBeUndefined();
   });
 
   it('renders selected label in trigger', () => {
@@ -1506,6 +1537,26 @@ describe('@treeui/vue', () => {
     expect(options[0].classes()).toContain('is-selected');
     expect(options[0].find('.tree-select__check').exists()).toBe(true);
     expect(options[1].find('.tree-select__check').exists()).toBe(false);
+  });
+
+  it('emits numeric values from select options without string coercion', async () => {
+    const wrapper = mount(TreeSelect, {
+      props: {
+        modelValue: 0,
+        options: [
+          { label: '2025', value: 2025 },
+          { label: '2026', value: 2026 },
+        ],
+      },
+      attrs: {
+        'aria-label': 'Year',
+      },
+    });
+
+    await wrapper.get('button').trigger('click');
+    await wrapper.findAll('[role="option"]')[1].trigger('click');
+
+    expect(wrapper.emitted('update:modelValue')?.[0]).toEqual([2026]);
   });
 
   it('renders form field with label and hint', () => {
@@ -1929,6 +1980,39 @@ describe('@treeui/vue', () => {
     expect(link.exists()).toBe(true);
     expect(link.attributes('href')).toBe('/products');
     expect(link.text()).toBe('Products');
+    expect(wrapper.find('[aria-current]').exists()).toBe(false);
+  });
+
+  it('renders breadcrumb item from string to prop when router is not installed', () => {
+    const wrapper = mount(TreeBreadcrumbItem, {
+      props: { to: '/products' },
+      slots: { default: 'Products' },
+    });
+
+    const link = wrapper.find('a.tree-breadcrumb__link');
+    expect(link.exists()).toBe(true);
+    expect(link.attributes('href')).toBe('/products');
+  });
+
+  it('renders breadcrumb item with RouterLink when to prop is used and router is available', () => {
+    const wrapper = mount(TreeBreadcrumbItem, {
+      props: {
+        to: { name: 'products' },
+      },
+      slots: {
+        default: 'Products',
+      },
+      global: {
+        components: {
+          RouterLink: {
+            props: ['to'],
+            template: '<a class="router-link-stub"><slot /></a>',
+          },
+        },
+      },
+    });
+
+    expect(wrapper.find('.router-link-stub.tree-breadcrumb__link').exists()).toBe(true);
     expect(wrapper.find('[aria-current]').exists()).toBe(false);
   });
 
@@ -2823,6 +2907,26 @@ describe('TTabs', () => {
 
     await header.trigger('click');
     expect(header.attributes('aria-sort')).toBe('descending');
+  });
+
+  it('renders custom table cells through the keyed slot API', () => {
+    const wrapper = mount({
+      components: { TreeTable },
+      data: () => ({
+        columns: [{ key: 'status', label: 'Status' }],
+        rows: [{ status: 'Ready' }],
+      }),
+      template: `
+        <TreeTable :columns="columns" :rows="rows">
+          <template #cell-status="{ value }">
+            <strong class="custom-status">{{ value }}</strong>
+          </template>
+        </TreeTable>
+      `,
+    });
+
+    expect(wrapper.find('.custom-status').exists()).toBe(true);
+    expect(wrapper.find('.custom-status').text()).toBe('Ready');
   });
 
   // ── Tag ──

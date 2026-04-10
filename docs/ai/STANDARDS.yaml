@@ -190,8 +190,8 @@ components:
     reference-variants: [New, Active, Pending, Error, Default]
     treeui-variants: [solid, outline, ghost, soft, danger]
     note: >
-      Reference uses semantic labels; TreeUI uses visual style
-      variants. Users apply color semantics via variant choice.
+      Reference uses semantic labels; TreeUI keeps visual variants
+      and can layer semantic meaning via badge tone when needed.
 
   conformance:
     treeui-status: PASS
@@ -199,7 +199,7 @@ components:
       Buttons cover all reference variants/sizes plus loading state.
       Inputs exceed the reference with invalid + loading.
       Cards have flexible slot-based structure.
-      Badges use systematic variants instead of hard-coded semantics.
+      Badges keep systematic variants while allowing semantic tone.
 
 # ═══════════════════════════════════════════════════════════════
 # 05 — ICONS & ICONOGRAPHY

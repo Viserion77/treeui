@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, resolveComponent, type Component } from 'vue';
+import { computed, getCurrentInstance, type Component } from 'vue';
 
 export type TreeLinkVariant = 'default' | 'muted' | 'danger';
 
@@ -20,19 +20,21 @@ const props = withDefaults(
   },
 );
 
+const instance = getCurrentInstance();
+
+const routerLinkComponent = computed<Component | null>(() => {
+  if (!props.to) return null;
+
+  return (instance?.appContext.components.RouterLink as Component | undefined) ?? null;
+});
+
 const hasRouterLink = computed(() => {
-  if (!props.to) return false;
-  try {
-    const resolved = resolveComponent('RouterLink');
-    return typeof resolved !== 'string';
-  } catch {
-    return false;
-  }
+  return Boolean(routerLinkComponent.value);
 });
 
 const tag = computed<string | Component>(() => {
   if (props.disabled) return 'span';
-  if (props.to && hasRouterLink.value) return resolveComponent('RouterLink') as Component;
+  if (props.to && routerLinkComponent.value) return routerLinkComponent.value;
   return 'a';
 });
 

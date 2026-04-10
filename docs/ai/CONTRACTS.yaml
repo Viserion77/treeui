@@ -110,6 +110,8 @@ shared_variants:
 shared_props:
   variant:
     used_by: [TBadge, TButton, TCard]
+  tone:
+    used_by: [TBadge, TStat]
   size:
     used_by: [TBadge, TButton, TCard, TCheckbox, TCombobox, TConfirmDialog, TDatePicker, TDropdown, TFileUpload, TInput, TModal, TRadio, TRadioGroup, TSelect, TSpinner, TTextarea, TTimeline]
   disabled:

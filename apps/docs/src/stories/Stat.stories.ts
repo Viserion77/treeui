@@ -13,6 +13,7 @@ const meta = {
     meta: 'vs last month',
     tone: 'success',
     trendDirection: 'up',
+    loading: false,
   },
   argTypes: {
     tone: {
@@ -89,6 +90,17 @@ export const CustomContent: Story = {
             </span>
           </template>
         </TStat>
+      </div>
+    `,
+  }),
+};
+
+export const Loading: Story = {
+  render: () => ({
+    components: { TStat },
+    template: `
+      <div style="width: 360px;">
+        <TStat loading label="Monthly recurring revenue" />
       </div>
     `,
   }),

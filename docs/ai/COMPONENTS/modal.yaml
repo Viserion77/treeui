@@ -6,6 +6,9 @@ kind: overlay
 status: available
 purpose: "Accessible modal dialog for focused tasks and confirmations."
 
+usage:
+  vue_pattern: "Supports `v-model:open` via the `open` prop and `update:open` event."
+
 props:
   open:
     type: boolean
@@ -68,4 +71,4 @@ behavior:
   overlay_click_closes_when_enabled: true
   close_button_optional: true
 
-example: '<TModal title="Invite teammate"><template #trigger><TButton>Open modal</TButton></template></TModal>'
+example: '<TModal v-model:open="open" title="Invite teammate"><template #trigger><TButton>Open modal</TButton></template></TModal>'

@@ -1,7 +1,7 @@
 {
-  "generatedAt": "2026-04-08T23:46:08.472Z",
+  "generatedAt": "2026-04-10T16:00:06.984Z",
   "packageName": "@treeui/vue",
-  "packageVersion": "0.5.0",
+  "packageVersion": "0.6.0",
   "decisionGuides": [
     {
       "id": "single-choice",
@@ -279,6 +279,37 @@
       ]
     },
     {
+      "id": "color-field",
+      "name": "Color field",
+      "useWhen": [
+        "A form needs a color selection control without adding a dedicated TreeUI component."
+      ],
+      "compose": [
+        "TFormField",
+        "native input[type=\"color\"]"
+      ],
+      "notes": [
+        "Wrap the native color input with `TFormField` for label, hint, and error handling."
+      ]
+    },
+    {
+      "id": "tag-input",
+      "name": "Tag input field",
+      "useWhen": [
+        "A form needs freeform tag entry such as domains, labels, or emails."
+      ],
+      "compose": [
+        "TFormField",
+        "TInput",
+        "TTag",
+        "TStack"
+      ],
+      "notes": [
+        "Keep the draft value in app state and add a tag on Enter or separator keys.",
+        "Use removable `TTag` items below or inside the field wrapper."
+      ]
+    },
+    {
       "id": "data-listing",
       "name": "Data table with paging",
       "useWhen": [
@@ -290,7 +321,23 @@
         "TStack"
       ],
       "notes": [
-        "`TTable` stays focused on structured listing; filters and toolbars compose around it."
+        "`TTable` stays focused on structured listing; filters and toolbars compose around it.",
+        "Use `#cell-{key}` slots when a column renders derived or rich content."
+      ]
+    },
+    {
+      "id": "router-backed-tabs",
+      "name": "Router-backed tabs",
+      "useWhen": [
+        "Tabs should deep-link to app state without turning into primary route navigation."
+      ],
+      "compose": [
+        "TTabs",
+        "app router state"
+      ],
+      "notes": [
+        "Bind `v-model` to a route param, query param, or derived route name in the app layer.",
+        "Prefer `TNavMenu` when the selection becomes app-section navigation instead of in-place panel switching."
       ]
     },
     {
@@ -306,6 +353,21 @@
       ],
       "notes": [
         "Use `TToast` only for the post-confirm success feedback."
+      ]
+    },
+    {
+      "id": "chart-surface",
+      "name": "Chart surface",
+      "useWhen": [
+        "A screen needs data visualization, but the charting engine should stay external to TreeUI."
+      ],
+      "compose": [
+        "TCard",
+        "TStack",
+        "external chart library"
+      ],
+      "notes": [
+        "Use TreeUI for the surrounding surface, headings, badges, filters, and empty/loading states."
       ]
     },
     {
@@ -408,7 +470,7 @@
       "TSelect": {
         "required": [],
         "notes": [
-          "Pass `options` as `{ label, value, disabled? }[]`.",
+          "Pass `options` as `{ label, value, disabled? }[]` where `value` can be `string` or `number`.",
           "Use `placeholder` when no selection has been made."
         ]
       },
@@ -485,6 +547,19 @@
         "required": [],
         "notes": [
           "Pass `plans` matching the same core fields used by `TPricingCard`."
+        ]
+      },
+      "TModal": {
+        "required": [],
+        "notes": [
+          "Use `v-model:open` for the idiomatic Vue controlled pattern."
+        ]
+      },
+      "TBreadcrumb": {
+        "required": [],
+        "notes": [
+          "Use `href` for native links.",
+          "Use `to` when the app has vue-router and breadcrumb items should render RouterLink."
         ]
       }
     },
@@ -774,6 +849,19 @@
           ]
         },
         {
+          "name": "tone",
+          "type": "TreeBadgeTone",
+          "default": "neutral",
+          "values": [
+            "neutral",
+            "success",
+            "warning",
+            "danger",
+            "info"
+          ],
+          "description": "Optional semantic tone layered on top of the visual variant."
+        },
+        {
           "name": "size",
           "type": "TreeSize",
           "default": "md",
@@ -857,7 +945,10 @@
       },
       "setup": {
         "required": [],
-        "notes": []
+        "notes": [
+          "Use `href` for native links.",
+          "Use `to` when the app has vue-router and breadcrumb items should render RouterLink."
+        ]
       },
       "recipes": []
     },
@@ -1056,7 +1147,9 @@
         "required": [],
         "notes": []
       },
-      "recipes": []
+      "recipes": [
+        "chart-surface"
+      ]
     },
     {
       "name": "TCheckbox",
@@ -2702,6 +2795,8 @@
         "form-field-input",
         "searchable-multi-choice",
         "date-range-form",
+        "color-field",
+        "tag-input",
         "hierarchy-picker"
       ]
     },
@@ -2919,7 +3014,8 @@
         "notes": []
       },
       "recipes": [
-        "form-field-input"
+        "form-field-input",
+        "tag-input"
       ]
     },
     {
@@ -3247,7 +3343,9 @@
       },
       "setup": {
         "required": [],
-        "notes": []
+        "notes": [
+          "Use `v-model:open` for the idiomatic Vue controlled pattern."
+        ]
       },
       "recipes": []
     },
@@ -4392,14 +4490,14 @@
       "props": [
         {
           "name": "modelValue",
-          "type": "string",
+          "type": "string | number",
           "default": ""
         },
         {
           "name": "options",
           "type": "TreeSelectOption[]",
           "default": "[]",
-          "note": "Array of { label: string; value: string; disabled?: boolean }"
+          "note": "Array of { label: string; value: string | number; disabled?: boolean }"
         },
         {
           "name": "open",
@@ -4473,13 +4571,14 @@
         "home_end_navigation: true"
       ],
       "behavior": [
-        "update_payload_type: string",
+        "update_payload_type: string | number",
         "loading_does_not_disable_by_itself: true",
         "placeholder_shown_as_muted_text: true",
         "chevron_rotates_when_open: true",
         "check_icon_on_selected_option: true",
         "outside_click_closes_dropdown: true",
-        "focus_restores_on_close: true"
+        "focus_restores_on_close: true",
+        "numeric_values_supported_without_string_coercion: true"
       ],
       "selection": {
         "keywords": [
@@ -4508,7 +4607,7 @@
       "setup": {
         "required": [],
         "notes": [
-          "Pass `options` as `{ label, value, disabled? }[]`.",
+          "Pass `options` as `{ label, value, disabled? }[]` where `value` can be `string` or `number`.",
           "Use `placeholder` when no selection has been made."
         ]
       },
@@ -4986,7 +5085,9 @@
         "notes": []
       },
       "recipes": [
-        "data-listing"
+        "tag-input",
+        "data-listing",
+        "chart-surface"
       ]
     },
     {
@@ -5046,6 +5147,11 @@
             "down",
             "neutral"
           ]
+        },
+        {
+          "name": "loading",
+          "type": "boolean",
+          "default": "false"
         }
       ],
       "events": [],
@@ -5073,7 +5179,8 @@
       "behavior": [
         "value_and_trend_are_optional: true",
         "icon_slot_adds_visual_emphasis: true",
-        "trend_indicator_changes_with_direction: true"
+        "trend_indicator_changes_with_direction: true",
+        "loading_renders_internal_skeleton_placeholders: true"
       ],
       "selection": {
         "keywords": [
@@ -5511,7 +5618,9 @@
         "required": [],
         "notes": []
       },
-      "recipes": []
+      "recipes": [
+        "router-backed-tabs"
+      ]
     },
     {
       "name": "TTag",
@@ -5592,7 +5701,9 @@
         "required": [],
         "notes": []
       },
-      "recipes": []
+      "recipes": [
+        "tag-input"
+      ]
     },
     {
       "name": "TTextarea",

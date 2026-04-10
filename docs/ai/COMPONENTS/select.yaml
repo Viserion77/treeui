@@ -8,12 +8,12 @@ purpose: "Custom styled dropdown select with listbox; controlled and uncontrolle
 
 props:
   modelValue:
-    type: string
+    type: "string | number"
     default: ""
   options:
     type: "TreeSelectOption[]"
     default: "[]"
-    note: "Array of { label: string; value: string; disabled?: boolean }"
+    note: "Array of { label: string; value: string | number; disabled?: boolean }"
   open:
     type: boolean
     default: undefined
@@ -62,13 +62,14 @@ a11y:
   home_end_navigation: true
 
 behavior:
-  update_payload_type: string
+  update_payload_type: "string | number"
   loading_does_not_disable_by_itself: true
   placeholder_shown_as_muted_text: true
   chevron_rotates_when_open: true
   check_icon_on_selected_option: true
   outside_click_closes_dropdown: true
   focus_restores_on_close: true
+  numeric_values_supported_without_string_coercion: true
 
 example: |
   <TSelect

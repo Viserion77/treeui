@@ -38,7 +38,7 @@ export const Playground: Story = {
     },
     template: `
       <TModal
-        :open="open"
+        v-model:open="open"
         :size="args.size"
         :disabled="args.disabled"
         :title="args.title"
@@ -46,7 +46,6 @@ export const Playground: Story = {
         :close-on-escape="args.closeOnEscape"
         :close-on-overlay="args.closeOnOverlay"
         :show-close-button="args.showCloseButton"
-        @update:open="open = $event"
       >
         <template #trigger>
           <TButton variant="outline">Open modal</TButton>
@@ -93,8 +92,7 @@ export const States: Story = {
         <TModal
           title="Default modal"
           description="Balanced spacing and quiet contrast for product work."
-          :open="defaultOpen"
-          @update:open="defaultOpen = $event"
+          v-model:open="defaultOpen"
         >
           <template #trigger>
             <TButton variant="outline">Default</TButton>
@@ -106,8 +104,7 @@ export const States: Story = {
           size="lg"
           title="Large modal"
           description="Use a larger surface when the task needs richer content."
-          :open="largeOpen"
-          @update:open="largeOpen = $event"
+          v-model:open="largeOpen"
         >
           <template #trigger>
             <TButton>Large</TButton>

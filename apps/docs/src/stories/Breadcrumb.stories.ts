@@ -20,9 +20,9 @@ export const Playground: Story = {
     setup: () => ({ args }),
     template: `
       <TBreadcrumb v-bind="args">
-        <TBreadcrumbItem href="/">Home</TBreadcrumbItem>
-        <TBreadcrumbItem href="/products">Products</TBreadcrumbItem>
-        <TBreadcrumbItem href="/products/components">Components</TBreadcrumbItem>
+        <TBreadcrumbItem to="/">Home</TBreadcrumbItem>
+        <TBreadcrumbItem to="/products">Products</TBreadcrumbItem>
+        <TBreadcrumbItem to="/products/components">Components</TBreadcrumbItem>
         <TBreadcrumbItem>Breadcrumb</TBreadcrumbItem>
       </TBreadcrumb>
     `,

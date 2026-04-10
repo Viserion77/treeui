@@ -58,6 +58,29 @@ recipes:
     notes:
       - "Use `TCard` only when the stat needs additional arbitrary content."
 
+  - id: color-field
+    name: "Color field"
+    use_when:
+      - "A form needs a color selection control without adding a dedicated TreeUI component."
+    compose:
+      - TFormField
+      - native input[type="color"]
+    notes:
+      - "Wrap the native color input with `TFormField` for label, hint, and error handling."
+
+  - id: tag-input
+    name: "Tag input field"
+    use_when:
+      - "A form needs freeform tag entry such as domains, labels, or emails."
+    compose:
+      - TFormField
+      - TInput
+      - TTag
+      - TStack
+    notes:
+      - "Keep the draft value in app state and add a tag on Enter or separator keys."
+      - "Use removable `TTag` items below or inside the field wrapper."
+
   - id: data-listing
     name: "Data table with paging"
     use_when:
@@ -68,6 +91,18 @@ recipes:
       - TStack
     notes:
       - "`TTable` stays focused on structured listing; filters and toolbars compose around it."
+      - "Use `#cell-{key}` slots when a column renders derived or rich content."
+
+  - id: router-backed-tabs
+    name: "Router-backed tabs"
+    use_when:
+      - "Tabs should deep-link to app state without turning into primary route navigation."
+    compose:
+      - TTabs
+      - app router state
+    notes:
+      - "Bind `v-model` to a route param, query param, or derived route name in the app layer."
+      - "Prefer `TNavMenu` when the selection becomes app-section navigation instead of in-place panel switching."
 
   - id: confirm-destructive-action
     name: "Destructive confirmation flow"
@@ -79,6 +114,17 @@ recipes:
       - TToast
     notes:
       - "Use `TToast` only for the post-confirm success feedback."
+
+  - id: chart-surface
+    name: "Chart surface"
+    use_when:
+      - "A screen needs data visualization, but the charting engine should stay external to TreeUI."
+    compose:
+      - TCard
+      - TStack
+      - external chart library
+    notes:
+      - "Use TreeUI for the surrounding surface, headings, badges, filters, and empty/loading states."
 
   - id: anchored-help
     name: "Anchored help affordance"

@@ -55,17 +55,6 @@ jobs:
           PW_SKIP_BUILD: "1"
         run: pnpm test:e2e
 
-      - name: Upload package artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: package-build
-          path: |
-            packages/tokens/dist
-            packages/utils/dist
-            packages/icons/dist
-            packages/vue/dist
-          retention-days: 1
-
       - name: Upload Storybook artifacts
         uses: actions/upload-artifact@v4
         with:
@@ -97,11 +86,15 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Download package artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: package-build
-          path: .
+      - name: Build packages
+        run: pnpm build:packages
+
+      - name: Verify publish tarballs
+        run: |
+          pnpm --filter @treeui/tokens exec npm --cache /tmp/npm-cache-tokens pack --dry-run | grep "dist/styles.css"
+          pnpm --filter @treeui/tokens exec npm --cache /tmp/npm-cache-tokens pack --dry-run | grep "dist/index.js"
+          pnpm --filter @treeui/vue exec npm --cache /tmp/npm-cache-vue pack --dry-run | grep "dist/style.css"
+          pnpm --filter @treeui/vue exec npm --cache /tmp/npm-cache-vue pack --dry-run | grep "dist/index.js"
 
       - name: Configure npm auth
         run: echo "//registry.npmjs.org/:_authToken=\${NPM_TOKEN}" >> .npmrc

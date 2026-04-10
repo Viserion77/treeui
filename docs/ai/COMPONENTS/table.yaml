@@ -30,6 +30,7 @@ events:
 slots:
   "cell-{key}":
     description: Custom cell renderer for a specific column. Receives `{ row, value }`.
+    note: "Use this when the displayed value does not come directly from `row[column.key]` or needs custom markup."
   "header-{key}":
     description: Custom header renderer for a specific column. Receives `{ column }`.
   empty:

@@ -30,6 +30,20 @@ describe('Milestone 1 components', () => {
     expect(wrapper.find('.tree-stat__trend').text()).toContain('12%');
   });
 
+  it('renders stat loading placeholders with aria-busy', () => {
+    const wrapper = mount(TreeStat, {
+      props: {
+        loading: true,
+        label: 'MRR',
+      },
+    });
+
+    expect(wrapper.classes()).toContain('is-loading');
+    expect(wrapper.attributes('aria-busy')).toBe('true');
+    expect(wrapper.find('.tree-stat__loading').exists()).toBe(true);
+    expect(wrapper.find('.tree-stat__value').exists()).toBe(false);
+  });
+
   it('steps number input with controls and keyboard while respecting bounds', async () => {
     const wrapper = mount(TreeNumberInput, {
       props: {

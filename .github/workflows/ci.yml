@@ -91,10 +91,15 @@ jobs:
 
       - name: Verify publish tarballs
         run: |
-          pnpm --filter @treeui/tokens exec npm --cache /tmp/npm-cache-tokens pack --dry-run | grep "dist/styles.css"
-          pnpm --filter @treeui/tokens exec npm --cache /tmp/npm-cache-tokens pack --dry-run | grep "dist/index.js"
-          pnpm --filter @treeui/vue exec npm --cache /tmp/npm-cache-vue pack --dry-run | grep "dist/style.css"
-          pnpm --filter @treeui/vue exec npm --cache /tmp/npm-cache-vue pack --dry-run | grep "dist/index.js"
+          TOKENS_PACK_OUTPUT="$(pnpm --filter @treeui/tokens exec npm --cache /tmp/npm-cache-tokens pack --dry-run 2>&1)"
+          printf '%s\n' "$TOKENS_PACK_OUTPUT"
+          grep -F "dist/styles.css" <<<"$TOKENS_PACK_OUTPUT"
+          grep -F "dist/index.js" <<<"$TOKENS_PACK_OUTPUT"
+
+          VUE_PACK_OUTPUT="$(pnpm --filter @treeui/vue exec npm --cache /tmp/npm-cache-vue pack --dry-run 2>&1)"
+          printf '%s\n' "$VUE_PACK_OUTPUT"
+          grep -F "dist/style.css" <<<"$VUE_PACK_OUTPUT"
+          grep -F "dist/index.js" <<<"$VUE_PACK_OUTPUT"
 
       - name: Configure npm auth
         run: echo "//registry.npmjs.org/:_authToken=\${NPM_TOKEN}" >> .npmrc

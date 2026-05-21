@@ -199,7 +199,7 @@ pnpm lint                             # ESLint across all packages
 pnpm typecheck                        # vue-tsc + tsc across all packages
 pnpm test                             # Vitest suites
 pnpm build                            # build packages + Storybook
-pnpm build:packages                   # build only @treeui/tokens/@treeui/utils/@treeui/icons/@treeui/vue/@treeui/mcp
+pnpm build:packages                   # build only @treeui/tokens / @treeui/utils / @treeui/icons / @treeui/vue / @treeui/mcp
 pnpm test:e2e                         # Playwright smoke tests against docs site
 pnpm changeset                        # create a changeset entry
 pnpm changeset status                 # list pending changesets

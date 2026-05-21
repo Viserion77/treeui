@@ -1,6 +1,6 @@
 {
   "name": "@treeui/utils",
-  "version": "0.1.1",
+  "version": "0.6.2",
   "description": "Framework-agnostic interaction utilities for TreeUI.",
   "type": "module",
   "main": "./dist/index.cjs",

@@ -171,14 +171,15 @@ squash-merge the version PR
             ↓
 release job re-runs on the merge commit
             ↓
-publishes @treeui/tokens, @treeui/utils, @treeui/icons, @treeui/vue to npm
+publishes @treeui/tokens, @treeui/utils, @treeui/icons, @treeui/vue, @treeui/mcp to npm
             ↓
 creates git tag(s) + GitHub Release(s)
 ```
 
-The four packages (`@treeui/tokens`, `@treeui/utils`, `@treeui/icons`,
+The four UI packages (`@treeui/tokens`, `@treeui/utils`, `@treeui/icons`,
 `@treeui/vue`) are **linked** in [.changeset/config.json](./.changeset/config.json),
-so they always release with the same version number.
+so they always release with the same version number. `@treeui/mcp` is also
+published by the same release job, but it versions independently.
 
 ### Troubleshooting
 
@@ -198,7 +199,7 @@ pnpm lint                             # ESLint across all packages
 pnpm typecheck                        # vue-tsc + tsc across all packages
 pnpm test                             # Vitest suites
 pnpm build                            # build packages + Storybook
-pnpm build:packages                   # build only the four publishable packages
+pnpm build:packages                   # build only the five publishable packages
 pnpm test:e2e                         # Playwright smoke tests against docs site
 pnpm changeset                        # create a changeset entry
 pnpm changeset status                 # list pending changesets

@@ -109,6 +109,7 @@ export const treeTokens = {
   z: {
     base: '1',
     dropdown: '1000',
+    popover: '1050',
     sticky: '1100',
     overlay: '1200',
     modal: '1300',

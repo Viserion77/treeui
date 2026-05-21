@@ -101,6 +101,11 @@ jobs:
           grep -F "dist/style.css" <<<"$VUE_PACK_OUTPUT"
           grep -F "dist/index.js" <<<"$VUE_PACK_OUTPUT"
 
+          MCP_PACK_OUTPUT="$(pnpm --filter @treeui/mcp exec npm --cache /tmp/npm-cache-mcp pack --dry-run 2>&1)"
+          printf '%s\n' "$MCP_PACK_OUTPUT"
+          grep -F "dist/index.js" <<<"$MCP_PACK_OUTPUT"
+          grep -F "dist/cli.js" <<<"$MCP_PACK_OUTPUT"
+
       - name: Configure npm auth
         run: echo "//registry.npmjs.org/:_authToken=\${NPM_TOKEN}" >> .npmrc
         env:

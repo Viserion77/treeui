@@ -1,0 +1,5 @@
+# TreeUI code owners
+# Every PR requires review from listed owners (enforced via repo ruleset on `main`).
+# See: https://docs.github.com/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+* @Viserion77

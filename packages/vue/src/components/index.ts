@@ -83,6 +83,9 @@ export { default as TPricing } from './TreePricing.vue';
 export { default as TPricingCard } from './TreePricingCard.vue';
 export type { PricingFeature } from './TreePricingCard.vue';
 export { default as TMarkdownEditor } from './TreeMarkdownEditor.vue';
+export { default as TIcon } from './TreeIcon.vue';
+export { default as TreeIcon } from './TreeIcon.vue';
+export type { TreeIconName } from '@treeui/icons';
 
 export { default as TreeAccordion } from './TreeAccordion.vue';
 export { default as TreeAccordionItem } from './TreeAccordionItem.vue';

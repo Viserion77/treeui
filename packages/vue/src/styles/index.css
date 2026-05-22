@@ -1136,6 +1136,13 @@
   margin-top: var(--tree-space-2);
 }
 
+.tree-icon {
+  display: inline-block;
+  flex-shrink: 0;
+  vertical-align: middle;
+  color: currentColor;
+}
+
 .tree-badge {
   --tree-badge-solid-bg: var(--tree-color-brand-primary);
   --tree-badge-solid-text: var(--tree-color-brand-contrast);

@@ -540,3 +540,14 @@ component_profiles:
         when: "The options are flat rich rows."
       - component: TNavMenu
         when: "The hierarchy is actually app navigation."
+
+  TIcon:
+    keywords: [icon, svg, glyph, pictogram]
+    use_when:
+      - "You need to render a registered TreeUI icon by name."
+      - "You want consistent sizing and a11y defaults without importing the icon component directly."
+    avoid_when:
+      - "The icon is not in the @treeui/icons registry — import or register it instead."
+    alternatives:
+      - component: "named import from @treeui/icons"
+        when: "You need tree-shaken, statically-imported icon components."

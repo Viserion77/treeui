@@ -62,6 +62,7 @@ import {
   TPricing,
   TPricingCard,
   TMarkdownEditor,
+  TIcon,
 } from './components';
 
 const components = {
@@ -127,6 +128,7 @@ const components = {
   TPricing,
   TPricingCard,
   TMarkdownEditor,
+  TIcon,
   TreeAccordion: TAccordion,
   TreeAccordionItem: TAccordionItem,
   TreeAlert: TAlert,
@@ -189,6 +191,7 @@ const components = {
   TreePricing: TPricing,
   TreePricingCard: TPricingCard,
   TreeMarkdownEditor: TMarkdownEditor,
+  TreeIcon: TIcon,
 };
 
 export const TreeUIPlugin: Plugin = {

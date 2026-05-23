@@ -1,0 +1,59 @@
+name: TIcon
+legacy_alias: TreeIcon
+source_file: packages/vue/src/components/TreeIcon.vue
+package: "@treeui/vue"
+kind: display
+status: available
+purpose: "Render a registered TreeUI icon by name with consistent sizing and accessibility defaults."
+
+props:
+  name:
+    type: TreeIconName
+    required: true
+    description: "Icon identifier from the @treeui/icons registry."
+    values:
+      - alert-circle
+      - calendar
+      - check
+      - chevron-left
+      - chevron-down
+      - chevron-right
+      - info
+      - loader-circle
+      - search
+      - x
+  size:
+    type: number | string
+    default: 20
+    description: "Pixel size for both width and height of the rendered svg."
+  strokeWidth:
+    type: number | string
+    default: 2
+  absoluteStrokeWidth:
+    type: boolean
+    default: true
+    description: "When true, stroke width stays visually constant across sizes."
+  label:
+    type: string
+    default: undefined
+    description: "Accessible label. When set, the icon becomes role=\"img\" with aria-label; otherwise it is aria-hidden."
+
+events: []
+slots: []
+
+a11y:
+  decorative_by_default: true
+  becomes_image_when_labeled: true
+  rule: "Provide `label` only when the icon conveys meaning that is not already in adjacent text."
+
+example: |
+  <!-- Decorative -->
+  <TIcon name="check" />
+
+  <!-- Meaningful (no adjacent text) -->
+  <TIcon name="alert-circle" label="Warning" size="32" />
+
+related:
+  - TBadge
+  - TButton
+  - TAlert

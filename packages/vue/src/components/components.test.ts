@@ -45,6 +45,7 @@ import TreeTimeline from './TreeTimeline.vue';
 import TreePricingCard from './TreePricingCard.vue';
 import TreePricing from './TreePricing.vue';
 import TreeMarkdownEditor from './TreeMarkdownEditor.vue';
+import TreeIcon from './TreeIcon.vue';
 import TreeLink from './TreeLink.vue';
 import TreeNavMenu from './TreeNavMenu.vue';
 import { useToast } from '../composables/useToast';
@@ -3249,5 +3250,34 @@ describe('TTabs', () => {
     await new Promise((r) => setTimeout(r, 50));
 
     expect(uploadImage).toHaveBeenCalledWith(file);
+  });
+});
+
+describe('TreeIcon', () => {
+  it('renders the registered icon by name with aria-hidden by default', () => {
+    const wrapper = mount(TreeIcon, { props: { name: 'check' } });
+
+    const svg = wrapper.find('svg');
+    expect(svg.exists()).toBe(true);
+    expect(svg.classes()).toContain('tree-icon');
+    expect(svg.attributes('aria-hidden')).toBe('true');
+    expect(svg.attributes('role')).toBeUndefined();
+  });
+
+  it('marks the icon as an image with aria-label when label is provided', () => {
+    const wrapper = mount(TreeIcon, { props: { name: 'alert-circle', label: 'Warning' } });
+
+    const svg = wrapper.find('svg');
+    expect(svg.attributes('role')).toBe('img');
+    expect(svg.attributes('aria-label')).toBe('Warning');
+    expect(svg.attributes('aria-hidden')).toBeUndefined();
+  });
+
+  it('forwards size to the underlying svg', () => {
+    const wrapper = mount(TreeIcon, { props: { name: 'info', size: 32 } });
+
+    const svg = wrapper.find('svg');
+    expect(svg.attributes('width')).toBe('32');
+    expect(svg.attributes('height')).toBe('32');
   });
 });

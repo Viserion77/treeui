@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-21T20:55:31.764Z",
+  "generatedAt": "2026-05-22T20:25:09.547Z",
   "packageName": "@treeui/vue",
   "packageVersion": "0.6.2",
   "decisionGuides": [
@@ -2902,6 +2902,99 @@
         "date-range-form",
         "stat-grid"
       ]
+    },
+    {
+      "name": "TIcon",
+      "legacyAlias": "TreeIcon",
+      "aliases": [
+        "TreeIcon"
+      ],
+      "package": "@treeui/vue",
+      "kind": "display",
+      "category": "Data Display",
+      "status": "available",
+      "purpose": "Render a registered TreeUI icon by name with consistent sizing and accessibility defaults.",
+      "sourceFile": "packages/vue/src/components/TreeIcon.vue",
+      "storyFile": "apps/docs/src/stories/Icon.stories.ts",
+      "storyTitle": "Components/Data Display/Icon",
+      "manifestFile": "docs/ai/COMPONENTS/icon.yaml",
+      "props": [
+        {
+          "name": "name",
+          "type": "TreeIconName",
+          "required": true,
+          "values": [
+            "alert-circle",
+            "calendar",
+            "check",
+            "chevron-left",
+            "chevron-down",
+            "chevron-right",
+            "info",
+            "loader-circle",
+            "search",
+            "x"
+          ],
+          "description": "Icon identifier from the @treeui/icons registry."
+        },
+        {
+          "name": "size",
+          "type": "number | string",
+          "default": "20",
+          "description": "Pixel size for both width and height of the rendered svg."
+        },
+        {
+          "name": "strokeWidth",
+          "type": "number | string",
+          "default": "2"
+        },
+        {
+          "name": "absoluteStrokeWidth",
+          "type": "boolean",
+          "default": "true",
+          "description": "When true, stroke width stays visually constant across sizes."
+        },
+        {
+          "name": "label",
+          "type": "string",
+          "default": "undefined",
+          "description": "Accessible label. When set, the icon becomes role=\"img\" with aria-label; otherwise it is aria-hidden."
+        }
+      ],
+      "events": [],
+      "slots": [],
+      "a11y": [
+        "decorative_by_default: true",
+        "becomes_image_when_labeled: true",
+        "rule: Provide `label` only when the icon conveys meaning that is not already in adjacent text."
+      ],
+      "behavior": [],
+      "selection": {
+        "keywords": [
+          "icon",
+          "svg",
+          "glyph",
+          "pictogram"
+        ],
+        "useWhen": [
+          "You need to render a registered TreeUI icon by name.",
+          "You want consistent sizing and a11y defaults without importing the icon component directly."
+        ],
+        "avoidWhen": [
+          "The icon is not in the @treeui/icons registry — import or register it instead."
+        ],
+        "alternatives": [
+          {
+            "component": "named import from @treeui/icons",
+            "when": "You need tree-shaken, statically-imported icon components."
+          }
+        ]
+      },
+      "setup": {
+        "required": [],
+        "notes": []
+      },
+      "recipes": []
     },
     {
       "name": "TInput",

@@ -1,5 +1,19 @@
 # @treeui/vue
 
+## 0.7.0
+
+### Minor Changes
+
+- 5e9b553: Add `TIcon` (alias `TreeIcon`) component: render any registered TreeUI icon by `name` with consistent sizing and a11y defaults. Icons are decorative (`aria-hidden`) by default, becoming `role="img"` with `aria-label` when a `label` prop is provided.
+
+### Patch Changes
+
+- 5e9b553: Sync root `vite` devDependency spec to `^8.0.14` to match the lockfile resolution. The Dependabot security PR bumped the lockfile (vite 5 → 8) without updating the `package.json` spec; this aligns them.
+- Updated dependencies [5e9b553]
+  - @treeui/tokens@0.7.0
+  - @treeui/utils@0.7.0
+  - @treeui/icons@0.7.0
+
 ## 0.6.2
 
 ### Patch Changes

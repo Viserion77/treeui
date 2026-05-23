@@ -1,5 +1,11 @@
 # @treeui/tokens
 
+## 0.7.0
+
+### Minor Changes
+
+- 5e9b553: Add `TIcon` (alias `TreeIcon`) component: render any registered TreeUI icon by `name` with consistent sizing and a11y defaults. Icons are decorative (`aria-hidden`) by default, becoming `role="img"` with `aria-label` when a `label` prop is provided.
+
 ## 0.6.2
 
 ### Patch Changes

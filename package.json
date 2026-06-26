@@ -28,6 +28,7 @@
     "test:e2e": "pnpm -w exec playwright test",
     "screenshots": "pnpm -w exec tsx scripts/screenshot-components.ts",
     "screenshots:only": "pnpm -w exec tsx scripts/screenshot-components.ts --skip-build",
+    "render:logos": "node scripts/render-logos.mjs",
     "changeset": "pnpm -w exec changeset",
     "version-packages": "pnpm -w exec changeset version",
     "release": "pnpm build:packages && pnpm -w exec changeset publish"
@@ -36,6 +37,7 @@
     "@changesets/cli": "^2.31.0",
     "@eslint/js": "^9.21.0",
     "@playwright/test": "^1.60.0",
+    "@resvg/resvg-js": "^2.6.2",
     "@storybook/addon-a11y": "^10.4.0",
     "@storybook/addon-docs": "^10.4.0",
     "@storybook/vue3-vite": "^10.4.0",

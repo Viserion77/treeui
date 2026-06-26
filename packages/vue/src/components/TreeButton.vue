@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue';
+import { tv } from '@treeui/utils';
 import type { TreeSize, TreeVariant } from '../types/contracts';
 import TreeSpinner from './TreeSpinner.vue';
 
@@ -26,17 +27,36 @@ const emit = defineEmits<{
   click: [event: MouseEvent];
 }>();
 
+const buttonClass = tv({
+  base: 'tree-button',
+  variants: {
+    variant: {
+      solid: 'tree-button--solid',
+      outline: 'tree-button--outline',
+      ghost: 'tree-button--ghost',
+      soft: 'tree-button--soft',
+      danger: 'tree-button--danger',
+    },
+    size: {
+      sm: 'tree-button--sm',
+      md: 'tree-button--md',
+      lg: 'tree-button--lg',
+    },
+  },
+});
+
 const isNativeButton = computed(() => props.as === 'button');
 const isDisabled = computed(() => props.disabled || props.loading);
-const classes = computed(() => [
-  'tree-button',
-  `tree-button--${props.variant}`,
-  `tree-button--${props.size}`,
-  {
-    'is-loading': props.loading,
-    'is-disabled': isDisabled.value,
-  },
-]);
+const classes = computed(() =>
+  buttonClass({
+    variant: props.variant,
+    size: props.size,
+    class: {
+      'is-loading': props.loading,
+      'is-disabled': isDisabled.value,
+    },
+  }),
+);
 
 const onClick = (event: MouseEvent) => {
   if (isDisabled.value) {

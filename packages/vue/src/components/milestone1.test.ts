@@ -1,16 +1,16 @@
 import { nextTick } from 'vue';
 import { mount } from '@vue/test-utils';
-import TreeMultiSelect from './TreeMultiSelect.vue';
-import TreeNumberInput from './TreeNumberInput.vue';
-import TreeSelectableList from './TreeSelectableList.vue';
-import TreeStat from './TreeStat.vue';
-import TreeSteps from './TreeSteps.vue';
-import TreeToggleGroup from './TreeToggleGroup.vue';
-import TreeTreeView from './TreeTreeView.vue';
+import TMultiSelect from './TMultiSelect.vue';
+import TNumberInput from './TNumberInput.vue';
+import TSelectableList from './TSelectableList.vue';
+import TStat from './TStat.vue';
+import TSteps from './TSteps.vue';
+import TToggleGroup from './TToggleGroup.vue';
+import TTreeView from './TTreeView.vue';
 
 describe('Milestone 1 components', () => {
   it('renders stat content with icon and trend styles', () => {
-    const wrapper = mount(TreeStat, {
+    const wrapper = mount(TStat, {
       props: {
         label: 'MRR',
         value: '$48.2k',
@@ -23,15 +23,15 @@ describe('Milestone 1 components', () => {
       },
     });
 
-    expect(wrapper.classes()).toContain('tree-stat--success');
-    expect(wrapper.find('.tree-stat__icon').exists()).toBe(true);
-    expect(wrapper.find('.tree-stat__label').text()).toBe('MRR');
-    expect(wrapper.find('.tree-stat__value').text()).toBe('$48.2k');
-    expect(wrapper.find('.tree-stat__trend').text()).toContain('12%');
+    expect(wrapper.classes()).toContain('t-stat--success');
+    expect(wrapper.find('.t-stat__icon').exists()).toBe(true);
+    expect(wrapper.find('.t-stat__label').text()).toBe('MRR');
+    expect(wrapper.find('.t-stat__value').text()).toBe('$48.2k');
+    expect(wrapper.find('.t-stat__trend').text()).toContain('12%');
   });
 
   it('renders stat loading placeholders with aria-busy', () => {
-    const wrapper = mount(TreeStat, {
+    const wrapper = mount(TStat, {
       props: {
         loading: true,
         label: 'MRR',
@@ -40,12 +40,12 @@ describe('Milestone 1 components', () => {
 
     expect(wrapper.classes()).toContain('is-loading');
     expect(wrapper.attributes('aria-busy')).toBe('true');
-    expect(wrapper.find('.tree-stat__loading').exists()).toBe(true);
-    expect(wrapper.find('.tree-stat__value').exists()).toBe(false);
+    expect(wrapper.find('.t-stat__loading').exists()).toBe(true);
+    expect(wrapper.find('.t-stat__value').exists()).toBe(false);
   });
 
   it('steps number input with controls and keyboard while respecting bounds', async () => {
-    const wrapper = mount(TreeNumberInput, {
+    const wrapper = mount(TNumberInput, {
       props: {
         modelValue: 1,
         min: 0,
@@ -74,7 +74,7 @@ describe('Milestone 1 components', () => {
   });
 
   it('emits single and multiple toggle group selections', async () => {
-    const single = mount(TreeToggleGroup, {
+    const single = mount(TToggleGroup, {
       props: {
         modelValue: 'day',
         options: [
@@ -90,7 +90,7 @@ describe('Milestone 1 components', () => {
 
     expect(single.emitted('update:modelValue')?.[0]).toEqual(['week']);
 
-    const multiple = mount(TreeToggleGroup, {
+    const multiple = mount(TToggleGroup, {
       props: {
         modelValue: ['design'],
         selectionMode: 'multiple',
@@ -107,7 +107,7 @@ describe('Milestone 1 components', () => {
   });
 
   it('supports keyboard selection in selectable list', async () => {
-    const wrapper = mount(TreeSelectableList, {
+    const wrapper = mount(TSelectableList, {
       attachTo: document.body,
       props: {
         defaultValue: 'release',
@@ -122,7 +122,7 @@ describe('Milestone 1 components', () => {
       },
     });
 
-    const items = wrapper.findAll('.tree-selectable-list__item');
+    const items = wrapper.findAll('.t-selectable-list__item');
     expect(items[0].classes()).toContain('is-selected');
 
     await items[0].trigger('keydown', { key: 'ArrowDown' });
@@ -135,7 +135,7 @@ describe('Milestone 1 components', () => {
   });
 
   it('updates interactive steps and resolves statuses from the current value', async () => {
-    const wrapper = mount(TreeSteps, {
+    const wrapper = mount(TSteps, {
       props: {
         interactive: true,
         modelValue: 'workspace',
@@ -147,18 +147,18 @@ describe('Milestone 1 components', () => {
       },
     });
 
-    const items = wrapper.findAll('.tree-steps__item');
+    const items = wrapper.findAll('.t-steps__item');
     expect(items[0].classes()).toContain('is-complete');
     expect(items[1].classes()).toContain('is-current');
     expect(items[2].classes()).toContain('is-upcoming');
 
-    await wrapper.findAll('.tree-steps__button')[2].trigger('click');
+    await wrapper.findAll('.t-steps__button')[2].trigger('click');
 
     expect(wrapper.emitted('update:modelValue')?.[0]).toEqual(['billing']);
   });
 
   it('opens multi-select options and emits array updates on selection and removal', async () => {
-    const wrapper = mount(TreeMultiSelect, {
+    const wrapper = mount(TMultiSelect, {
       props: {
         modelValue: ['engineering'],
         options: [
@@ -187,7 +187,7 @@ describe('Milestone 1 components', () => {
   });
 
   it('renders tree view selection and expansion interactions', async () => {
-    const wrapper = mount(TreeTreeView, {
+    const wrapper = mount(TTreeView, {
       props: {
         defaultValue: 'docs-roadmap',
         defaultExpanded: ['workspace'],

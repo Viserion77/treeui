@@ -40,7 +40,7 @@ const nodes = [
 ];
 
 const meta = {
-  title: 'Components/Navigation & Disclosure/TreeView',
+  title: 'Components/Navigation & Disclosure/TView',
   component: TTreeView,
   tags: ['autodocs'],
   args: {

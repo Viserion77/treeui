@@ -1,6 +1,5 @@
 name: TCard
-legacy_alias: TreeCard
-source_file: packages/vue/src/components/TreeCard.vue
+source_file: packages/vue/src/components/TCard.vue
 package: "@treeui/vue"
 kind: layout
 status: available
@@ -11,11 +10,11 @@ props:
     type: string
     default: section
   variant:
-    type: TreeCardVariant
+    type: TCardVariant
     default: outline
     values: [outline, soft, solid, inset]
   size:
-    type: TreeSize
+    type: TSize
     default: md
     values: [sm, md, lg]
   title:

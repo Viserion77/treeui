@@ -1,16 +1,15 @@
 component: TTag
 package: "@treeui/vue"
-source: TreeTag.vue
+source: TTag.vue
 description: Removable label/chip for filters and selections.
-aliases: [TreeTag]
 
 props:
   variant:
-    type: TreeTagVariant
+    type: TTagVariant
     default: soft
     values: [solid, outline, soft]
   size:
-    type: TreeSize
+    type: TSize
     default: md
     values: [sm, md, lg]
   removable:

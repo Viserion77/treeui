@@ -4,11 +4,11 @@
 // labels, descriptions, and hidden synonym keywords.
 import { ref } from 'vue';
 import { TFormField, TMultiSelect } from '@treeui/vue';
-import type { TreeMultiSelectOption } from '@treeui/vue';
+import type { TMultiSelectOption } from '@treeui/vue';
 
 const selected = ref<string[]>(['frontend']);
 
-const options: TreeMultiSelectOption[] = [
+const options: TMultiSelectOption[] = [
   {
     label: 'Frontend',
     value: 'frontend',

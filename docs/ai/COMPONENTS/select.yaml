@@ -1,6 +1,5 @@
 name: TSelect
-legacy_alias: TreeSelect
-source_file: packages/vue/src/components/TreeSelect.vue
+source_file: packages/vue/src/components/TSelect.vue
 package: "@treeui/vue"
 kind: primitive
 status: available
@@ -11,7 +10,7 @@ props:
     type: "string | number"
     default: ""
   options:
-    type: "TreeSelectOption[]"
+    type: "TSelectOption[]"
     default: "[]"
     note: "Array of { label: string; value: string | number; disabled?: boolean }"
   open:
@@ -21,7 +20,7 @@ props:
     type: boolean
     default: false
   size:
-    type: TreeSize
+    type: TSize
     default: md
     values: [sm, md, lg]
   disabled:

@@ -17,7 +17,7 @@ props:
     default: 100
     description: "Maximum value."
   size:
-    type: TreeSize
+    type: TSize
     default: md
     values: [sm, md, lg]
   label:

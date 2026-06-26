@@ -4,9 +4,9 @@
 // across nested levels of a hierarchy (e.g. assigning a teammate to folders).
 import { computed, ref } from 'vue';
 import { TFormField, TStack, TTreeView } from '@treeui/vue';
-import type { TreeTreeViewNode } from '@treeui/vue';
+import type { TTreeViewNode } from '@treeui/vue';
 
-const nodes: TreeTreeViewNode[] = [
+const nodes: TTreeViewNode[] = [
   {
     id: 'engineering',
     label: 'Engineering',

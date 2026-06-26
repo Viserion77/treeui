@@ -1,6 +1,5 @@
 name: TButton
-legacy_alias: TreeButton
-source_file: packages/vue/src/components/TreeButton.vue
+source_file: packages/vue/src/components/TButton.vue
 package: "@treeui/vue"
 kind: primitive
 status: available
@@ -11,11 +10,11 @@ props:
     type: string
     default: button
   variant:
-    type: TreeVariant
+    type: TVariant
     default: solid
     values: [solid, outline, ghost, soft, danger]
   size:
-    type: TreeSize
+    type: TSize
     default: md
     values: [sm, md, lg]
   disabled:

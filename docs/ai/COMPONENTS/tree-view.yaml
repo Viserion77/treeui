@@ -1,6 +1,5 @@
 name: TTreeView
-legacy_alias: TreeTreeView
-source_file: packages/vue/src/components/TreeTreeView.vue
+source_file: packages/vue/src/components/TTreeView.vue
 package: "@treeui/vue"
 kind: selection
 status: available
@@ -14,11 +13,11 @@ props:
     type: "string | string[]"
     default: undefined
   nodes:
-    type: "TreeTreeViewNode[]"
+    type: "TTreeViewNode[]"
     default: "[]"
     note: "Array of `{ id, label, description?, meta?, disabled?, children? }`."
   selectionMode:
-    type: TreeTreeViewSelectionMode
+    type: TTreeViewSelectionMode
     default: single
     values: [single, multiple]
   expanded:

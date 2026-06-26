@@ -1,7 +1,7 @@
 {
-  "generatedAt": "2026-05-22T20:25:09.547Z",
+  "generatedAt": "2026-06-26T22:03:23.940Z",
   "packageName": "@treeui/vue",
-  "packageVersion": "0.6.2",
+  "packageVersion": "0.7.0",
   "decisionGuides": [
     {
       "id": "single-choice",
@@ -442,7 +442,7 @@
     },
     "globalRules": [
       "Always import `@treeui/vue/style.css` once in the consuming application.",
-      "Compatibility aliases such as `TreeButton` remain available but are not the preferred direction.",
+      "All components use the `T<Name>` export prefix; there are no `Tree<Name>` aliases.",
       "Form controls use `modelValue` + `update:modelValue`.",
       "Overlay-style components generally support controlled and uncontrolled open state.",
       "Date-only values use `YYYY-MM-DD`.",
@@ -583,16 +583,13 @@
   "components": [
     {
       "name": "TAccordion",
-      "legacyAlias": "TreeAccordion",
-      "aliases": [
-        "TreeAccordion"
-      ],
+      "aliases": [],
       "package": "@treeui/vue",
       "kind": "disclosure",
       "category": "Data Display",
       "status": "available",
       "purpose": "Organized content sections with expandable/collapsible behavior. Supports single-open and multi-open modes.\n",
-      "sourceFile": "packages/vue/src/components/TreeAccordion.vue",
+      "sourceFile": "packages/vue/src/components/TAccordion.vue",
       "storyFile": "apps/docs/src/stories/Accordion.stories.ts",
       "storyTitle": "Components/Data Display/Accordion",
       "manifestFile": "docs/ai/COMPONENTS/accordion.yaml",
@@ -639,16 +636,13 @@
     },
     {
       "name": "TAlert",
-      "legacyAlias": "TreeAlert",
-      "aliases": [
-        "TreeAlert"
-      ],
+      "aliases": [],
       "package": "@treeui/vue",
       "kind": "feedback",
       "category": "Feedback",
       "status": "available",
       "purpose": "Inline status banner for info, success, warning, and danger messages.",
-      "sourceFile": "packages/vue/src/components/TreeAlert.vue",
+      "sourceFile": "packages/vue/src/components/TAlert.vue",
       "storyFile": "apps/docs/src/stories/Alert.stories.ts",
       "storyTitle": "Components/Feedback/Alert",
       "manifestFile": "docs/ai/COMPONENTS/alert.yaml",
@@ -666,7 +660,7 @@
         },
         {
           "name": "size",
-          "type": "TreeSize",
+          "type": "TSize",
           "default": "md",
           "values": [
             "sm",
@@ -742,14 +736,11 @@
     },
     {
       "name": "TAvatar",
-      "legacyAlias": "TreeAvatar",
-      "aliases": [
-        "TreeAvatar"
-      ],
+      "aliases": [],
       "package": "@treeui/vue",
       "category": "Data Display",
       "description": "User image with fallback initials and optional status indicator dot.",
-      "sourceFile": "packages/vue/src/components/TreeAvatar.vue",
+      "sourceFile": "packages/vue/src/components/TAvatar.vue",
       "storyFile": "apps/docs/src/stories/Avatar.stories.ts",
       "storyTitle": "Components/Data Display/Avatar",
       "manifestFile": "docs/ai/COMPONENTS/avatar.yaml",
@@ -774,7 +765,7 @@
         },
         {
           "name": "size",
-          "type": "TreeSize",
+          "type": "TSize",
           "default": "md",
           "values": [
             "sm",
@@ -784,7 +775,7 @@
         },
         {
           "name": "status",
-          "type": "TreeAvatarStatus",
+          "type": "TAvatarStatus",
           "required": false,
           "values": [
             "online",
@@ -822,23 +813,20 @@
     },
     {
       "name": "TBadge",
-      "legacyAlias": "TreeBadge",
-      "aliases": [
-        "TreeBadge"
-      ],
+      "aliases": [],
       "package": "@treeui/vue",
       "kind": "display",
       "category": "Data Display",
       "status": "available",
       "purpose": "Compact status or metadata label with optional icon.",
-      "sourceFile": "packages/vue/src/components/TreeBadge.vue",
+      "sourceFile": "packages/vue/src/components/TBadge.vue",
       "storyFile": "apps/docs/src/stories/Badge.stories.ts",
       "storyTitle": "Components/Data Display/Badge",
       "manifestFile": "docs/ai/COMPONENTS/badge.yaml",
       "props": [
         {
           "name": "variant",
-          "type": "TreeVariant",
+          "type": "TVariant",
           "default": "soft",
           "values": [
             "solid",
@@ -850,7 +838,7 @@
         },
         {
           "name": "tone",
-          "type": "TreeBadgeTone",
+          "type": "TBadgeTone",
           "default": "neutral",
           "values": [
             "neutral",
@@ -863,7 +851,7 @@
         },
         {
           "name": "size",
-          "type": "TreeSize",
+          "type": "TSize",
           "default": "md",
           "values": [
             "sm",
@@ -902,16 +890,13 @@
     },
     {
       "name": "TBreadcrumb",
-      "legacyAlias": "TreeBreadcrumb",
-      "aliases": [
-        "TreeBreadcrumb"
-      ],
+      "aliases": [],
       "package": "@treeui/vue",
       "kind": "navigation",
       "category": "Navigation",
       "status": "available",
       "purpose": "Hierarchical navigation trail showing the user's current location within a site or application.",
-      "sourceFile": "packages/vue/src/components/TreeBreadcrumb.vue",
+      "sourceFile": "packages/vue/src/components/TBreadcrumb.vue",
       "storyFile": "apps/docs/src/stories/Breadcrumb.stories.ts",
       "storyTitle": "Components/Navigation/Breadcrumb",
       "manifestFile": "docs/ai/COMPONENTS/breadcrumb.yaml",
@@ -954,16 +939,13 @@
     },
     {
       "name": "TButton",
-      "legacyAlias": "TreeButton",
-      "aliases": [
-        "TreeButton"
-      ],
+      "aliases": [],
       "package": "@treeui/vue",
       "kind": "primitive",
       "category": "Actions",
       "status": "available",
       "purpose": "Clickable action trigger with variants, sizes, optional polymorphism, and loading state.",
-      "sourceFile": "packages/vue/src/components/TreeButton.vue",
+      "sourceFile": "packages/vue/src/components/TButton.vue",
       "storyFile": "apps/docs/src/stories/Button.stories.ts",
       "storyTitle": "Components/Actions/Button",
       "manifestFile": "docs/ai/COMPONENTS/button.yaml",
@@ -975,7 +957,7 @@
         },
         {
           "name": "variant",
-          "type": "TreeVariant",
+          "type": "TVariant",
           "default": "solid",
           "values": [
             "solid",
@@ -987,7 +969,7 @@
         },
         {
           "name": "size",
-          "type": "TreeSize",
+          "type": "TSize",
           "default": "md",
           "values": [
             "sm",
@@ -1052,16 +1034,13 @@
     },
     {
       "name": "TCard",
-      "legacyAlias": "TreeCard",
-      "aliases": [
-        "TreeCard"
-      ],
+      "aliases": [],
       "package": "@treeui/vue",
       "kind": "layout",
       "category": "Data Display",
       "status": "available",
       "purpose": "Surface container with optional header and footer slots.",
-      "sourceFile": "packages/vue/src/components/TreeCard.vue",
+      "sourceFile": "packages/vue/src/components/TCard.vue",
       "storyFile": "apps/docs/src/stories/Card.stories.ts",
       "storyTitle": "Components/Data Display/Card",
       "manifestFile": "docs/ai/COMPONENTS/card.yaml",
@@ -1073,7 +1052,7 @@
         },
         {
           "name": "variant",
-          "type": "TreeCardVariant",
+          "type": "TCardVariant",
           "default": "outline",
           "values": [
             "outline",
@@ -1084,7 +1063,7 @@
         },
         {
           "name": "size",
-          "type": "TreeSize",
+          "type": "TSize",
           "default": "md",
           "values": [
             "sm",
@@ -1153,16 +1132,13 @@
     },
     {
       "name": "TCheckbox",
-      "legacyAlias": "TreeCheckbox",
-      "aliases": [
-        "TreeCheckbox"
-      ],
+      "aliases": [],
       "package": "@treeui/vue",
       "kind": "primitive",
       "category": "Data Entry",
       "status": "available",
       "purpose": "Boolean toggle with indeterminate state; supports v-model via modelValue.",
-      "sourceFile": "packages/vue/src/components/TreeCheckbox.vue",
+      "sourceFile": "packages/vue/src/components/TCheckbox.vue",
       "storyFile": "apps/docs/src/stories/Checkbox.stories.ts",
       "storyTitle": "Components/Data Entry/Checkbox",
       "manifestFile": "docs/ai/COMPONENTS/checkbox.yaml",
@@ -1174,7 +1150,7 @@
         },
         {
           "name": "size",
-          "type": "TreeSize",
+          "type": "TSize",
           "default": "md",
           "values": [
             "sm",
@@ -1254,16 +1230,13 @@
     },
     {
       "name": "TCombobox",
-      "legacyAlias": "TreeCombobox",
-      "aliases": [
-        "TreeCombobox"
-      ],
+      "aliases": [],
       "package": "@treeui/vue",
       "kind": "primitive",
       "category": "Data Entry",
       "status": "available",
       "purpose": "Searchable combobox / autocomplete input with local filtering, controlled selection, and shared open-state behavior.",
-      "sourceFile": "packages/vue/src/components/TreeCombobox.vue",
+      "sourceFile": "packages/vue/src/components/TCombobox.vue",
       "storyFile": "apps/docs/src/stories/Combobox.stories.ts",
       "storyTitle": "Components/Data Entry/Combobox",
       "manifestFile": "docs/ai/COMPONENTS/combobox.yaml",
@@ -1275,7 +1248,7 @@
         },
         {
           "name": "options",
-          "type": "TreeComboboxOption[]",
+          "type": "TComboboxOption[]",
           "default": "[]",
           "note": "Array of { label: string; value: string; description?: string; keywords?: string[]; disabled?: boolean }"
         },
@@ -1291,7 +1264,7 @@
         },
         {
           "name": "size",
-          "type": "TreeSize",
+          "type": "TSize",
           "default": "md",
           "values": [
             "sm",
@@ -1408,16 +1381,13 @@
     },
     {
       "name": "TConfirmDialog",
-      "legacyAlias": "TreeConfirmDialog",
-      "aliases": [
-        "TreeConfirmDialog"
-      ],
+      "aliases": [],
       "package": "@treeui/vue",
       "kind": "overlay",
       "category": "Overlay",
       "status": "available",
       "purpose": "High-level confirmation dialog built on the shared modal contract, with default confirm and cancel actions.",
-      "sourceFile": "packages/vue/src/components/TreeConfirmDialog.vue",
+      "sourceFile": "packages/vue/src/components/TConfirmDialog.vue",
       "storyFile": "apps/docs/src/stories/ConfirmDialog.stories.ts",
       "storyTitle": "Components/Overlay/ConfirmDialog",
       "manifestFile": "docs/ai/COMPONENTS/confirm-dialog.yaml",
@@ -1439,7 +1409,7 @@
         },
         {
           "name": "size",
-          "type": "TreeSize",
+          "type": "TSize",
           "default": "sm",
           "values": [
             "sm",
@@ -1469,7 +1439,7 @@
         },
         {
           "name": "confirmVariant",
-          "type": "TreeVariant",
+          "type": "TVariant",
           "default": "danger"
         },
         {
@@ -1577,16 +1547,13 @@
     },
     {
       "name": "TContainer",
-      "legacyAlias": "TreeContainer",
-      "aliases": [
-        "TreeContainer"
-      ],
+      "aliases": [],
       "package": "@treeui/vue",
       "kind": "layout",
       "category": "Layout",
       "status": "available",
       "purpose": "Width-constrained layout wrapper for readable page content and app sections.",
-      "sourceFile": "packages/vue/src/components/TreeContainer.vue",
+      "sourceFile": "packages/vue/src/components/TContainer.vue",
       "storyFile": "apps/docs/src/stories/Container.stories.ts",
       "storyTitle": "Components/Layout/Container",
       "manifestFile": "docs/ai/COMPONENTS/container.yaml",
@@ -1598,7 +1565,7 @@
         },
         {
           "name": "size",
-          "type": "TreeContainerSize",
+          "type": "TContainerSize",
           "default": "lg",
           "values": [
             "sm",
@@ -1669,10 +1636,7 @@
     },
     {
       "name": "TContextMenu",
-      "legacyAlias": "TreeContextMenu",
-      "aliases": [
-        "TreeContextMenu"
-      ],
+      "aliases": [],
       "package": "@treeui/vue",
       "category": "Overlay",
       "status": "stable",
@@ -1682,7 +1646,7 @@
       "props": [
         {
           "name": "items",
-          "type": "TreeContextMenuItem[]",
+          "type": "TContextMenuItem[]",
           "default": "[]",
           "description": "Menu items to render."
         },
@@ -1706,7 +1670,7 @@
         },
         {
           "name": "size",
-          "type": "TreeSize",
+          "type": "TSize",
           "default": "md",
           "description": "Item sizing variant."
         }
@@ -1779,16 +1743,13 @@
     },
     {
       "name": "TDatePicker",
-      "legacyAlias": "TreeDatePicker",
-      "aliases": [
-        "TreeDatePicker"
-      ],
+      "aliases": [],
       "package": "@treeui/vue",
       "kind": "form_overlay",
       "category": "Data Entry",
       "status": "available",
       "purpose": "Date input with calendar popover and keyboard navigation.",
-      "sourceFile": "packages/vue/src/components/TreeDatePicker.vue",
+      "sourceFile": "packages/vue/src/components/TDatePicker.vue",
       "storyFile": "apps/docs/src/stories/DatePicker.stories.ts",
       "storyTitle": "Components/Data Entry/DatePicker",
       "manifestFile": "docs/ai/COMPONENTS/date-picker.yaml",
@@ -1810,7 +1771,7 @@
         },
         {
           "name": "size",
-          "type": "TreeSize",
+          "type": "TSize",
           "default": "md",
           "values": [
             "sm",
@@ -1931,16 +1892,13 @@
     },
     {
       "name": "TDateTimePicker",
-      "legacyAlias": "TreeDateTimePicker",
-      "aliases": [
-        "TreeDateTimePicker"
-      ],
+      "aliases": [],
       "package": "@treeui/vue",
       "kind": "form",
       "category": "Data Entry",
       "status": "available",
       "purpose": "Date and time picker with a calendar grid, time selection, and overlay trigger.",
-      "sourceFile": "packages/vue/src/components/TreeDateTimePicker.vue",
+      "sourceFile": "packages/vue/src/components/TDateTimePicker.vue",
       "storyFile": "apps/docs/src/stories/DateTimePicker.stories.ts",
       "storyTitle": "Components/Data Entry/DateTimePicker",
       "manifestFile": "docs/ai/COMPONENTS/date-time-picker.yaml",
@@ -1963,7 +1921,7 @@
         },
         {
           "name": "size",
-          "type": "TreeSize",
+          "type": "TSize",
           "default": "md",
           "values": [
             "sm",
@@ -2092,14 +2050,11 @@
     },
     {
       "name": "TDivider",
-      "legacyAlias": "TreeDivider",
-      "aliases": [
-        "TreeDivider"
-      ],
+      "aliases": [],
       "package": "@treeui/vue",
       "category": "Layout",
       "description": "Horizontal or vertical visual separator.",
-      "sourceFile": "packages/vue/src/components/TreeDivider.vue",
+      "sourceFile": "packages/vue/src/components/TDivider.vue",
       "storyFile": "apps/docs/src/stories/Divider.stories.ts",
       "storyTitle": "Components/Layout/Divider",
       "manifestFile": "docs/ai/COMPONENTS/divider.yaml",
@@ -2148,16 +2103,13 @@
     },
     {
       "name": "TDrawer",
-      "legacyAlias": "TreeDrawer",
-      "aliases": [
-        "TreeDrawer"
-      ],
+      "aliases": [],
       "package": "@treeui/vue",
       "kind": "overlay",
       "category": "Overlay",
       "status": "available",
       "purpose": "Side-anchored panel for secondary content, navigation, or forms.",
-      "sourceFile": "packages/vue/src/components/TreeDrawer.vue",
+      "sourceFile": "packages/vue/src/components/TDrawer.vue",
       "storyFile": "apps/docs/src/stories/Drawer.stories.ts",
       "storyTitle": "Components/Overlay/Drawer",
       "manifestFile": "docs/ai/COMPONENTS/drawer.yaml",
@@ -2179,7 +2131,7 @@
         },
         {
           "name": "size",
-          "type": "TreeSize",
+          "type": "TSize",
           "default": "md",
           "values": [
             "sm",
@@ -2189,7 +2141,7 @@
         },
         {
           "name": "side",
-          "type": "TreeDrawerSide",
+          "type": "TDrawerSide",
           "default": "right",
           "values": [
             "top",
@@ -2304,23 +2256,20 @@
     },
     {
       "name": "TDropdown",
-      "legacyAlias": "TreeDropdown",
-      "aliases": [
-        "TreeDropdown"
-      ],
+      "aliases": [],
       "package": "@treeui/vue",
       "kind": "overlay",
       "category": "Overlay",
       "status": "available",
       "purpose": "Trigger + floating menu with keyboard navigation for action lists.",
-      "sourceFile": "packages/vue/src/components/TreeDropdown.vue",
+      "sourceFile": "packages/vue/src/components/TDropdown.vue",
       "storyFile": "apps/docs/src/stories/Dropdown.stories.ts",
       "storyTitle": "Components/Overlay/Dropdown",
       "manifestFile": "docs/ai/COMPONENTS/dropdown.yaml",
       "props": [
         {
           "name": "items",
-          "type": "TreeDropdownItem[]",
+          "type": "TDropdownItem[]",
           "default": "[]",
           "note": "Array of { label: string; value: string; disabled?: boolean }"
         },
@@ -2341,7 +2290,7 @@
         },
         {
           "name": "size",
-          "type": "TreeSize",
+          "type": "TSize",
           "default": "md",
           "values": [
             "sm",
@@ -2421,16 +2370,13 @@
     },
     {
       "name": "TEmptyState",
-      "legacyAlias": "TreeEmptyState",
-      "aliases": [
-        "TreeEmptyState"
-      ],
+      "aliases": [],
       "package": "@treeui/vue",
       "kind": "feedback",
       "category": "Feedback",
       "status": "available",
       "purpose": "Structured empty, no-results, and first-run placeholder block with optional icon, body content, and actions.",
-      "sourceFile": "packages/vue/src/components/TreeEmptyState.vue",
+      "sourceFile": "packages/vue/src/components/TEmptyState.vue",
       "storyFile": "apps/docs/src/stories/EmptyState.stories.ts",
       "storyTitle": "Components/Feedback/EmptyState",
       "manifestFile": "docs/ai/COMPONENTS/empty-state.yaml",
@@ -2442,7 +2388,7 @@
         },
         {
           "name": "size",
-          "type": "TreeSize",
+          "type": "TSize",
           "default": "md",
           "values": [
             "sm",
@@ -2516,16 +2462,13 @@
     },
     {
       "name": "TFileUpload",
-      "legacyAlias": "TreeFileUpload",
-      "aliases": [
-        "TreeFileUpload"
-      ],
+      "aliases": [],
       "package": "@treeui/vue",
       "kind": "form",
       "category": "Form",
       "status": "available",
       "purpose": "Composable dropzone and file picker with browse, drag-and-drop, and Ctrl+V paste support.",
-      "sourceFile": "packages/vue/src/components/TreeFileUpload.vue",
+      "sourceFile": "packages/vue/src/components/TFileUpload.vue",
       "storyFile": "apps/docs/src/stories/FileUpload.stories.ts",
       "storyTitle": "Components/Form/FileUpload",
       "manifestFile": "docs/ai/COMPONENTS/file-upload.yaml",
@@ -2537,7 +2480,7 @@
         },
         {
           "name": "size",
-          "type": "TreeSize",
+          "type": "TSize",
           "default": "md",
           "values": [
             "sm",
@@ -2670,15 +2613,12 @@
     },
     {
       "name": "TFormField",
-      "legacyAlias": "TreeFormField",
-      "aliases": [
-        "TreeFormField"
-      ],
+      "aliases": [],
       "package": "@treeui/vue",
       "category": "Data Entry",
       "status": "milestone-1",
       "description": "Label + input wrapper with error and hint slots. Provides consistent layout, labelling, and validation messaging for any form control.\n",
-      "sourceFile": "packages/vue/src/components/TreeFormField.vue",
+      "sourceFile": "packages/vue/src/components/TFormField.vue",
       "storyFile": "apps/docs/src/stories/FormField.stories.ts",
       "storyTitle": "Components/Data Entry/FormField",
       "manifestFile": "docs/ai/COMPONENTS/form-field.yaml",
@@ -2721,7 +2661,7 @@
         },
         {
           "name": "size",
-          "type": "TreeSize",
+          "type": "TSize",
           "default": "md",
           "values": [
             "sm",
@@ -2802,16 +2742,13 @@
     },
     {
       "name": "TGrid",
-      "legacyAlias": "TreeGrid",
-      "aliases": [
-        "TreeGrid"
-      ],
+      "aliases": [],
       "package": "@treeui/vue",
       "kind": "layout",
       "category": "Layout",
       "status": "available",
       "purpose": "Responsive grid wrapper for cards, forms, stats, and other multi-column layouts.",
-      "sourceFile": "packages/vue/src/components/TreeGrid.vue",
+      "sourceFile": "packages/vue/src/components/TGrid.vue",
       "storyFile": "apps/docs/src/stories/Grid.stories.ts",
       "storyTitle": "Components/Layout/Grid",
       "manifestFile": "docs/ai/COMPONENTS/grid.yaml",
@@ -2905,23 +2842,20 @@
     },
     {
       "name": "TIcon",
-      "legacyAlias": "TreeIcon",
-      "aliases": [
-        "TreeIcon"
-      ],
+      "aliases": [],
       "package": "@treeui/vue",
       "kind": "display",
       "category": "Data Display",
       "status": "available",
       "purpose": "Render a registered TreeUI icon by name with consistent sizing and accessibility defaults.",
-      "sourceFile": "packages/vue/src/components/TreeIcon.vue",
+      "sourceFile": "packages/vue/src/components/TIcon.vue",
       "storyFile": "apps/docs/src/stories/Icon.stories.ts",
       "storyTitle": "Components/Data Display/Icon",
       "manifestFile": "docs/ai/COMPONENTS/icon.yaml",
       "props": [
         {
           "name": "name",
-          "type": "TreeIconName",
+          "type": "TIconName",
           "required": true,
           "values": [
             "alert-circle",
@@ -2998,16 +2932,13 @@
     },
     {
       "name": "TInput",
-      "legacyAlias": "TreeInput",
-      "aliases": [
-        "TreeInput"
-      ],
+      "aliases": [],
       "package": "@treeui/vue",
       "kind": "primitive",
       "category": "Data Entry",
       "status": "available",
       "purpose": "Text input with size, loading, invalid, and prefix or suffix slots.",
-      "sourceFile": "packages/vue/src/components/TreeInput.vue",
+      "sourceFile": "packages/vue/src/components/TInput.vue",
       "storyFile": "apps/docs/src/stories/Input.stories.ts",
       "storyTitle": "Components/Data Entry/Input",
       "manifestFile": "docs/ai/COMPONENTS/input.yaml",
@@ -3019,7 +2950,7 @@
         },
         {
           "name": "size",
-          "type": "TreeSize",
+          "type": "TSize",
           "default": "md",
           "values": [
             "sm",
@@ -3113,16 +3044,13 @@
     },
     {
       "name": "TLink",
-      "legacyAlias": "TreeLink",
-      "aliases": [
-        "TreeLink"
-      ],
+      "aliases": [],
       "package": "@treeui/vue",
       "kind": "navigation",
       "category": "Navigation",
       "status": "available",
       "purpose": "Inline link with consistent styling, optional RouterLink rendering, and external link support.",
-      "sourceFile": "packages/vue/src/components/TreeLink.vue",
+      "sourceFile": "packages/vue/src/components/TLink.vue",
       "storyFile": "apps/docs/src/stories/Link.stories.ts",
       "storyTitle": "Components/Navigation/Link",
       "manifestFile": "docs/ai/COMPONENTS/link.yaml",
@@ -3152,7 +3080,7 @@
         },
         {
           "name": "variant",
-          "type": "TreeLinkVariant",
+          "type": "TLinkVariant",
           "default": "default",
           "values": [
             "default",
@@ -3188,10 +3116,7 @@
     },
     {
       "name": "TMarkdownEditor",
-      "legacyAlias": "TreeMarkdownEditor",
-      "aliases": [
-        "TreeMarkdownEditor"
-      ],
+      "aliases": [],
       "package": "@treeui/vue",
       "category": "Form",
       "status": "stable",
@@ -3208,7 +3133,7 @@
         },
         {
           "name": "size",
-          "type": "TreeSize",
+          "type": "TSize",
           "default": "md",
           "values": [
             "sm",
@@ -3293,16 +3218,13 @@
     },
     {
       "name": "TModal",
-      "legacyAlias": "TreeModal",
-      "aliases": [
-        "TreeModal"
-      ],
+      "aliases": [],
       "package": "@treeui/vue",
       "kind": "overlay",
       "category": "Overlay",
       "status": "available",
       "purpose": "Accessible modal dialog for focused tasks and confirmations.",
-      "sourceFile": "packages/vue/src/components/TreeModal.vue",
+      "sourceFile": "packages/vue/src/components/TModal.vue",
       "storyFile": "apps/docs/src/stories/Modal.stories.ts",
       "storyTitle": "Components/Overlay/Modal",
       "manifestFile": "docs/ai/COMPONENTS/modal.yaml",
@@ -3324,7 +3246,7 @@
         },
         {
           "name": "size",
-          "type": "TreeSize",
+          "type": "TSize",
           "default": "md",
           "values": [
             "sm",
@@ -3444,16 +3366,13 @@
     },
     {
       "name": "TMultiSelect",
-      "legacyAlias": "TreeMultiSelect",
-      "aliases": [
-        "TreeMultiSelect"
-      ],
+      "aliases": [],
       "package": "@treeui/vue",
       "kind": "form",
       "category": "Data Entry",
       "status": "available",
       "purpose": "Searchable multi-select control that renders selected values as tags.",
-      "sourceFile": "packages/vue/src/components/TreeMultiSelect.vue",
+      "sourceFile": "packages/vue/src/components/TMultiSelect.vue",
       "storyFile": "apps/docs/src/stories/MultiSelect.stories.ts",
       "storyTitle": "Components/Data Entry/MultiSelect",
       "manifestFile": "docs/ai/COMPONENTS/multi-select.yaml",
@@ -3465,7 +3384,7 @@
         },
         {
           "name": "options",
-          "type": "TreeMultiSelectOption[]",
+          "type": "TMultiSelectOption[]",
           "default": "[]",
           "note": "Array of `{ label, value, description?, keywords?, disabled? }`."
         },
@@ -3481,7 +3400,7 @@
         },
         {
           "name": "size",
-          "type": "TreeSize",
+          "type": "TSize",
           "default": "md",
           "values": [
             "sm",
@@ -3606,18 +3525,15 @@
     },
     {
       "name": "TNavbar",
-      "legacyAlias": "TreeAppBar",
       "aliases": [
-        "TAppBar",
-        "TreeAppBar",
-        "TreeNavbar"
+        "TAppBar"
       ],
       "package": "@treeui/vue",
       "kind": "layout",
       "category": "Layout",
       "status": "available",
       "purpose": "Top application bar with start, center, and end content areas.",
-      "sourceFile": "packages/vue/src/components/TreeNavbar.vue",
+      "sourceFile": "packages/vue/src/components/TNavbar.vue",
       "storyFile": "apps/docs/src/stories/Navbar.stories.ts",
       "storyTitle": "Components/Layout/Navbar",
       "manifestFile": "docs/ai/COMPONENTS/navbar.yaml",
@@ -3629,7 +3545,7 @@
         },
         {
           "name": "size",
-          "type": "TreeSize",
+          "type": "TSize",
           "default": "md",
           "values": [
             "sm",
@@ -3707,16 +3623,13 @@
     },
     {
       "name": "TNavMenu",
-      "legacyAlias": "TreeNavMenu",
-      "aliases": [
-        "TreeNavMenu"
-      ],
+      "aliases": [],
       "package": "@treeui/vue",
       "kind": "navigation",
       "category": "Layout",
       "status": "available",
       "purpose": "Vertical navigation menu with selection state, keyboard navigation, optional RouterLink rendering, and sidebar integration.",
-      "sourceFile": "packages/vue/src/components/TreeNavMenu.vue",
+      "sourceFile": "packages/vue/src/components/TNavMenu.vue",
       "storyFile": "apps/docs/src/stories/NavMenu.stories.ts",
       "storyTitle": "Components/Layout/NavMenu",
       "manifestFile": "docs/ai/COMPONENTS/nav-menu.yaml",
@@ -3733,13 +3646,13 @@
         },
         {
           "name": "items",
-          "type": "TreeNavMenuItem[]",
+          "type": "TNavMenuItem[]",
           "default": "[]",
           "note": "Array of `{ label, value, shortLabel?, description?, icon?, to?, badge?, disabled? }`."
         },
         {
           "name": "size",
-          "type": "TreeSize",
+          "type": "TSize",
           "default": "md",
           "values": [
             "sm",
@@ -3823,16 +3736,13 @@
     },
     {
       "name": "TNumberInput",
-      "legacyAlias": "TreeNumberInput",
-      "aliases": [
-        "TreeNumberInput"
-      ],
+      "aliases": [],
       "package": "@treeui/vue",
       "kind": "form",
       "category": "Data Entry",
       "status": "available",
       "purpose": "Numeric input with optional increment and decrement controls.",
-      "sourceFile": "packages/vue/src/components/TreeNumberInput.vue",
+      "sourceFile": "packages/vue/src/components/TNumberInput.vue",
       "storyFile": "apps/docs/src/stories/NumberInput.stories.ts",
       "storyTitle": "Components/Data Entry/NumberInput",
       "manifestFile": "docs/ai/COMPONENTS/number-input.yaml",
@@ -3858,7 +3768,7 @@
         },
         {
           "name": "size",
-          "type": "TreeSize",
+          "type": "TSize",
           "default": "md",
           "values": [
             "sm",
@@ -3933,16 +3843,13 @@
     },
     {
       "name": "TPagination",
-      "legacyAlias": "TreePagination",
-      "aliases": [
-        "TreePagination"
-      ],
+      "aliases": [],
       "package": "@treeui/vue",
       "kind": "primitive",
       "category": "Navigation",
       "status": "available",
       "purpose": "Page controls with previous/next navigation, numbered page buttons, and ellipsis for large page ranges. Supports v-model for the active page.\n",
-      "sourceFile": "packages/vue/src/components/TreePagination.vue",
+      "sourceFile": "packages/vue/src/components/TPagination.vue",
       "storyFile": "apps/docs/src/stories/Pagination.stories.ts",
       "storyTitle": "Components/Navigation/Pagination",
       "manifestFile": "docs/ai/COMPONENTS/pagination.yaml",
@@ -3967,7 +3874,7 @@
         },
         {
           "name": "size",
-          "type": "TreeSize",
+          "type": "TSize",
           "default": "md",
           "values": [
             "sm",
@@ -4049,10 +3956,7 @@
     },
     {
       "name": "TPopover",
-      "legacyAlias": "TreePopover",
-      "aliases": [
-        "TreePopover"
-      ],
+      "aliases": [],
       "package": "@treeui/vue",
       "category": "Overlay",
       "status": "stable",
@@ -4155,10 +4059,7 @@
     },
     {
       "name": "TPricing",
-      "legacyAlias": "TreePricing",
-      "aliases": [
-        "TreePricing"
-      ],
+      "aliases": [],
       "package": "@treeui/vue",
       "status": "stable",
       "description": "Grid wrapper that renders multiple PricingCard components from an array of plan objects.\n",
@@ -4174,7 +4075,7 @@
         },
         {
           "name": "size",
-          "type": "TreeSize",
+          "type": "TSize",
           "default": "md",
           "description": "Size applied to all child pricing cards."
         },
@@ -4222,10 +4123,7 @@
     },
     {
       "name": "TPricingCard",
-      "legacyAlias": "TreePricingCard",
-      "aliases": [
-        "TreePricingCard"
-      ],
+      "aliases": [],
       "package": "@treeui/vue",
       "category": "Data Display",
       "status": "stable",
@@ -4290,7 +4188,7 @@
         },
         {
           "name": "size",
-          "type": "TreeSize",
+          "type": "TSize",
           "default": "md",
           "description": "Card size — affects padding, font sizes."
         },
@@ -4335,7 +4233,7 @@
         "Uses <h3> for plan title.",
         "Feature list uses role=\"list\" with <ul>/<li>.",
         "Feature icons are aria-hidden=\"true\".",
-        "CTA button inherits TreeButton a11y (disabled, aria-busy)."
+        "CTA button inherits TButton a11y (disabled, aria-busy)."
       ],
       "behavior": [],
       "selection": {
@@ -4354,10 +4252,7 @@
     },
     {
       "name": "TProgress",
-      "legacyAlias": "TreeProgress",
-      "aliases": [
-        "TreeProgress"
-      ],
+      "aliases": [],
       "package": "@treeui/vue",
       "category": "Feedback",
       "status": "draft",
@@ -4380,7 +4275,7 @@
         },
         {
           "name": "size",
-          "type": "TreeSize",
+          "type": "TSize",
           "default": "md",
           "values": [
             "sm",
@@ -4418,15 +4313,12 @@
     },
     {
       "name": "TRadio",
-      "legacyAlias": "TreeRadio",
-      "aliases": [
-        "TreeRadio"
-      ],
+      "aliases": [],
       "package": "@treeui/vue",
       "kind": "primitive",
       "status": "available",
       "purpose": "Single radio option within a TRadioGroup; renders a native radio input.",
-      "sourceFile": "packages/vue/src/components/TreeRadio.vue",
+      "sourceFile": "packages/vue/src/components/TRadio.vue",
       "manifestFile": "docs/ai/COMPONENTS/radio.yaml",
       "props": [
         {
@@ -4446,7 +4338,7 @@
         },
         {
           "name": "size",
-          "type": "TreeSize",
+          "type": "TSize",
           "default": "inherited_from_group",
           "values": [
             "sm",
@@ -4489,16 +4381,13 @@
     },
     {
       "name": "TRadioGroup",
-      "legacyAlias": "TreeRadioGroup",
-      "aliases": [
-        "TreeRadioGroup"
-      ],
+      "aliases": [],
       "package": "@treeui/vue",
       "kind": "primitive",
       "category": "Data Entry",
       "status": "available",
       "purpose": "Container for TRadio options; manages v-model for single-select from a group.",
-      "sourceFile": "packages/vue/src/components/TreeRadioGroup.vue",
+      "sourceFile": "packages/vue/src/components/TRadioGroup.vue",
       "storyFile": "apps/docs/src/stories/Radio.stories.ts",
       "storyTitle": "Components/Data Entry/Radio",
       "manifestFile": "docs/ai/COMPONENTS/radio.yaml",
@@ -4525,7 +4414,7 @@
         },
         {
           "name": "size",
-          "type": "TreeSize",
+          "type": "TSize",
           "default": "md",
           "values": [
             "sm",
@@ -4567,16 +4456,13 @@
     },
     {
       "name": "TSelect",
-      "legacyAlias": "TreeSelect",
-      "aliases": [
-        "TreeSelect"
-      ],
+      "aliases": [],
       "package": "@treeui/vue",
       "kind": "primitive",
       "category": "Data Entry",
       "status": "available",
       "purpose": "Custom styled dropdown select with listbox; controlled and uncontrolled via v-model and open/defaultOpen.",
-      "sourceFile": "packages/vue/src/components/TreeSelect.vue",
+      "sourceFile": "packages/vue/src/components/TSelect.vue",
       "storyFile": "apps/docs/src/stories/Select.stories.ts",
       "storyTitle": "Components/Data Entry/Select",
       "manifestFile": "docs/ai/COMPONENTS/select.yaml",
@@ -4588,7 +4474,7 @@
         },
         {
           "name": "options",
-          "type": "TreeSelectOption[]",
+          "type": "TSelectOption[]",
           "default": "[]",
           "note": "Array of { label: string; value: string | number; disabled?: boolean }"
         },
@@ -4604,7 +4490,7 @@
         },
         {
           "name": "size",
-          "type": "TreeSize",
+          "type": "TSize",
           "default": "md",
           "values": [
             "sm",
@@ -4708,16 +4594,13 @@
     },
     {
       "name": "TSelectableList",
-      "legacyAlias": "TreeSelectableList",
-      "aliases": [
-        "TreeSelectableList"
-      ],
+      "aliases": [],
       "package": "@treeui/vue",
       "kind": "selection",
       "category": "Navigation & Disclosure",
       "status": "available",
       "purpose": "Rich single-selection list for options with description and metadata.",
-      "sourceFile": "packages/vue/src/components/TreeSelectableList.vue",
+      "sourceFile": "packages/vue/src/components/TSelectableList.vue",
       "storyFile": "apps/docs/src/stories/SelectableList.stories.ts",
       "storyTitle": "Components/Navigation & Disclosure/SelectableList",
       "manifestFile": "docs/ai/COMPONENTS/selectable-list.yaml",
@@ -4734,13 +4617,13 @@
         },
         {
           "name": "items",
-          "type": "TreeSelectableListItem[]",
+          "type": "TSelectableListItem[]",
           "default": "[]",
           "note": "Array of `{ label, value, description?, meta?, disabled? }`."
         },
         {
           "name": "size",
-          "type": "TreeSize",
+          "type": "TSize",
           "default": "md",
           "values": [
             "sm",
@@ -4817,16 +4700,13 @@
     },
     {
       "name": "TSidebar",
-      "legacyAlias": "TreeSidebar",
-      "aliases": [
-        "TreeSidebar"
-      ],
+      "aliases": [],
       "package": "@treeui/vue",
       "kind": "layout",
       "category": "Layout",
       "status": "available",
       "purpose": "Persistent or collapsible side shell for app navigation and secondary workspace controls.",
-      "sourceFile": "packages/vue/src/components/TreeSidebar.vue",
+      "sourceFile": "packages/vue/src/components/TSidebar.vue",
       "storyFile": "apps/docs/src/stories/Sidebar.stories.ts",
       "storyTitle": "Components/Layout/Sidebar",
       "manifestFile": "docs/ai/COMPONENTS/sidebar.yaml",
@@ -4853,7 +4733,7 @@
         },
         {
           "name": "size",
-          "type": "TreeSize",
+          "type": "TSize",
           "default": "md",
           "values": [
             "sm",
@@ -4863,7 +4743,7 @@
         },
         {
           "name": "side",
-          "type": "TreeSidebarSide",
+          "type": "TSidebarSide",
           "default": "left",
           "values": [
             "left",
@@ -4966,16 +4846,13 @@
     },
     {
       "name": "TSkeleton",
-      "legacyAlias": "TreeSkeleton",
-      "aliases": [
-        "TreeSkeleton"
-      ],
+      "aliases": [],
       "package": "@treeui/vue",
       "kind": "feedback",
       "category": "Feedback",
       "status": "available",
       "purpose": "Placeholder shimmer for loading states. Renders an animated block that indicates content is being loaded.",
-      "sourceFile": "packages/vue/src/components/TreeSkeleton.vue",
+      "sourceFile": "packages/vue/src/components/TSkeleton.vue",
       "storyFile": "apps/docs/src/stories/Skeleton.stories.ts",
       "storyTitle": "Components/Feedback/Skeleton",
       "manifestFile": "docs/ai/COMPONENTS/skeleton.yaml",
@@ -5032,23 +4909,20 @@
     },
     {
       "name": "TSpinner",
-      "legacyAlias": "TreeSpinner",
-      "aliases": [
-        "TreeSpinner"
-      ],
+      "aliases": [],
       "package": "@treeui/vue",
       "kind": "feedback",
       "category": "Feedback",
       "status": "available",
       "purpose": "Accessible loading indicator.",
-      "sourceFile": "packages/vue/src/components/TreeSpinner.vue",
+      "sourceFile": "packages/vue/src/components/TSpinner.vue",
       "storyFile": "apps/docs/src/stories/Spinner.stories.ts",
       "storyTitle": "Components/Feedback/Spinner",
       "manifestFile": "docs/ai/COMPONENTS/spinner.yaml",
       "props": [
         {
           "name": "size",
-          "type": "TreeSize",
+          "type": "TSize",
           "default": "md",
           "values": [
             "sm",
@@ -5084,16 +4958,13 @@
     },
     {
       "name": "TStack",
-      "legacyAlias": "TreeStack",
-      "aliases": [
-        "TreeStack"
-      ],
+      "aliases": [],
       "package": "@treeui/vue",
       "kind": "layout",
       "category": "Layout",
       "status": "available",
       "purpose": "One-dimensional spacing and alignment wrapper for vertical or horizontal compositions.",
-      "sourceFile": "packages/vue/src/components/TreeStack.vue",
+      "sourceFile": "packages/vue/src/components/TStack.vue",
       "storyFile": "apps/docs/src/stories/Stack.stories.ts",
       "storyTitle": "Components/Layout/Stack",
       "manifestFile": "docs/ai/COMPONENTS/stack.yaml",
@@ -5105,7 +4976,7 @@
         },
         {
           "name": "direction",
-          "type": "TreeStackDirection",
+          "type": "TStackDirection",
           "default": "vertical",
           "values": [
             "vertical",
@@ -5185,16 +5056,13 @@
     },
     {
       "name": "TStat",
-      "legacyAlias": "TreeStat",
-      "aliases": [
-        "TreeStat"
-      ],
+      "aliases": [],
       "package": "@treeui/vue",
       "kind": "data-display",
       "category": "Data Display",
       "status": "available",
       "purpose": "Compact KPI display with label, value, trend, metadata, and optional icon.",
-      "sourceFile": "packages/vue/src/components/TreeStat.vue",
+      "sourceFile": "packages/vue/src/components/TStat.vue",
       "storyFile": "apps/docs/src/stories/Stat.stories.ts",
       "storyTitle": "Components/Data Display/Stat",
       "manifestFile": "docs/ai/COMPONENTS/stat.yaml",
@@ -5221,7 +5089,7 @@
         },
         {
           "name": "tone",
-          "type": "TreeStatTone",
+          "type": "TStatTone",
           "default": "neutral",
           "values": [
             "neutral",
@@ -5233,7 +5101,7 @@
         },
         {
           "name": "trendDirection",
-          "type": "TreeStatTrendDirection",
+          "type": "TStatTrendDirection",
           "default": "neutral",
           "values": [
             "up",
@@ -5305,18 +5173,15 @@
     },
     {
       "name": "TSteps",
-      "legacyAlias": "TreeStepper",
       "aliases": [
-        "TStepper",
-        "TreeStepper",
-        "TreeSteps"
+        "TStepper"
       ],
       "package": "@treeui/vue",
       "kind": "navigation",
       "category": "Navigation & Disclosure",
       "status": "available",
       "purpose": "Stepper component for visualizing workflow progress, with optional interactive selection.",
-      "sourceFile": "packages/vue/src/components/TreeSteps.vue",
+      "sourceFile": "packages/vue/src/components/TSteps.vue",
       "storyFile": "apps/docs/src/stories/Steps.stories.ts",
       "storyTitle": "Components/Navigation & Disclosure/Steps",
       "manifestFile": "docs/ai/COMPONENTS/steps.yaml",
@@ -5333,13 +5198,13 @@
         },
         {
           "name": "items",
-          "type": "TreeStepItem[]",
+          "type": "TStepItem[]",
           "default": "[]",
           "note": "Array of `{ label, value, description?, meta?, status?, disabled? }`."
         },
         {
           "name": "size",
-          "type": "TreeSize",
+          "type": "TSize",
           "default": "md",
           "values": [
             "sm",
@@ -5349,7 +5214,7 @@
         },
         {
           "name": "orientation",
-          "type": "TreeStepOrientation",
+          "type": "TStepOrientation",
           "default": "horizontal",
           "values": [
             "horizontal",
@@ -5412,16 +5277,13 @@
     },
     {
       "name": "TSwitch",
-      "legacyAlias": "TreeSwitch",
-      "aliases": [
-        "TreeSwitch"
-      ],
+      "aliases": [],
       "package": "@treeui/vue",
       "kind": "primitive",
       "category": "Data Entry",
       "status": "available",
       "purpose": "On/off toggle; semantic alternative to checkbox for settings. Supports v-model via modelValue.",
-      "sourceFile": "packages/vue/src/components/TreeSwitch.vue",
+      "sourceFile": "packages/vue/src/components/TSwitch.vue",
       "storyFile": "apps/docs/src/stories/Switch.stories.ts",
       "storyTitle": "Components/Data Entry/Switch",
       "manifestFile": "docs/ai/COMPONENTS/switch.yaml",
@@ -5433,7 +5295,7 @@
         },
         {
           "name": "size",
-          "type": "TreeSize",
+          "type": "TSize",
           "default": "md",
           "values": [
             "sm",
@@ -5504,21 +5366,18 @@
     },
     {
       "name": "TTable",
-      "legacyAlias": "TreeTable",
-      "aliases": [
-        "TreeTable"
-      ],
+      "aliases": [],
       "package": "@treeui/vue",
       "category": "Data Display",
       "description": "Sortable, accessible data table with column definitions and row data.",
-      "sourceFile": "packages/vue/src/components/TreeTable.vue",
+      "sourceFile": "packages/vue/src/components/TTable.vue",
       "storyFile": "apps/docs/src/stories/Table.stories.ts",
       "storyTitle": "Components/Data Display/Table",
       "manifestFile": "docs/ai/COMPONENTS/table.yaml",
       "props": [
         {
           "name": "columns",
-          "type": "TreeTableColumn[]",
+          "type": "TTableColumn[]",
           "required": true,
           "description": "Array of column definitions with key, label, sortable, align, and width."
         },
@@ -5530,7 +5389,7 @@
         },
         {
           "name": "size",
-          "type": "TreeSize",
+          "type": "TSize",
           "default": "md",
           "values": [
             "sm",
@@ -5540,7 +5399,7 @@
         },
         {
           "name": "sortBy",
-          "type": "TreeTableSortState",
+          "type": "TTableSortState",
           "required": false,
           "description": "Controlled sort state. When provided, overrides internal sort tracking."
         }
@@ -5549,7 +5408,7 @@
         {
           "name": "sort",
           "description": "Emitted when a sortable column header is clicked.",
-          "payload": "TreeTableSortState"
+          "payload": "TTableSortState"
         }
       ],
       "slots": [
@@ -5608,16 +5467,13 @@
     },
     {
       "name": "TTabs",
-      "legacyAlias": "TreeTabs",
-      "aliases": [
-        "TreeTabs"
-      ],
+      "aliases": [],
       "package": "@treeui/vue",
       "kind": "navigation",
       "category": "Navigation",
       "status": "available",
       "purpose": "Tabbed panel navigation with full keyboard support and automatic/manual activation modes.",
-      "sourceFile": "packages/vue/src/components/TreeTabs.vue",
+      "sourceFile": "packages/vue/src/components/TTabs.vue",
       "storyFile": "apps/docs/src/stories/Tabs.stories.ts",
       "storyTitle": "Components/Navigation/Tabs",
       "manifestFile": "docs/ai/COMPONENTS/tabs.yaml",
@@ -5636,7 +5492,7 @@
         },
         {
           "name": "size",
-          "type": "TreeSize",
+          "type": "TSize",
           "default": "md",
           "values": [
             "sm",
@@ -5717,21 +5573,18 @@
     },
     {
       "name": "TTag",
-      "legacyAlias": "TreeTag",
-      "aliases": [
-        "TreeTag"
-      ],
+      "aliases": [],
       "package": "@treeui/vue",
       "category": "Data Display",
       "description": "Removable label/chip for filters and selections.",
-      "sourceFile": "packages/vue/src/components/TreeTag.vue",
+      "sourceFile": "packages/vue/src/components/TTag.vue",
       "storyFile": "apps/docs/src/stories/Tag.stories.ts",
       "storyTitle": "Components/Data Display/Tag",
       "manifestFile": "docs/ai/COMPONENTS/tag.yaml",
       "props": [
         {
           "name": "variant",
-          "type": "TreeTagVariant",
+          "type": "TTagVariant",
           "default": "soft",
           "values": [
             "solid",
@@ -5741,7 +5594,7 @@
         },
         {
           "name": "size",
-          "type": "TreeSize",
+          "type": "TSize",
           "default": "md",
           "values": [
             "sm",
@@ -5800,16 +5653,13 @@
     },
     {
       "name": "TTextarea",
-      "legacyAlias": "TreeTextarea",
-      "aliases": [
-        "TreeTextarea"
-      ],
+      "aliases": [],
       "package": "@treeui/vue",
       "kind": "primitive",
       "category": "Data Entry",
       "status": "available",
       "purpose": "Multi-line text field with size, loading, invalid states, and auto-grow option.",
-      "sourceFile": "packages/vue/src/components/TreeTextarea.vue",
+      "sourceFile": "packages/vue/src/components/TTextarea.vue",
       "storyFile": "apps/docs/src/stories/Textarea.stories.ts",
       "storyTitle": "Components/Data Entry/Textarea",
       "manifestFile": "docs/ai/COMPONENTS/textarea.yaml",
@@ -5821,7 +5671,7 @@
         },
         {
           "name": "size",
-          "type": "TreeSize",
+          "type": "TSize",
           "default": "md",
           "values": [
             "sm",
@@ -5906,28 +5756,25 @@
     },
     {
       "name": "TTimeline",
-      "legacyAlias": "TreeTimeline",
-      "aliases": [
-        "TreeTimeline"
-      ],
+      "aliases": [],
       "package": "@treeui/vue",
       "kind": "data_display",
       "status": "available",
       "purpose": "Vertical timeline for activity history, audits, release events, and chronological product updates.",
-      "sourceFile": "packages/vue/src/components/TreeTimeline.vue",
+      "sourceFile": "packages/vue/src/components/TTimeline.vue",
       "storyFile": "apps/docs/src/stories/Timeline.stories.ts",
       "storyTitle": "Release queued for review",
       "manifestFile": "docs/ai/COMPONENTS/timeline.yaml",
       "props": [
         {
           "name": "items",
-          "type": "TreeTimelineItem[]",
+          "type": "TTimelineItem[]",
           "default": "[]",
           "note": "Array of { id?: string | number; title: string; description?: string; meta?: string; timestamp?: string; datetime?: string; tone?: 'neutral' | 'brand' | 'success' | 'warning' | 'danger' }"
         },
         {
           "name": "size",
-          "type": "TreeSize",
+          "type": "TSize",
           "default": "md",
           "values": [
             "sm",
@@ -5969,15 +5816,12 @@
     },
     {
       "name": "TToast",
-      "legacyAlias": "TreeToast",
-      "aliases": [
-        "TreeToast"
-      ],
+      "aliases": [],
       "package": "@treeui/vue",
       "kind": "feedback",
       "status": "available",
       "purpose": "Ephemeral notification stack driven by a composable. Renders toast items inside a positioned container with auto-dismiss and manual close.",
-      "sourceFile": "packages/vue/src/components/TreeToast.vue",
+      "sourceFile": "packages/vue/src/components/TToast.vue",
       "manifestFile": "docs/ai/COMPONENTS/toast.yaml",
       "props": [],
       "events": [
@@ -6035,16 +5879,13 @@
     },
     {
       "name": "TToggleGroup",
-      "legacyAlias": "TreeToggleGroup",
-      "aliases": [
-        "TreeToggleGroup"
-      ],
+      "aliases": [],
       "package": "@treeui/vue",
       "kind": "selection",
       "category": "Data Entry",
       "status": "available",
       "purpose": "Segmented button group for single or multiple visible choices.",
-      "sourceFile": "packages/vue/src/components/TreeToggleGroup.vue",
+      "sourceFile": "packages/vue/src/components/TToggleGroup.vue",
       "storyFile": "apps/docs/src/stories/ToggleGroup.stories.ts",
       "storyTitle": "Components/Data Entry/ToggleGroup",
       "manifestFile": "docs/ai/COMPONENTS/toggle-group.yaml",
@@ -6056,13 +5897,13 @@
         },
         {
           "name": "options",
-          "type": "TreeToggleGroupOption[]",
+          "type": "TToggleGroupOption[]",
           "default": "[]",
           "note": "Array of `{ label, value, disabled? }`."
         },
         {
           "name": "selectionMode",
-          "type": "TreeToggleGroupSelectionMode",
+          "type": "TToggleGroupSelectionMode",
           "default": "single",
           "values": [
             "single",
@@ -6071,7 +5912,7 @@
         },
         {
           "name": "size",
-          "type": "TreeSize",
+          "type": "TSize",
           "default": "md",
           "values": [
             "sm",
@@ -6081,7 +5922,7 @@
         },
         {
           "name": "variant",
-          "type": "TreeToggleGroupVariant",
+          "type": "TToggleGroupVariant",
           "default": "outline",
           "values": [
             "outline",
@@ -6155,16 +5996,13 @@
     },
     {
       "name": "TTooltip",
-      "legacyAlias": "TreeTooltip",
-      "aliases": [
-        "TreeTooltip"
-      ],
+      "aliases": [],
       "package": "@treeui/vue",
       "kind": "overlay",
       "category": "Overlay",
       "status": "available",
       "purpose": "Small contextual overlay shown on hover or focus.",
-      "sourceFile": "packages/vue/src/components/TreeTooltip.vue",
+      "sourceFile": "packages/vue/src/components/TTooltip.vue",
       "storyFile": "apps/docs/src/stories/Tooltip.stories.ts",
       "storyTitle": "Components/Overlay/Tooltip",
       "manifestFile": "docs/ai/COMPONENTS/tooltip.yaml",
@@ -6191,7 +6029,7 @@
         },
         {
           "name": "side",
-          "type": "TreeTooltipSide",
+          "type": "TTooltipSide",
           "default": "top",
           "values": [
             "top",
@@ -6270,18 +6108,15 @@
     },
     {
       "name": "TTreeView",
-      "legacyAlias": "TreeTreeView",
-      "aliases": [
-        "TreeTreeView"
-      ],
+      "aliases": [],
       "package": "@treeui/vue",
       "kind": "selection",
       "category": "Navigation & Disclosure",
       "status": "available",
       "purpose": "Hierarchical tree view with expansion, keyboard navigation, and single or multiple selection.",
-      "sourceFile": "packages/vue/src/components/TreeTreeView.vue",
+      "sourceFile": "packages/vue/src/components/TTreeView.vue",
       "storyFile": "apps/docs/src/stories/TreeView.stories.ts",
-      "storyTitle": "Components/Navigation & Disclosure/TreeView",
+      "storyTitle": "Components/Navigation & Disclosure/TView",
       "manifestFile": "docs/ai/COMPONENTS/tree-view.yaml",
       "props": [
         {
@@ -6296,13 +6131,13 @@
         },
         {
           "name": "nodes",
-          "type": "TreeTreeViewNode[]",
+          "type": "TTreeViewNode[]",
           "default": "[]",
           "note": "Array of `{ id, label, description?, meta?, disabled?, children? }`."
         },
         {
           "name": "selectionMode",
-          "type": "TreeTreeViewSelectionMode",
+          "type": "TTreeViewSelectionMode",
           "default": "single",
           "values": [
             "single",

@@ -1,7 +1,6 @@
 name: TToast
-legacy_alias: TreeToast
-source_file: packages/vue/src/components/TreeToast.vue
-provider_source_file: packages/vue/src/components/TreeToastProvider.vue
+source_file: packages/vue/src/components/TToast.vue
+provider_source_file: packages/vue/src/components/TToastProvider.vue
 composable_source_file: packages/vue/src/composables/useToast.ts
 package: "@treeui/vue"
 kind: feedback

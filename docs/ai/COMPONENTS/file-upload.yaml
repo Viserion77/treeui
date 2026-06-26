@@ -1,6 +1,5 @@
 name: TFileUpload
-legacy_alias: TreeFileUpload
-source_file: packages/vue/src/components/TreeFileUpload.vue
+source_file: packages/vue/src/components/TFileUpload.vue
 package: "@treeui/vue"
 kind: form
 status: available
@@ -11,7 +10,7 @@ props:
     type: File[]
     default: "[]"
   size:
-    type: TreeSize
+    type: TSize
     default: md
     values: [sm, md, lg]
   disabled:

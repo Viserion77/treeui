@@ -1,6 +1,5 @@
 name: TNavbar
-legacy_alias: TreeNavbar
-source_file: packages/vue/src/components/TreeNavbar.vue
+source_file: packages/vue/src/components/TNavbar.vue
 package: "@treeui/vue"
 kind: layout
 status: available
@@ -8,14 +7,13 @@ purpose: "Top application bar with start, center, and end content areas."
 
 aliases:
   - TAppBar
-  - TreeAppBar
 
 props:
   as:
     type: string
     default: header
   size:
-    type: TreeSize
+    type: TSize
     default: md
     values: [sm, md, lg]
   sticky:

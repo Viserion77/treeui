@@ -1,28 +1,28 @@
 import type { ComputedRef, InjectionKey, Ref } from 'vue';
 
-export interface TreeTreeViewNode {
+export interface TTreeViewNode {
   id: string;
   label: string;
   description?: string;
   meta?: string;
   disabled?: boolean;
-  children?: TreeTreeViewNode[];
+  children?: TTreeViewNode[];
 }
 
 export const treeTreeViewSelectionModes = ['single', 'multiple'] as const;
 
-export type TreeTreeViewSelectionMode = (typeof treeTreeViewSelectionModes)[number];
+export type TTreeViewSelectionMode = (typeof treeTreeViewSelectionModes)[number];
 
-export interface TreeTreeViewRecord {
-  node: TreeTreeViewNode;
+export interface TTreeViewRecord {
+  node: TTreeViewNode;
   level: number;
   parentId?: string;
 }
 
-export interface TreeTreeViewContext {
+export interface TTreeViewContext {
   baseId: string;
   disabled: ComputedRef<boolean>;
-  selectionMode: ComputedRef<TreeTreeViewSelectionMode>;
+  selectionMode: ComputedRef<TTreeViewSelectionMode>;
   focusedId: Ref<string>;
   isExpanded: (id: string) => boolean;
   toggleExpanded: (id: string) => void;
@@ -34,5 +34,5 @@ export interface TreeTreeViewContext {
   unregisterItem: (id: string) => void;
 }
 
-export const treeTreeViewInjectionKey: InjectionKey<TreeTreeViewContext> =
+export const treeTreeViewInjectionKey: InjectionKey<TTreeViewContext> =
   Symbol('tree-tree-view');

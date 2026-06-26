@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite';
 import { TTimeline } from '@treeui/vue';
-import type { TreeTimelineItem } from '@treeui/vue';
+import type { TTimelineItem } from '@treeui/vue';
 import { CheckIcon, InfoIcon, iconProps } from './icon-helpers';
 
-const releaseEvents: TreeTimelineItem[] = [
+const releaseEvents: TTimelineItem[] = [
   {
     id: 'queued',
     meta: 'Queued',
@@ -33,12 +33,12 @@ const releaseEvents: TreeTimelineItem[] = [
   },
 ];
 
-const auditEvents: TreeTimelineItem[] = [
+const auditEvents: TTimelineItem[] = [
   {
     id: 'delete',
     meta: 'Destructive action',
     title: 'Component removed',
-    description: 'TreeMarketingBanner was removed from the registry by an admin.',
+    description: 'TMarketingBanner was removed from the registry by an admin.',
     timestamp: 'Today',
     tone: 'danger',
   },

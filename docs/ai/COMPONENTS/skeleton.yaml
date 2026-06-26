@@ -1,6 +1,5 @@
 name: TSkeleton
-legacy_alias: TreeSkeleton
-source_file: packages/vue/src/components/TreeSkeleton.vue
+source_file: packages/vue/src/components/TSkeleton.vue
 package: "@treeui/vue"
 kind: feedback
 status: available

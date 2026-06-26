@@ -1,6 +1,5 @@
 name: TMultiSelect
-legacy_alias: TreeMultiSelect
-source_file: packages/vue/src/components/TreeMultiSelect.vue
+source_file: packages/vue/src/components/TMultiSelect.vue
 package: "@treeui/vue"
 kind: form
 status: available
@@ -11,7 +10,7 @@ props:
     type: "string[]"
     default: "[]"
   options:
-    type: "TreeMultiSelectOption[]"
+    type: "TMultiSelectOption[]"
     default: "[]"
     note: "Array of `{ label, value, description?, keywords?, disabled? }`."
   open:
@@ -21,7 +20,7 @@ props:
     type: boolean
     default: false
   size:
-    type: TreeSize
+    type: TSize
     default: md
     values: [sm, md, lg]
   disabled:

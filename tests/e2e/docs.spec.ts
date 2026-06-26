@@ -12,7 +12,7 @@ test('renders the tooltip story canvas', async ({ page }) => {
   await page.goto('/iframe.html?id=components-overlay-tooltip--playground');
 
   const trigger = page.getByRole('button', { name: 'Invite teammate' });
-  const tooltipRoot = page.locator('.tree-tooltip');
+  const tooltipRoot = page.locator('.t-tooltip');
 
   await expect(trigger).toBeVisible();
   await expect(tooltipRoot).toHaveAttribute('data-state', 'open');
@@ -32,7 +32,7 @@ test('tooltip is visible when story has open=true', async ({ page }) => {
   await page.goto('/iframe.html?id=components-overlay-tooltip--playground');
 
   const trigger = page.getByRole('button', { name: 'Invite teammate' });
-  const tooltipRoot = page.locator('.tree-tooltip');
+  const tooltipRoot = page.locator('.t-tooltip');
 
   await expect(trigger).toBeVisible();
   await expect(tooltipRoot).toHaveAttribute('data-state', 'open');
@@ -65,7 +65,7 @@ test('modal opens with trigger, traps focus, and closes on Escape', async ({ pag
 test('date picker opens on keyboard and navigates with arrow keys', async ({ page }) => {
   await page.goto('/iframe.html?id=components-data-entry-datepicker--playground');
 
-  const trigger = page.locator('.tree-date-picker__trigger');
+  const trigger = page.locator('.t-date-picker__trigger');
   await trigger.focus();
 
   // Open with ArrowDown

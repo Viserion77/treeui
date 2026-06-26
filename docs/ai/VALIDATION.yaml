@@ -25,15 +25,12 @@ global-criteria:
     - id: NAM-01
       title: "Export público usa prefixo T"
       rule: "Componente exportado como T<Name> (ex: TButton)"
-    - id: NAM-02
-      title: "Alias de compatibilidade Tree<Name>"
-      rule: "Alias Tree<Name> exportado em components/index.ts"
     - id: NAM-03
-      title: "Arquivo fonte usa Tree<Name>.vue"
-      rule: "Nome do arquivo SFC: Tree<Name>.vue"
+      title: "Arquivo fonte usa T<Name>.vue"
+      rule: "Nome do arquivo SFC: T<Name>.vue"
     - id: NAM-04
-      title: "Classes CSS usam BEM com prefixo tree-"
-      rule: "Classes: .tree-<name>, .tree-<name>--<variant>, .tree-<name>__<slot>"
+      title: "Classes CSS usam BEM com prefixo t-"
+      rule: "Classes: .t-<name>, .t-<name>--<variant>, .t-<name>__<slot>"
     - id: NAM-05
       title: "CSS custom properties usam --tree-*"
       rule: "Nenhum valor raw de cor/espaçamento; sempre var(--tree-*)"
@@ -49,7 +46,7 @@ global-criteria:
       title: "Emits tipados com defineEmits<{}>()"
       rule: "Eventos tipados com assinatura de payload"
     - id: STR-04
-      title: "Usa tipos compartilhados (TreeSize, TreeVariant, etc.)"
+      title: "Usa tipos compartilhados (TSize, TVariant, etc.)"
       rule: "Import de packages/vue/src/types/contracts.ts"
     - id: STR-05
       title: "Registrado no plugin"

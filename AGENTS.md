@@ -16,8 +16,7 @@ Stop loading as soon as you have enough context.
 
 ## TreeUI Rules
 
-- Prefer `T<Name>` exports in all new code.
-- Treat `Tree<Name>` aliases as compatibility-only.
+- Use `T<Name>` exports for all components. There are no `Tree<Name>` aliases.
 - Keep API changes in sync with `docs/ai`.
 - For component choice, prefer the smallest component that satisfies the interaction and accessibility requirement.
 - Prefer docs-first composition over inventing new public components.

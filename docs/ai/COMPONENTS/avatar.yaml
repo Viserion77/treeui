@@ -1,8 +1,7 @@
 component: TAvatar
 package: "@treeui/vue"
-source: TreeAvatar.vue
+source: TAvatar.vue
 description: User image with fallback initials and optional status indicator dot.
-aliases: [TreeAvatar]
 
 props:
   src:
@@ -18,11 +17,11 @@ props:
     required: false
     description: Explicit initials to display when no image is provided. Overrides derived initials from `alt`.
   size:
-    type: TreeSize
+    type: TSize
     default: md
     values: [sm, md, lg]
   status:
-    type: TreeAvatarStatus
+    type: TAvatarStatus
     required: false
     values: [online, offline, busy, away]
     description: Shows a colored status dot on the avatar.

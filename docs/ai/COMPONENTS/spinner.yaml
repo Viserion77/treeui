@@ -1,6 +1,5 @@
 name: TSpinner
-legacy_alias: TreeSpinner
-source_file: packages/vue/src/components/TreeSpinner.vue
+source_file: packages/vue/src/components/TSpinner.vue
 package: "@treeui/vue"
 kind: feedback
 status: available
@@ -8,7 +7,7 @@ purpose: "Accessible loading indicator."
 
 props:
   size:
-    type: TreeSize
+    type: TSize
     default: md
     values: [sm, md, lg]
   label:

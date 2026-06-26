@@ -1,6 +1,6 @@
 import { defineComponent, h, type Component } from 'vue';
 
-type TreeIconNode = Array<[string, Record<string, string>]>;
+type TIconNode = Array<[string, Record<string, string>]>;
 
 export const treeIconDefaults = {
   size: 20,
@@ -16,7 +16,7 @@ const toNumber = (value: number | string) => {
   return Number.parseFloat(value);
 };
 
-const createTreeIcon = (name: string, nodes: TreeIconNode) =>
+const createTreeIcon = (name: string, nodes: TIconNode) =>
   defineComponent({
     name,
     props: {
@@ -62,49 +62,49 @@ const createTreeIcon = (name: string, nodes: TreeIconNode) =>
     },
   });
 
-const CircleAlert = createTreeIcon('TreeCircleAlertIcon', [
+const CircleAlert = createTreeIcon('TCircleAlertIcon', [
   ['circle', { cx: '12', cy: '12', r: '10' }],
   ['line', { x1: '12', x2: '12', y1: '8', y2: '12' }],
   ['line', { x1: '12', x2: '12.01', y1: '16', y2: '16' }],
 ]);
 
-const Check = createTreeIcon('TreeCheckIcon', [['path', { d: 'M20 6 9 17l-5-5' }]]);
+const Check = createTreeIcon('TCheckIcon', [['path', { d: 'M20 6 9 17l-5-5' }]]);
 
-const Calendar = createTreeIcon('TreeCalendarIcon', [
+const Calendar = createTreeIcon('TCalendarIcon', [
   ['path', { d: 'M8 2v4' }],
   ['path', { d: 'M16 2v4' }],
   ['rect', { width: '18', height: '18', x: '3', y: '4', rx: '2' }],
   ['path', { d: 'M3 10h18' }],
 ]);
 
-const ChevronLeft = createTreeIcon('TreeChevronLeftIcon', [
+const ChevronLeft = createTreeIcon('TChevronLeftIcon', [
   ['path', { d: 'm15 18-6-6 6-6' }],
 ]);
 
-const ChevronDown = createTreeIcon('TreeChevronDownIcon', [
+const ChevronDown = createTreeIcon('TChevronDownIcon', [
   ['path', { d: 'm6 9 6 6 6-6' }],
 ]);
 
-const ChevronRight = createTreeIcon('TreeChevronRightIcon', [
+const ChevronRight = createTreeIcon('TChevronRightIcon', [
   ['path', { d: 'm9 18 6-6-6-6' }],
 ]);
 
-const Info = createTreeIcon('TreeInfoIcon', [
+const Info = createTreeIcon('TInfoIcon', [
   ['circle', { cx: '12', cy: '12', r: '10' }],
   ['path', { d: 'M12 16v-4' }],
   ['path', { d: 'M12 8h.01' }],
 ]);
 
-const LoaderCircle = createTreeIcon('TreeLoaderCircleIcon', [
+const LoaderCircle = createTreeIcon('TLoaderCircleIcon', [
   ['path', { d: 'M21 12a9 9 0 1 1-6.219-8.56' }],
 ]);
 
-const Search = createTreeIcon('TreeSearchIcon', [
+const Search = createTreeIcon('TSearchIcon', [
   ['circle', { cx: '11', cy: '11', r: '8' }],
   ['path', { d: 'm21 21-4.3-4.3' }],
 ]);
 
-const X = createTreeIcon('TreeXIcon', [
+const X = createTreeIcon('TXIcon', [
   ['path', { d: 'M18 6 6 18' }],
   ['path', { d: 'm6 6 12 12' }],
 ]);
@@ -122,6 +122,6 @@ export const treeIcons = {
   x: X,
 } satisfies Record<string, Component>;
 
-export type TreeIconName = keyof typeof treeIcons;
+export type TIconName = keyof typeof treeIcons;
 
-export const getTreeIcon = (name: TreeIconName) => treeIcons[name];
+export const getTreeIcon = (name: TIconName) => treeIcons[name];

@@ -1,6 +1,5 @@
 name: TCombobox
-legacy_alias: TreeCombobox
-source_file: packages/vue/src/components/TreeCombobox.vue
+source_file: packages/vue/src/components/TCombobox.vue
 package: "@treeui/vue"
 kind: primitive
 status: available
@@ -11,7 +10,7 @@ props:
     type: string
     default: ""
   options:
-    type: "TreeComboboxOption[]"
+    type: "TComboboxOption[]"
     default: "[]"
     note: "Array of { label: string; value: string; description?: string; keywords?: string[]; disabled?: boolean }"
   open:
@@ -21,7 +20,7 @@ props:
     type: boolean
     default: false
   size:
-    type: TreeSize
+    type: TSize
     default: md
     values: [sm, md, lg]
   disabled:

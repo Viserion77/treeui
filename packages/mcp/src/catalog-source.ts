@@ -365,11 +365,9 @@ export const buildCatalogFromRepo = (repoRoot: string): TreeuiCatalog => {
         const setup = normalizeSetupEntry(componentSetup[name]);
         const aliases = Array.from(
           new Set(
-            [
-              ...normalizeStringList(document.aliases),
-              aliasMap[name],
-              name.startsWith('T') ? `Tree${name.slice(1)}` : undefined,
-            ].filter((value): value is string => Boolean(value)),
+            [...normalizeStringList(document.aliases), aliasMap[name]].filter(
+              (value): value is string => Boolean(value),
+            ),
           ),
         );
 

@@ -1,6 +1,5 @@
 name: TTabs
-legacy_alias: TreeTabs
-source_file: packages/vue/src/components/TreeTabs.vue
+source_file: packages/vue/src/components/TTabs.vue
 package: "@treeui/vue"
 kind: navigation
 status: available
@@ -16,7 +15,7 @@ props:
     default: ""
     note: "Initial active tab when uncontrolled."
   size:
-    type: TreeSize
+    type: TSize
     default: md
     values: [sm, md, lg]
   activationMode:

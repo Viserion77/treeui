@@ -1,6 +1,5 @@
 name: TEmptyState
-legacy_alias: TreeEmptyState
-source_file: packages/vue/src/components/TreeEmptyState.vue
+source_file: packages/vue/src/components/TEmptyState.vue
 package: "@treeui/vue"
 kind: feedback
 status: available
@@ -11,7 +10,7 @@ props:
     type: string
     default: section
   size:
-    type: TreeSize
+    type: TSize
     default: md
     values: [sm, md, lg]
   title:

@@ -1,6 +1,5 @@
 name: TTooltip
-legacy_alias: TreeTooltip
-source_file: packages/vue/src/components/TreeTooltip.vue
+source_file: packages/vue/src/components/TTooltip.vue
 package: "@treeui/vue"
 kind: overlay
 status: available
@@ -20,7 +19,7 @@ props:
     type: string
     default: ""
   side:
-    type: TreeTooltipSide
+    type: TTooltipSide
     default: top
     values: [top, right, bottom, left]
   delay:

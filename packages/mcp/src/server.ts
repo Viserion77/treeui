@@ -160,7 +160,7 @@ export const createTreeuiMcpServer = () => {
         inputSchema: {
           type: 'object',
           properties: {
-            name: { type: 'string', description: 'Component name or alias, such as TSelect or TreeSelect.' },
+            name: { type: 'string', description: 'Component name or alias, such as TSelect or TSelect.' },
           },
           required: ['name'],
         },

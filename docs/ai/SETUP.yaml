@@ -24,7 +24,7 @@ vue_setup:
 
 global_rules:
   - "Always import `@treeui/vue/style.css` once in the consuming application."
-  - "Compatibility aliases such as `TreeButton` remain available but are not the preferred direction."
+  - "All components use the `T<Name>` export prefix; there are no `Tree<Name>` aliases."
   - "Form controls use `modelValue` + `update:modelValue`."
   - "Overlay-style components generally support controlled and uncontrolled open state."
   - "Date-only values use `YYYY-MM-DD`."

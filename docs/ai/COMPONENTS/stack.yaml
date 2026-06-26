@@ -1,6 +1,5 @@
 name: TStack
-legacy_alias: TreeStack
-source_file: packages/vue/src/components/TreeStack.vue
+source_file: packages/vue/src/components/TStack.vue
 package: "@treeui/vue"
 kind: layout
 status: available
@@ -11,7 +10,7 @@ props:
     type: string
     default: div
   direction:
-    type: TreeStackDirection
+    type: TStackDirection
     default: vertical
     values: [vertical, horizontal]
   gap:

@@ -39,10 +39,9 @@ If consumer-app wiring changes, update `docs/ai/SETUP.yaml` in the same change.
 
 ## Naming Conventions
 
-- **Public exports**: `T<Name>` (e.g. `TButton`, `TInput`) — primary direction
-- **Compatibility aliases**: `Tree<Name>` (e.g. `TreeButton`) — still exported, do not remove
-- **Source filenames**: `Tree<Name>.vue` (e.g. `TreeButton.vue`)
-- **CSS classes**: BEM with `tree-` prefix (e.g. `tree-button`, `tree-button--solid`, `tree-button--sm`, `is-loading`)
+- **Public exports**: `T<Name>` (e.g. `TButton`, `TInput`) — there are no `Tree<Name>` aliases
+- **Source filenames**: `T<Name>.vue` (e.g. `TButton.vue`)
+- **CSS classes**: BEM with `t-` prefix (e.g. `t-button`, `t-button--solid`, `t-button--sm`, `is-loading`)
 - **CSS variables**: `--tree-*` (semantic tokens from `@treeui/tokens`)
 
 ## Coding Patterns
@@ -51,7 +50,7 @@ If consumer-app wiring changes, update `docs/ai/SETUP.yaml` in the same change.
 
 - Always use `<script setup lang="ts">` — no Options API
 - Type props with `defineProps<{...}>()` and emits with `defineEmits<{...}>()`
-- Use shared types from `packages/vue/src/types/contracts.ts`: `TreeSize`, `TreeVariant`, `TreeCardVariant`, `TreeTooltipSide`
+- Use shared types from `packages/vue/src/types/contracts.ts`: `TSize`, `TVariant`, `TCardVariant`, `TTooltipSide`
 - Style with design tokens `var(--tree-*)`, never raw color/spacing values
 - Use computed classes following BEM: `tree-<component>`, `tree-<component>--<variant>`, `tree-<component>--<size>`
 
@@ -75,10 +74,10 @@ If consumer-app wiring changes, update `docs/ai/SETUP.yaml` in the same change.
 
 ## Adding a New Component
 
-1. Create `packages/vue/src/components/Tree<Name>.vue`
+1. Create `packages/vue/src/components/T<Name>.vue`
 2. Use existing shared types and composables
 3. Add CSS to `packages/vue/src/styles/index.css` using tokens
-4. Export as `T<Name>` + `Tree<Name>` alias in `packages/vue/src/components/index.ts`
+4. Export as `T<Name>` in `packages/vue/src/components/index.ts`
 5. Register in plugin at `packages/vue/src/plugin.ts`
 6. Create story at `apps/docs/src/stories/<Name>.stories.ts`
 7. Add tests in `packages/vue/src/components/components.test.ts`
@@ -121,7 +120,7 @@ pnpm test:e2e      # Playwright (if interaction/a11y changed)
 
 - Use Options API or raw `<script>` without `setup`
 - Use hardcoded colors, spacing, or font values — always use `--tree-*` tokens
-- Remove `Tree<Name>` compatibility aliases
+- Reintroduce `Tree<Name>` component aliases — the public API is `T<Name>` only
 - Introduce framework-specific code in `tokens`, `utils`, or `icons` packages
 - Skip contract file updates when public API changes
 - Add dependencies to `@treeui/tokens` or `@treeui/utils` — they must stay dependency-free

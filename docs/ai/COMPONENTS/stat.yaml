@@ -1,6 +1,5 @@
 name: TStat
-legacy_alias: TreeStat
-source_file: packages/vue/src/components/TreeStat.vue
+source_file: packages/vue/src/components/TStat.vue
 package: "@treeui/vue"
 kind: data-display
 status: available
@@ -20,11 +19,11 @@ props:
     type: string
     default: ""
   tone:
-    type: TreeStatTone
+    type: TStatTone
     default: neutral
     values: [neutral, success, warning, danger, info]
   trendDirection:
-    type: TreeStatTrendDirection
+    type: TStatTrendDirection
     default: neutral
     values: [up, down, neutral]
   loading:

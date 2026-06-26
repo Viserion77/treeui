@@ -2,11 +2,11 @@
 
 This file explains why the contracts look the way they do. Exact prop names, event names, value formats, and token values live in `CONTRACTS.yaml`, `TOKENS.yaml`, and `COMPONENTS/*.yaml`.
 
-## Naming Migration
+## Naming
 
-- `T<Name>` is the long-term public naming direction
-- `Tree<Name>` remains as a compatibility bridge so the library can evolve without forcing an immediate breaking rename
-- Source files still use `Tree*.vue` so internal implementation can stay stable while public exports move forward
+- `T<Name>` is the public naming for all components, exported types, and BEM CSS classes (`.t-button`)
+- The earlier `Tree<Name>` export aliases and `Tree*.vue` source filenames were removed in favor of a single `T`-prefixed surface
+- Design-token CSS variables keep the `--tree-*` prefix because they belong to the framework-agnostic token layer, not the Vue component surface
 
 ## Portability Boundary
 

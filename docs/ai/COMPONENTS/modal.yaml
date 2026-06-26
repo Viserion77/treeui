@@ -1,6 +1,5 @@
 name: TModal
-legacy_alias: TreeModal
-source_file: packages/vue/src/components/TreeModal.vue
+source_file: packages/vue/src/components/TModal.vue
 package: "@treeui/vue"
 kind: overlay
 status: available
@@ -20,7 +19,7 @@ props:
     type: boolean
     default: false
   size:
-    type: TreeSize
+    type: TSize
     default: md
     values: [sm, md, lg]
   title:

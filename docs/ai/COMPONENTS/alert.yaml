@@ -1,6 +1,5 @@
 name: TAlert
-legacy_alias: TreeAlert
-source_file: packages/vue/src/components/TreeAlert.vue
+source_file: packages/vue/src/components/TAlert.vue
 package: "@treeui/vue"
 kind: feedback
 status: available
@@ -12,7 +11,7 @@ props:
     default: info
     values: [info, success, warning, danger]
   size:
-    type: TreeSize
+    type: TSize
     default: md
     values: [sm, md, lg]
   dismissible:

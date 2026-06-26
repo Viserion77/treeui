@@ -1,6 +1,5 @@
 name: TBadge
-legacy_alias: TreeBadge
-source_file: packages/vue/src/components/TreeBadge.vue
+source_file: packages/vue/src/components/TBadge.vue
 package: "@treeui/vue"
 kind: display
 status: available
@@ -8,16 +7,16 @@ purpose: "Compact status or metadata label with optional icon."
 
 props:
   variant:
-    type: TreeVariant
+    type: TVariant
     default: soft
     values: [solid, outline, ghost, soft, danger]
   tone:
-    type: TreeBadgeTone
+    type: TBadgeTone
     default: neutral
     values: [neutral, success, warning, danger, info]
     description: "Optional semantic tone layered on top of the visual variant."
   size:
-    type: TreeSize
+    type: TSize
     default: md
     values: [sm, md, lg]
 

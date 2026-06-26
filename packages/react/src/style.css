@@ -1,0 +1,376 @@
+/*
+ * TreeUI React component styles.
+ * Token variables and themes come from @treeui/tokens; component rules below
+ * reuse the same --tree-* tokens and t-* BEM classes as @treeui/vue.
+ */
+@import '@treeui/tokens/styles.css';
+@import '@treeui/tokens/themes.css';
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+.t-button,
+.t-input,
+.t-combobox,
+.t-file-upload,
+.t-checkbox,
+.t-switch,
+.t-select,
+.t-card,
+.t-badge,
+.t-alert,
+.t-empty-state,
+.t-timeline,
+.t-toast,
+.t-pagination,
+.t-tooltip__content {
+  font-family: var(--tree-font-family-sans);
+}
+
+.t-button {
+  --tree-button-bg: var(--tree-color-brand-primary);
+  --tree-button-text: var(--tree-color-brand-contrast);
+  --tree-button-border: transparent;
+  --tree-button-shadow: transparent;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--tree-space-2);
+  min-width: max-content;
+  height: var(--tree-size-control-md);
+  padding-inline: var(--tree-space-4);
+  border: var(--tree-border-width-subtle) solid var(--tree-button-border);
+  border-radius: var(--tree-radius-md);
+  background: var(--tree-button-bg);
+  color: var(--tree-button-text);
+  box-shadow: 0 0 0 0 var(--tree-button-shadow);
+  font-size: var(--tree-font-size-md);
+  font-weight: var(--tree-font-weight-medium);
+  line-height: var(--tree-font-lineHeight-tight);
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    transform var(--tree-motion-duration-fast) var(--tree-motion-easing-standard),
+    background-color var(--tree-motion-duration-fast) var(--tree-motion-easing-standard),
+    border-color var(--tree-motion-duration-fast) var(--tree-motion-easing-standard),
+    box-shadow var(--tree-motion-duration-fast) var(--tree-motion-easing-standard);
+}
+
+.t-button::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  min-width: 44px;
+  min-height: 44px;
+  width: 100%;
+  height: 100%;
+  transform: translate(-50%, -50%);
+}
+
+.t-button:hover:not(.is-disabled) {
+  transform: translateY(-1px);
+}
+
+.t-button:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 4px var(--tree-color-focus-ring);
+}
+
+.t-button.is-disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.t-button--sm {
+  height: var(--tree-size-control-sm);
+  padding-inline: var(--tree-space-3);
+  font-size: var(--tree-font-size-sm);
+}
+
+.t-button--lg {
+  height: var(--tree-size-control-lg);
+  padding-inline: var(--tree-space-5);
+  font-size: var(--tree-font-size-lg);
+}
+
+.t-button--solid {
+  --tree-button-bg: var(--tree-color-brand-primary);
+  --tree-button-text: var(--tree-color-brand-contrast);
+}
+
+.t-button--outline {
+  --tree-button-bg: var(--tree-color-bg-surface);
+  --tree-button-text: var(--tree-color-text-primary);
+  --tree-button-border: var(--tree-color-border-default);
+}
+
+.t-button--ghost {
+  --tree-button-bg: transparent;
+  --tree-button-text: var(--tree-color-text-primary);
+}
+
+.t-button--soft {
+  --tree-button-bg: var(--tree-color-brand-soft);
+  --tree-button-text: var(--tree-color-brand-primary);
+}
+
+.t-button--danger {
+  --tree-button-bg: var(--tree-color-status-error);
+  --tree-button-text: var(--tree-color-brand-contrast);
+}
+
+.t-button__icon,
+.t-button__spinner,
+.t-badge__icon,
+.t-input__slot {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.t-button__spinner .t-spinner {
+  color: currentColor;
+}
+
+.t-input {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--tree-space-2);
+  width: 100%;
+  min-height: var(--tree-size-control-md);
+  padding-inline: var(--tree-space-3);
+  border: var(--tree-border-width-subtle) solid var(--tree-color-border-default);
+  border-radius: var(--tree-radius-md);
+  background: var(--tree-color-bg-surface);
+  color: var(--tree-color-text-primary);
+  transition:
+    border-color var(--tree-motion-duration-fast) var(--tree-motion-easing-standard),
+    box-shadow var(--tree-motion-duration-fast) var(--tree-motion-easing-standard);
+}
+
+.t-input:focus-within {
+  border-color: var(--tree-color-brand-primary);
+  box-shadow: 0 0 0 4px var(--tree-color-focus-ring);
+}
+
+.t-input.is-invalid {
+  border-color: var(--tree-color-status-error);
+}
+
+.t-input.is-disabled {
+  opacity: 0.68;
+  cursor: not-allowed;
+}
+
+.t-input--sm {
+  min-height: var(--tree-size-control-sm);
+  padding-inline: var(--tree-space-2);
+}
+
+.t-input--lg {
+  min-height: var(--tree-size-control-lg);
+  padding-inline: var(--tree-space-4);
+}
+
+.t-input__field {
+  width: 100%;
+  min-width: 0;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  outline: none;
+}
+
+.t-input__field::placeholder {
+  color: var(--tree-color-text-muted);
+}
+
+.t-input__slot {
+  color: var(--tree-color-text-muted);
+}
+
+.t-card {
+  display: grid;
+  gap: var(--tree-space-3);
+  border: var(--tree-border-width-subtle) solid var(--tree-color-border-default);
+  border-radius: var(--tree-radius-lg);
+  background: var(--tree-color-bg-surface);
+  color: var(--tree-color-text-primary);
+  box-shadow: var(--tree-shadow-xs);
+}
+
+.t-card--sm {
+  padding: var(--tree-space-3);
+}
+
+.t-card--md {
+  padding: var(--tree-space-4);
+}
+
+.t-card--lg {
+  padding: var(--tree-space-5);
+}
+
+.t-card--soft {
+  background: var(--tree-color-bg-subtle);
+}
+
+.t-card--solid {
+  background: var(--tree-color-text-primary);
+  color: var(--tree-color-bg-surface);
+  border-color: transparent;
+}
+
+.t-card--inset {
+  background: var(--tree-color-bg-subtle);
+  border-color: var(--tree-color-border-default);
+  box-shadow: none;
+}
+
+.t-card__header,
+.t-card__footer {
+  color: var(--tree-color-text-muted);
+}
+
+.t-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--tree-space-3);
+}
+
+.t-card__title {
+  font-size: var(--tree-font-size-lg);
+  font-weight: var(--tree-font-weight-semibold);
+  line-height: var(--tree-font-lineHeight-heading);
+  color: var(--tree-color-text-primary);
+}
+
+.t-card__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--tree-space-2);
+  flex-shrink: 0;
+}
+
+.t-card__body {
+  display: grid;
+  gap: var(--tree-space-2);
+}
+
+.t-badge {
+  --tree-badge-solid-bg: var(--tree-color-brand-primary);
+  --tree-badge-solid-text: var(--tree-color-brand-contrast);
+  --tree-badge-outline-bg: var(--tree-color-bg-surface);
+  --tree-badge-outline-text: var(--tree-color-text-primary);
+  --tree-badge-outline-border: var(--tree-color-border-default);
+  --tree-badge-ghost-bg: transparent;
+  --tree-badge-ghost-text: var(--tree-color-text-muted);
+  --tree-badge-soft-bg: var(--tree-color-brand-soft);
+  --tree-badge-soft-text: var(--tree-color-brand-primary);
+  --tree-badge-danger-bg: color-mix(in srgb, var(--tree-color-status-error) 16%, var(--tree-color-bg-surface));
+  --tree-badge-danger-text: var(--tree-color-status-error);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--tree-space-2);
+  width: fit-content;
+  border: var(--tree-border-width-subtle) solid transparent;
+  border-radius: var(--tree-radius-pill);
+  padding-inline: var(--tree-space-3);
+  font-weight: var(--tree-font-weight-medium);
+  line-height: 1;
+}
+
+.t-badge--tone-success {
+  --tree-badge-solid-bg: var(--tree-color-status-success);
+  --tree-badge-outline-text: var(--tree-color-status-success);
+  --tree-badge-outline-border: color-mix(in srgb, var(--tree-color-status-success) 36%, var(--tree-color-border-default));
+  --tree-badge-ghost-text: var(--tree-color-status-success);
+  --tree-badge-soft-bg: color-mix(in srgb, var(--tree-color-status-success) 14%, var(--tree-color-bg-surface));
+  --tree-badge-soft-text: var(--tree-color-status-success);
+  --tree-badge-danger-bg: color-mix(in srgb, var(--tree-color-status-success) 18%, var(--tree-color-bg-surface));
+  --tree-badge-danger-text: var(--tree-color-status-success);
+}
+
+.t-badge--tone-warning {
+  --tree-badge-solid-bg: var(--tree-color-status-warning);
+  --tree-badge-outline-text: var(--tree-color-status-warning);
+  --tree-badge-outline-border: color-mix(in srgb, var(--tree-color-status-warning) 36%, var(--tree-color-border-default));
+  --tree-badge-ghost-text: var(--tree-color-status-warning);
+  --tree-badge-soft-bg: color-mix(in srgb, var(--tree-color-status-warning) 14%, var(--tree-color-bg-surface));
+  --tree-badge-soft-text: var(--tree-color-status-warning);
+  --tree-badge-danger-bg: color-mix(in srgb, var(--tree-color-status-warning) 18%, var(--tree-color-bg-surface));
+  --tree-badge-danger-text: var(--tree-color-status-warning);
+}
+
+.t-badge--tone-danger {
+  --tree-badge-solid-bg: var(--tree-color-status-error);
+  --tree-badge-outline-text: var(--tree-color-status-error);
+  --tree-badge-outline-border: color-mix(in srgb, var(--tree-color-status-error) 36%, var(--tree-color-border-default));
+  --tree-badge-ghost-text: var(--tree-color-status-error);
+  --tree-badge-soft-bg: color-mix(in srgb, var(--tree-color-status-error) 14%, var(--tree-color-bg-surface));
+  --tree-badge-soft-text: var(--tree-color-status-error);
+}
+
+.t-badge--tone-info {
+  --tree-badge-solid-bg: var(--tree-color-status-info);
+  --tree-badge-outline-text: var(--tree-color-status-info);
+  --tree-badge-outline-border: color-mix(in srgb, var(--tree-color-status-info) 36%, var(--tree-color-border-default));
+  --tree-badge-ghost-text: var(--tree-color-status-info);
+  --tree-badge-soft-bg: color-mix(in srgb, var(--tree-color-status-info) 14%, var(--tree-color-bg-surface));
+  --tree-badge-soft-text: var(--tree-color-status-info);
+  --tree-badge-danger-bg: color-mix(in srgb, var(--tree-color-status-info) 18%, var(--tree-color-bg-surface));
+  --tree-badge-danger-text: var(--tree-color-status-info);
+}
+
+.t-badge--sm {
+  min-height: 1.5rem;
+  font-size: var(--tree-font-size-xs);
+}
+
+.t-badge--md {
+  min-height: 1.75rem;
+  font-size: var(--tree-font-size-sm);
+}
+
+.t-badge--lg {
+  min-height: 2rem;
+  font-size: var(--tree-font-size-md);
+}
+
+.t-badge--solid {
+  background: var(--tree-badge-solid-bg);
+  color: var(--tree-badge-solid-text);
+}
+
+.t-badge--outline {
+  background: var(--tree-badge-outline-bg);
+  color: var(--tree-badge-outline-text);
+  border-color: var(--tree-badge-outline-border);
+}
+
+.t-badge--ghost {
+  background: var(--tree-badge-ghost-bg);
+  color: var(--tree-badge-ghost-text);
+}
+
+.t-badge--soft {
+  background: var(--tree-badge-soft-bg);
+  color: var(--tree-badge-soft-text);
+}
+
+.t-badge--danger {
+  background: var(--tree-badge-danger-bg);
+  color: var(--tree-badge-danger-text);
+}
+
+.t-pricing-card__action .t-button {
+  width: 100%;
+}

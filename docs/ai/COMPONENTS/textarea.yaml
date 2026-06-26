@@ -1,6 +1,5 @@
 name: TTextarea
-legacy_alias: TreeTextarea
-source_file: packages/vue/src/components/TreeTextarea.vue
+source_file: packages/vue/src/components/TTextarea.vue
 package: "@treeui/vue"
 kind: primitive
 status: available
@@ -11,7 +10,7 @@ props:
     type: string
     default: ""
   size:
-    type: TreeSize
+    type: TSize
     default: md
     values: [sm, md, lg]
   disabled:

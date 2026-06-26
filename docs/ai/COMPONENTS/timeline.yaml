@@ -1,6 +1,5 @@
 name: TTimeline
-legacy_alias: TreeTimeline
-source_file: packages/vue/src/components/TreeTimeline.vue
+source_file: packages/vue/src/components/TTimeline.vue
 package: "@treeui/vue"
 kind: data_display
 status: available
@@ -8,11 +7,11 @@ purpose: "Vertical timeline for activity history, audits, release events, and ch
 
 props:
   items:
-    type: "TreeTimelineItem[]"
+    type: "TTimelineItem[]"
     default: "[]"
     note: "Array of { id?: string | number; title: string; description?: string; meta?: string; timestamp?: string; datetime?: string; tone?: 'neutral' | 'brand' | 'success' | 'warning' | 'danger' }"
   size:
-    type: TreeSize
+    type: TSize
     default: md
     values: [sm, md, lg]
 

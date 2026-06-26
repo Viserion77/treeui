@@ -1,6 +1,5 @@
 name: TAccordion
-legacy_alias: TreeAccordion
-source_file: packages/vue/src/components/TreeAccordion.vue
+source_file: packages/vue/src/components/TAccordion.vue
 kind: disclosure
 status: available
 purpose: >
@@ -8,7 +7,7 @@ purpose: >
   Supports single-open and multi-open modes.
 
 compound:
-  - TAccordionItem (TreeAccordionItem)
+  - TAccordionItem (TAccordionItem)
 
 # ── TAccordion (container) ──────────────────────────────────────────────
 

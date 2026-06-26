@@ -60,7 +60,7 @@ props:
     description: CTA button label. If omitted and no action slot, footer is hidden.
 
   size:
-    type: TreeSize
+    type: TSize
     default: md
     description: Card size — affects padding, font sizes.
 
@@ -114,7 +114,7 @@ a11y:
   - Uses <h3> for plan title.
   - Feature list uses role="list" with <ul>/<li>.
   - Feature icons are aria-hidden="true".
-  - CTA button inherits TreeButton a11y (disabled, aria-busy).
+  - CTA button inherits TButton a11y (disabled, aria-busy).
 
 ---
 
@@ -135,7 +135,7 @@ props:
       badge, buttonText, disabled).
 
   size:
-    type: TreeSize
+    type: TSize
     default: md
     description: Size applied to all child pricing cards.
 

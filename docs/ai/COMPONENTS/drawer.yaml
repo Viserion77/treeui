@@ -1,6 +1,5 @@
 name: TDrawer
-legacy_alias: TreeDrawer
-source_file: packages/vue/src/components/TreeDrawer.vue
+source_file: packages/vue/src/components/TDrawer.vue
 package: "@treeui/vue"
 kind: overlay
 status: available
@@ -17,11 +16,11 @@ props:
     type: boolean
     default: false
   size:
-    type: TreeSize
+    type: TSize
     default: md
     values: [sm, md, lg]
   side:
-    type: TreeDrawerSide
+    type: TDrawerSide
     default: right
     values: [top, right, bottom, left]
   title:

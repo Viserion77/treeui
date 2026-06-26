@@ -1,6 +1,5 @@
 name: TContainer
-legacy_alias: TreeContainer
-source_file: packages/vue/src/components/TreeContainer.vue
+source_file: packages/vue/src/components/TContainer.vue
 package: "@treeui/vue"
 kind: layout
 status: available
@@ -11,7 +10,7 @@ props:
     type: string
     default: div
   size:
-    type: TreeContainerSize
+    type: TContainerSize
     default: lg
     values: [sm, md, lg, xl, full]
   padded:

@@ -1,6 +1,5 @@
 name: TSidebar
-legacy_alias: TreeSidebar
-source_file: packages/vue/src/components/TreeSidebar.vue
+source_file: packages/vue/src/components/TSidebar.vue
 package: "@treeui/vue"
 kind: layout
 status: available
@@ -20,11 +19,11 @@ props:
     type: boolean
     default: true
   size:
-    type: TreeSize
+    type: TSize
     default: md
     values: [sm, md, lg]
   side:
-    type: TreeSidebarSide
+    type: TSidebarSide
     default: left
     values: [left, right]
   sticky:

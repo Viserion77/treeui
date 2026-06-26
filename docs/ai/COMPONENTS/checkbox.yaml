@@ -1,6 +1,5 @@
 name: TCheckbox
-legacy_alias: TreeCheckbox
-source_file: packages/vue/src/components/TreeCheckbox.vue
+source_file: packages/vue/src/components/TCheckbox.vue
 package: "@treeui/vue"
 kind: primitive
 status: available
@@ -11,7 +10,7 @@ props:
     type: boolean
     default: false
   size:
-    type: TreeSize
+    type: TSize
     default: md
     values: [sm, md, lg]
   disabled:

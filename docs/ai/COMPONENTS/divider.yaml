@@ -1,8 +1,7 @@
 component: TDivider
 package: "@treeui/vue"
-source: TreeDivider.vue
+source: TDivider.vue
 description: Horizontal or vertical visual separator.
-aliases: [TreeDivider]
 
 props:
   orientation:

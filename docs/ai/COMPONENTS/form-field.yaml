@@ -1,7 +1,7 @@
 component: TFormField
 status: milestone-1
 package: "@treeui/vue"
-source: TreeFormField.vue
+source: TFormField.vue
 description: >
   Label + input wrapper with error and hint slots.
   Provides consistent layout, labelling, and validation messaging for any form control.
@@ -32,7 +32,7 @@ props:
     default: false
     description: "Applies disabled styling (reduced opacity) to the entire field."
   size:
-    type: TreeSize
+    type: TSize
     default: md
     values: [sm, md, lg]
     description: "Controls the label font size."

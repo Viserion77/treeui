@@ -1,6 +1,5 @@
 name: TNavMenu
-legacy_alias: TreeNavMenu
-source_file: packages/vue/src/components/TreeNavMenu.vue
+source_file: packages/vue/src/components/TNavMenu.vue
 package: "@treeui/vue"
 kind: navigation
 status: available
@@ -14,11 +13,11 @@ props:
     type: string
     default: ""
   items:
-    type: "TreeNavMenuItem[]"
+    type: "TNavMenuItem[]"
     default: "[]"
     note: "Array of `{ label, value, shortLabel?, description?, icon?, to?, badge?, disabled? }`."
   size:
-    type: TreeSize
+    type: TSize
     default: md
     values: [sm, md, lg]
   collapsed:
@@ -29,7 +28,7 @@ props:
     default: false
 
 item_interface:
-  name: TreeNavMenuItem
+  name: TNavMenuItem
   fields:
     label: { type: string, required: true }
     value: { type: string, required: true }

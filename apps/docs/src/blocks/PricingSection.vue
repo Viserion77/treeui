@@ -134,9 +134,9 @@ const onSelect = (plan: Plan) => {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.5rem;
+  gap: var(--tree-space-2);
   text-align: center;
-  margin-bottom: 2rem;
+  margin-bottom: var(--tree-space-8);
 }
 
 .pricing-section__title {
@@ -153,12 +153,12 @@ const onSelect = (plan: Plan) => {
 
 .pricing-section__toggle {
   display: inline-flex;
-  gap: 0.25rem;
-  margin-top: 0.75rem;
+  gap: var(--tree-space-1);
+  margin-top: var(--tree-space-3);
 }
 
 .pricing-section__status {
-  margin-top: 1.5rem;
+  margin-top: var(--tree-space-6);
   text-align: center;
 }
 </style>

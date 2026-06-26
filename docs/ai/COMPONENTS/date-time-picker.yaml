@@ -1,6 +1,5 @@
 name: TDateTimePicker
-legacy_alias: TreeDateTimePicker
-source_file: packages/vue/src/components/TreeDateTimePicker.vue
+source_file: packages/vue/src/components/TDateTimePicker.vue
 package: "@treeui/vue"
 kind: form
 status: available
@@ -18,7 +17,7 @@ props:
     type: boolean
     default: false
   size:
-    type: TreeSize
+    type: TSize
     default: md
     values: [sm, md, lg]
   disabled:

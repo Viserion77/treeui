@@ -8,10 +8,10 @@ import {
   TNavMenu,
   TNavbar,
   TContainer,
-  type TreeNavMenuItem,
+  type TNavMenuItem,
 } from '@treeui/vue';
 
-const navItems: TreeNavMenuItem[] = [
+const navItems: TNavMenuItem[] = [
   { label: 'Dashboard', value: 'dashboard', shortLabel: 'Db' },
   { label: 'Projects', value: 'projects', shortLabel: 'Pr', badge: 4 },
   { label: 'Team', value: 'team', shortLabel: 'Tm' },
@@ -46,7 +46,7 @@ const activeSection = ref('dashboard');
           <strong>Workspace</strong>
         </template>
         <template #end>
-          <span>jeferson@simplificamais</span>
+          <span>jeferson@example.com</span>
         </template>
       </TNavbar>
 

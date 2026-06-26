@@ -1,6 +1,5 @@
 name: TBreadcrumb
-legacy_alias: TreeBreadcrumb
-source_file: packages/vue/src/components/TreeBreadcrumb.vue
+source_file: packages/vue/src/components/TBreadcrumb.vue
 package: "@treeui/vue"
 kind: navigation
 status: available
@@ -26,8 +25,7 @@ a11y:
 
 sub_components:
   TBreadcrumbItem:
-    legacy_alias: TreeBreadcrumbItem
-    source_file: packages/vue/src/components/TreeBreadcrumbItem.vue
+    source_file: packages/vue/src/components/TBreadcrumbItem.vue
     purpose: "Individual breadcrumb link or current-page indicator."
     props:
       to:

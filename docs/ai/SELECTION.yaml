@@ -3,7 +3,7 @@ package: "@treeui/vue"
 
 selection_principles:
   - "Prefer the smallest component that matches the interaction and accessibility need."
-  - "Prefer `T<Name>` exports in new code. `Tree<Name>` aliases are compatibility-only."
+  - "Use `T<Name>` exports. There are no `Tree<Name>` aliases."
   - "Prefer docs-first composition before inventing new public components."
   - "When a component has an in-flow and overlay alternative, choose the in-flow one unless anchored or modal behavior is required."
 

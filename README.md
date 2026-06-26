@@ -6,9 +6,9 @@
 
 Clean components for modern Vue products.
 
-TreeUI is an open source component library for Vue 3 with a framework-ready foundation. The first release stays intentionally small and focuses on production-oriented components, strong accessibility defaults, and token-driven theming that can outlive a single framework package.
+TreeUI is an open source component library built on a framework-agnostic foundation. The Vue 3 package ships a comprehensive, production-oriented component set with strong accessibility defaults and token-driven theming that outlives any single framework package, while an early React package brings the same tokens and primitives to React apps.
 
-Public Vue components use the `T` prefix, such as `TButton`, `TInput`, `TDatePicker`, and `TModal`.
+All public components use the `T` prefix, such as `TButton`, `TInput`, `TDatePicker`, and `TModal`.
 
 ## Why TreeUI
 

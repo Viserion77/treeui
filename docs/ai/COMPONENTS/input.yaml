@@ -1,6 +1,5 @@
 name: TInput
-legacy_alias: TreeInput
-source_file: packages/vue/src/components/TreeInput.vue
+source_file: packages/vue/src/components/TInput.vue
 package: "@treeui/vue"
 kind: primitive
 status: available
@@ -11,7 +10,7 @@ props:
     type: "string | number"
     default: ""
   size:
-    type: TreeSize
+    type: TSize
     default: md
     values: [sm, md, lg]
   disabled:

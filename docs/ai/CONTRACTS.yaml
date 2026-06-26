@@ -1,9 +1,7 @@
 version: 0.1
 package: "@treeui/vue"
 public_component_prefix: "T"
-legacy_component_prefix: "Tree"
-legacy_alias_status: "compatibility_only"
-source_component_filename_prefix: "Tree"
+source_component_filename_prefix: "T"
 
 primary_exports:
   - TAlert
@@ -42,44 +40,6 @@ primary_exports:
   - TTag
   - TTimeline
   - TLink
-
-compatibility_aliases:
-  TAlert: TreeAlert
-  TBadge: TreeBadge
-  TBreadcrumb: TreeBreadcrumb
-  TBreadcrumbItem: TreeBreadcrumbItem
-  TButton: TreeButton
-  TCard: TreeCard
-  TCheckbox: TreeCheckbox
-  TCombobox: TreeCombobox
-  TConfirmDialog: TreeConfirmDialog
-  TDatePicker: TreeDatePicker
-  TDropdown: TreeDropdown
-  TDrawer: TreeDrawer
-  TEmptyState: TreeEmptyState
-  TFileUpload: TreeFileUpload
-  TFormField: TreeFormField
-  TInput: TreeInput
-  TModal: TreeModal
-  TRadio: TreeRadio
-  TRadioGroup: TreeRadioGroup
-  TSelect: TreeSelect
-  TSkeleton: TreeSkeleton
-  TSpinner: TreeSpinner
-  TSwitch: TreeSwitch
-  TTabs: TreeTabs
-  TTabList: TreeTabList
-  TTab: TreeTab
-  TTabPanel: TreeTabPanel
-  TToast: TreeToast
-  TToastProvider: TreeToastProvider
-  TTooltip: TreeTooltip
-  TAvatar: TreeAvatar
-  TDivider: TreeDivider
-  TTable: TreeTable
-  TTag: TreeTag
-  TTimeline: TreeTimeline
-  TLink: TreeLink
 
 shared_sizes:
   values: [sm, md, lg]
@@ -176,6 +136,5 @@ accessibility_baseline:
   screen_reader_labels_when_needed: true
 
 notes:
-  - "Prefer T<Name> in examples, docs, and new code."
-  - "Keep Tree<Name> only for migration compatibility."
+  - "Use T<Name> in examples, docs, and code. There are no Tree<Name> aliases."
   - "Do not introduce Vue-specific naming into tokens or design contracts."

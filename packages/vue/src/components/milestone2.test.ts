@@ -1,15 +1,15 @@
 import { nextTick } from 'vue';
 import { mount } from '@vue/test-utils';
-import TreeContainer from './TreeContainer.vue';
-import TreeGrid from './TreeGrid.vue';
-import TreeStack from './TreeStack.vue';
-import TreeNavbar from './TreeNavbar.vue';
-import TreeNavMenu from './TreeNavMenu.vue';
-import TreeSidebar from './TreeSidebar.vue';
+import TContainer from './TContainer.vue';
+import TGrid from './TGrid.vue';
+import TStack from './TStack.vue';
+import TNavbar from './TNavbar.vue';
+import TNavMenu from './TNavMenu.vue';
+import TSidebar from './TSidebar.vue';
 
 describe('Milestone 2 components', () => {
   it('renders container with sizing and polymorphic tag', () => {
-    const wrapper = mount(TreeContainer, {
+    const wrapper = mount(TContainer, {
       props: {
         as: 'section',
         size: 'xl',
@@ -21,13 +21,13 @@ describe('Milestone 2 components', () => {
     });
 
     expect(wrapper.element.tagName).toBe('SECTION');
-    expect(wrapper.classes()).toContain('tree-container--xl');
+    expect(wrapper.classes()).toContain('t-container--xl');
     expect(wrapper.classes()).not.toContain('is-padded');
     expect(wrapper.text()).toContain('Container content');
   });
 
   it('applies grid styles for fixed and auto-fit layouts', () => {
-    const fixed = mount(TreeGrid, {
+    const fixed = mount(TGrid, {
       props: {
         columns: 3,
         gap: '1rem',
@@ -37,7 +37,7 @@ describe('Milestone 2 components', () => {
     expect((fixed.element as HTMLElement).style.gridTemplateColumns).toContain('repeat(3');
     expect((fixed.element as HTMLElement).style.gap).toBe('1rem');
 
-    const auto = mount(TreeGrid, {
+    const auto = mount(TGrid, {
       props: {
         minItemWidth: '18rem',
       },
@@ -47,7 +47,7 @@ describe('Milestone 2 components', () => {
   });
 
   it('renders stack direction and wrapping controls', () => {
-    const wrapper = mount(TreeStack, {
+    const wrapper = mount(TStack, {
       props: {
         direction: 'horizontal',
         wrap: true,
@@ -56,14 +56,14 @@ describe('Milestone 2 components', () => {
       },
     });
 
-    expect(wrapper.classes()).toContain('tree-stack--horizontal');
+    expect(wrapper.classes()).toContain('t-stack--horizontal');
     expect(wrapper.classes()).toContain('is-wrapping');
     expect(wrapper.classes()).toContain('is-reversed');
     expect((wrapper.element as HTMLElement).style.justifyContent).toBe('space-between');
   });
 
   it('renders navbar slots and sticky state', () => {
-    const wrapper = mount(TreeNavbar, {
+    const wrapper = mount(TNavbar, {
       props: {
         sticky: true,
         elevated: true,
@@ -77,12 +77,12 @@ describe('Milestone 2 components', () => {
 
     expect(wrapper.classes()).toContain('is-sticky');
     expect(wrapper.classes()).toContain('is-elevated');
-    expect(wrapper.find('.tree-navbar__section--start').text()).toContain('TreeUI');
-    expect(wrapper.find('.tree-navbar__section--end').text()).toContain('Invite');
+    expect(wrapper.find('.t-navbar__section--start').text()).toContain('TreeUI');
+    expect(wrapper.find('.t-navbar__section--end').text()).toContain('Invite');
   });
 
   it('supports keyboard focus and selection in nav menu', async () => {
-    const wrapper = mount(TreeNavMenu, {
+    const wrapper = mount(TNavMenu, {
       attachTo: document.body,
       props: {
         modelValue: 'overview',
@@ -97,7 +97,7 @@ describe('Milestone 2 components', () => {
       },
     });
 
-    const items = wrapper.findAll('.tree-nav-menu__item');
+    const items = wrapper.findAll('.t-nav-menu__item');
     await items[0].trigger('keydown', { key: 'ArrowDown' });
     await nextTick();
 
@@ -112,14 +112,14 @@ describe('Milestone 2 components', () => {
   });
 
   it('toggles sidebar collapsed state and updates nested nav menu presentation', async () => {
-    const wrapper = mount(TreeSidebar, {
+    const wrapper = mount(TSidebar, {
       attachTo: document.body,
       props: {
         defaultCollapsed: false,
       },
       slots: {
         default: `
-          <TreeNavMenu
+          <TNavMenu
             aria-label="Nav"
             :items="[
               { label: 'Overview', value: 'overview', shortLabel: 'O' },
@@ -131,20 +131,20 @@ describe('Milestone 2 components', () => {
       },
       global: {
         components: {
-          TreeNavMenu,
+          TNavMenu,
         },
       },
     });
 
     expect(wrapper.classes()).not.toContain('is-collapsed');
-    expect(wrapper.find('.tree-nav-menu').classes()).not.toContain('is-collapsed');
+    expect(wrapper.find('.t-nav-menu').classes()).not.toContain('is-collapsed');
 
-    await wrapper.get('.tree-sidebar__toggle').trigger('click');
+    await wrapper.get('.t-sidebar__toggle').trigger('click');
     await nextTick();
 
     expect(wrapper.emitted('update:collapsed')?.[0]).toEqual([true]);
     expect(wrapper.classes()).toContain('is-collapsed');
-    expect(wrapper.find('.tree-nav-menu').classes()).toContain('is-collapsed');
+    expect(wrapper.find('.t-nav-menu').classes()).toContain('is-collapsed');
 
     wrapper.unmount();
   });

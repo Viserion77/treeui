@@ -1,6 +1,5 @@
 name: TGrid
-legacy_alias: TreeGrid
-source_file: packages/vue/src/components/TreeGrid.vue
+source_file: packages/vue/src/components/TGrid.vue
 package: "@treeui/vue"
 kind: layout
 status: available

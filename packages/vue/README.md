@@ -88,14 +88,9 @@ Dark mode activates automatically via `prefers-color-scheme: dark`. To control i
 document.documentElement.setAttribute('data-tree-theme', 'dark')
 ```
 
-## Compatibility aliases
-
-All components are also exported with the `Tree` prefix (e.g. `TreeButton`, `TreeInput`) for backwards compatibility.
-
 ## Conventions
 
-- Primary docs and examples use the `T` prefix for public exports.
-- `Tree<Name>` aliases remain available for migration and compatibility.
+- All public exports use the `T` prefix.
 - `TNavbar` / `TAppBar` and `TSteps` / `TStepper` are alias pairs for the same implementations.
 - Page-level assemblies that are mostly layout stay documented as recipes until they need a dedicated semantic API.
 - Overlays such as `TModal`, `TDrawer`, and `TPopover` support controlled open state; `TModal` works with `v-model:open`.
@@ -136,7 +131,7 @@ Some repeated app UI intentionally stays documented as composition guidance inst
 Full TypeScript support with exported types:
 
 ```ts
-import type { TreeSize, TreeVariant } from '@treeui/vue'
+import type { TSize, TVariant } from '@treeui/vue'
 ```
 
 ## Documentation

@@ -1,6 +1,5 @@
 name: TSteps
-legacy_alias: TreeSteps
-source_file: packages/vue/src/components/TreeSteps.vue
+source_file: packages/vue/src/components/TSteps.vue
 package: "@treeui/vue"
 kind: navigation
 status: available
@@ -8,7 +7,6 @@ purpose: "Stepper component for visualizing workflow progress, with optional int
 
 aliases:
   - TStepper
-  - TreeStepper
 
 props:
   modelValue:
@@ -18,15 +16,15 @@ props:
     type: string
     default: ""
   items:
-    type: "TreeStepItem[]"
+    type: "TStepItem[]"
     default: "[]"
     note: "Array of `{ label, value, description?, meta?, status?, disabled? }`."
   size:
-    type: TreeSize
+    type: TSize
     default: md
     values: [sm, md, lg]
   orientation:
-    type: TreeStepOrientation
+    type: TStepOrientation
     default: horizontal
     values: [horizontal, vertical]
   interactive:

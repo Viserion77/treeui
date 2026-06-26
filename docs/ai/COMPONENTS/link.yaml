@@ -1,6 +1,5 @@
 name: TLink
-legacy_alias: TreeLink
-source_file: packages/vue/src/components/TreeLink.vue
+source_file: packages/vue/src/components/TLink.vue
 package: "@treeui/vue"
 kind: navigation
 status: available
@@ -23,7 +22,7 @@ props:
     type: boolean
     default: false
   variant:
-    type: TreeLinkVariant
+    type: TLinkVariant
     default: default
     values: [default, muted, danger]
 

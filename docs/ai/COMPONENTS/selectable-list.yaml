@@ -1,6 +1,5 @@
 name: TSelectableList
-legacy_alias: TreeSelectableList
-source_file: packages/vue/src/components/TreeSelectableList.vue
+source_file: packages/vue/src/components/TSelectableList.vue
 package: "@treeui/vue"
 kind: selection
 status: available
@@ -14,11 +13,11 @@ props:
     type: string
     default: ""
   items:
-    type: "TreeSelectableListItem[]"
+    type: "TSelectableListItem[]"
     default: "[]"
     note: "Array of `{ label, value, description?, meta?, disabled? }`."
   size:
-    type: TreeSize
+    type: TSize
     default: md
     values: [sm, md, lg]
   disabled:

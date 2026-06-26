@@ -1,58 +1,58 @@
 import { nextTick } from 'vue';
 import { mount } from '@vue/test-utils';
-import TreeBadge from './TreeBadge.vue';
-import TreeButton from './TreeButton.vue';
-import TreeAlert from './TreeAlert.vue';
-import TreeCard from './TreeCard.vue';
-import TreeCheckbox from './TreeCheckbox.vue';
-import TreeCombobox from './TreeCombobox.vue';
-import TreeConfirmDialog from './TreeConfirmDialog.vue';
-import TreeDatePicker from './TreeDatePicker.vue';
-import TreeDateTimePicker from './TreeDateTimePicker.vue';
-import TreeInput from './TreeInput.vue';
-import TreeTextarea from './TreeTextarea.vue';
-import TreeModal from './TreeModal.vue';
-import TreeSpinner from './TreeSpinner.vue';
-import TreeTooltip from './TreeTooltip.vue';
-import TreeRadio from './TreeRadio.vue';
-import TreeRadioGroup from './TreeRadioGroup.vue';
-import TreeSelect from './TreeSelect.vue';
-import TreeFormField from './TreeFormField.vue';
-import TreeSwitch from './TreeSwitch.vue';
-import TreeSkeleton from './TreeSkeleton.vue';
-import TreeProgress from './TreeProgress.vue';
-import TreePagination from './TreePagination.vue';
-import TreeAccordion from './TreeAccordion.vue';
-import TreeAccordionItem from './TreeAccordionItem.vue';
-import TreeBreadcrumb from './TreeBreadcrumb.vue';
-import TreeBreadcrumbItem from './TreeBreadcrumbItem.vue';
-import TreeDropdown from './TreeDropdown.vue';
-import TreeDrawer from './TreeDrawer.vue';
-import TreeContextMenu from './TreeContextMenu.vue';
-import TreeFileUpload from './TreeFileUpload.vue';
-import TreePopover from './TreePopover.vue';
-import TreeTabs from './TreeTabs.vue';
-import TreeTabList from './TreeTabList.vue';
-import TreeTab from './TreeTab.vue';
-import TreeTabPanel from './TreeTabPanel.vue';
-import TreeToastProvider from './TreeToastProvider.vue';
-import TreeAvatar from './TreeAvatar.vue';
-import TreeDivider from './TreeDivider.vue';
-import TreeEmptyState from './TreeEmptyState.vue';
-import TreeTable from './TreeTable.vue';
-import TreeTag from './TreeTag.vue';
-import TreeTimeline from './TreeTimeline.vue';
-import TreePricingCard from './TreePricingCard.vue';
-import TreePricing from './TreePricing.vue';
-import TreeMarkdownEditor from './TreeMarkdownEditor.vue';
-import TreeIcon from './TreeIcon.vue';
-import TreeLink from './TreeLink.vue';
-import TreeNavMenu from './TreeNavMenu.vue';
+import TBadge from './TBadge.vue';
+import TButton from './TButton.vue';
+import TAlert from './TAlert.vue';
+import TCard from './TCard.vue';
+import TCheckbox from './TCheckbox.vue';
+import TCombobox from './TCombobox.vue';
+import TConfirmDialog from './TConfirmDialog.vue';
+import TDatePicker from './TDatePicker.vue';
+import TDateTimePicker from './TDateTimePicker.vue';
+import TInput from './TInput.vue';
+import TTextarea from './TTextarea.vue';
+import TModal from './TModal.vue';
+import TSpinner from './TSpinner.vue';
+import TTooltip from './TTooltip.vue';
+import TRadio from './TRadio.vue';
+import TRadioGroup from './TRadioGroup.vue';
+import TSelect from './TSelect.vue';
+import TFormField from './TFormField.vue';
+import TSwitch from './TSwitch.vue';
+import TSkeleton from './TSkeleton.vue';
+import TProgress from './TProgress.vue';
+import TPagination from './TPagination.vue';
+import TAccordion from './TAccordion.vue';
+import TAccordionItem from './TAccordionItem.vue';
+import TBreadcrumb from './TBreadcrumb.vue';
+import TBreadcrumbItem from './TBreadcrumbItem.vue';
+import TDropdown from './TDropdown.vue';
+import TDrawer from './TDrawer.vue';
+import TContextMenu from './TContextMenu.vue';
+import TFileUpload from './TFileUpload.vue';
+import TPopover from './TPopover.vue';
+import TTabs from './TTabs.vue';
+import TTabList from './TTabList.vue';
+import TTab from './TTab.vue';
+import TTabPanel from './TTabPanel.vue';
+import TToastProvider from './TToastProvider.vue';
+import TAvatar from './TAvatar.vue';
+import TDivider from './TDivider.vue';
+import TEmptyState from './TEmptyState.vue';
+import TTable from './TTable.vue';
+import TTag from './TTag.vue';
+import TTimeline from './TTimeline.vue';
+import TPricingCard from './TPricingCard.vue';
+import TPricing from './TPricing.vue';
+import TMarkdownEditor from './TMarkdownEditor.vue';
+import TIcon from './TIcon.vue';
+import TLink from './TLink.vue';
+import TNavMenu from './TNavMenu.vue';
 import { useToast } from '../composables/useToast';
 
 describe('@treeui/vue', () => {
   it('renders button states and blocks clicks while loading', async () => {
-    const wrapper = mount(TreeButton, {
+    const wrapper = mount(TButton, {
       props: {
         loading: true,
       },
@@ -61,7 +61,7 @@ describe('@treeui/vue', () => {
       },
     });
 
-    expect(wrapper.classes()).toContain('tree-button--solid');
+    expect(wrapper.classes()).toContain('t-button--solid');
     expect(wrapper.attributes('aria-busy')).toBe('true');
 
     await wrapper.trigger('click');
@@ -70,7 +70,7 @@ describe('@treeui/vue', () => {
   });
 
   it('renders polymorphic button with correct a11y when disabled', async () => {
-    const wrapper = mount(TreeButton, {
+    const wrapper = mount(TButton, {
       props: {
         as: 'a',
         disabled: true,
@@ -90,7 +90,7 @@ describe('@treeui/vue', () => {
   });
 
   it('renders polymorphic button without a11y attrs when enabled', async () => {
-    const wrapper = mount(TreeButton, {
+    const wrapper = mount(TButton, {
       props: {
         as: 'a',
       },
@@ -109,7 +109,7 @@ describe('@treeui/vue', () => {
   });
 
   it('emits input updates and keeps prefix and suffix slots', async () => {
-    const wrapper = mount(TreeInput, {
+    const wrapper = mount(TInput, {
       props: {
         modelValue: 'hello',
         'onUpdate:modelValue': (value: string) => value,
@@ -134,13 +134,13 @@ describe('@treeui/vue', () => {
   it('opens the file picker from keyboard and accepts input files', async () => {
     const clickSpy = vi.spyOn(HTMLInputElement.prototype, 'click').mockImplementation(() => {});
 
-    const wrapper = mount(TreeFileUpload, {
+    const wrapper = mount(TFileUpload, {
       props: {
         label: 'Upload assets',
       },
     });
 
-    const dropzone = wrapper.get('.tree-file-upload__dropzone');
+    const dropzone = wrapper.get('.t-file-upload__dropzone');
     await dropzone.trigger('keydown', { key: 'Enter' });
 
     expect(clickSpy).toHaveBeenCalledTimes(1);
@@ -162,8 +162,8 @@ describe('@treeui/vue', () => {
   });
 
   it('handles drag and drop files', async () => {
-    const wrapper = mount(TreeFileUpload);
-    const dropzone = wrapper.get('.tree-file-upload__dropzone');
+    const wrapper = mount(TFileUpload);
+    const dropzone = wrapper.get('.t-file-upload__dropzone');
     const file = new File(['image'], 'hero.png', { type: 'image/png' });
     const dataTransfer = {
       files: [file],
@@ -182,7 +182,7 @@ describe('@treeui/vue', () => {
   });
 
   it('accepts pasted files while focused', async () => {
-    const wrapper = mount(TreeFileUpload);
+    const wrapper = mount(TFileUpload);
     const file = new File(['image'], 'pasted.png', { type: 'image/png' });
     const pasteEvent = new Event('paste', {
       bubbles: true,
@@ -210,14 +210,14 @@ describe('@treeui/vue', () => {
   });
 
   it('rejects invalid type and oversized files in file upload', async () => {
-    const wrapper = mount(TreeFileUpload, {
+    const wrapper = mount(TFileUpload, {
       props: {
         accept: 'image/*',
         maxFileSize: 3,
       },
     });
 
-    const dropzone = wrapper.get('.tree-file-upload__dropzone');
+    const dropzone = wrapper.get('.t-file-upload__dropzone');
     const invalidType = new File(['pdf'], 'report.pdf', { type: 'application/pdf' });
     const oversized = new File(['12345'], 'screen.png', { type: 'image/png' });
     const dataTransfer = {
@@ -240,7 +240,7 @@ describe('@treeui/vue', () => {
     const first = new File(['a'], 'alpha.txt', { type: 'text/plain' });
     const second = new File(['b'], 'beta.txt', { type: 'text/plain' });
 
-    const wrapper = mount(TreeFileUpload, {
+    const wrapper = mount(TFileUpload, {
       props: {
         modelValue: [first, second],
         filesLabel: 'Uploads',
@@ -251,15 +251,15 @@ describe('@treeui/vue', () => {
     expect(wrapper.text()).toContain('alpha.txt');
     expect(wrapper.text()).toContain('beta.txt');
 
-    await wrapper.findAll('.tree-file-upload__remove')[0].trigger('click');
-    await wrapper.get('.tree-file-upload__clear').trigger('click');
+    await wrapper.findAll('.t-file-upload__remove')[0].trigger('click');
+    await wrapper.get('.t-file-upload__clear').trigger('click');
 
     expect(wrapper.emitted('update:modelValue')?.[0]).toEqual([[second]]);
     expect(wrapper.emitted('update:modelValue')?.[1]).toEqual([[]]);
   });
 
   it('emits textarea updates and applies size class', async () => {
-    const wrapper = mount(TreeTextarea, {
+    const wrapper = mount(TTextarea, {
       props: {
         modelValue: 'hello',
         size: 'lg',
@@ -270,8 +270,8 @@ describe('@treeui/vue', () => {
       },
     });
 
-    expect(wrapper.classes()).toContain('tree-textarea');
-    expect(wrapper.classes()).toContain('tree-textarea--lg');
+    expect(wrapper.classes()).toContain('t-textarea');
+    expect(wrapper.classes()).toContain('t-textarea--lg');
 
     await wrapper.get('textarea').setValue('hello tree');
 
@@ -280,7 +280,7 @@ describe('@treeui/vue', () => {
   });
 
   it('applies invalid and disabled states to textarea', () => {
-    const invalid = mount(TreeTextarea, {
+    const invalid = mount(TTextarea, {
       props: { modelValue: '', invalid: true },
       attrs: { 'aria-label': 'Invalid' },
     });
@@ -288,7 +288,7 @@ describe('@treeui/vue', () => {
     expect(invalid.classes()).toContain('is-invalid');
     expect(invalid.get('textarea').attributes('aria-invalid')).toBe('true');
 
-    const disabled = mount(TreeTextarea, {
+    const disabled = mount(TTextarea, {
       props: { modelValue: '', disabled: true },
       attrs: { 'aria-label': 'Disabled' },
     });
@@ -298,7 +298,7 @@ describe('@treeui/vue', () => {
   });
 
   it('renders card slots', () => {
-    const wrapper = mount(TreeCard, {
+    const wrapper = mount(TCard, {
       slots: {
         header: '<strong>TreeUI</strong>',
         default: '<p>Quiet elegance for product UI.</p>',
@@ -306,12 +306,12 @@ describe('@treeui/vue', () => {
       },
     });
 
-    expect(wrapper.find('.tree-card__header').exists()).toBe(true);
-    expect(wrapper.find('.tree-card__footer').exists()).toBe(true);
+    expect(wrapper.find('.t-card__header').exists()).toBe(true);
+    expect(wrapper.find('.t-card__footer').exists()).toBe(true);
   });
 
   it('renders card with title prop and actions slot', () => {
-    const wrapper = mount(TreeCard, {
+    const wrapper = mount(TCard, {
       props: { title: 'Pool Semanal' },
       slots: {
         actions: '<button>Fechar</button>',
@@ -319,22 +319,22 @@ describe('@treeui/vue', () => {
       },
     });
 
-    expect(wrapper.find('.tree-card__title').text()).toBe('Pool Semanal');
-    expect(wrapper.find('.tree-card__actions').exists()).toBe(true);
-    expect(wrapper.find('.tree-card__header').exists()).toBe(true);
+    expect(wrapper.find('.t-card__title').text()).toBe('Pool Semanal');
+    expect(wrapper.find('.t-card__actions').exists()).toBe(true);
+    expect(wrapper.find('.t-card__header').exists()).toBe(true);
   });
 
   it('renders card inset variant', () => {
-    const wrapper = mount(TreeCard, {
+    const wrapper = mount(TCard, {
       props: { variant: 'inset' },
       slots: { default: '<p>Sub-section</p>' },
     });
 
-    expect(wrapper.classes()).toContain('tree-card--inset');
+    expect(wrapper.classes()).toContain('t-card--inset');
   });
 
   it('renders card header slot as override when both title and header are provided', () => {
-    const wrapper = mount(TreeCard, {
+    const wrapper = mount(TCard, {
       props: { title: 'Ignored' },
       slots: {
         header: '<strong>Custom Header</strong>',
@@ -342,26 +342,26 @@ describe('@treeui/vue', () => {
       },
     });
 
-    expect(wrapper.find('.tree-card__header').exists()).toBe(true);
-    expect(wrapper.find('.tree-card__title').exists()).toBe(false);
+    expect(wrapper.find('.t-card__header').exists()).toBe(true);
+    expect(wrapper.find('.t-card__title').exists()).toBe(false);
     expect(wrapper.find('strong').text()).toBe('Custom Header');
   });
 
   it('renders link with default variant and href', () => {
-    const wrapper = mount(TreeLink, {
+    const wrapper = mount(TLink, {
       props: { href: '/docs' },
       slots: { default: 'Documentation' },
     });
 
     expect(wrapper.element.tagName).toBe('A');
     expect(wrapper.attributes('href')).toBe('/docs');
-    expect(wrapper.classes()).toContain('tree-link');
-    expect(wrapper.classes()).toContain('tree-link--default');
+    expect(wrapper.classes()).toContain('t-link');
+    expect(wrapper.classes()).toContain('t-link--default');
     expect(wrapper.text()).toBe('Documentation');
   });
 
   it('renders link as span when disabled', () => {
-    const wrapper = mount(TreeLink, {
+    const wrapper = mount(TLink, {
       props: { href: '/docs', disabled: true },
       slots: { default: 'Disabled link' },
     });
@@ -373,7 +373,7 @@ describe('@treeui/vue', () => {
   });
 
   it('renders external link with target and rel', () => {
-    const wrapper = mount(TreeLink, {
+    const wrapper = mount(TLink, {
       props: { href: 'https://example.com', external: true },
       slots: { default: 'External' },
     });
@@ -383,21 +383,21 @@ describe('@treeui/vue', () => {
   });
 
   it('renders link variant classes', () => {
-    const muted = mount(TreeLink, {
+    const muted = mount(TLink, {
       props: { href: '#', variant: 'muted' as const },
       slots: { default: 'Muted' },
     });
-    expect(muted.classes()).toContain('tree-link--muted');
+    expect(muted.classes()).toContain('t-link--muted');
 
-    const danger = mount(TreeLink, {
+    const danger = mount(TLink, {
       props: { href: '#', variant: 'danger' as const },
       slots: { default: 'Danger' },
     });
-    expect(danger.classes()).toContain('tree-link--danger');
+    expect(danger.classes()).toContain('t-link--danger');
   });
 
   it('renders nav menu items and emits selection', async () => {
-    const wrapper = mount(TreeNavMenu, {
+    const wrapper = mount(TNavMenu, {
       props: {
         items: [
           { label: 'Home', value: 'home' },
@@ -409,19 +409,19 @@ describe('@treeui/vue', () => {
     });
 
     expect(wrapper.find('nav').exists()).toBe(true);
-    expect(wrapper.findAll('.tree-nav-menu__item')).toHaveLength(2);
+    expect(wrapper.findAll('.t-nav-menu__item')).toHaveLength(2);
 
-    const firstItem = wrapper.find('.tree-nav-menu__item.is-selected');
+    const firstItem = wrapper.find('.t-nav-menu__item.is-selected');
     expect(firstItem.exists()).toBe(true);
     expect(firstItem.attributes('aria-current')).toBe('page');
 
-    await wrapper.findAll('.tree-nav-menu__item')[1].trigger('click');
+    await wrapper.findAll('.t-nav-menu__item')[1].trigger('click');
     expect(wrapper.emitted('update:modelValue')?.[0]).toEqual(['settings']);
   });
 
   it('renders nav menu item with icon when provided', () => {
     const IconStub = { template: '<svg />' };
-    const wrapper = mount(TreeNavMenu, {
+    const wrapper = mount(TNavMenu, {
       props: {
         items: [
           { label: 'Dashboard', value: 'dash', icon: IconStub },
@@ -430,12 +430,12 @@ describe('@treeui/vue', () => {
       attrs: { 'aria-label': 'Nav' },
     });
 
-    expect(wrapper.find('.tree-nav-menu__icon').exists()).toBe(true);
-    expect(wrapper.find('.tree-nav-menu__marker').exists()).toBe(false);
+    expect(wrapper.find('.t-nav-menu__icon').exists()).toBe(true);
+    expect(wrapper.find('.t-nav-menu__marker').exists()).toBe(false);
   });
 
   it('renders badge variants', () => {
-    const wrapper = mount(TreeBadge, {
+    const wrapper = mount(TBadge, {
       props: {
         variant: 'danger',
       },
@@ -444,12 +444,12 @@ describe('@treeui/vue', () => {
       },
     });
 
-    expect(wrapper.classes()).toContain('tree-badge--danger');
+    expect(wrapper.classes()).toContain('t-badge--danger');
     expect(wrapper.text()).toContain('Critical');
   });
 
   it('supports semantic badge tones without changing the visual variant API', () => {
-    const wrapper = mount(TreeBadge, {
+    const wrapper = mount(TBadge, {
       props: {
         variant: 'soft',
         tone: 'success',
@@ -459,13 +459,13 @@ describe('@treeui/vue', () => {
       },
     });
 
-    expect(wrapper.classes()).toContain('tree-badge--soft');
-    expect(wrapper.classes()).toContain('tree-badge--tone-success');
+    expect(wrapper.classes()).toContain('t-badge--soft');
+    expect(wrapper.classes()).toContain('t-badge--tone-success');
     expect(wrapper.text()).toContain('Healthy');
   });
 
   it('exposes an accessible loading label on the spinner', () => {
-    const wrapper = mount(TreeSpinner, {
+    const wrapper = mount(TSpinner, {
       props: {
         label: 'Saving',
       },
@@ -478,7 +478,7 @@ describe('@treeui/vue', () => {
   it('opens the tooltip from a slotted trigger and emits state changes', async () => {
     vi.useFakeTimers();
 
-    const wrapper = mount(TreeTooltip, {
+    const wrapper = mount(TTooltip, {
       attachTo: document.body,
       props: {
         content: 'Helpful hint',
@@ -504,7 +504,7 @@ describe('@treeui/vue', () => {
   });
 
   it('selects dates from the calendar and emits the shared open contract', async () => {
-    const wrapper = mount(TreeDatePicker, {
+    const wrapper = mount(TDatePicker, {
       props: {
         modelValue: '2026-03-15',
       },
@@ -531,7 +531,7 @@ describe('@treeui/vue', () => {
   });
 
   it('supports keyboard navigation and month changes in the date picker', async () => {
-    const wrapper = mount(TreeDatePicker, {
+    const wrapper = mount(TDatePicker, {
       props: {
         modelValue: '2026-03-15',
       },
@@ -554,7 +554,7 @@ describe('@treeui/vue', () => {
 
     await wrapper.get('[data-date="2026-03-16"]').trigger('keydown', { key: 'PageDown' });
     await nextTick();
-    expect(wrapper.get('.tree-date-picker__month').text()).toContain('April');
+    expect(wrapper.get('.t-date-picker__month').text()).toContain('April');
 
     await wrapper.get('[data-date="2026-04-16"]').trigger('keydown', { key: 'Escape' });
     await nextTick();
@@ -565,7 +565,7 @@ describe('@treeui/vue', () => {
   });
 
   it('opens the custom datetime picker, lets users pick a slot, and emits the shared open contract', async () => {
-    const wrapper = mount(TreeDateTimePicker, {
+    const wrapper = mount(TDateTimePicker, {
       props: {
         modelValue: '2026-04-08T14:30',
         step: 900,
@@ -584,7 +584,7 @@ describe('@treeui/vue', () => {
     await wrapper.get('button[aria-label="Release window"]').trigger('click');
     await nextTick();
 
-    expect(wrapper.classes()).toContain('tree-date-time-picker');
+    expect(wrapper.classes()).toContain('t-date-time-picker');
     expect(wrapper.emitted('update:open')?.[0]).toEqual([true]);
     expect(wrapper.find('[role="dialog"]').exists()).toBe(true);
     expect(wrapper.get('input[type="hidden"]').attributes('name')).toBe('releaseWindow');
@@ -594,7 +594,7 @@ describe('@treeui/vue', () => {
     await wrapper.get('[data-date="2026-04-10"]').trigger('click');
     await wrapper.get('select[aria-label="Select hour"]').setValue('16');
     await wrapper.get('select[aria-label="Select minute"]').setValue('45');
-    await wrapper.get('.tree-date-time-picker__footer .tree-button--solid').trigger('click');
+    await wrapper.get('.t-date-time-picker__footer .t-button--solid').trigger('click');
     await nextTick();
 
     expect(wrapper.emitted('update:modelValue')?.[0]).toEqual(['2026-04-10T16:45']);
@@ -606,7 +606,7 @@ describe('@treeui/vue', () => {
   });
 
   it('disables out-of-range days and times in the datetime picker surface', async () => {
-    const wrapper = mount(TreeDateTimePicker, {
+    const wrapper = mount(TDateTimePicker, {
       props: {
         modelValue: '2026-04-08T14:30',
         min: '2026-04-08T14:30',
@@ -638,7 +638,7 @@ describe('@treeui/vue', () => {
   });
 
   it('opens the modal from a trigger slot and closes on escape', async () => {
-    const wrapper = mount(TreeModal, {
+    const wrapper = mount(TModal, {
       attachTo: document.body,
       props: {
         title: 'Invite teammate',
@@ -675,7 +675,7 @@ describe('@treeui/vue', () => {
   });
 
   it('traps focus inside the modal and closes from the overlay', async () => {
-    const wrapper = mount(TreeModal, {
+    const wrapper = mount(TModal, {
       attachTo: document.body,
       props: {
         defaultOpen: true,
@@ -713,7 +713,7 @@ describe('@treeui/vue', () => {
     expect(document.activeElement?.id).toBe('last-action');
 
     (
-      document.body.querySelector('.tree-modal__backdrop') as HTMLDivElement | null
+      document.body.querySelector('.t-modal__backdrop') as HTMLDivElement | null
     )?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
     await nextTick();
     expect(document.body.querySelector('[role="dialog"]')).toBeNull();
@@ -722,7 +722,7 @@ describe('@treeui/vue', () => {
   });
 
   it('opens the drawer from a trigger slot and closes on escape', async () => {
-    const wrapper = mount(TreeDrawer, {
+    const wrapper = mount(TDrawer, {
       attachTo: document.body,
       props: {
         title: 'Settings',
@@ -747,8 +747,8 @@ describe('@treeui/vue', () => {
     expect(document.body.textContent).toContain('Settings');
     expect(document.body.textContent).toContain('Drawer content');
 
-    const surface = document.body.querySelector('.tree-drawer__surface');
-    expect(surface?.classList.contains('tree-drawer__surface--right')).toBe(true);
+    const surface = document.body.querySelector('.t-drawer__surface');
+    expect(surface?.classList.contains('t-drawer__surface--right')).toBe(true);
 
     (
       document.getElementById('drawer-save') as HTMLButtonElement | null
@@ -763,7 +763,7 @@ describe('@treeui/vue', () => {
   });
 
   it('traps focus inside the drawer and closes from the overlay', async () => {
-    const wrapper = mount(TreeDrawer, {
+    const wrapper = mount(TDrawer, {
       attachTo: document.body,
       props: {
         defaultOpen: true,
@@ -802,7 +802,7 @@ describe('@treeui/vue', () => {
     expect(document.activeElement?.id).toBe('drawer-last');
 
     (
-      document.body.querySelector('.tree-drawer__backdrop') as HTMLDivElement | null
+      document.body.querySelector('.t-drawer__backdrop') as HTMLDivElement | null
     )?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
     await nextTick();
     expect(document.body.querySelector('[role="dialog"]')).toBeNull();
@@ -811,7 +811,7 @@ describe('@treeui/vue', () => {
   });
 
   it('toggles checkbox and emits update:modelValue', async () => {
-    const wrapper = mount(TreeCheckbox, {
+    const wrapper = mount(TCheckbox, {
       props: {
         modelValue: false,
         'onUpdate:modelValue': (value: boolean) => value,
@@ -821,7 +821,7 @@ describe('@treeui/vue', () => {
       },
     });
 
-    expect(wrapper.classes()).toContain('tree-checkbox');
+    expect(wrapper.classes()).toContain('t-checkbox');
     expect(wrapper.classes()).not.toContain('is-checked');
     expect(wrapper.text()).toContain('Accept terms');
 
@@ -831,7 +831,7 @@ describe('@treeui/vue', () => {
   });
 
   it('renders checked state with correct aria', () => {
-    const wrapper = mount(TreeCheckbox, {
+    const wrapper = mount(TCheckbox, {
       props: {
         modelValue: true,
       },
@@ -845,7 +845,7 @@ describe('@treeui/vue', () => {
   });
 
   it('renders indeterminate state with aria-checked mixed', () => {
-    const wrapper = mount(TreeCheckbox, {
+    const wrapper = mount(TCheckbox, {
       props: {
         modelValue: false,
         indeterminate: true,
@@ -860,7 +860,7 @@ describe('@treeui/vue', () => {
   });
 
   it('applies disabled state to checkbox', () => {
-    const wrapper = mount(TreeCheckbox, {
+    const wrapper = mount(TCheckbox, {
       props: {
         modelValue: false,
         disabled: true,
@@ -875,7 +875,7 @@ describe('@treeui/vue', () => {
   });
 
   it('applies invalid state to checkbox', () => {
-    const wrapper = mount(TreeCheckbox, {
+    const wrapper = mount(TCheckbox, {
       props: {
         modelValue: false,
         invalid: true,
@@ -890,15 +890,15 @@ describe('@treeui/vue', () => {
   });
 
   it('renders checkbox sizes', () => {
-    const sm = mount(TreeCheckbox, { props: { size: 'sm' as const } });
-    const lg = mount(TreeCheckbox, { props: { size: 'lg' as const } });
+    const sm = mount(TCheckbox, { props: { size: 'sm' as const } });
+    const lg = mount(TCheckbox, { props: { size: 'lg' as const } });
 
-    expect(sm.classes()).toContain('tree-checkbox--sm');
-    expect(lg.classes()).toContain('tree-checkbox--lg');
+    expect(sm.classes()).toContain('t-checkbox--sm');
+    expect(lg.classes()).toContain('t-checkbox--lg');
   });
 
   it('selects a radio option and emits update:modelValue on the group', async () => {
-    const wrapper = mount(TreeRadioGroup, {
+    const wrapper = mount(TRadioGroup, {
       props: {
         modelValue: 'a',
         name: 'test-group',
@@ -906,17 +906,17 @@ describe('@treeui/vue', () => {
       },
       slots: {
         default: {
-          components: { TreeRadio },
+          components: { TRadio },
           template: `
-            <TreeRadio value="a">Option A</TreeRadio>
-            <TreeRadio value="b">Option B</TreeRadio>
+            <TRadio value="a">Option A</TRadio>
+            <TRadio value="b">Option B</TRadio>
           `,
         },
       },
     });
 
-    expect(wrapper.find('.tree-radio-group').exists()).toBe(true);
-    expect(wrapper.find('.tree-radio-group').attributes('role')).toBe('radiogroup');
+    expect(wrapper.find('.t-radio-group').exists()).toBe(true);
+    expect(wrapper.find('.t-radio-group').attributes('role')).toBe('radiogroup');
 
     const radios = wrapper.findAll('input[type="radio"]');
     expect(radios).toHaveLength(2);
@@ -930,23 +930,23 @@ describe('@treeui/vue', () => {
   });
 
   it('renders checked state with correct aria on radio', () => {
-    const wrapper = mount(TreeRadioGroup, {
+    const wrapper = mount(TRadioGroup, {
       props: {
         modelValue: 'yes',
         name: 'checked-test',
       },
       slots: {
         default: {
-          components: { TreeRadio },
+          components: { TRadio },
           template: `
-            <TreeRadio value="yes">Yes</TreeRadio>
-            <TreeRadio value="no">No</TreeRadio>
+            <TRadio value="yes">Yes</TRadio>
+            <TRadio value="no">No</TRadio>
           `,
         },
       },
     });
 
-    const labels = wrapper.findAll('.tree-radio');
+    const labels = wrapper.findAll('.t-radio');
     expect(labels[0].classes()).toContain('is-checked');
     expect(labels[1].classes()).not.toContain('is-checked');
 
@@ -956,7 +956,7 @@ describe('@treeui/vue', () => {
   });
 
   it('applies disabled state from group to radios', () => {
-    const wrapper = mount(TreeRadioGroup, {
+    const wrapper = mount(TRadioGroup, {
       props: {
         modelValue: 'a',
         name: 'disabled-test',
@@ -964,18 +964,18 @@ describe('@treeui/vue', () => {
       },
       slots: {
         default: {
-          components: { TreeRadio },
-          template: '<TreeRadio value="a">Option A</TreeRadio>',
+          components: { TRadio },
+          template: '<TRadio value="a">Option A</TRadio>',
         },
       },
     });
 
-    expect(wrapper.find('.tree-radio').classes()).toContain('is-disabled');
+    expect(wrapper.find('.t-radio').classes()).toContain('is-disabled');
     expect(wrapper.find('input').attributes('disabled')).toBeDefined();
   });
 
   it('applies invalid state from group to radios', () => {
-    const wrapper = mount(TreeRadioGroup, {
+    const wrapper = mount(TRadioGroup, {
       props: {
         modelValue: 'a',
         name: 'invalid-test',
@@ -983,42 +983,42 @@ describe('@treeui/vue', () => {
       },
       slots: {
         default: {
-          components: { TreeRadio },
-          template: '<TreeRadio value="a">Option A</TreeRadio>',
+          components: { TRadio },
+          template: '<TRadio value="a">Option A</TRadio>',
         },
       },
     });
 
-    expect(wrapper.find('.tree-radio').classes()).toContain('is-invalid');
+    expect(wrapper.find('.t-radio').classes()).toContain('is-invalid');
     expect(wrapper.find('input').attributes('aria-invalid')).toBe('true');
   });
 
   it('renders radio sizes from group', () => {
-    const sm = mount(TreeRadioGroup, {
+    const sm = mount(TRadioGroup, {
       props: { modelValue: 'a', name: 'sm', size: 'sm' as const },
       slots: {
         default: {
-          components: { TreeRadio },
-          template: '<TreeRadio value="a">A</TreeRadio>',
+          components: { TRadio },
+          template: '<TRadio value="a">A</TRadio>',
         },
       },
     });
-    const lg = mount(TreeRadioGroup, {
+    const lg = mount(TRadioGroup, {
       props: { modelValue: 'a', name: 'lg', size: 'lg' as const },
       slots: {
         default: {
-          components: { TreeRadio },
-          template: '<TreeRadio value="a">A</TreeRadio>',
+          components: { TRadio },
+          template: '<TRadio value="a">A</TRadio>',
         },
       },
     });
 
-    expect(sm.find('.tree-radio').classes()).toContain('tree-radio--sm');
-    expect(lg.find('.tree-radio').classes()).toContain('tree-radio--lg');
+    expect(sm.find('.t-radio').classes()).toContain('t-radio--sm');
+    expect(lg.find('.t-radio').classes()).toContain('t-radio--lg');
   });
 
   it('toggles switch and emits update:modelValue', async () => {
-    const wrapper = mount(TreeSwitch, {
+    const wrapper = mount(TSwitch, {
       props: {
         modelValue: false,
         'onUpdate:modelValue': (value: boolean) => value,
@@ -1028,7 +1028,7 @@ describe('@treeui/vue', () => {
       },
     });
 
-    expect(wrapper.classes()).toContain('tree-switch');
+    expect(wrapper.classes()).toContain('t-switch');
     expect(wrapper.classes()).not.toContain('is-checked');
     expect(wrapper.text()).toContain('Enable notifications');
 
@@ -1038,7 +1038,7 @@ describe('@treeui/vue', () => {
   });
 
   it('renders checked switch with role and aria', () => {
-    const wrapper = mount(TreeSwitch, {
+    const wrapper = mount(TSwitch, {
       props: {
         modelValue: true,
       },
@@ -1053,7 +1053,7 @@ describe('@treeui/vue', () => {
   });
 
   it('applies disabled state to switch', () => {
-    const wrapper = mount(TreeSwitch, {
+    const wrapper = mount(TSwitch, {
       props: {
         modelValue: false,
         disabled: true,
@@ -1068,7 +1068,7 @@ describe('@treeui/vue', () => {
   });
 
   it('applies invalid state to switch', () => {
-    const wrapper = mount(TreeSwitch, {
+    const wrapper = mount(TSwitch, {
       props: {
         modelValue: false,
         invalid: true,
@@ -1083,17 +1083,17 @@ describe('@treeui/vue', () => {
   });
 
   it('renders switch sizes', () => {
-    const sm = mount(TreeSwitch, { props: { size: 'sm' as const } });
-    const lg = mount(TreeSwitch, { props: { size: 'lg' as const } });
+    const sm = mount(TSwitch, { props: { size: 'sm' as const } });
+    const lg = mount(TSwitch, { props: { size: 'lg' as const } });
 
-    expect(sm.classes()).toContain('tree-switch--sm');
-    expect(lg.classes()).toContain('tree-switch--lg');
+    expect(sm.classes()).toContain('t-switch--sm');
+    expect(lg.classes()).toContain('t-switch--lg');
   });
 
   // ── Combobox ───────────────────────────────────────────
 
   it('filters combobox options and emits model updates on selection', async () => {
-    const wrapper = mount(TreeCombobox, {
+    const wrapper = mount(TCombobox, {
       props: {
         modelValue: '',
         options: [
@@ -1127,7 +1127,7 @@ describe('@treeui/vue', () => {
   });
 
   it('supports keyboard navigation in the combobox', async () => {
-    const wrapper = mount(TreeCombobox, {
+    const wrapper = mount(TCombobox, {
       props: {
         modelValue: '',
         options: [
@@ -1146,14 +1146,14 @@ describe('@treeui/vue', () => {
     await input.trigger('focus');
     await nextTick();
 
-    let options = wrapper.findAll('.tree-combobox__option');
+    let options = wrapper.findAll('.t-combobox__option');
     expect(options[0].classes()).toContain('is-active');
     expect(input.attributes('aria-activedescendant')).toContain('apple');
 
     await input.trigger('keydown', { key: 'ArrowDown' });
     await nextTick();
 
-    options = wrapper.findAll('.tree-combobox__option');
+    options = wrapper.findAll('.t-combobox__option');
     expect(options[1].classes()).toContain('is-active');
     expect(options[2].classes()).not.toContain('is-active');
 
@@ -1163,7 +1163,7 @@ describe('@treeui/vue', () => {
   });
 
   it('renders the combobox empty state when nothing matches', async () => {
-    const wrapper = mount(TreeCombobox, {
+    const wrapper = mount(TCombobox, {
       props: {
         modelValue: '',
         options: [{ label: 'Apple', value: 'apple' }],
@@ -1180,11 +1180,11 @@ describe('@treeui/vue', () => {
     await input.setValue('zzz');
     await nextTick();
 
-    expect(wrapper.find('.tree-combobox__empty').text()).toContain('Nothing found here.');
+    expect(wrapper.find('.t-combobox__empty').text()).toContain('Nothing found here.');
   });
 
   it('clears the combobox selection when the input is emptied and closed', async () => {
-    const wrapper = mount(TreeCombobox, {
+    const wrapper = mount(TCombobox, {
       props: {
         modelValue: 'banana',
         options: [
@@ -1208,7 +1208,7 @@ describe('@treeui/vue', () => {
   });
 
   it('restores the previous combobox selection on escape', async () => {
-    const wrapper = mount(TreeCombobox, {
+    const wrapper = mount(TCombobox, {
       props: {
         modelValue: 'banana',
         options: [
@@ -1233,7 +1233,7 @@ describe('@treeui/vue', () => {
   // ── ConfirmDialog ──────────────────────────────────────
 
   it('opens confirm dialog from trigger and emits confirm', async () => {
-    const wrapper = mount(TreeConfirmDialog, {
+    const wrapper = mount(TConfirmDialog, {
       attachTo: document.body,
       props: {
         title: 'Delete component',
@@ -1266,7 +1266,7 @@ describe('@treeui/vue', () => {
   });
 
   it('emits cancel and keeps overlay clicks disabled by default', async () => {
-    const wrapper = mount(TreeConfirmDialog, {
+    const wrapper = mount(TConfirmDialog, {
       attachTo: document.body,
       props: {
         title: 'Archive release',
@@ -1279,7 +1279,7 @@ describe('@treeui/vue', () => {
     await wrapper.get('button').trigger('click');
     await nextTick();
 
-    const backdrop = document.body.querySelector('.tree-modal__backdrop') as HTMLDivElement | null;
+    const backdrop = document.body.querySelector('.t-modal__backdrop') as HTMLDivElement | null;
     backdrop?.click();
     await nextTick();
 
@@ -1298,7 +1298,7 @@ describe('@treeui/vue', () => {
   });
 
   it('applies confirm dialog defaults and loading state', () => {
-    const wrapper = mount(TreeConfirmDialog, {
+    const wrapper = mount(TConfirmDialog, {
       attachTo: document.body,
       props: {
         defaultOpen: true,
@@ -1312,18 +1312,18 @@ describe('@treeui/vue', () => {
       },
     });
 
-    expect(wrapper.findComponent(TreeModal).props('closeOnOverlay')).toBe(false);
-    expect(wrapper.findComponent(TreeModal).props('showCloseButton')).toBe(true);
-    expect(document.body.querySelector('.tree-confirm-dialog__icon')).not.toBeNull();
+    expect(wrapper.findComponent(TModal).props('closeOnOverlay')).toBe(false);
+    expect(wrapper.findComponent(TModal).props('showCloseButton')).toBe(true);
+    expect(document.body.querySelector('.t-confirm-dialog__icon')).not.toBeNull();
 
-    const buttons = wrapper.findAllComponents(TreeButton);
+    const buttons = wrapper.findAllComponents(TButton);
     expect(buttons[1].props('loading')).toBe(true);
     expect(buttons[1].text()).toContain('Delete now');
     expect(buttons[1].props('variant')).toBe('danger');
   });
 
   it('applies combobox states and sizes', () => {
-    const invalid = mount(TreeCombobox, {
+    const invalid = mount(TCombobox, {
       props: {
         modelValue: '',
         options: [],
@@ -1337,7 +1337,7 @@ describe('@treeui/vue', () => {
     expect(invalid.classes()).toContain('is-invalid');
     expect(invalid.get('input').attributes('aria-invalid')).toBe('true');
 
-    const disabled = mount(TreeCombobox, {
+    const disabled = mount(TCombobox, {
       props: {
         modelValue: '',
         options: [],
@@ -1351,7 +1351,7 @@ describe('@treeui/vue', () => {
     expect(disabled.classes()).toContain('is-disabled');
     expect(disabled.get('input').attributes('disabled')).toBeDefined();
 
-    const loading = mount(TreeCombobox, {
+    const loading = mount(TCombobox, {
       props: {
         modelValue: '',
         options: [],
@@ -1365,23 +1365,23 @@ describe('@treeui/vue', () => {
     expect(loading.classes()).toContain('is-loading');
     expect(loading.get('input').attributes('aria-busy')).toBe('true');
 
-    const sm = mount(TreeCombobox, {
+    const sm = mount(TCombobox, {
       props: { modelValue: '', options: [], size: 'sm' as const },
       attrs: { 'aria-label': 'Small combobox' },
     });
-    const lg = mount(TreeCombobox, {
+    const lg = mount(TCombobox, {
       props: { modelValue: '', options: [], size: 'lg' as const },
       attrs: { 'aria-label': 'Large combobox' },
     });
 
-    expect(sm.classes()).toContain('tree-combobox--sm');
-    expect(lg.classes()).toContain('tree-combobox--lg');
+    expect(sm.classes()).toContain('t-combobox--sm');
+    expect(lg.classes()).toContain('t-combobox--lg');
   });
 
   // ── Select ──────────────────────────────────────────────
 
   it('renders select with options and emits update:modelValue on click', async () => {
-    const wrapper = mount(TreeSelect, {
+    const wrapper = mount(TSelect, {
       props: {
         modelValue: '',
         options: [
@@ -1395,7 +1395,7 @@ describe('@treeui/vue', () => {
       },
     });
 
-    expect(wrapper.classes()).toContain('tree-select');
+    expect(wrapper.classes()).toContain('t-select');
     const trigger = wrapper.get('button');
     expect(trigger.attributes('aria-haspopup')).toBe('listbox');
     expect(trigger.attributes('aria-label')).toBe('Fruit');
@@ -1412,7 +1412,7 @@ describe('@treeui/vue', () => {
   });
 
   it('renders placeholder text when no value selected', () => {
-    const wrapper = mount(TreeSelect, {
+    const wrapper = mount(TSelect, {
       props: {
         modelValue: '',
         options: [{ label: 'Apple', value: 'apple' }],
@@ -1420,12 +1420,12 @@ describe('@treeui/vue', () => {
       },
     });
 
-    expect(wrapper.get('.tree-select__value').text()).toBe('Choose fruit');
-    expect(wrapper.get('.tree-select__value').attributes('data-placeholder')).toBeDefined();
+    expect(wrapper.get('.t-select__value').text()).toBe('Choose fruit');
+    expect(wrapper.get('.t-select__value').attributes('data-placeholder')).toBeDefined();
   });
 
   it('supports numeric select values without treating zero as placeholder', () => {
-    const wrapper = mount(TreeSelect, {
+    const wrapper = mount(TSelect, {
       props: {
         modelValue: 0,
         options: [
@@ -1435,12 +1435,12 @@ describe('@treeui/vue', () => {
       },
     });
 
-    expect(wrapper.get('.tree-select__value').text()).toBe('January');
-    expect(wrapper.get('.tree-select__value').attributes('data-placeholder')).toBeUndefined();
+    expect(wrapper.get('.t-select__value').text()).toBe('January');
+    expect(wrapper.get('.t-select__value').attributes('data-placeholder')).toBeUndefined();
   });
 
   it('renders selected label in trigger', () => {
-    const wrapper = mount(TreeSelect, {
+    const wrapper = mount(TSelect, {
       props: {
         modelValue: 'apple',
         options: [
@@ -1450,12 +1450,12 @@ describe('@treeui/vue', () => {
       },
     });
 
-    expect(wrapper.get('.tree-select__value').text()).toBe('Apple');
-    expect(wrapper.get('.tree-select__value').attributes('data-placeholder')).toBeUndefined();
+    expect(wrapper.get('.t-select__value').text()).toBe('Apple');
+    expect(wrapper.get('.t-select__value').attributes('data-placeholder')).toBeUndefined();
   });
 
   it('applies disabled state to select', () => {
-    const wrapper = mount(TreeSelect, {
+    const wrapper = mount(TSelect, {
       props: {
         modelValue: '',
         options: [],
@@ -1468,7 +1468,7 @@ describe('@treeui/vue', () => {
   });
 
   it('applies invalid state to select', () => {
-    const wrapper = mount(TreeSelect, {
+    const wrapper = mount(TSelect, {
       props: {
         modelValue: '',
         options: [],
@@ -1481,7 +1481,7 @@ describe('@treeui/vue', () => {
   });
 
   it('applies loading state to select', () => {
-    const wrapper = mount(TreeSelect, {
+    const wrapper = mount(TSelect, {
       props: {
         modelValue: '',
         options: [],
@@ -1494,19 +1494,19 @@ describe('@treeui/vue', () => {
   });
 
   it('renders select sizes', () => {
-    const sm = mount(TreeSelect, {
+    const sm = mount(TSelect, {
       props: { modelValue: '', options: [], size: 'sm' as const },
     });
-    const lg = mount(TreeSelect, {
+    const lg = mount(TSelect, {
       props: { modelValue: '', options: [], size: 'lg' as const },
     });
 
-    expect(sm.classes()).toContain('tree-select--sm');
-    expect(lg.classes()).toContain('tree-select--lg');
+    expect(sm.classes()).toContain('t-select--sm');
+    expect(lg.classes()).toContain('t-select--lg');
   });
 
   it('renders disabled options in select', async () => {
-    const wrapper = mount(TreeSelect, {
+    const wrapper = mount(TSelect, {
       props: {
         modelValue: '',
         options: [
@@ -1523,7 +1523,7 @@ describe('@treeui/vue', () => {
   });
 
   it('shows check icon for selected option', async () => {
-    const wrapper = mount(TreeSelect, {
+    const wrapper = mount(TSelect, {
       props: {
         modelValue: 'apple',
         options: [
@@ -1536,12 +1536,12 @@ describe('@treeui/vue', () => {
     await wrapper.get('button').trigger('click');
     const options = wrapper.findAll('[role="option"]');
     expect(options[0].classes()).toContain('is-selected');
-    expect(options[0].find('.tree-select__check').exists()).toBe(true);
-    expect(options[1].find('.tree-select__check').exists()).toBe(false);
+    expect(options[0].find('.t-select__check').exists()).toBe(true);
+    expect(options[1].find('.t-select__check').exists()).toBe(false);
   });
 
   it('emits numeric values from select options without string coercion', async () => {
-    const wrapper = mount(TreeSelect, {
+    const wrapper = mount(TSelect, {
       props: {
         modelValue: 0,
         options: [
@@ -1561,7 +1561,7 @@ describe('@treeui/vue', () => {
   });
 
   it('renders form field with label and hint', () => {
-    const wrapper = mount(TreeFormField, {
+    const wrapper = mount(TFormField, {
       props: {
         label: 'Email',
         hint: 'Enter your email address',
@@ -1572,14 +1572,14 @@ describe('@treeui/vue', () => {
       },
     });
 
-    expect(wrapper.classes()).toContain('tree-form-field');
-    expect(wrapper.find('.tree-form-field__label').text()).toBe('Email');
-    expect(wrapper.find('.tree-form-field__hint').text()).toBe('Enter your email address');
+    expect(wrapper.classes()).toContain('t-form-field');
+    expect(wrapper.find('.t-form-field__label').text()).toBe('Email');
+    expect(wrapper.find('.t-form-field__hint').text()).toBe('Enter your email address');
     expect(wrapper.find('label').attributes('for')).toBe('email-input');
   });
 
   it('renders form field with error and role alert', () => {
-    const wrapper = mount(TreeFormField, {
+    const wrapper = mount(TFormField, {
       props: {
         label: 'Username',
         error: 'Username is required',
@@ -1591,13 +1591,13 @@ describe('@treeui/vue', () => {
     });
 
     expect(wrapper.classes()).toContain('is-invalid');
-    expect(wrapper.find('.tree-form-field__error').text()).toBe('Username is required');
-    expect(wrapper.find('.tree-form-field__error').attributes('role')).toBe('alert');
-    expect(wrapper.find('.tree-form-field__hint').exists()).toBe(false);
+    expect(wrapper.find('.t-form-field__error').text()).toBe('Username is required');
+    expect(wrapper.find('.t-form-field__error').attributes('role')).toBe('alert');
+    expect(wrapper.find('.t-form-field__hint').exists()).toBe(false);
   });
 
   it('renders required indicator on form field', () => {
-    const wrapper = mount(TreeFormField, {
+    const wrapper = mount(TFormField, {
       props: {
         label: 'Name',
         required: true,
@@ -1608,14 +1608,14 @@ describe('@treeui/vue', () => {
     });
 
     expect(wrapper.classes()).toContain('is-required');
-    const required = wrapper.find('.tree-form-field__required');
+    const required = wrapper.find('.t-form-field__required');
     expect(required.exists()).toBe(true);
     expect(required.text()).toBe('*');
     expect(required.attributes('aria-hidden')).toBe('true');
   });
 
   it('applies disabled state to form field', () => {
-    const wrapper = mount(TreeFormField, {
+    const wrapper = mount(TFormField, {
       props: {
         label: 'Field',
         disabled: true,
@@ -1629,69 +1629,69 @@ describe('@treeui/vue', () => {
   });
 
   it('renders form field sizes', () => {
-    const sm = mount(TreeFormField, {
+    const sm = mount(TFormField, {
       props: { label: 'SM', size: 'sm' as const },
       slots: { default: '<input />' },
     });
-    const lg = mount(TreeFormField, {
+    const lg = mount(TFormField, {
       props: { label: 'LG', size: 'lg' as const },
       slots: { default: '<input />' },
     });
 
-    expect(sm.classes()).toContain('tree-form-field--sm');
-    expect(lg.classes()).toContain('tree-form-field--lg');
+    expect(sm.classes()).toContain('t-form-field--sm');
+    expect(lg.classes()).toContain('t-form-field--lg');
   });
 
   it('renders progress bar with determinate value', () => {
-    const wrapper = mount(TreeProgress, {
+    const wrapper = mount(TProgress, {
       props: { value: 60, label: 'Upload progress' },
     });
 
-    expect(wrapper.classes()).toContain('tree-progress');
-    expect(wrapper.classes()).toContain('tree-progress--md');
+    expect(wrapper.classes()).toContain('t-progress');
+    expect(wrapper.classes()).toContain('t-progress--md');
     expect(wrapper.attributes('role')).toBe('progressbar');
     expect(wrapper.attributes('aria-valuenow')).toBe('60');
     expect(wrapper.attributes('aria-valuemin')).toBe('0');
     expect(wrapper.attributes('aria-valuemax')).toBe('100');
     expect(wrapper.attributes('aria-label')).toBe('Upload progress');
-    expect(wrapper.find('.tree-progress__fill').exists()).toBe(true);
+    expect(wrapper.find('.t-progress__fill').exists()).toBe(true);
   });
 
   it('renders progress bar as indeterminate when no value', () => {
-    const wrapper = mount(TreeProgress, {
+    const wrapper = mount(TProgress, {
       props: { label: 'Loading' },
     });
 
-    expect(wrapper.classes()).toContain('tree-progress--indeterminate');
+    expect(wrapper.classes()).toContain('t-progress--indeterminate');
     expect(wrapper.attributes('aria-valuenow')).toBeUndefined();
   });
 
   it('renders progress sizes', () => {
-    const sm = mount(TreeProgress, {
+    const sm = mount(TProgress, {
       props: { value: 30, size: 'sm' as const },
     });
-    const lg = mount(TreeProgress, {
+    const lg = mount(TProgress, {
       props: { value: 30, size: 'lg' as const },
     });
 
-    expect(sm.classes()).toContain('tree-progress--sm');
-    expect(lg.classes()).toContain('tree-progress--lg');
+    expect(sm.classes()).toContain('t-progress--sm');
+    expect(lg.classes()).toContain('t-progress--lg');
   });
 
   it('clamps progress value between 0 and 100', () => {
-    const over = mount(TreeProgress, {
+    const over = mount(TProgress, {
       props: { value: 150 },
     });
     expect(over.attributes('aria-valuenow')).toBe('100');
 
-    const under = mount(TreeProgress, {
+    const under = mount(TProgress, {
       props: { value: -10 },
     });
     expect(under.attributes('aria-valuenow')).toBe('0');
   });
 
   it('renders alert with role and variant class', () => {
-    const wrapper = mount(TreeAlert, {
+    const wrapper = mount(TAlert, {
       props: {
         variant: 'danger',
       },
@@ -1701,40 +1701,40 @@ describe('@treeui/vue', () => {
     });
 
     expect(wrapper.attributes('role')).toBe('alert');
-    expect(wrapper.classes()).toContain('tree-alert');
-    expect(wrapper.classes()).toContain('tree-alert--danger');
+    expect(wrapper.classes()).toContain('t-alert');
+    expect(wrapper.classes()).toContain('t-alert--danger');
     expect(wrapper.text()).toContain('Something went wrong!');
   });
 
   it('renders alert sizes', () => {
-    const sm = mount(TreeAlert, {
+    const sm = mount(TAlert, {
       props: { size: 'sm' as const },
       slots: { default: 'Small' },
     });
-    const lg = mount(TreeAlert, {
+    const lg = mount(TAlert, {
       props: { size: 'lg' as const },
       slots: { default: 'Large' },
     });
 
-    expect(sm.classes()).toContain('tree-alert--sm');
-    expect(lg.classes()).toContain('tree-alert--lg');
+    expect(sm.classes()).toContain('t-alert--sm');
+    expect(lg.classes()).toContain('t-alert--lg');
   });
 
   it('renders alert icon slot with aria-hidden', () => {
-    const wrapper = mount(TreeAlert, {
+    const wrapper = mount(TAlert, {
       slots: {
         default: 'Info message',
         icon: '<svg data-testid="icon"></svg>',
       },
     });
 
-    const iconSlot = wrapper.find('.tree-alert__icon');
+    const iconSlot = wrapper.find('.t-alert__icon');
     expect(iconSlot.exists()).toBe(true);
     expect(iconSlot.attributes('aria-hidden')).toBe('true');
   });
 
   it('shows dismiss button and emits dismiss event', async () => {
-    const wrapper = mount(TreeAlert, {
+    const wrapper = mount(TAlert, {
       props: {
         dismissible: true,
       },
@@ -1743,7 +1743,7 @@ describe('@treeui/vue', () => {
       },
     });
 
-    const dismissBtn = wrapper.find('.tree-alert__dismiss');
+    const dismissBtn = wrapper.find('.t-alert__dismiss');
     expect(dismissBtn.exists()).toBe(true);
     expect(dismissBtn.attributes('aria-label')).toBe('Dismiss');
 
@@ -1752,47 +1752,47 @@ describe('@treeui/vue', () => {
   });
 
   it('does not show dismiss button when not dismissible', () => {
-    const wrapper = mount(TreeAlert, {
+    const wrapper = mount(TAlert, {
       slots: {
         default: 'Not closable',
       },
     });
 
-    expect(wrapper.find('.tree-alert__dismiss').exists()).toBe(false);
+    expect(wrapper.find('.t-alert__dismiss').exists()).toBe(false);
   });
 
   it('renders skeleton with default text variant', () => {
-    const wrapper = mount(TreeSkeleton);
-    expect(wrapper.classes()).toContain('tree-skeleton');
-    expect(wrapper.classes()).toContain('tree-skeleton--pulse');
+    const wrapper = mount(TSkeleton);
+    expect(wrapper.classes()).toContain('t-skeleton');
+    expect(wrapper.classes()).toContain('t-skeleton--pulse');
     expect(wrapper.attributes('aria-hidden')).toBe('true');
   });
 
   it('renders skeleton with custom dimensions', () => {
-    const wrapper = mount(TreeSkeleton, {
+    const wrapper = mount(TSkeleton, {
       props: { width: '100%', height: '8rem' },
     });
     expect(wrapper.element.style.height).toBe('8rem');
   });
 
   it('renders skeleton wave animation', () => {
-    const wrapper = mount(TreeSkeleton, {
+    const wrapper = mount(TSkeleton, {
       props: { animation: 'wave' },
     });
-    expect(wrapper.classes()).toContain('tree-skeleton--wave');
-    expect(wrapper.classes()).not.toContain('tree-skeleton--pulse');
+    expect(wrapper.classes()).toContain('t-skeleton--wave');
+    expect(wrapper.classes()).not.toContain('t-skeleton--pulse');
   });
 
   it('renders skeleton without animation', () => {
-    const wrapper = mount(TreeSkeleton, {
+    const wrapper = mount(TSkeleton, {
       props: { animation: 'none' },
     });
-    expect(wrapper.classes()).not.toContain('tree-skeleton--pulse');
-    expect(wrapper.classes()).not.toContain('tree-skeleton--wave');
+    expect(wrapper.classes()).not.toContain('t-skeleton--pulse');
+    expect(wrapper.classes()).not.toContain('t-skeleton--wave');
   });
 
   it('renders skeleton with slot content', () => {
-    const wrapper = mount(TreeSkeleton, {
+    const wrapper = mount(TSkeleton, {
       slots: { default: '<span>Loading content</span>' },
     });
     expect(wrapper.text()).toContain('Loading content');
@@ -1802,7 +1802,7 @@ describe('@treeui/vue', () => {
     const toast = useToast();
     toast.clear();
 
-    const wrapper = mount(TreeToastProvider, {
+    const wrapper = mount(TToastProvider, {
       attachTo: document.body,
       props: { position: 'bottom-right' },
     });
@@ -1816,16 +1816,16 @@ describe('@treeui/vue', () => {
 
     await nextTick();
 
-    const toastEl = document.querySelector('.tree-toast');
+    const toastEl = document.querySelector('.t-toast');
     expect(toastEl).not.toBeNull();
-    expect(toastEl?.classList.contains('tree-toast--success')).toBe(true);
+    expect(toastEl?.classList.contains('t-toast--success')).toBe(true);
     expect(toastEl?.getAttribute('role')).toBe('status');
     expect(toastEl?.textContent).toContain('Changes saved');
     expect(toastEl?.textContent).toContain('Your settings have been updated.');
 
     toast.clear();
     await nextTick();
-    expect(document.querySelector('.tree-toast')).toBeNull();
+    expect(document.querySelector('.t-toast')).toBeNull();
 
     wrapper.unmount();
   });
@@ -1834,7 +1834,7 @@ describe('@treeui/vue', () => {
     const toast = useToast();
     toast.clear();
 
-    const wrapper = mount(TreeToastProvider, {
+    const wrapper = mount(TToastProvider, {
       attachTo: document.body,
       slots: {
         default: '<div class="toast-provider-child">Wrapped app</div>',
@@ -1852,7 +1852,7 @@ describe('@treeui/vue', () => {
 
     await nextTick();
 
-    const toastContainer = document.querySelector('.tree-toast-provider');
+    const toastContainer = document.querySelector('.t-toast-provider');
     expect(toastContainer).not.toBeNull();
     expect(toastContainer?.parentElement).toBe(document.body);
 
@@ -1864,7 +1864,7 @@ describe('@treeui/vue', () => {
     const toast = useToast();
     toast.clear();
 
-    const wrapper = mount(TreeToastProvider, {
+    const wrapper = mount(TToastProvider, {
       attachTo: document.body,
     });
 
@@ -1877,14 +1877,14 @@ describe('@treeui/vue', () => {
 
     await nextTick();
 
-    const closeBtn = document.querySelector('.tree-toast__close');
+    const closeBtn = document.querySelector('.t-toast__close');
     expect(closeBtn).not.toBeNull();
     expect(closeBtn?.getAttribute('aria-label')).toBe('Dismiss notification');
 
     toast.remove(id);
     await nextTick();
 
-    expect(document.querySelector('.tree-toast')).toBeNull();
+    expect(document.querySelector('.t-toast')).toBeNull();
 
     wrapper.unmount();
   });
@@ -1893,7 +1893,7 @@ describe('@treeui/vue', () => {
     const toast = useToast();
     toast.clear();
 
-    const wrapper = mount(TreeToastProvider, {
+    const wrapper = mount(TToastProvider, {
       attachTo: document.body,
     });
 
@@ -1904,12 +1904,12 @@ describe('@treeui/vue', () => {
 
     await nextTick();
 
-    const toasts = document.querySelectorAll('.tree-toast');
+    const toasts = document.querySelectorAll('.t-toast');
     expect(toasts).toHaveLength(4);
-    expect(toasts[0]?.classList.contains('tree-toast--info')).toBe(true);
-    expect(toasts[1]?.classList.contains('tree-toast--success')).toBe(true);
-    expect(toasts[2]?.classList.contains('tree-toast--warning')).toBe(true);
-    expect(toasts[3]?.classList.contains('tree-toast--danger')).toBe(true);
+    expect(toasts[0]?.classList.contains('t-toast--info')).toBe(true);
+    expect(toasts[1]?.classList.contains('t-toast--success')).toBe(true);
+    expect(toasts[2]?.classList.contains('t-toast--warning')).toBe(true);
+    expect(toasts[3]?.classList.contains('t-toast--danger')).toBe(true);
 
     toast.clear();
     wrapper.unmount();
@@ -1919,7 +1919,7 @@ describe('@treeui/vue', () => {
     const toast = useToast();
     toast.clear();
 
-    const wrapper = mount(TreeToastProvider, {
+    const wrapper = mount(TToastProvider, {
       attachTo: document.body,
       props: { max: 2 },
     });
@@ -1930,7 +1930,7 @@ describe('@treeui/vue', () => {
 
     await nextTick();
 
-    const toasts = document.querySelectorAll('.tree-toast');
+    const toasts = document.querySelectorAll('.t-toast');
     expect(toasts).toHaveLength(2);
     expect(toasts[0]?.textContent).toContain('Second');
     expect(toasts[1]?.textContent).toContain('Third');
@@ -1940,7 +1940,7 @@ describe('@treeui/vue', () => {
   });
 
   it('renders breadcrumb with nav and aria-label', () => {
-    const wrapper = mount(TreeBreadcrumb, {
+    const wrapper = mount(TBreadcrumb, {
       slots: {
         default: '<li>Home</li>',
       },
@@ -1948,36 +1948,36 @@ describe('@treeui/vue', () => {
 
     expect(wrapper.element.tagName).toBe('NAV');
     expect(wrapper.attributes('aria-label')).toBe('Breadcrumb');
-    expect(wrapper.classes()).toContain('tree-breadcrumb');
-    expect(wrapper.find('ol.tree-breadcrumb__list').exists()).toBe(true);
+    expect(wrapper.classes()).toContain('t-breadcrumb');
+    expect(wrapper.find('ol.t-breadcrumb__list').exists()).toBe(true);
   });
 
   it('renders breadcrumb items with links and current page', () => {
-    const wrapper = mount(TreeBreadcrumb, {
+    const wrapper = mount(TBreadcrumb, {
       slots: {
         default: [
-          `<li class="tree-breadcrumb__item"><a href="/" class="tree-breadcrumb__link">Home</a></li>`,
-          `<li class="tree-breadcrumb__item"><span class="tree-breadcrumb__current" aria-current="page">Current</span></li>`,
+          `<li class="t-breadcrumb__item"><a href="/" class="t-breadcrumb__link">Home</a></li>`,
+          `<li class="t-breadcrumb__item"><span class="t-breadcrumb__current" aria-current="page">Current</span></li>`,
         ],
       },
     });
 
-    const link = wrapper.find('.tree-breadcrumb__link');
+    const link = wrapper.find('.t-breadcrumb__link');
     expect(link.exists()).toBe(true);
     expect(link.attributes('href')).toBe('/');
 
-    const current = wrapper.find('.tree-breadcrumb__current');
+    const current = wrapper.find('.t-breadcrumb__current');
     expect(current.exists()).toBe(true);
     expect(current.attributes('aria-current')).toBe('page');
   });
 
   it('renders breadcrumb item as link when href is provided', () => {
-    const wrapper = mount(TreeBreadcrumbItem, {
+    const wrapper = mount(TBreadcrumbItem, {
       props: { href: '/products' },
       slots: { default: 'Products' },
     });
 
-    const link = wrapper.find('a.tree-breadcrumb__link');
+    const link = wrapper.find('a.t-breadcrumb__link');
     expect(link.exists()).toBe(true);
     expect(link.attributes('href')).toBe('/products');
     expect(link.text()).toBe('Products');
@@ -1985,18 +1985,18 @@ describe('@treeui/vue', () => {
   });
 
   it('renders breadcrumb item from string to prop when router is not installed', () => {
-    const wrapper = mount(TreeBreadcrumbItem, {
+    const wrapper = mount(TBreadcrumbItem, {
       props: { to: '/products' },
       slots: { default: 'Products' },
     });
 
-    const link = wrapper.find('a.tree-breadcrumb__link');
+    const link = wrapper.find('a.t-breadcrumb__link');
     expect(link.exists()).toBe(true);
     expect(link.attributes('href')).toBe('/products');
   });
 
   it('renders breadcrumb item with RouterLink when to prop is used and router is available', () => {
-    const wrapper = mount(TreeBreadcrumbItem, {
+    const wrapper = mount(TBreadcrumbItem, {
       props: {
         to: { name: 'products' },
       },
@@ -2013,36 +2013,36 @@ describe('@treeui/vue', () => {
       },
     });
 
-    expect(wrapper.find('.router-link-stub.tree-breadcrumb__link').exists()).toBe(true);
+    expect(wrapper.find('.router-link-stub.t-breadcrumb__link').exists()).toBe(true);
     expect(wrapper.find('[aria-current]').exists()).toBe(false);
   });
 
   it('renders breadcrumb item as current when no href', () => {
-    const wrapper = mount(TreeBreadcrumbItem, {
+    const wrapper = mount(TBreadcrumbItem, {
       slots: { default: 'Current Page' },
     });
 
     expect(wrapper.find('a').exists()).toBe(false);
-    const current = wrapper.find('span.tree-breadcrumb__current');
+    const current = wrapper.find('span.t-breadcrumb__current');
     expect(current.exists()).toBe(true);
     expect(current.attributes('aria-current')).toBe('page');
     expect(current.text()).toBe('Current Page');
   });
 
   it('applies custom separator via CSS variable', () => {
-    const wrapper = mount(TreeBreadcrumb, {
+    const wrapper = mount(TBreadcrumb, {
       props: { separator: '›' },
       slots: { default: '<li>Home</li>' },
     });
 
-    const ol = wrapper.find('ol.tree-breadcrumb__list');
+    const ol = wrapper.find('ol.t-breadcrumb__list');
     expect(ol.attributes('style')).toContain("--tree-breadcrumb-separator: '›'");
   });
 
   // ── Accordion ─────────────────────────────────────────────
 
   function mountAccordion(props: Record<string, unknown> = {}) {
-    return mount(TreeAccordion, {
+    return mount(TAccordion, {
       attachTo: document.body,
       props: {
         type: 'single' as const,
@@ -2051,20 +2051,20 @@ describe('@treeui/vue', () => {
       },
       slots: {
         default: {
-          components: { TreeAccordionItem },
+          components: { TAccordionItem },
           template: `
-            <TreeAccordionItem value="item-1">
+            <TAccordionItem value="item-1">
               <template #trigger>First</template>
               Content 1
-            </TreeAccordionItem>
-            <TreeAccordionItem value="item-2">
+            </TAccordionItem>
+            <TAccordionItem value="item-2">
               <template #trigger>Second</template>
               Content 2
-            </TreeAccordionItem>
-            <TreeAccordionItem value="item-3" disabled>
+            </TAccordionItem>
+            <TAccordionItem value="item-3" disabled>
               <template #trigger>Third (disabled)</template>
               Content 3
-            </TreeAccordionItem>
+            </TAccordionItem>
           `,
         },
       },
@@ -2074,7 +2074,7 @@ describe('@treeui/vue', () => {
   it('renders accordion with items and aria attributes', () => {
     const wrapper = mountAccordion();
 
-    const triggers = wrapper.findAll('.tree-accordion__trigger');
+    const triggers = wrapper.findAll('.t-accordion__trigger');
     expect(triggers).toHaveLength(3);
     expect(triggers[0].attributes('aria-expanded')).toBe('false');
     expect(triggers[0].text()).toContain('First');
@@ -2083,18 +2083,18 @@ describe('@treeui/vue', () => {
   it('opens an item on click and sets aria-expanded', async () => {
     const wrapper = mountAccordion();
 
-    const trigger = wrapper.findAll('.tree-accordion__trigger')[0];
+    const trigger = wrapper.findAll('.t-accordion__trigger')[0];
     await trigger.trigger('click');
 
     expect(trigger.attributes('aria-expanded')).toBe('true');
-    expect(wrapper.find('.tree-accordion__content').exists()).toBe(true);
-    expect(wrapper.find('.tree-accordion__panel').text()).toContain('Content 1');
+    expect(wrapper.find('.t-accordion__content').exists()).toBe(true);
+    expect(wrapper.find('.t-accordion__panel').text()).toContain('Content 1');
   });
 
   it('single mode closes previous item when opening another', async () => {
     const wrapper = mountAccordion();
 
-    const triggers = wrapper.findAll('.tree-accordion__trigger');
+    const triggers = wrapper.findAll('.t-accordion__trigger');
     await triggers[0].trigger('click');
     expect(triggers[0].attributes('aria-expanded')).toBe('true');
 
@@ -2106,7 +2106,7 @@ describe('@treeui/vue', () => {
   it('collapsible single mode allows closing open item', async () => {
     const wrapper = mountAccordion({ collapsible: true });
 
-    const trigger = wrapper.findAll('.tree-accordion__trigger')[0];
+    const trigger = wrapper.findAll('.t-accordion__trigger')[0];
     await trigger.trigger('click');
     expect(trigger.attributes('aria-expanded')).toBe('true');
 
@@ -2117,35 +2117,35 @@ describe('@treeui/vue', () => {
   it('disabled item cannot be toggled', async () => {
     const wrapper = mountAccordion();
 
-    const disabledTrigger = wrapper.findAll('.tree-accordion__trigger')[2];
+    const disabledTrigger = wrapper.findAll('.t-accordion__trigger')[2];
     await disabledTrigger.trigger('click');
 
     expect(disabledTrigger.attributes('aria-expanded')).toBe('false');
-    expect(wrapper.findAll('.tree-accordion__item')[2].classes()).toContain('is-disabled');
+    expect(wrapper.findAll('.t-accordion__item')[2].classes()).toContain('is-disabled');
   });
 
   it('multiple mode allows several items open at once', async () => {
-    const wrapper = mount(TreeAccordion, {
+    const wrapper = mount(TAccordion, {
       attachTo: document.body,
       props: { type: 'multiple' as const },
       slots: {
         default: {
-          components: { TreeAccordionItem },
+          components: { TAccordionItem },
           template: `
-            <TreeAccordionItem value="a">
+            <TAccordionItem value="a">
               <template #trigger>A</template>
               Content A
-            </TreeAccordionItem>
-            <TreeAccordionItem value="b">
+            </TAccordionItem>
+            <TAccordionItem value="b">
               <template #trigger>B</template>
               Content B
-            </TreeAccordionItem>
+            </TAccordionItem>
           `,
         },
       },
     });
 
-    const triggers = wrapper.findAll('.tree-accordion__trigger');
+    const triggers = wrapper.findAll('.t-accordion__trigger');
     await triggers[0].trigger('click');
     await triggers[1].trigger('click');
 
@@ -2156,36 +2156,36 @@ describe('@treeui/vue', () => {
   it('panel has region role and aria-labelledby linking to trigger', async () => {
     const wrapper = mountAccordion();
 
-    await wrapper.findAll('.tree-accordion__trigger')[0].trigger('click');
+    await wrapper.findAll('.t-accordion__trigger')[0].trigger('click');
 
-    const panel = wrapper.find('.tree-accordion__content');
+    const panel = wrapper.find('.t-accordion__content');
     expect(panel.attributes('role')).toBe('region');
 
-    const triggerId = wrapper.findAll('.tree-accordion__trigger')[0].attributes('id');
+    const triggerId = wrapper.findAll('.t-accordion__trigger')[0].attributes('id');
     expect(panel.attributes('aria-labelledby')).toBe(triggerId);
   });
 
   it('emits update:modelValue when item is toggled', async () => {
     const wrapper = mountAccordion();
 
-    await wrapper.findAll('.tree-accordion__trigger')[0].trigger('click');
+    await wrapper.findAll('.t-accordion__trigger')[0].trigger('click');
     expect(wrapper.emitted('update:modelValue')?.[0]).toEqual(['item-1']);
   });
 
   /* ── TPagination ───────── */
 
   it('renders pagination with correct number of page buttons', () => {
-    const wrapper = mount(TreePagination, {
+    const wrapper = mount(TPagination, {
       props: { totalPages: 3, modelValue: 1 },
     });
-    expect(wrapper.find('.tree-pagination').exists()).toBe(true);
+    expect(wrapper.find('.t-pagination').exists()).toBe(true);
     expect(wrapper.find('nav').attributes('aria-label')).toBe('Pagination');
-    const buttons = wrapper.findAll('.tree-pagination__button').filter(b => !b.classes().includes('tree-pagination__button--prev') && !b.classes().includes('tree-pagination__button--next'));
+    const buttons = wrapper.findAll('.t-pagination__button').filter(b => !b.classes().includes('t-pagination__button--prev') && !b.classes().includes('t-pagination__button--next'));
     expect(buttons.length).toBe(3);
   });
 
   it('marks the active page with aria-current', () => {
-    const wrapper = mount(TreePagination, {
+    const wrapper = mount(TPagination, {
       props: { totalPages: 5, modelValue: 3 },
     });
     const activeBtn = wrapper.find('[aria-current="page"]');
@@ -2195,50 +2195,50 @@ describe('@treeui/vue', () => {
   });
 
   it('emits update:modelValue when a page button is clicked', async () => {
-    const wrapper = mount(TreePagination, {
+    const wrapper = mount(TPagination, {
       props: { totalPages: 3, modelValue: 1 },
     });
-    const pageButtons = wrapper.findAll('.tree-pagination__button').filter(b => !b.classes().includes('tree-pagination__button--prev') && !b.classes().includes('tree-pagination__button--next'));
+    const pageButtons = wrapper.findAll('.t-pagination__button').filter(b => !b.classes().includes('t-pagination__button--prev') && !b.classes().includes('t-pagination__button--next'));
     await pageButtons[1]!.trigger('click');
     expect(wrapper.emitted('update:modelValue')?.[0]).toEqual([2]);
   });
 
   it('disables previous button on first page', () => {
-    const wrapper = mount(TreePagination, {
+    const wrapper = mount(TPagination, {
       props: { totalPages: 5, modelValue: 1 },
     });
-    const prevBtn = wrapper.find('.tree-pagination__button--prev');
+    const prevBtn = wrapper.find('.t-pagination__button--prev');
     expect((prevBtn.element as HTMLButtonElement).disabled).toBe(true);
   });
 
   it('disables next button on last page', () => {
-    const wrapper = mount(TreePagination, {
+    const wrapper = mount(TPagination, {
       props: { totalPages: 5, modelValue: 5 },
     });
-    const nextBtn = wrapper.find('.tree-pagination__button--next');
+    const nextBtn = wrapper.find('.t-pagination__button--next');
     expect((nextBtn.element as HTMLButtonElement).disabled).toBe(true);
   });
 
   it('applies size classes', () => {
-    const wrapper = mount(TreePagination, {
+    const wrapper = mount(TPagination, {
       props: { totalPages: 5, modelValue: 1, size: 'lg' },
     });
-    expect(wrapper.find('.tree-pagination').classes()).toContain('tree-pagination--lg');
+    expect(wrapper.find('.t-pagination').classes()).toContain('t-pagination--lg');
   });
 
   it('renders ellipsis for many pages', () => {
-    const wrapper = mount(TreePagination, {
+    const wrapper = mount(TPagination, {
       props: { totalPages: 20, modelValue: 10, siblings: 1 },
     });
-    const ellipses = wrapper.findAll('.tree-pagination__ellipsis');
+    const ellipses = wrapper.findAll('.t-pagination__ellipsis');
     expect(ellipses.length).toBe(2);
   });
 
   it('disables all buttons when disabled prop is set', () => {
-    const wrapper = mount(TreePagination, {
+    const wrapper = mount(TPagination, {
       props: { totalPages: 5, modelValue: 3, disabled: true },
     });
-    expect(wrapper.find('.tree-pagination').classes()).toContain('is-disabled');
+    expect(wrapper.find('.t-pagination').classes()).toContain('is-disabled');
     const buttons = wrapper.findAll('button');
     buttons.forEach(btn => {
       expect((btn.element as HTMLButtonElement).disabled).toBe(true);
@@ -2248,7 +2248,7 @@ describe('@treeui/vue', () => {
   // ── Dropdown ──────────────────────────────────────────────
 
   it('renders dropdown with items and emits select on click', async () => {
-    const wrapper = mount(TreeDropdown, {
+    const wrapper = mount(TDropdown, {
       props: {
         label: 'Actions',
         items: [
@@ -2258,7 +2258,7 @@ describe('@treeui/vue', () => {
       },
     });
 
-    expect(wrapper.classes()).toContain('tree-dropdown');
+    expect(wrapper.classes()).toContain('t-dropdown');
     const trigger = wrapper.get('button');
     expect(trigger.attributes('aria-haspopup')).toBe('menu');
     expect(trigger.attributes('aria-expanded')).toBe('false');
@@ -2276,19 +2276,19 @@ describe('@treeui/vue', () => {
   });
 
   it('renders dropdown sizes', () => {
-    const sm = mount(TreeDropdown, {
+    const sm = mount(TDropdown, {
       props: { size: 'sm' as const, label: 'SM', items: [] },
     });
-    const lg = mount(TreeDropdown, {
+    const lg = mount(TDropdown, {
       props: { size: 'lg' as const, label: 'LG', items: [] },
     });
 
-    expect(sm.classes()).toContain('tree-dropdown--sm');
-    expect(lg.classes()).toContain('tree-dropdown--lg');
+    expect(sm.classes()).toContain('t-dropdown--sm');
+    expect(lg.classes()).toContain('t-dropdown--lg');
   });
 
   it('applies disabled state to dropdown', () => {
-    const wrapper = mount(TreeDropdown, {
+    const wrapper = mount(TDropdown, {
       props: {
         disabled: true,
         label: 'Actions',
@@ -2301,7 +2301,7 @@ describe('@treeui/vue', () => {
   });
 
   it('renders disabled items in dropdown', async () => {
-    const wrapper = mount(TreeDropdown, {
+    const wrapper = mount(TDropdown, {
       props: {
         label: 'Actions',
         items: [
@@ -2318,7 +2318,7 @@ describe('@treeui/vue', () => {
   });
 
   it('closes dropdown on Escape key', async () => {
-    const wrapper = mount(TreeDropdown, {
+    const wrapper = mount(TDropdown, {
       props: {
         label: 'Actions',
         items: [{ label: 'Edit', value: 'edit' }],
@@ -2335,7 +2335,7 @@ describe('@treeui/vue', () => {
   });
 
   it('emits open-change events', async () => {
-    const wrapper = mount(TreeDropdown, {
+    const wrapper = mount(TDropdown, {
       props: {
         label: 'Actions',
         items: [{ label: 'Edit', value: 'edit' }],
@@ -2352,18 +2352,18 @@ describe('@treeui/vue', () => {
 
 describe('TTabs', () => {
   const TabsFixture = {
-    components: { TreeTabs, TreeTabList, TreeTab, TreeTabPanel },
+    components: { TTabs, TTabList, TTab, TTabPanel },
     template: `
-      <TreeTabs v-bind="$attrs">
-        <TreeTabList>
-          <TreeTab value="a">Tab A</TreeTab>
-          <TreeTab value="b">Tab B</TreeTab>
-          <TreeTab value="c" :disabled="disabledC">Tab C</TreeTab>
-        </TreeTabList>
-        <TreeTabPanel value="a">Panel A</TreeTabPanel>
-        <TreeTabPanel value="b">Panel B</TreeTabPanel>
-        <TreeTabPanel value="c">Panel C</TreeTabPanel>
-      </TreeTabs>
+      <TTabs v-bind="$attrs">
+        <TTabList>
+          <TTab value="a">Tab A</TTab>
+          <TTab value="b">Tab B</TTab>
+          <TTab value="c" :disabled="disabledC">Tab C</TTab>
+        </TTabList>
+        <TTabPanel value="a">Panel A</TTabPanel>
+        <TTabPanel value="b">Panel B</TTabPanel>
+        <TTabPanel value="c">Panel C</TTabPanel>
+      </TTabs>
     `,
     props: {
       disabledC: { type: Boolean, default: false },
@@ -2464,16 +2464,16 @@ describe('TTabs', () => {
 
   it('supports controlled mode via v-model', async () => {
     const ControlledFixture = {
-      components: { TreeTabs, TreeTabList, TreeTab, TreeTabPanel },
+      components: { TTabs, TTabList, TTab, TTabPanel },
       template: `
-        <TreeTabs :model-value="active" @update:model-value="active = $event">
-          <TreeTabList>
-            <TreeTab value="x">X</TreeTab>
-            <TreeTab value="y">Y</TreeTab>
-          </TreeTabList>
-          <TreeTabPanel value="x">Content X</TreeTabPanel>
-          <TreeTabPanel value="y">Content Y</TreeTabPanel>
-        </TreeTabs>
+        <TTabs :model-value="active" @update:model-value="active = $event">
+          <TTabList>
+            <TTab value="x">X</TTab>
+            <TTab value="y">Y</TTab>
+          </TTabList>
+          <TTabPanel value="x">Content X</TTabPanel>
+          <TTabPanel value="y">Content Y</TTabPanel>
+        </TTabs>
       `,
       data: () => ({ active: 'x' }),
     };
@@ -2514,11 +2514,11 @@ describe('TTabs', () => {
     const line = mount(TabsFixture, {
       attrs: { 'default-value': 'a', size: 'sm' },
     });
-    expect(line.find('.tree-tabs--sm').exists()).toBe(true);
+    expect(line.find('.t-tabs--sm').exists()).toBe(true);
   });
 
   it('opens the popover on click and closes on escape', async () => {
-    const wrapper = mount(TreePopover, {
+    const wrapper = mount(TPopover, {
       attachTo: document.body,
       slots: {
         trigger: '<button type="button">Open</button>',
@@ -2545,7 +2545,7 @@ describe('TTabs', () => {
   });
 
   it('renders the popover with the correct side class', () => {
-    const wrapper = mount(TreePopover, {
+    const wrapper = mount(TPopover, {
       attachTo: document.body,
       props: {
         defaultOpen: true,
@@ -2559,14 +2559,14 @@ describe('TTabs', () => {
     });
 
     const content = wrapper.find('[role="dialog"]');
-    expect(content.classes()).toContain('tree-popover__content--right');
-    expect(content.classes()).toContain('tree-popover__content--align-start');
+    expect(content.classes()).toContain('t-popover__content--right');
+    expect(content.classes()).toContain('t-popover__content--align-start');
 
     wrapper.unmount();
   });
 
   it('does not open the popover when disabled', async () => {
-    const wrapper = mount(TreePopover, {
+    const wrapper = mount(TPopover, {
       attachTo: document.body,
       props: {
         disabled: true,
@@ -2589,7 +2589,7 @@ describe('TTabs', () => {
   // ── Context Menu ──────────────────────────────────────────
 
   it('renders context menu and emits select on item click', async () => {
-    const wrapper = mount(TreeContextMenu, {
+    const wrapper = mount(TContextMenu, {
       props: {
         items: [
           { label: 'Cut', value: 'cut' },
@@ -2602,7 +2602,7 @@ describe('TTabs', () => {
       attachTo: document.body,
     });
 
-    expect(wrapper.classes()).toContain('tree-context-menu');
+    expect(wrapper.classes()).toContain('t-context-menu');
 
     // Open context menu via right-click
     await wrapper.trigger('contextmenu');
@@ -2621,24 +2621,24 @@ describe('TTabs', () => {
   });
 
   it('renders context menu sizes', () => {
-    const sm = mount(TreeContextMenu, {
+    const sm = mount(TContextMenu, {
       props: { size: 'sm' as const, items: [] },
       slots: { default: '<div>Area</div>' },
     });
-    const lg = mount(TreeContextMenu, {
+    const lg = mount(TContextMenu, {
       props: { size: 'lg' as const, items: [] },
       slots: { default: '<div>Area</div>' },
     });
 
-    expect(sm.classes()).toContain('tree-context-menu--sm');
-    expect(lg.classes()).toContain('tree-context-menu--lg');
+    expect(sm.classes()).toContain('t-context-menu--sm');
+    expect(lg.classes()).toContain('t-context-menu--lg');
 
     sm.unmount();
     lg.unmount();
   });
 
   it('does not open context menu when disabled', async () => {
-    const wrapper = mount(TreeContextMenu, {
+    const wrapper = mount(TContextMenu, {
       props: {
         disabled: true,
         items: [{ label: 'Cut', value: 'cut' }],
@@ -2661,7 +2661,7 @@ describe('TTabs', () => {
   });
 
   it('renders disabled items in context menu', async () => {
-    const wrapper = mount(TreeContextMenu, {
+    const wrapper = mount(TContextMenu, {
       props: {
         items: [
           { label: 'Cut', value: 'cut' },
@@ -2685,7 +2685,7 @@ describe('TTabs', () => {
   });
 
   it('emits open-change events on context menu', async () => {
-    const wrapper = mount(TreeContextMenu, {
+    const wrapper = mount(TContextMenu, {
       props: {
         items: [{ label: 'Cut', value: 'cut' }],
       },
@@ -2711,25 +2711,25 @@ describe('TTabs', () => {
   // ── Avatar ──
 
   it('renders avatar with initials from alt text', () => {
-    const wrapper = mount(TreeAvatar, {
+    const wrapper = mount(TAvatar, {
       props: { alt: 'Jane Doe', size: 'md' },
     });
-    expect(wrapper.classes()).toContain('tree-avatar');
-    expect(wrapper.classes()).toContain('tree-avatar--md');
+    expect(wrapper.classes()).toContain('t-avatar');
+    expect(wrapper.classes()).toContain('t-avatar--md');
     expect(wrapper.text()).toBe('JD');
     expect(wrapper.attributes('role')).toBe('img');
     expect(wrapper.attributes('aria-label')).toBe('Jane Doe');
   });
 
   it('renders avatar with explicit initials', () => {
-    const wrapper = mount(TreeAvatar, {
+    const wrapper = mount(TAvatar, {
       props: { alt: 'Jane Doe', initials: 'X' },
     });
     expect(wrapper.text()).toBe('X');
   });
 
   it('renders avatar with image', () => {
-    const wrapper = mount(TreeAvatar, {
+    const wrapper = mount(TAvatar, {
       props: { src: 'https://example.com/photo.jpg', alt: 'Jane' },
     });
     const img = wrapper.find('img');
@@ -2739,28 +2739,28 @@ describe('TTabs', () => {
   });
 
   it('renders avatar with status dot', () => {
-    const wrapper = mount(TreeAvatar, {
+    const wrapper = mount(TAvatar, {
       props: { alt: 'User', status: 'online' },
     });
-    const dot = wrapper.find('.tree-avatar__status');
+    const dot = wrapper.find('.t-avatar__status');
     expect(dot.exists()).toBe(true);
-    expect(dot.classes()).toContain('tree-avatar__status--online');
+    expect(dot.classes()).toContain('t-avatar__status--online');
   });
 
   // ── Divider ──
 
   it('renders horizontal divider by default', () => {
-    const wrapper = mount(TreeDivider);
-    expect(wrapper.classes()).toContain('tree-divider');
-    expect(wrapper.classes()).toContain('tree-divider--horizontal');
+    const wrapper = mount(TDivider);
+    expect(wrapper.classes()).toContain('t-divider');
+    expect(wrapper.classes()).toContain('t-divider--horizontal');
     expect(wrapper.attributes('role')).toBe('none');
   });
 
   it('renders vertical divider with separator role', () => {
-    const wrapper = mount(TreeDivider, {
+    const wrapper = mount(TDivider, {
       props: { orientation: 'vertical', decorative: false, label: 'Section' },
     });
-    expect(wrapper.classes()).toContain('tree-divider--vertical');
+    expect(wrapper.classes()).toContain('t-divider--vertical');
     expect(wrapper.attributes('role')).toBe('separator');
     expect(wrapper.attributes('aria-orientation')).toBe('vertical');
     expect(wrapper.attributes('aria-label')).toBe('Section');
@@ -2769,22 +2769,22 @@ describe('TTabs', () => {
   // ── EmptyState ──
 
   it('renders empty state with title and description props', () => {
-    const wrapper = mount(TreeEmptyState, {
+    const wrapper = mount(TEmptyState, {
       props: {
         title: 'No releases yet',
         description: 'Create your first release to start tracking milestones.',
       },
     });
 
-    expect(wrapper.classes()).toContain('tree-empty-state');
-    expect(wrapper.find('.tree-empty-state__title').text()).toBe('No releases yet');
-    expect(wrapper.find('.tree-empty-state__description').text()).toContain('Create your first release');
+    expect(wrapper.classes()).toContain('t-empty-state');
+    expect(wrapper.find('.t-empty-state__title').text()).toBe('No releases yet');
+    expect(wrapper.find('.t-empty-state__description').text()).toContain('Create your first release');
     expect(wrapper.attributes('aria-labelledby')).toBeDefined();
     expect(wrapper.attributes('aria-describedby')).toBeDefined();
   });
 
   it('renders icon, body, and actions slots in empty state', () => {
-    const wrapper = mount(TreeEmptyState, {
+    const wrapper = mount(TEmptyState, {
       props: {
         title: 'No projects',
       },
@@ -2795,20 +2795,20 @@ describe('TTabs', () => {
       },
     });
 
-    expect(wrapper.find('.tree-empty-state__icon').exists()).toBe(true);
-    expect(wrapper.find('.tree-empty-state__body').text()).toContain('Invite teammates');
-    expect(wrapper.find('.tree-empty-state__actions').text()).toContain('Invite');
+    expect(wrapper.find('.t-empty-state__icon').exists()).toBe(true);
+    expect(wrapper.find('.t-empty-state__body').text()).toContain('Invite teammates');
+    expect(wrapper.find('.t-empty-state__actions').text()).toContain('Invite');
   });
 
   it('supports polymorphic empty state root and size classes', () => {
-    const sm = mount(TreeEmptyState, {
+    const sm = mount(TEmptyState, {
       props: {
         as: 'article',
         size: 'sm',
         title: 'Small empty state',
       },
     });
-    const lg = mount(TreeEmptyState, {
+    const lg = mount(TEmptyState, {
       props: {
         size: 'lg',
         title: 'Large empty state',
@@ -2816,20 +2816,20 @@ describe('TTabs', () => {
     });
 
     expect(sm.element.tagName).toBe('ARTICLE');
-    expect(sm.classes()).toContain('tree-empty-state--sm');
-    expect(lg.classes()).toContain('tree-empty-state--lg');
+    expect(sm.classes()).toContain('t-empty-state--sm');
+    expect(lg.classes()).toContain('t-empty-state--lg');
   });
 
   it('renders title and description slots when provided', () => {
-    const wrapper = mount(TreeEmptyState, {
+    const wrapper = mount(TEmptyState, {
       slots: {
         title: '<span>Custom title</span>',
         description: '<span>Custom description</span>',
       },
     });
 
-    expect(wrapper.find('.tree-empty-state__title').text()).toBe('Custom title');
-    expect(wrapper.find('.tree-empty-state__description').text()).toBe('Custom description');
+    expect(wrapper.find('.t-empty-state__title').text()).toBe('Custom title');
+    expect(wrapper.find('.t-empty-state__description').text()).toBe('Custom description');
   });
 
   // ── Table ──
@@ -2844,24 +2844,24 @@ describe('TTabs', () => {
       { name: 'Bob', email: 'bob@example.com' },
     ];
 
-    const wrapper = mount(TreeTable, {
+    const wrapper = mount(TTable, {
       props: { columns, rows },
     });
 
-    expect(wrapper.find('.tree-table').exists()).toBe(true);
-    expect(wrapper.findAll('.tree-table__header')).toHaveLength(2);
-    expect(wrapper.findAll('.tree-table__body .tree-table__row')).toHaveLength(2);
+    expect(wrapper.find('.t-table').exists()).toBe(true);
+    expect(wrapper.findAll('.t-table__header')).toHaveLength(2);
+    expect(wrapper.findAll('.t-table__body .t-table__row')).toHaveLength(2);
     expect(wrapper.text()).toContain('Alice');
     expect(wrapper.text()).toContain('bob@example.com');
   });
 
   it('renders empty state when no rows', () => {
     const columns = [{ key: 'name', label: 'Name' }];
-    const wrapper = mount(TreeTable, {
+    const wrapper = mount(TTable, {
       props: { columns, rows: [] },
     });
 
-    expect(wrapper.find('.tree-table__cell--empty').exists()).toBe(true);
+    expect(wrapper.find('.t-table__cell--empty').exists()).toBe(true);
     expect(wrapper.text()).toContain('No data available');
   });
 
@@ -2876,14 +2876,14 @@ describe('TTabs', () => {
       { name: 'Bob', age: 28 },
     ];
 
-    const wrapper = mount(TreeTable, {
+    const wrapper = mount(TTable, {
       props: { columns, rows },
     });
 
-    const sortableHeader = wrapper.find('.tree-table__header--sortable');
+    const sortableHeader = wrapper.find('.t-table__header--sortable');
     await sortableHeader.trigger('click');
 
-    const cells = wrapper.findAll('.tree-table__body .tree-table__row');
+    const cells = wrapper.findAll('.t-table__body .t-table__row');
     expect(cells[0].text()).toContain('Alice');
     expect(cells[1].text()).toContain('Bob');
     expect(cells[2].text()).toContain('Charlie');
@@ -2896,11 +2896,11 @@ describe('TTabs', () => {
     const columns = [{ key: 'name', label: 'Name', sortable: true }];
     const rows = [{ name: 'A' }];
 
-    const wrapper = mount(TreeTable, {
+    const wrapper = mount(TTable, {
       props: { columns, rows },
     });
 
-    const header = wrapper.find('.tree-table__header--sortable');
+    const header = wrapper.find('.t-table__header--sortable');
     expect(header.attributes('aria-sort')).toBe('none');
 
     await header.trigger('click');
@@ -2912,17 +2912,17 @@ describe('TTabs', () => {
 
   it('renders custom table cells through the keyed slot API', () => {
     const wrapper = mount({
-      components: { TreeTable },
+      components: { TTable },
       data: () => ({
         columns: [{ key: 'status', label: 'Status' }],
         rows: [{ status: 'Ready' }],
       }),
       template: `
-        <TreeTable :columns="columns" :rows="rows">
+        <TTable :columns="columns" :rows="rows">
           <template #cell-status="{ value }">
             <strong class="custom-status">{{ value }}</strong>
           </template>
-        </TreeTable>
+        </TTable>
       `,
     });
 
@@ -2933,23 +2933,23 @@ describe('TTabs', () => {
   // ── Tag ──
 
   it('renders tag with variant and size classes', () => {
-    const wrapper = mount(TreeTag, {
+    const wrapper = mount(TTag, {
       props: { variant: 'solid', size: 'sm' },
       slots: { default: 'Vue' },
     });
-    expect(wrapper.classes()).toContain('tree-tag');
-    expect(wrapper.classes()).toContain('tree-tag--solid');
-    expect(wrapper.classes()).toContain('tree-tag--sm');
+    expect(wrapper.classes()).toContain('t-tag');
+    expect(wrapper.classes()).toContain('t-tag--solid');
+    expect(wrapper.classes()).toContain('t-tag--sm');
     expect(wrapper.text()).toContain('Vue');
   });
 
   it('shows remove button and emits remove event', async () => {
-    const wrapper = mount(TreeTag, {
+    const wrapper = mount(TTag, {
       props: { removable: true },
       slots: { default: 'React' },
     });
 
-    const removeBtn = wrapper.find('.tree-tag__remove');
+    const removeBtn = wrapper.find('.t-tag__remove');
     expect(removeBtn.exists()).toBe(true);
     expect(removeBtn.attributes('aria-label')).toBe('Remove');
 
@@ -2958,20 +2958,20 @@ describe('TTabs', () => {
   });
 
   it('does not emit remove when disabled', async () => {
-    const wrapper = mount(TreeTag, {
+    const wrapper = mount(TTag, {
       props: { removable: true, disabled: true },
       slots: { default: 'Disabled' },
     });
 
     expect(wrapper.classes()).toContain('is-disabled');
-    await wrapper.find('.tree-tag__remove').trigger('click');
+    await wrapper.find('.t-tag__remove').trigger('click');
     expect(wrapper.emitted('remove')).toBeUndefined();
   });
 
   // ── Timeline ──
 
   it('renders timeline items with metadata and timestamps', () => {
-    const wrapper = mount(TreeTimeline, {
+    const wrapper = mount(TTimeline, {
       props: {
         items: [
           {
@@ -2998,18 +2998,18 @@ describe('TTabs', () => {
       },
     });
 
-    expect(wrapper.classes()).toContain('tree-timeline');
-    expect(wrapper.findAll('.tree-timeline__item')).toHaveLength(2);
+    expect(wrapper.classes()).toContain('t-timeline');
+    expect(wrapper.findAll('.t-timeline__item')).toHaveLength(2);
     expect(wrapper.text()).toContain('Release queued');
     expect(wrapper.text()).toContain('Approved');
-    expect(wrapper.find('.tree-timeline__marker--brand').exists()).toBe(true);
-    expect(wrapper.find('.tree-timeline__marker--success').exists()).toBe(true);
+    expect(wrapper.find('.t-timeline__marker--brand').exists()).toBe(true);
+    expect(wrapper.find('.t-timeline__marker--success').exists()).toBe(true);
     expect(wrapper.get('time').attributes('datetime')).toBe('2026-04-07T09:12:00Z');
     expect(wrapper.attributes('aria-label')).toBe('Release history');
   });
 
   it('supports custom marker and item slots in timeline', () => {
-    const wrapper = mount(TreeTimeline, {
+    const wrapper = mount(TTimeline, {
       props: {
         items: [
           { id: 'item-1', title: 'Event one', tone: 'warning' },
@@ -3026,13 +3026,13 @@ describe('TTabs', () => {
   });
 
   it('applies timeline size classes and omits connector on last item', () => {
-    const sm = mount(TreeTimeline, {
+    const sm = mount(TTimeline, {
       props: {
         size: 'sm',
         items: [{ title: 'Small item' }],
       },
     });
-    const lg = mount(TreeTimeline, {
+    const lg = mount(TTimeline, {
       props: {
         size: 'lg',
         items: [
@@ -3042,14 +3042,14 @@ describe('TTabs', () => {
       },
     });
 
-    expect(sm.classes()).toContain('tree-timeline--sm');
-    expect(sm.find('.tree-timeline__line').exists()).toBe(false);
-    expect(lg.classes()).toContain('tree-timeline--lg');
-    expect(lg.findAll('.tree-timeline__line')).toHaveLength(1);
+    expect(sm.classes()).toContain('t-timeline--sm');
+    expect(sm.find('.t-timeline__line').exists()).toBe(false);
+    expect(lg.classes()).toContain('t-timeline--lg');
+    expect(lg.findAll('.t-timeline__line')).toHaveLength(1);
   });
 
   it('renders pricing card with title, price, and features', () => {
-    const wrapper = mount(TreePricingCard, {
+    const wrapper = mount(TPricingCard, {
       props: {
         title: 'Pro',
         price: 29,
@@ -3063,17 +3063,17 @@ describe('TTabs', () => {
       },
     });
 
-    expect(wrapper.find('.tree-pricing-card__title').text()).toBe('Pro');
-    expect(wrapper.find('.tree-pricing-card__amount').text()).toBe('29');
-    expect(wrapper.find('.tree-pricing-card__currency').text()).toBe('$');
-    expect(wrapper.find('.tree-pricing-card__period').text()).toBe('/month');
-    expect(wrapper.findAll('.tree-pricing-card__feature-item')).toHaveLength(2);
-    expect(wrapper.find('.tree-pricing-card__feature-item--excluded').exists()).toBe(true);
-    expect(wrapper.find('.tree-button').text()).toBe('Get started');
+    expect(wrapper.find('.t-pricing-card__title').text()).toBe('Pro');
+    expect(wrapper.find('.t-pricing-card__amount').text()).toBe('29');
+    expect(wrapper.find('.t-pricing-card__currency').text()).toBe('$');
+    expect(wrapper.find('.t-pricing-card__period').text()).toBe('/month');
+    expect(wrapper.findAll('.t-pricing-card__feature-item')).toHaveLength(2);
+    expect(wrapper.find('.t-pricing-card__feature-item--excluded').exists()).toBe(true);
+    expect(wrapper.find('.t-button').text()).toBe('Get started');
   });
 
   it('applies highlighted class and badge on pricing card', () => {
-    const wrapper = mount(TreePricingCard, {
+    const wrapper = mount(TPricingCard, {
       props: {
         title: 'Pro',
         price: 29,
@@ -3082,13 +3082,13 @@ describe('TTabs', () => {
       },
     });
 
-    expect(wrapper.classes()).toContain('tree-pricing-card--highlighted');
-    expect(wrapper.find('.tree-pricing-card__badge').exists()).toBe(true);
-    expect(wrapper.find('.tree-badge').text()).toBe('Most popular');
+    expect(wrapper.classes()).toContain('t-pricing-card--highlighted');
+    expect(wrapper.find('.t-pricing-card__badge').exists()).toBe(true);
+    expect(wrapper.find('.t-badge').text()).toBe('Most popular');
   });
 
   it('emits select when pricing card button is clicked', async () => {
-    const wrapper = mount(TreePricingCard, {
+    const wrapper = mount(TPricingCard, {
       props: {
         title: 'Pro',
         price: 29,
@@ -3096,12 +3096,12 @@ describe('TTabs', () => {
       },
     });
 
-    await wrapper.find('.tree-button').trigger('click');
+    await wrapper.find('.t-button').trigger('click');
     expect(wrapper.emitted('select')).toHaveLength(1);
   });
 
   it('renders pricing grid with multiple plans', () => {
-    const wrapper = mount(TreePricing, {
+    const wrapper = mount(TPricing, {
       props: {
         plans: [
           { title: 'Free', price: 0, buttonText: 'Start' },
@@ -3111,8 +3111,8 @@ describe('TTabs', () => {
       },
     });
 
-    expect(wrapper.findAll('.tree-pricing-card')).toHaveLength(3);
-    expect(wrapper.find('.tree-pricing-card--highlighted').exists()).toBe(true);
+    expect(wrapper.findAll('.t-pricing-card')).toHaveLength(3);
+    expect(wrapper.find('.t-pricing-card--highlighted').exists()).toBe(true);
   });
 
   it('emits select with plan data from pricing grid', async () => {
@@ -3121,11 +3121,11 @@ describe('TTabs', () => {
       { title: 'Pro', price: 29, buttonText: 'Choose' },
     ];
 
-    const wrapper = mount(TreePricing, {
+    const wrapper = mount(TPricing, {
       props: { plans },
     });
 
-    await wrapper.findAll('.tree-button')[1].trigger('click');
+    await wrapper.findAll('.t-button')[1].trigger('click');
     expect(wrapper.emitted('select')).toHaveLength(1);
     expect(wrapper.emitted('select')![0]).toEqual([plans[1], 1]);
   });
@@ -3133,17 +3133,17 @@ describe('TTabs', () => {
   /* ── MarkdownEditor ── */
 
   it('renders markdown editor with default classes', () => {
-    const wrapper = mount(TreeMarkdownEditor);
-    expect(wrapper.classes()).toContain('tree-md-editor');
-    expect(wrapper.classes()).toContain('tree-md-editor--md');
+    const wrapper = mount(TMarkdownEditor);
+    expect(wrapper.classes()).toContain('t-md-editor');
+    expect(wrapper.classes()).toContain('t-md-editor--md');
   });
 
   it('emits update:modelValue on textarea input', async () => {
-    const wrapper = mount(TreeMarkdownEditor, {
+    const wrapper = mount(TMarkdownEditor, {
       props: { modelValue: '' },
     });
 
-    const textarea = wrapper.find('.tree-md-editor__textarea');
+    const textarea = wrapper.find('.t-md-editor__textarea');
     await textarea.setValue('# Hello');
 
     expect(wrapper.emitted('update:modelValue')).toBeTruthy();
@@ -3151,40 +3151,40 @@ describe('TTabs', () => {
   });
 
   it('renders markdown preview from modelValue', () => {
-    const wrapper = mount(TreeMarkdownEditor, {
+    const wrapper = mount(TMarkdownEditor, {
       props: { modelValue: '# Title\n\nSome **bold** text' },
     });
 
-    const preview = wrapper.find('.tree-md-editor__preview');
+    const preview = wrapper.find('.t-md-editor__preview');
     expect(preview.html()).toContain('<h1');
     expect(preview.html()).toContain('Title');
     expect(preview.html()).toContain('<strong>bold</strong>');
   });
 
   it('applies disabled state', () => {
-    const wrapper = mount(TreeMarkdownEditor, {
+    const wrapper = mount(TMarkdownEditor, {
       props: { disabled: true },
     });
 
     expect(wrapper.classes()).toContain('is-disabled');
-    expect(wrapper.find('.tree-md-editor__textarea').attributes('disabled')).toBeDefined();
+    expect(wrapper.find('.t-md-editor__textarea').attributes('disabled')).toBeDefined();
   });
 
   it('applies size variants', () => {
-    const sm = mount(TreeMarkdownEditor, { props: { size: 'sm' as const } });
-    const lg = mount(TreeMarkdownEditor, { props: { size: 'lg' as const } });
+    const sm = mount(TMarkdownEditor, { props: { size: 'sm' as const } });
+    const lg = mount(TMarkdownEditor, { props: { size: 'lg' as const } });
 
-    expect(sm.classes()).toContain('tree-md-editor--sm');
-    expect(lg.classes()).toContain('tree-md-editor--lg');
+    expect(sm.classes()).toContain('t-md-editor--sm');
+    expect(lg.classes()).toContain('t-md-editor--lg');
   });
 
   it('renders headings at different levels in preview', () => {
     const md = '# H1\n## H2\n### H3';
-    const wrapper = mount(TreeMarkdownEditor, {
+    const wrapper = mount(TMarkdownEditor, {
       props: { modelValue: md },
     });
 
-    const preview = wrapper.find('.tree-md-editor__preview');
+    const preview = wrapper.find('.t-md-editor__preview');
     expect(preview.html()).toContain('<h1');
     expect(preview.html()).toContain('<h2');
     expect(preview.html()).toContain('<h3');
@@ -3192,38 +3192,38 @@ describe('TTabs', () => {
 
   it('renders code blocks in preview', () => {
     const md = '```\nconst x = 1;\n```';
-    const wrapper = mount(TreeMarkdownEditor, {
+    const wrapper = mount(TMarkdownEditor, {
       props: { modelValue: md },
     });
 
-    const preview = wrapper.find('.tree-md-editor__preview');
+    const preview = wrapper.find('.t-md-editor__preview');
     expect(preview.html()).toContain('<pre');
     expect(preview.html()).toContain('const x = 1;');
   });
 
   it('renders blockquotes in preview', () => {
-    const wrapper = mount(TreeMarkdownEditor, {
+    const wrapper = mount(TMarkdownEditor, {
       props: { modelValue: '> quoted text' },
     });
 
-    const preview = wrapper.find('.tree-md-editor__preview');
+    const preview = wrapper.find('.t-md-editor__preview');
     expect(preview.html()).toContain('<blockquote');
     expect(preview.html()).toContain('quoted text');
   });
 
   it('renders lists in preview', () => {
-    const wrapper = mount(TreeMarkdownEditor, {
+    const wrapper = mount(TMarkdownEditor, {
       props: { modelValue: '- item 1\n- item 2' },
     });
 
-    const preview = wrapper.find('.tree-md-editor__preview');
+    const preview = wrapper.find('.t-md-editor__preview');
     expect(preview.html()).toContain('<ul');
     expect(preview.html()).toContain('<li>');
   });
 
   it('has accessible toolbar buttons with titles', () => {
-    const wrapper = mount(TreeMarkdownEditor);
-    const buttons = wrapper.findAll('.tree-md-editor__toolbar-btn');
+    const wrapper = mount(TMarkdownEditor);
+    const buttons = wrapper.findAll('.t-md-editor__toolbar-btn');
 
     expect(buttons.length).toBeGreaterThan(0);
     buttons.forEach((btn) => {
@@ -3234,7 +3234,7 @@ describe('TTabs', () => {
   it('calls uploadImage and emits image-upload on paste', async () => {
     const uploadImage = vi.fn().mockResolvedValue('https://example.com/img.png');
 
-    const wrapper = mount(TreeMarkdownEditor, {
+    const wrapper = mount(TMarkdownEditor, {
       props: { modelValue: '', uploadImage },
     });
 
@@ -3243,7 +3243,7 @@ describe('TTabs', () => {
       items: [{ type: 'image/png', getAsFile: () => file }],
     };
 
-    const textarea = wrapper.find('.tree-md-editor__textarea');
+    const textarea = wrapper.find('.t-md-editor__textarea');
     await textarea.trigger('paste', { clipboardData });
 
     // Wait for async upload
@@ -3253,19 +3253,19 @@ describe('TTabs', () => {
   });
 });
 
-describe('TreeIcon', () => {
+describe('TIcon', () => {
   it('renders the registered icon by name with aria-hidden by default', () => {
-    const wrapper = mount(TreeIcon, { props: { name: 'check' } });
+    const wrapper = mount(TIcon, { props: { name: 'check' } });
 
     const svg = wrapper.find('svg');
     expect(svg.exists()).toBe(true);
-    expect(svg.classes()).toContain('tree-icon');
+    expect(svg.classes()).toContain('t-icon');
     expect(svg.attributes('aria-hidden')).toBe('true');
     expect(svg.attributes('role')).toBeUndefined();
   });
 
   it('marks the icon as an image with aria-label when label is provided', () => {
-    const wrapper = mount(TreeIcon, { props: { name: 'alert-circle', label: 'Warning' } });
+    const wrapper = mount(TIcon, { props: { name: 'alert-circle', label: 'Warning' } });
 
     const svg = wrapper.find('svg');
     expect(svg.attributes('role')).toBe('img');
@@ -3274,7 +3274,7 @@ describe('TreeIcon', () => {
   });
 
   it('forwards size to the underlying svg', () => {
-    const wrapper = mount(TreeIcon, { props: { name: 'info', size: 32 } });
+    const wrapper = mount(TIcon, { props: { name: 'info', size: 32 } });
 
     const svg = wrapper.find('svg');
     expect(svg.attributes('width')).toBe('32');

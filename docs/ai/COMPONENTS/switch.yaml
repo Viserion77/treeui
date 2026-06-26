@@ -1,6 +1,5 @@
 name: TSwitch
-legacy_alias: TreeSwitch
-source_file: packages/vue/src/components/TreeSwitch.vue
+source_file: packages/vue/src/components/TSwitch.vue
 package: "@treeui/vue"
 kind: primitive
 status: available
@@ -11,7 +10,7 @@ props:
     type: boolean
     default: false
   size:
-    type: TreeSize
+    type: TSize
     default: md
     values: [sm, md, lg]
   disabled:

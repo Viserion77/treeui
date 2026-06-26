@@ -1,6 +1,5 @@
 name: TRadio
-legacy_alias: TreeRadio
-source_file: packages/vue/src/components/TreeRadio.vue
+source_file: packages/vue/src/components/TRadio.vue
 package: "@treeui/vue"
 kind: primitive
 status: available
@@ -17,7 +16,7 @@ props:
     type: boolean
     default: false
   size:
-    type: TreeSize
+    type: TSize
     default: inherited_from_group
     values: [sm, md, lg]
 
@@ -43,8 +42,7 @@ behavior:
 ---
 
 name: TRadioGroup
-legacy_alias: TreeRadioGroup
-source_file: packages/vue/src/components/TreeRadioGroup.vue
+source_file: packages/vue/src/components/TRadioGroup.vue
 package: "@treeui/vue"
 kind: primitive
 status: available
@@ -64,7 +62,7 @@ props:
     type: boolean
     default: false
   size:
-    type: TreeSize
+    type: TSize
     default: md
     values: [sm, md, lg]
 

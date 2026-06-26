@@ -1,6 +1,5 @@
 name: TPagination
-legacy_alias: TreePagination
-source_file: packages/vue/src/components/TreePagination.vue
+source_file: packages/vue/src/components/TPagination.vue
 package: "@treeui/vue"
 kind: primitive
 status: available
@@ -22,7 +21,7 @@ props:
     default: 1
     description: "Number of sibling page buttons shown around the current page."
   size:
-    type: TreeSize
+    type: TSize
     default: md
     values: [sm, md, lg]
     description: "Size variant for the pagination controls."

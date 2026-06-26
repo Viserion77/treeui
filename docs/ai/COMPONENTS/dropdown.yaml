@@ -1,13 +1,12 @@
 name: TDropdown
-legacy_alias: TreeDropdown
-source_file: packages/vue/src/components/TreeDropdown.vue
+source_file: packages/vue/src/components/TDropdown.vue
 kind: overlay
 status: available
 purpose: "Trigger + floating menu with keyboard navigation for action lists."
 
 props:
   items:
-    type: "TreeDropdownItem[]"
+    type: "TDropdownItem[]"
     default: "[]"
     note: "Array of { label: string; value: string; disabled?: boolean }"
   open:
@@ -20,7 +19,7 @@ props:
     type: boolean
     default: false
   size:
-    type: TreeSize
+    type: TSize
     default: md
     values: [sm, md, lg]
   label:

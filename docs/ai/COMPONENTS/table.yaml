@@ -1,12 +1,11 @@
 component: TTable
 package: "@treeui/vue"
-source: TreeTable.vue
+source: TTable.vue
 description: Sortable, accessible data table with column definitions and row data.
-aliases: [TreeTable]
 
 props:
   columns:
-    type: "TreeTableColumn[]"
+    type: "TTableColumn[]"
     required: true
     description: Array of column definitions with key, label, sortable, align, and width.
   rows:
@@ -14,17 +13,17 @@ props:
     required: true
     description: Array of row data objects keyed by column keys.
   size:
-    type: TreeSize
+    type: TSize
     default: md
     values: [sm, md, lg]
   sortBy:
-    type: TreeTableSortState
+    type: TTableSortState
     required: false
     description: Controlled sort state. When provided, overrides internal sort tracking.
 
 events:
   sort:
-    payload: "TreeTableSortState"
+    payload: "TTableSortState"
     description: Emitted when a sortable column header is clicked.
 
 slots:
@@ -37,13 +36,13 @@ slots:
     description: Content shown when rows array is empty.
 
 types:
-  TreeTableColumn:
+  TTableColumn:
     key: string
     label: string
     sortable: boolean (optional)
     align: "'left' | 'center' | 'right'" (optional)
     width: string (optional)
-  TreeTableSortState:
+  TTableSortState:
     key: string
     direction: "'asc' | 'desc' | 'none'"
 

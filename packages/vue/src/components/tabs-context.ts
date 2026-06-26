@@ -1,12 +1,12 @@
 import type { InjectionKey, Ref } from 'vue';
-import type { TreeSize } from '../types/contracts';
+import type { TSize } from '../types/contracts';
 
 export type TabsActivationMode = 'automatic' | 'manual';
 
 export interface TabsContext {
   activeValue: Ref<string>;
   setActiveValue: (value: string) => void;
-  size: Ref<TreeSize>;
+  size: Ref<TSize>;
   activationMode: Ref<TabsActivationMode>;
   disabled: Ref<boolean>;
   baseId: string;
@@ -17,4 +17,4 @@ export interface TabsContext {
   setTabDisabled: (value: string, disabled: boolean) => void;
 }
 
-export const TABS_INJECTION_KEY: InjectionKey<TabsContext> = Symbol('TreeTabs');
+export const TABS_INJECTION_KEY: InjectionKey<TabsContext> = Symbol('TTabs');

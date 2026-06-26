@@ -1,6 +1,5 @@
 name: TDatePicker
-legacy_alias: TreeDatePicker
-source_file: packages/vue/src/components/TreeDatePicker.vue
+source_file: packages/vue/src/components/TDatePicker.vue
 package: "@treeui/vue"
 kind: form_overlay
 status: available
@@ -18,7 +17,7 @@ props:
     type: boolean
     default: false
   size:
-    type: TreeSize
+    type: TSize
     default: md
     values: [sm, md, lg]
   disabled:

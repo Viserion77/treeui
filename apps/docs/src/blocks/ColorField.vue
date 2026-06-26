@@ -24,7 +24,8 @@ const error = computed(() =>
       id="brand-color"
       v-model="color"
       type="color"
-      aria-required="true"
+      required
+      :aria-invalid="error ? 'true' : undefined"
     >
   </TFormField>
 </template>

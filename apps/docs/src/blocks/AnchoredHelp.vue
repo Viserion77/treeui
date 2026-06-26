@@ -15,11 +15,11 @@ const dismiss = () => {
 <template>
   <TStack
     direction="horizontal"
-    gap="2rem"
+    gap="var(--tree-space-8)"
     align="flex-start"
   >
     <!-- Short, non-interactive help: a tooltip on hover/focus. -->
-    <TStack gap="0.5rem">
+    <TStack gap="var(--tree-space-2)">
       <span class="anchored-help__label">Tooltip</span>
       <TTooltip
         content="We email you a receipt for every successful payment."
@@ -34,7 +34,7 @@ const dismiss = () => {
     </TStack>
 
     <!-- Interactive help: escalate to a popover with focusable content. -->
-    <TStack gap="0.5rem">
+    <TStack gap="var(--tree-space-2)">
       <span class="anchored-help__label">Popover</span>
       <TPopover
         v-model:open="popoverOpen"
@@ -50,7 +50,7 @@ const dismiss = () => {
           </TButton>
         </template>
         <TStack
-          gap="0.75rem"
+          gap="var(--tree-space-3)"
           class="anchored-help__panel"
         >
           <strong>Contact support</strong>
@@ -60,7 +60,7 @@ const dismiss = () => {
           </p>
           <TStack
             direction="horizontal"
-            gap="0.5rem"
+            gap="var(--tree-space-2)"
             justify="flex-end"
           >
             <TButton
@@ -95,7 +95,7 @@ const dismiss = () => {
 
 .anchored-help__panel {
   min-width: 16rem;
-  padding: 0.25rem;
+  padding: var(--tree-space-1);
 }
 
 .anchored-help__text {

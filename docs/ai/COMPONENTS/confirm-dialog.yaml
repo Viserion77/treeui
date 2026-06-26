@@ -1,6 +1,5 @@
 name: TConfirmDialog
-legacy_alias: TreeConfirmDialog
-source_file: packages/vue/src/components/TreeConfirmDialog.vue
+source_file: packages/vue/src/components/TConfirmDialog.vue
 package: "@treeui/vue"
 kind: overlay
 status: available
@@ -17,7 +16,7 @@ props:
     type: boolean
     default: false
   size:
-    type: TreeSize
+    type: TSize
     default: sm
     values: [sm, md, lg]
   title:
@@ -33,7 +32,7 @@ props:
     type: string
     default: Cancel
   confirmVariant:
-    type: TreeVariant
+    type: TVariant
     default: danger
   confirmDisabled:
     type: boolean

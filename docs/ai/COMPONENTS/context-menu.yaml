@@ -8,7 +8,7 @@ category: overlay
 
 props:
   items:
-    type: TreeContextMenuItem[]
+    type: TContextMenuItem[]
     default: "[]"
     description: Menu items to render.
   open:
@@ -24,7 +24,7 @@ props:
     default: false
     description: Prevents the context menu from opening.
   size:
-    type: TreeSize
+    type: TSize
     default: md
     description: Item sizing variant.
 
@@ -43,11 +43,11 @@ slots:
   default:
     description: Content that acts as the right-click trigger area.
   item:
-    props: "{ item: TreeContextMenuItem; index: number }"
+    props: "{ item: TContextMenuItem; index: number }"
     description: Custom rendering for each menu item.
 
 types:
-  TreeContextMenuItem:
+  TContextMenuItem:
     label: string
     value: string
     disabled?: boolean

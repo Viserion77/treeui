@@ -1,8 +1,8 @@
 import type { ComputedRef, InjectionKey } from 'vue';
 
-export interface TreeSidebarContext {
+export interface TSidebarContext {
   collapsed: ComputedRef<boolean>;
 }
 
-export const treeSidebarInjectionKey: InjectionKey<TreeSidebarContext> =
+export const treeSidebarInjectionKey: InjectionKey<TSidebarContext> =
   Symbol('tree-sidebar');

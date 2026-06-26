@@ -30,7 +30,6 @@ The package stays intentionally composable, so teams can assemble forms, overlay
 ## Conventions
 
 - Primary docs use the `T` prefix for public exports.
-- `Tree<Name>` aliases remain available for compatibility and migration.
 - `TNavbar` / `TAppBar` and `TSteps` / `TStepper` are public alias pairs for the same implementations.
 - Terms like `Snackbar`, `Banner`, and `Collapsible` stay semantic aliases in docs rather than extra exports.
 - Page assemblies that are mostly layout stay docs-first recipes until repeated behavior proves they need a dedicated API.
@@ -58,7 +57,7 @@ TreeUI keeps the following app patterns documented as recipes instead of adding 
 
 TreeUI uses two kinds of aliases in documentation:
 
-- Export aliases: primary exports use the `T` prefix, and `Tree<Name>` remains available only for compatibility and migration.
+- Export alias pairs: a few components expose two `T`-prefixed names for the same implementation (`TNavbar` / `TAppBar`, `TSteps` / `TStepper`).
 - Semantic aliases: some common UI names map to existing patterns instead of creating duplicate standalone components.
 
 These semantic aliases are documentation guidance only. They do not add extra exports to `@treeui/vue`.

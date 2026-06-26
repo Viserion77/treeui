@@ -1,4 +1,5 @@
 import { fileURLToPath } from 'node:url';
+import vue from '@vitejs/plugin-vue';
 import type { StorybookConfig } from '@storybook/vue3-vite';
 
 const packageDistStylePath = fileURLToPath(
@@ -31,6 +32,10 @@ const config: StorybookConfig = {
       ...(config.resolve.alias as Record<string, string>),
       '@treeui/vue/style.css': packageDistStylePath,
     };
+    // @storybook/vue3-vite does not register the Vue SFC plugin itself, so add it
+    // here to compile local .vue blocks (apps/docs/src/blocks) imported by stories.
+    config.plugins ??= [];
+    config.plugins.push(vue());
     return config;
   },
 };

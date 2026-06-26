@@ -1,6 +1,103 @@
 export const cx = (...values: Array<string | false | null | undefined>) =>
   values.filter(Boolean).join(' ');
 
+type ClassDictionary = Record<string, boolean | null | undefined>;
+
+export type ClassValue = string | false | null | undefined | ClassValue[] | ClassDictionary;
+
+const toClassList = (value: ClassValue): string[] => {
+  if (typeof value === 'string') {
+    return value ? [value] : [];
+  }
+
+  if (Array.isArray(value)) {
+    return value.flatMap(toClassList);
+  }
+
+  if (value && typeof value === 'object') {
+    return Object.keys(value).filter((key) => Boolean(value[key]));
+  }
+
+  return [];
+};
+
+type VariantOptions = Record<string, Record<string, ClassValue>>;
+
+// `string & Record<never, never>` keeps literal autocomplete while still accepting any string.
+type VariantValue<G> = keyof G | (string & Record<never, never>);
+
+type VariantSelection<V extends VariantOptions> = {
+  [K in keyof V]?: VariantValue<V[K]>;
+};
+
+export interface TvConfig<V extends VariantOptions> {
+  base?: ClassValue;
+  variants?: V;
+  defaultVariants?: VariantSelection<V>;
+  compoundVariants?: Array<VariantSelection<V> & { class: ClassValue }>;
+}
+
+export type TvProps<V extends VariantOptions> = VariantSelection<V> & { class?: ClassValue };
+
+/**
+ * Minimal class-variants helper. Maps a declarative variant config to a class
+ * string, the way CVA does — but it just joins values (no Tailwind merge), so
+ * it fits TreeUI's BEM class convention.
+ *
+ * @example
+ * const button = tv({
+ *   base: 'tree-button',
+ *   variants: { variant: { solid: 'tree-button--solid' }, size: { md: 'tree-button--md' } },
+ * });
+ * button({ variant: 'solid', size: 'md' }); // 'tree-button tree-button--solid tree-button--md'
+ */
+export const tv = <V extends VariantOptions>(config: TvConfig<V>) => {
+  const { base, variants, defaultVariants, compoundVariants } = config;
+
+  return (props: TvProps<V> = {}): string => {
+    const { class: extraClass, ...selection } = props;
+    const resolved: Record<string, unknown> = { ...defaultVariants };
+
+    for (const [key, value] of Object.entries(selection)) {
+      if (value !== undefined) {
+        resolved[key] = value;
+      }
+    }
+
+    const classes: ClassValue[] = [base];
+
+    if (variants) {
+      for (const name of Object.keys(variants)) {
+        const value = resolved[name];
+
+        if (value != null) {
+          const match = variants[name][value as string];
+
+          if (match != null) {
+            classes.push(match);
+          }
+        }
+      }
+    }
+
+    if (compoundVariants) {
+      for (const { class: compoundClass, ...conditions } of compoundVariants) {
+        const matches = Object.entries(conditions).every(
+          ([key, expected]) => resolved[key] === expected,
+        );
+
+        if (matches) {
+          classes.push(compoundClass);
+        }
+      }
+    }
+
+    classes.push(extraClass);
+
+    return classes.flatMap(toClassList).join(' ');
+  };
+};
+
 let treeId = 0;
 
 export const createId = (prefix = 'treeui') => {

@@ -8,6 +8,6 @@ addons.setConfig({
     colorSecondary: '#3f82ff',
     brandTitle: 'TreeUI',
     brandUrl: './',
-    brandImage: './treeui-logo.svg',
+    brandImage: './treeui-wordmark.svg',
   }),
 });

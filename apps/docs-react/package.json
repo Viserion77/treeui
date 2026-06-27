@@ -1,0 +1,21 @@
+{
+  "name": "@treeui/docs-react",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "docs:dev": "pnpm exec storybook dev -p 6007 --host 0.0.0.0 --ci",
+    "docs:build": "pnpm exec storybook build",
+    "typecheck": "pnpm exec tsc --noEmit -p tsconfig.json"
+  },
+  "dependencies": {
+    "@treeui/react": "workspace:*",
+    "@treeui/tokens": "workspace:*",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "devDependencies": {
+    "@storybook/react-vite": "10.4.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0"
+  }
+}

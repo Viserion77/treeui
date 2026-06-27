@@ -42,11 +42,14 @@ docker compose run --rm e2e
 ## Workspace Layout
 
 ```text
-apps/docs          Storybook documentation and playground
+apps/landing       Landing page that links to the per-framework docs
+apps/docs          Vue Storybook documentation and playground
+apps/docs-react    React Storybook documentation and playground
 packages/tokens    Framework-agnostic design tokens and themes
 packages/utils     Shared accessibility and interaction helpers
 packages/icons     Curated icon registry and defaults
 packages/vue       Vue 3 component package and plugin entry
+packages/react     React component package
 packages/mcp       TreeUI AI catalog and MCP server for coding agents
 tooling            Docker, ESLint, and TypeScript shared config
 ```
@@ -124,11 +127,14 @@ git push
 
 The Changesets bot will open a **"chore: version packages"** PR. Merging it bumps versions, updates `CHANGELOG.md`, and publishes to npm automatically.
 
-### Storybook
+### Documentation site
 
-Live documentation is deployed to GitHub Pages on every push to `main`:
+The docs site is deployed to GitHub Pages on every push to `main`. A landing
+page links to one Storybook per framework:
 
-[https://viserion77.github.io/treeui/](https://viserion77.github.io/treeui/)
+- Home: [https://viserion77.github.io/treeui/](https://viserion77.github.io/treeui/)
+- Vue: [https://viserion77.github.io/treeui/vue/](https://viserion77.github.io/treeui/vue/)
+- React: [https://viserion77.github.io/treeui/react/](https://viserion77.github.io/treeui/react/)
 
 ## License
 

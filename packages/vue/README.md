@@ -136,7 +136,7 @@ import type { TSize, TVariant } from '@treeui/vue'
 
 ## Documentation
 
-See the full component docs and interactive playground at the [Storybook site](https://viserion77.github.io/treeui/).
+See the full component docs and interactive playground at the [Vue Storybook](https://viserion77.github.io/treeui/vue/).
 
 ## License
 

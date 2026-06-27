@@ -1,0 +1,44 @@
+import { Meta, Title, Subtitle } from '@storybook/addon-docs/blocks';
+
+<Meta title="Foundation/Introduction" />
+
+<Title>TreeUI for React</Title>
+<Subtitle>The same tokens and design language, as React components.</Subtitle>
+
+<div style={{ display: 'flex', justifyContent: 'center', margin: '0 0 2rem' }}>
+  <img src="./treeui-wordmark.svg" alt="TreeUI" width="320" style={{ width: '320px', maxWidth: '80vw' }} />
+</div>
+
+`@treeui/react` is an early React package built on the same framework-agnostic
+foundation as the Vue library — the same `@treeui/tokens`, the same `t-*` BEM
+classes, and the same `T`-prefixed public API.
+
+This first release ships four primitives:
+
+- **TButton** — variants, sizes, loading, optional icon.
+- **TInput** — sizes, invalid state, prefix/suffix slots.
+- **TBadge** — variants, sizes, and tones.
+- **TCard** — variants, sizes, header/footer.
+
+## Install
+
+```bash
+pnpm add @treeui/react react react-dom
+```
+
+```tsx
+import '@treeui/react/style.css';
+import { TButton, TCard } from '@treeui/react';
+
+export function Example() {
+  return (
+    <TCard header={<strong>Invite</strong>}>
+      <TButton variant="solid">Send invite</TButton>
+    </TCard>
+  );
+}
+```
+
+The stylesheet re-imports `@treeui/tokens`, so theming (including
+`[data-tree-theme]`) works exactly as it does in the Vue package. The full
+component set lives in the Vue documentation.

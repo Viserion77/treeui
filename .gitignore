@@ -5,6 +5,7 @@ playwright-report
 test-results
 screenshots
 storybook-static
+site
 .DS_Store
 .idea
 .vscode

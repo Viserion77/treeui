@@ -10,6 +10,7 @@ export default [
       '**/dist/**',
       '**/coverage/**',
       '**/storybook-static/**',
+      'site/**',
       '**/node_modules/**',
       'playwright-report/**',
       'test-results/**',

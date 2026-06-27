@@ -44,8 +44,8 @@ jobs:
       - name: Build packages
         run: pnpm build:packages
 
-      - name: Build Storybook
-        run: pnpm build:docs
+      - name: Build docs site (landing + Vue + React Storybooks)
+        run: pnpm build:site
 
       - name: Install Playwright browser
         run: pnpm exec playwright install --with-deps chromium
@@ -55,11 +55,11 @@ jobs:
           PW_SKIP_BUILD: "1"
         run: pnpm test:e2e
 
-      - name: Upload Storybook artifacts
+      - name: Upload site artifact
         uses: actions/upload-artifact@v4
         with:
-          name: storybook-static
-          path: apps/docs/storybook-static
+          name: site
+          path: site
           retention-days: 1
 
   release:
@@ -126,16 +126,16 @@ jobs:
     needs: validate
     runs-on: ubuntu-latest
     steps:
-      - name: Download Storybook artifacts
+      - name: Download site artifact
         uses: actions/download-artifact@v4
         with:
-          name: storybook-static
-          path: storybook-static
+          name: site
+          path: site
 
       - name: Upload pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: storybook-static
+          path: site
 
   deploy-pages:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'

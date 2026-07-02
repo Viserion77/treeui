@@ -14,7 +14,7 @@
     "react-dom": "^19.0.0"
   },
   "devDependencies": {
-    "@storybook/react-vite": "10.4.0",
+    "@storybook/react-vite": "10.4.6",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0"
   }

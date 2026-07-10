@@ -39,6 +39,7 @@ const features = [
         <nav class="top__nav">
           <a href="./vue/">Vue docs</a>
           <a href="./react/">React docs</a>
+          <a href="./examples/dashboard-vue/">Examples</a>
           <a href="https://github.com/Viserion77/treeui">GitHub</a>
         </nav>
       </div>
@@ -118,6 +119,70 @@ const features = [
               </div>
             </template>
           </TCard>
+        </section>
+
+        <section
+          class="examples"
+          aria-label="Live examples"
+        >
+          <h3>See it running</h3>
+          <p class="examples__intro">
+            A full configurable dashboard — theme, accent color, density, and widgets — built
+            entirely with TreeUI components. No custom UI framework code.
+          </p>
+          <div class="examples__grid">
+            <TCard
+              as="a"
+              href="./examples/dashboard-vue/"
+              variant="soft"
+              class="path"
+            >
+              <template #header>
+                <div class="path__head">
+                  <h4>Vue dashboard</h4>
+                  <TBadge tone="success">
+                    Live demo
+                  </TBadge>
+                </div>
+              </template>
+              <p class="path__body">
+                Sidebar shell, sortable tables, KPI stats, toasts, and a settings drawer — the
+                complete component set working together.
+              </p>
+              <template #footer>
+                <div class="path__foot">
+                  <span class="mono">examples/dashboard-vue</span>
+                  <span class="go">Open example →</span>
+                </div>
+              </template>
+            </TCard>
+
+            <TCard
+              as="a"
+              href="./examples/dashboard-react/"
+              variant="soft"
+              class="path"
+            >
+              <template #header>
+                <div class="path__head">
+                  <h4>React dashboard</h4>
+                  <TBadge tone="success">
+                    Live demo
+                  </TBadge>
+                </div>
+              </template>
+              <p class="path__body">
+                The same dashboard concept built with the React primitives — Button, Input, Badge,
+                Card — on shared tokens.
+              </p>
+              <template #footer>
+                <div class="path__foot">
+                  <span class="mono">examples/dashboard-react</span>
+                  <span class="go">Open example →</span>
+                </div>
+              </template>
+            </TCard>
+          </div>
         </section>
 
         <section class="foundation">
@@ -294,6 +359,34 @@ a {
   color: var(--tree-color-brand-primary);
 }
 
+.examples {
+  padding-block: var(--tree-space-8) var(--tree-space-3);
+}
+
+.examples h3 {
+  font-size: var(--tree-font-size-lg);
+  margin: 0 0 var(--tree-space-2);
+  letter-spacing: -0.01em;
+}
+
+.examples__intro {
+  margin: 0 0 var(--tree-space-5);
+  color: var(--tree-color-text-muted);
+  max-width: 64ch;
+}
+
+.examples__grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--tree-space-5);
+}
+
+.examples__grid h4 {
+  margin: 0;
+  font-size: var(--tree-font-size-lg);
+  letter-spacing: -0.02em;
+}
+
 .foundation {
   padding-block: var(--tree-space-8) var(--tree-space-3);
 }
@@ -359,6 +452,7 @@ a {
 
 @media (max-width: 720px) {
   .paths,
+  .examples__grid,
   .foundation__grid {
     grid-template-columns: 1fr;
   }

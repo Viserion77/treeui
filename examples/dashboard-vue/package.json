@@ -1,0 +1,17 @@
+{
+  "name": "@treeui/example-dashboard-vue",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "pnpm exec vite --port 6008",
+    "build": "pnpm exec vite build",
+    "typecheck": "pnpm exec vue-tsc --noEmit -p tsconfig.json"
+  },
+  "dependencies": {
+    "@treeui/icons": "workspace:*",
+    "@treeui/tokens": "workspace:*",
+    "@treeui/vue": "workspace:*",
+    "vue": "^3.5.34"
+  }
+}

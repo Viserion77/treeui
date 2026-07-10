@@ -95,8 +95,10 @@ const findClippingAncestor = (element: HTMLElement): HTMLElement | null => {
   return null;
 };
 
-// Flip the listbox above the trigger when there is not enough room below it
-// (e.g. near the bottom of a modal or the viewport) but more room above.
+// Flip the listbox above the trigger when its rendered position overflows the
+// nearest clipping ancestor (e.g. a modal body) or the viewport, and there is
+// more room above the trigger than below it. Measuring the rendered rect keeps
+// the decision in sync with the CSS offset (--tree-space-2) automatically.
 const updateDropDirection = () => {
   const trigger = triggerRef.value;
   const listbox = listboxRef.value;
@@ -105,13 +107,13 @@ const updateDropDirection = () => {
     return;
   }
   const triggerRect = trigger.getBoundingClientRect();
+  const listboxRect = listbox.getBoundingClientRect();
   const boundary = findClippingAncestor(trigger)?.getBoundingClientRect();
   const bottomLimit = Math.min(boundary?.bottom ?? Infinity, window.innerHeight);
   const topLimit = Math.max(boundary?.top ?? 0, 0);
   const spaceBelow = bottomLimit - triggerRect.bottom;
   const spaceAbove = triggerRect.top - topLimit;
-  const needed = listbox.offsetHeight + 12;
-  dropUp.value = spaceBelow < needed && spaceAbove > spaceBelow;
+  dropUp.value = listboxRect.bottom > bottomLimit && spaceAbove > spaceBelow;
 };
 
 const rootStyle = computed(() => attrs.style);
@@ -129,6 +131,8 @@ const openDropdown = () => {
   if (props.disabled) return;
   const selectedIdx = props.options.findIndex((o) => o.value === props.modelValue);
   focusedIndex.value = selectedIdx >= 0 ? selectedIdx : 0;
+  // Render downward first so the measurement always starts from the default position.
+  dropUp.value = false;
   setValue(true);
   nextTick(() => {
     updateDropDirection();

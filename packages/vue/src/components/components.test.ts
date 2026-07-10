@@ -1522,6 +1522,65 @@ describe('@treeui/vue', () => {
     expect(options[1].attributes('aria-disabled')).toBe('true');
   });
 
+  it('flips the select listbox above the trigger when it overflows below', async () => {
+    // Trigger near the viewport bottom; rendered listbox overflows past it.
+    const rectSpy = vi
+      .spyOn(HTMLElement.prototype, 'getBoundingClientRect')
+      .mockImplementation(function (this: HTMLElement) {
+        const rect = { x: 0, y: 0, left: 0, right: 200, width: 200, height: 0, top: 0, bottom: 0, toJSON: () => ({}) };
+        if (this.getAttribute('role') === 'listbox') {
+          return { ...rect, top: 746, bottom: 946, height: 200 } as DOMRect;
+        }
+        if (this.tagName === 'BUTTON') {
+          return { ...rect, top: 700, bottom: 738, height: 38 } as DOMRect;
+        }
+        return rect as DOMRect;
+      });
+
+    const wrapper = mount(TSelect, {
+      props: {
+        modelValue: '',
+        options: [{ label: 'Apple', value: 'apple' }],
+      },
+    });
+
+    expect(wrapper.classes()).not.toContain('t-select--drop-up');
+    await wrapper.get('button').trigger('click');
+    await nextTick();
+    expect(wrapper.classes()).toContain('t-select--drop-up');
+
+    rectSpy.mockRestore();
+  });
+
+  it('keeps the select listbox below the trigger when it fits', async () => {
+    // Trigger near the viewport top; rendered listbox fits within it.
+    const rectSpy = vi
+      .spyOn(HTMLElement.prototype, 'getBoundingClientRect')
+      .mockImplementation(function (this: HTMLElement) {
+        const rect = { x: 0, y: 0, left: 0, right: 200, width: 200, height: 0, top: 0, bottom: 0, toJSON: () => ({}) };
+        if (this.getAttribute('role') === 'listbox') {
+          return { ...rect, top: 66, bottom: 266, height: 200 } as DOMRect;
+        }
+        if (this.tagName === 'BUTTON') {
+          return { ...rect, top: 20, bottom: 58, height: 38 } as DOMRect;
+        }
+        return rect as DOMRect;
+      });
+
+    const wrapper = mount(TSelect, {
+      props: {
+        modelValue: '',
+        options: [{ label: 'Apple', value: 'apple' }],
+      },
+    });
+
+    await wrapper.get('button').trigger('click');
+    await nextTick();
+    expect(wrapper.classes()).not.toContain('t-select--drop-up');
+
+    rectSpy.mockRestore();
+  });
+
   it('shows check icon for selected option', async () => {
     const wrapper = mount(TSelect, {
       props: {

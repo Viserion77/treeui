@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-10T16:38:54.639Z",
+  "generatedAt": "2026-07-10T17:35:46.616Z",
   "packageName": "@treeui/vue",
   "packageVersion": "0.8.0",
   "decisionGuides": [
@@ -1095,7 +1095,8 @@
       ],
       "a11y": [],
       "behavior": [
-        "body_wrapper_class: tree-card__body"
+        "body_wrapper_class: t-card__body",
+        "solid_variant_rescopes_color_tokens_for_nested_content: true"
       ],
       "selection": {
         "keywords": [
@@ -2302,6 +2303,16 @@
           "name": "label",
           "type": "string",
           "default": ""
+        },
+        {
+          "name": "align",
+          "type": "TDropdownAlign",
+          "default": "start",
+          "values": [
+            "start",
+            "end"
+          ],
+          "note": "Horizontal alignment of the menu relative to the trigger. Use `end` when the trigger sits near the right edge of a clipping container (e.g. a table actions column)."
         }
       ],
       "events": [
@@ -2337,7 +2348,8 @@
       "behavior": [
         "outside_click_closes_menu: true",
         "focus_restores_on_close: true",
-        "chevron_rotates_when_open: true"
+        "chevron_rotates_when_open: true",
+        "menu_grows_to_fit_items_without_wrapping: true"
       ],
       "selection": {
         "keywords": [
@@ -4557,7 +4569,8 @@
         "check_icon_on_selected_option: true",
         "outside_click_closes_dropdown: true",
         "focus_restores_on_close: true",
-        "numeric_values_supported_without_string_coercion: true"
+        "numeric_values_supported_without_string_coercion: true",
+        "listbox_flips_above_trigger_when_space_below_is_insufficient: true"
       ],
       "selection": {
         "keywords": [
@@ -4812,7 +4825,8 @@
         "controlled_and_uncontrolled_collapsed_state: true",
         "provides_collapsed_state_to_descendants: true",
         "left_and_right_variants: true",
-        "exposes_slot_props_with_collapsed_state: true"
+        "exposes_slot_props_with_collapsed_state: true",
+        "collapsed_state_centers_header_and_footer_content: true"
       ],
       "selection": {
         "keywords": [

@@ -50,8 +50,10 @@ const attrs = useAttrs();
 const listboxId = createId('t-select');
 const rootRef = ref<HTMLElement | null>(null);
 const triggerRef = ref<HTMLButtonElement | null>(null);
+const listboxRef = ref<HTMLElement | null>(null);
 const optionRefs = ref<Map<string | number, HTMLElement>>(new Map());
 const focusedIndex = ref(-1);
+const dropUp = ref(false);
 
 const triggerAttrs = computed(() => {
   const { class: _class, style: _style, ...rest } = attrs;
@@ -71,6 +73,7 @@ const rootClasses = computed(() => [
   't-select',
   `t-select--${props.size}`,
   {
+    't-select--drop-up': dropUp.value,
     'is-disabled': props.disabled,
     'is-invalid': props.invalid,
     'is-loading': props.loading,
@@ -78,6 +81,40 @@ const rootClasses = computed(() => [
   },
   attrs.class,
 ]);
+
+// Nearest ancestor that can clip the listbox (scroll container or hidden overflow).
+const findClippingAncestor = (element: HTMLElement): HTMLElement | null => {
+  let parent = element.parentElement;
+  while (parent && parent !== document.body) {
+    const { overflowY } = window.getComputedStyle(parent);
+    if (overflowY === 'auto' || overflowY === 'scroll' || overflowY === 'hidden') {
+      return parent;
+    }
+    parent = parent.parentElement;
+  }
+  return null;
+};
+
+// Flip the listbox above the trigger when its rendered position overflows the
+// nearest clipping ancestor (e.g. a modal body) or the viewport, and there is
+// more room above the trigger than below it. Measuring the rendered rect keeps
+// the decision in sync with the CSS offset (--tree-space-2) automatically.
+const updateDropDirection = () => {
+  const trigger = triggerRef.value;
+  const listbox = listboxRef.value;
+  if (!trigger || !listbox) {
+    dropUp.value = false;
+    return;
+  }
+  const triggerRect = trigger.getBoundingClientRect();
+  const listboxRect = listbox.getBoundingClientRect();
+  const boundary = findClippingAncestor(trigger)?.getBoundingClientRect();
+  const bottomLimit = Math.min(boundary?.bottom ?? Infinity, window.innerHeight);
+  const topLimit = Math.max(boundary?.top ?? 0, 0);
+  const spaceBelow = bottomLimit - triggerRect.bottom;
+  const spaceAbove = triggerRect.top - topLimit;
+  dropUp.value = listboxRect.bottom > bottomLimit && spaceAbove > spaceBelow;
+};
 
 const rootStyle = computed(() => attrs.style);
 
@@ -94,8 +131,13 @@ const openDropdown = () => {
   if (props.disabled) return;
   const selectedIdx = props.options.findIndex((o) => o.value === props.modelValue);
   focusedIndex.value = selectedIdx >= 0 ? selectedIdx : 0;
+  // Render downward first so the measurement always starts from the default position.
+  dropUp.value = false;
   setValue(true);
-  nextTick(() => focusOption(focusedIndex.value));
+  nextTick(() => {
+    updateDropDirection();
+    focusOption(focusedIndex.value);
+  });
 };
 
 const closeDropdown = (restoreFocus = false) => {
@@ -284,6 +326,7 @@ onBeforeUnmount(() => {
       <ul
         v-if="isOpen && !disabled"
         :id="listboxId"
+        ref="listboxRef"
         role="listbox"
         class="t-select__listbox"
         :aria-label="typeof triggerAttrs['aria-label'] === 'string' ? triggerAttrs['aria-label'] : undefined"

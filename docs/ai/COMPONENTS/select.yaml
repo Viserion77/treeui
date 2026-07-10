@@ -69,6 +69,7 @@ behavior:
   outside_click_closes_dropdown: true
   focus_restores_on_close: true
   numeric_values_supported_without_string_coercion: true
+  listbox_flips_above_trigger_when_space_below_is_insufficient: true
 
 example: |
   <TSelect

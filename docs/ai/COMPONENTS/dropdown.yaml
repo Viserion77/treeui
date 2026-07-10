@@ -25,6 +25,11 @@ props:
   label:
     type: string
     default: ""
+  align:
+    type: TDropdownAlign
+    default: start
+    values: [start, end]
+    note: "Horizontal alignment of the menu relative to the trigger. Use `end` when the trigger sits near the right edge of a clipping container (e.g. a table actions column)."
 
 events:
   - select
@@ -52,6 +57,7 @@ behavior:
   outside_click_closes_menu: true
   focus_restores_on_close: true
   chevron_rotates_when_open: true
+  menu_grows_to_fit_items_without_wrapping: true
 
 example: |
   <TDropdown

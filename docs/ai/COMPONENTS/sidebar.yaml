@@ -65,6 +65,7 @@ behavior:
   provides_collapsed_state_to_descendants: true
   left_and_right_variants: true
   exposes_slot_props_with_collapsed_state: true
+  collapsed_state_centers_header_and_footer_content: true
 
 example: |
   <TSidebar>

@@ -31,6 +31,7 @@ slots:
   - footer
 
 behavior:
-  body_wrapper_class: tree-card__body
+  body_wrapper_class: t-card__body
+  solid_variant_rescopes_color_tokens_for_nested_content: true
 
 example: '<TCard><p>Quiet elegance for product UI.</p></TCard>'

@@ -50,8 +50,8 @@ const cardVariantOptions: Array<{ label: string; value: TCardVariant }> = [
 ];
 
 const accentPresets = [
-  { label: 'Ocean blue', value: '#2057d4' },
-  { label: 'Forest green', value: '#117c50' },
+  { label: 'Ocean blue', value: '#0969da' },
+  { label: 'Forest green', value: '#1a7f37' },
   { label: 'Grape violet', value: '#6d28d9' },
   { label: 'Clay orange', value: '#c2410c' },
   { label: 'Rosewood', value: '#be185d' },
@@ -59,9 +59,11 @@ const accentPresets = [
 
 const widgetOptions: Array<{ key: keyof typeof config.widgets; label: string }> = [
   { key: 'stats', label: 'Key metrics' },
-  { key: 'goals', label: 'Quarterly goals' },
-  { key: 'activity', label: 'Recent activity' },
+  { key: 'channels', label: 'Sessions by channel' },
   { key: 'orders', label: 'Latest orders' },
+  { key: 'customer', label: 'New customer form' },
+  { key: 'alerts', label: 'Alerts' },
+  { key: 'activity', label: 'Recent activity' },
 ];
 
 function restoreDefaults() {

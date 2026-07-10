@@ -13,7 +13,7 @@ const STORAGE_KEY = 'treeui-example-dashboard-react-config';
 
 export const DEFAULTS: DashboardConfig = {
   theme: 'system',
-  accent: '#2057d4',
+  accent: '#0969da',
   density: 'md',
 };
 

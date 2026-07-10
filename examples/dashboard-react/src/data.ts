@@ -13,14 +13,51 @@ export interface Stat {
   label: string;
   value: string;
   trend: string;
-  tone: 'success' | 'info' | 'warning' | 'neutral';
+  tone: 'success' | 'info' | 'warning' | 'neutral' | 'danger';
+  /** Weekly datapoints rendered as a sparkline next to the metric. */
+  spark: number[];
 }
 
 export const stats: Stat[] = [
-  { label: 'Monthly revenue', value: '$48,210', trend: '▲ 12.4% vs. last month', tone: 'success' },
-  { label: 'Active customers', value: '1,284', trend: '▲ 3.1% — 92 new this month', tone: 'info' },
-  { label: 'Open orders', value: '37', trend: '4 overdue · avg. 2.3 days', tone: 'warning' },
-  { label: 'Refund rate', value: '1.9%', trend: '▼ 0.4% vs. last month', tone: 'neutral' },
+  {
+    label: 'Monthly revenue',
+    value: '$48,920',
+    trend: '▲ 12.4% vs. last month',
+    tone: 'success',
+    spark: [32, 38, 36, 44, 42, 50, 48, 57, 55],
+  },
+  {
+    label: 'Orders',
+    value: '1,284',
+    trend: '▼ 3.1% vs. last month',
+    tone: 'danger',
+    spark: [55, 50, 52, 45, 47, 40, 43, 36, 38],
+  },
+  {
+    label: 'New customers',
+    value: '312',
+    trend: '▲ 5.8% — 92 this week',
+    tone: 'success',
+    spark: [30, 29, 35, 33, 41, 39, 46, 45, 52],
+  },
+];
+
+export interface ChannelMonth {
+  month: string;
+  /** Sessions in thousands, one entry per channel in `channelNames` order. */
+  values: number[];
+}
+
+export const channelNames = ['Organic', 'Social', 'Email', 'Paid', 'Direct'];
+
+export const channelMonths: ChannelMonth[] = [
+  { month: 'Jan', values: [32, 25, 17, 14, 10] },
+  { month: 'Feb', values: [37, 28, 20, 16, 11] },
+  { month: 'Mar', values: [41, 31, 23, 18, 13] },
+  { month: 'Apr', values: [39, 28, 22, 17, 12] },
+  { month: 'May', values: [44, 33, 25, 19, 13] },
+  { month: 'Jun', values: [49, 37, 28, 21, 15] },
+  { month: 'Jul', values: [46, 35, 27, 20, 14] },
 ];
 
 export const orders: Order[] = [

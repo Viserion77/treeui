@@ -28,53 +28,56 @@ export type Stat = {
   trendDirection: 'up' | 'down' | 'neutral';
   tone: 'neutral' | 'success' | 'warning' | 'danger' | 'info';
   meta: string;
-};
-
-export type Goal = {
-  label: string;
-  value: number;
-  target: string;
+  /** Weekly datapoints rendered as a sparkline next to the metric. */
+  spark: number[];
 };
 
 export const stats: Stat[] = [
   {
     label: 'Monthly revenue',
-    value: '$48,210',
+    value: '$48,920',
     trend: '12.4%',
     trendDirection: 'up',
     tone: 'success',
     meta: 'vs. last month',
+    spark: [32, 38, 36, 44, 42, 50, 48, 57, 55],
   },
   {
-    label: 'Active customers',
+    label: 'Orders',
     value: '1,284',
     trend: '3.1%',
-    trendDirection: 'up',
-    tone: 'info',
-    meta: '92 new this month',
-  },
-  {
-    label: 'Open orders',
-    value: '37',
-    trend: '4 overdue',
-    trendDirection: 'neutral',
-    tone: 'warning',
-    meta: 'avg. fulfilment 2.3 days',
-  },
-  {
-    label: 'Refund rate',
-    value: '1.9%',
-    trend: '0.4%',
     trendDirection: 'down',
-    tone: 'neutral',
+    tone: 'danger',
     meta: 'vs. last month',
+    spark: [55, 50, 52, 45, 47, 40, 43, 36, 38],
+  },
+  {
+    label: 'New customers',
+    value: '312',
+    trend: '5.8%',
+    trendDirection: 'up',
+    tone: 'success',
+    meta: '92 this week',
+    spark: [30, 29, 35, 33, 41, 39, 46, 45, 52],
   },
 ];
 
-export const goals: Goal[] = [
-  { label: 'Quarterly revenue', value: 68, target: '$150k target' },
-  { label: 'New customers', value: 82, target: '500 target' },
-  { label: 'Support satisfaction', value: 94, target: '90% target' },
+export type ChannelMonth = {
+  month: string;
+  /** Sessions in thousands, one entry per channel in `channelNames` order. */
+  values: number[];
+};
+
+export const channelNames = ['Organic', 'Social', 'Email', 'Paid', 'Direct'];
+
+export const channelMonths: ChannelMonth[] = [
+  { month: 'Jan', values: [32, 25, 17, 14, 10] },
+  { month: 'Feb', values: [37, 28, 20, 16, 11] },
+  { month: 'Mar', values: [41, 31, 23, 18, 13] },
+  { month: 'Apr', values: [39, 28, 22, 17, 12] },
+  { month: 'May', values: [44, 33, 25, 19, 13] },
+  { month: 'Jun', values: [49, 37, 28, 21, 15] },
+  { month: 'Jul', values: [46, 35, 27, 20, 14] },
 ];
 
 export const activity: TTimelineItem[] = [

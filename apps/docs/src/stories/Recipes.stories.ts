@@ -328,7 +328,7 @@ export const ColorField: Story = {
   render: () => ({
     components: { TFormField, TStack },
     setup: () => ({
-      value: ref('#2057d4'),
+      value: ref('#0969da'),
     }),
     template: `
       <div style="max-width: 20rem;">

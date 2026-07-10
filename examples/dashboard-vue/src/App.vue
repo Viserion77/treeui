@@ -5,8 +5,10 @@ import {
   TBadge,
   TButton,
   TDropdown,
+  TInput,
   TNavMenu,
   TNavbar,
+  TProgress,
   TSidebar,
   TToastProvider,
   TTooltip,
@@ -15,7 +17,16 @@ import {
 import type { TNavMenuItem } from '@treeui/vue';
 import logoUrl from './assets/treeui-logo.svg';
 import { useDashboardConfig } from './composables/useDashboardConfig';
-import { IconGear, IconHome, IconMoon, IconOrders, IconSun, IconUsers } from './icons';
+import {
+  IconBell,
+  IconGear,
+  IconHome,
+  IconMoon,
+  IconOrders,
+  IconSearch,
+  IconSun,
+  IconUsers,
+} from './icons';
 import SettingsDrawer from './components/SettingsDrawer.vue';
 import OverviewView from './views/OverviewView.vue';
 import OrdersView from './views/OrdersView.vue';
@@ -26,6 +37,15 @@ const toast = useToast();
 
 const view = ref('overview');
 const settingsOpen = ref(false);
+const search = ref('');
+
+function onNotifications() {
+  toast.add({
+    title: "You're all caught up",
+    description: 'No new notifications right now.',
+    variant: 'info',
+  });
+}
 
 const navItems: TNavMenuItem[] = [
   { label: 'Overview', value: 'overview', icon: IconHome, description: 'Metrics and activity' },
@@ -98,17 +118,31 @@ function onUserMenu(action: string) {
         />
 
         <template #footer="{ collapsed }">
-          <div class="sidebar-foot">
-            <TAvatar
-              initials="JA"
-              status="online"
-              size="sm"
-              alt="Jef Almeida"
-            />
-            <span
+          <div class="sidebar-foot-group">
+            <div
               v-if="!collapsed"
-              class="sidebar-foot__name"
-            >Jef Almeida</span>
+              class="storage"
+            >
+              <span class="storage__label">Storage</span>
+              <TProgress
+                :value="64"
+                label="Storage used"
+                size="sm"
+              />
+              <span class="storage__meta">6.4 GB of 10 GB used</span>
+            </div>
+            <div class="sidebar-foot">
+              <TAvatar
+                initials="JA"
+                status="online"
+                size="sm"
+                alt="Jef Almeida"
+              />
+              <span
+                v-if="!collapsed"
+                class="sidebar-foot__name"
+              >Jef Almeida</span>
+            </div>
           </div>
         </template>
       </TSidebar>
@@ -129,8 +163,38 @@ function onUserMenu(action: string) {
               </TBadge>
             </div>
           </template>
+          <template #center>
+            <TInput
+              v-model="search"
+              type="search"
+              size="sm"
+              class="navbar-search"
+              placeholder="Search orders, customers…"
+              aria-label="Search"
+            >
+              <template #prefix>
+                <IconSearch
+                  width="16"
+                  height="16"
+                />
+              </template>
+              <template #suffix>
+                <kbd class="navbar-search__kbd">⌘K</kbd>
+              </template>
+            </TInput>
+          </template>
           <template #end>
             <div class="navbar-actions">
+              <TTooltip content="Notifications">
+                <TButton
+                  variant="ghost"
+                  size="sm"
+                  aria-label="Notifications"
+                  @click="onNotifications"
+                >
+                  <IconBell />
+                </TButton>
+              </TTooltip>
               <TTooltip :content="isDark ? 'Switch to light theme' : 'Switch to dark theme'">
                 <TButton
                   variant="ghost"
@@ -218,6 +282,31 @@ function onUserMenu(action: string) {
   letter-spacing: -0.01em;
 }
 
+.sidebar-foot-group {
+  display: grid;
+  gap: var(--tree-space-3);
+  min-width: 0;
+}
+
+.storage {
+  display: grid;
+  gap: var(--tree-space-1);
+  padding: var(--tree-space-3);
+  border: var(--tree-border-width-subtle) solid var(--tree-color-border-default);
+  border-radius: var(--tree-radius-lg);
+  background: var(--tree-color-bg-surface);
+}
+
+.storage__label {
+  font-size: var(--tree-font-size-sm);
+  font-weight: var(--tree-font-weight-semibold, 600);
+}
+
+.storage__meta {
+  font-size: var(--tree-font-size-xs);
+  color: var(--tree-color-text-muted);
+}
+
 .sidebar-foot {
   display: flex;
   align-items: center;
@@ -249,6 +338,25 @@ function onUserMenu(action: string) {
   display: flex;
   align-items: center;
   gap: var(--tree-space-2);
+}
+
+.navbar-search {
+  width: min(20rem, 100%);
+}
+
+.navbar-search__kbd {
+  font-family: var(--tree-font-family-mono);
+  font-size: var(--tree-font-size-xs);
+  color: var(--tree-color-text-muted);
+  border: var(--tree-border-width-subtle) solid var(--tree-color-border-default);
+  border-radius: var(--tree-radius-sm);
+  padding: 0 var(--tree-space-1);
+}
+
+@media (max-width: 768px) {
+  .navbar-search {
+    display: none;
+  }
 }
 
 </style>

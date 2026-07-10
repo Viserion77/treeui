@@ -126,53 +126,53 @@ theme_values:
   light:
     color:
       bg:
-        primary: "#f3f5f9"
+        primary: "#f6f8fa"
         surface: "#ffffff"
-        subtle: "#eef2f7"
+        subtle: "#eff2f5"
       border:
-        default: "#d7dfeb"
-        strong: "#b8c4d8"
+        default: "#d0d7de"
+        strong: "#afb8c1"
       text:
-        primary: "#142033"
-        muted: "#5b6b84"
+        primary: "#1f2328"
+        muted: "#59636e"
         inverse: "#ffffff"
       brand:
-        primary: "#2057d4"
-        hover: "#1845ac"
-        soft: "#e8efff"
+        primary: "#0969da"
+        hover: "#0550ae"
+        soft: "#ddf4ff"
         contrast: "#ffffff"
       status:
-        success: "#117c50"
-        warning: "#a15d00"
-        error: "#bc2f3f"
-        info: "#2459d6"
-      overlay: "rgba(15, 23, 42, 0.4)"
-      focus-ring: "rgba(32, 87, 212, 0.32)"
+        success: "#1a7f37"
+        warning: "#9a6700"
+        error: "#d1242f"
+        info: "#0969da"
+      overlay: "rgba(31, 35, 40, 0.5)"
+      focus-ring: "rgba(9, 105, 218, 0.32)"
   dark:
     color:
       bg:
-        primary: "#0f1724"
-        surface: "#162131"
-        subtle: "#1b293d"
+        primary: "#1c2128"
+        surface: "#22272e"
+        subtle: "#2d333b"
       border:
-        default: "#2d3d57"
-        strong: "#41516d"
+        default: "#444c56"
+        strong: "#576270"
       text:
-        primary: "#edf3ff"
-        muted: "#aab7cb"
-        inverse: "#07101f"
+        primary: "#adbac7"
+        muted: "#95a3b2"
+        inverse: "#1c2128"
       brand:
-        primary: "#74a2ff"
-        hover: "#8bb1ff"
-        soft: "#18386d"
-        contrast: "#07101f"
+        primary: "#539bf5"
+        hover: "#6cabf7"
+        soft: "#1a3453"
+        contrast: "#0a1a2f"
       status:
-        success: "#4cc38f"
-        warning: "#ffb14d"
-        error: "#ff7d88"
-        info: "#8ab0ff"
-      overlay: "rgba(7, 16, 31, 0.68)"
-      focus-ring: "rgba(116, 162, 255, 0.34)"
+        success: "#57ab5a"
+        warning: "#c69026"
+        error: "#f47067"
+        info: "#6cb6ff"
+      overlay: "rgba(13, 17, 23, 0.6)"
+      focus-ring: "rgba(83, 155, 245, 0.32)"
 
 rules:
   - "Use semantic color roles, not raw hex values, in component code."

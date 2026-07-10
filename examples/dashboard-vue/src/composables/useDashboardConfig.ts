@@ -10,9 +10,11 @@ export interface DashboardConfig {
   cardVariant: TCardVariant;
   widgets: {
     stats: boolean;
-    goals: boolean;
-    activity: boolean;
+    channels: boolean;
     orders: boolean;
+    customer: boolean;
+    alerts: boolean;
+    activity: boolean;
   };
 }
 
@@ -20,14 +22,16 @@ const STORAGE_KEY = 'treeui-example-dashboard-config';
 
 const DEFAULTS: DashboardConfig = {
   theme: 'system',
-  accent: '#2057d4',
+  accent: '#0969da',
   density: 'md',
   cardVariant: 'outline',
   widgets: {
     stats: true,
-    goals: true,
-    activity: true,
+    channels: true,
     orders: true,
+    customer: true,
+    alerts: true,
+    activity: true,
   },
 };
 

@@ -75,9 +75,9 @@ export const createThemesStylesheet = () =>
 // --- Theme generator -------------------------------------------------------
 
 /** Soft tint base for dark-mode brand `soft`. */
-const SOFT_DARK_BASE: Rgb = { r: 11, g: 18, b: 32 };
+const SOFT_DARK_BASE: Rgb = { r: 13, g: 17, b: 23 };
 /** Near-black contrast candidate (matches the dark theme `text.inverse`). */
-const CONTRAST_DARK: Rgb = { r: 7, g: 16, b: 31 };
+const CONTRAST_DARK: Rgb = { r: 28, g: 33, b: 40 };
 const CONTRAST_LIGHT: Rgb = { r: 255, g: 255, b: 255 };
 
 export interface BrandRamp {

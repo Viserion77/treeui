@@ -1,8 +1,8 @@
 export const treeTokens = {
   font: {
     family: {
-      sans: "'IBM Plex Sans', 'Segoe UI', sans-serif",
-      mono: "'IBM Plex Mono', 'SFMono-Regular', monospace",
+      sans: "'Google Sans Flex', 'Segoe UI', sans-serif",
+      mono: "'Google Sans Code', 'SFMono-Regular', monospace",
     },
     size: {
       xs: '0.6875rem',

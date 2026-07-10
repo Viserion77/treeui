@@ -297,6 +297,7 @@ function createOrder() {
           <TDropdown
             :items="rowActions"
             size="sm"
+            align="end"
             label="⋯"
             :aria-label="`Actions for ${row.id}`"
             @select="onRowAction(row as Order, $event)"

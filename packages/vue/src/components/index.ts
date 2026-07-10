@@ -17,6 +17,7 @@ export { default as TDatePicker } from './TDatePicker.vue';
 export { default as TDateTimePicker } from './TDateTimePicker.vue';
 export { default as TDrawer } from './TDrawer.vue';
 export { default as TDropdown } from './TDropdown.vue';
+export type { TDropdownAlign, TDropdownItem } from './TDropdown.vue';
 export { default as TEmptyState } from './TEmptyState.vue';
 export { default as TFileUpload } from './TFileUpload.vue';
 export { default as TMultiSelect } from './TMultiSelect.vue';

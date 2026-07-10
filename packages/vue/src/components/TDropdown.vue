@@ -14,6 +14,8 @@ export interface TDropdownItem {
   disabled?: boolean;
 }
 
+export type TDropdownAlign = 'start' | 'end';
+
 const props = withDefaults(
   defineProps<{
     items?: TDropdownItem[];
@@ -22,6 +24,7 @@ const props = withDefaults(
     disabled?: boolean;
     size?: TSize;
     label?: string;
+    align?: TDropdownAlign;
   }>(),
   {
     items: () => [],
@@ -30,6 +33,7 @@ const props = withDefaults(
     disabled: false,
     size: 'md',
     label: '',
+    align: 'start',
   },
 );
 
@@ -69,6 +73,7 @@ const rootClasses = computed(() => [
   't-dropdown',
   `t-dropdown--${props.size}`,
   {
+    't-dropdown--align-end': props.align === 'end',
     'is-disabled': props.disabled,
     'is-open': isOpen.value,
   },

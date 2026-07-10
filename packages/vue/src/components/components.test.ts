@@ -2287,6 +2287,18 @@ describe('@treeui/vue', () => {
     expect(lg.classes()).toContain('t-dropdown--lg');
   });
 
+  it('aligns the dropdown menu to the end when requested', () => {
+    const start = mount(TDropdown, {
+      props: { label: 'Actions', items: [] },
+    });
+    const end = mount(TDropdown, {
+      props: { align: 'end' as const, label: 'Actions', items: [] },
+    });
+
+    expect(start.classes()).not.toContain('t-dropdown--align-end');
+    expect(end.classes()).toContain('t-dropdown--align-end');
+  });
+
   it('applies disabled state to dropdown', () => {
     const wrapper = mount(TDropdown, {
       props: {

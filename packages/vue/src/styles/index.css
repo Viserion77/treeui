@@ -972,6 +972,18 @@
   border-color: transparent;
 }
 
+/* The solid variant inverts its surface, so re-scope the core color tokens for
+   nested content (titles, tables, timelines, dividers, …) to stay legible. */
+.t-card--solid > * {
+  --tree-color-text-primary: var(--tree-color-text-inverse);
+  --tree-color-text-muted: color-mix(in srgb, var(--tree-color-text-inverse) 72%, transparent);
+  --tree-color-bg-primary: transparent;
+  --tree-color-bg-surface: color-mix(in srgb, var(--tree-color-text-inverse) 8%, transparent);
+  --tree-color-bg-subtle: color-mix(in srgb, var(--tree-color-text-inverse) 12%, transparent);
+  --tree-color-border-default: color-mix(in srgb, var(--tree-color-text-inverse) 24%, transparent);
+  --tree-color-border-strong: color-mix(in srgb, var(--tree-color-text-inverse) 40%, transparent);
+}
+
 .t-card--inset {
   background: var(--tree-color-bg-subtle);
   border-color: var(--tree-color-border-default);
@@ -2261,6 +2273,11 @@
   box-shadow: var(--tree-shadow-md);
 }
 
+.t-select--drop-up .t-select__listbox {
+  top: auto;
+  bottom: calc(100% + var(--tree-space-2));
+}
+
 .t-select__option {
   display: flex;
   align-items: center;
@@ -2324,7 +2341,8 @@
 
 .t-form-field {
   display: grid;
-  gap: var(--tree-space-1);
+  /* space-2 keeps focus rings (outline-offset) from overlapping the label above. */
+  gap: var(--tree-space-2);
   font-family: var(--tree-font-family-sans);
 }
 
@@ -2989,7 +3007,7 @@
   top: calc(100% + var(--tree-space-2));
   left: 0;
   z-index: var(--tree-z-dropdown);
-  min-width: 10rem;
+  min-width: max-content;
   max-height: 15rem;
   overflow-y: auto;
   margin: 0;
@@ -3001,6 +3019,11 @@
   box-shadow: var(--tree-shadow-md);
 }
 
+.t-dropdown--align-end .t-dropdown__menu {
+  left: auto;
+  right: 0;
+}
+
 .t-dropdown__item {
   display: flex;
   align-items: center;
@@ -3010,6 +3033,7 @@
   font-size: var(--tree-font-size-md);
   line-height: var(--tree-font-lineHeight-ui);
   color: var(--tree-color-text-primary);
+  white-space: nowrap;
   cursor: pointer;
   outline: none;
   transition: background-color var(--tree-motion-duration-fast) var(--tree-motion-easing-standard);
@@ -5518,6 +5542,12 @@
   width: var(--tree-sidebar-collapsed-width);
   min-width: var(--tree-sidebar-collapsed-width);
   padding-inline: var(--tree-space-3);
+}
+
+/* Center custom header/footer content so it lines up with the icon column. */
+.t-sidebar.is-collapsed .t-sidebar__header,
+.t-sidebar.is-collapsed .t-sidebar__footer {
+  justify-items: center;
 }
 
 .t-sidebar__header,

@@ -4,7 +4,7 @@
   "description": "Vue 3 component package for TreeUI.",
   "type": "module",
   "sideEffects": [
-    "*.css"
+    "**/*.css"
   ],
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",

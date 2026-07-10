@@ -967,21 +967,26 @@
 }
 
 .t-card--solid {
-  background: var(--tree-color-text-primary);
+  /* Captured here, before the child scope below redefines text-primary. */
+  --t-card-solid-surface: var(--tree-color-text-primary);
+
+  background: var(--t-card-solid-surface);
   color: var(--tree-color-bg-surface);
   border-color: transparent;
 }
 
 /* The solid variant inverts its surface, so re-scope the core color tokens for
-   nested content (titles, tables, timelines, dividers, …) to stay legible. */
+   nested content (titles, tables, timelines, dividers, …) to stay legible.
+   Backgrounds are mixed over the captured surface color (not transparency) so
+   floating layers like dropdown menus and select listboxes remain opaque. */
 .t-card--solid > * {
   --tree-color-text-primary: var(--tree-color-text-inverse);
-  --tree-color-text-muted: color-mix(in srgb, var(--tree-color-text-inverse) 72%, transparent);
-  --tree-color-bg-primary: transparent;
-  --tree-color-bg-surface: color-mix(in srgb, var(--tree-color-text-inverse) 8%, transparent);
-  --tree-color-bg-subtle: color-mix(in srgb, var(--tree-color-text-inverse) 12%, transparent);
-  --tree-color-border-default: color-mix(in srgb, var(--tree-color-text-inverse) 24%, transparent);
-  --tree-color-border-strong: color-mix(in srgb, var(--tree-color-text-inverse) 40%, transparent);
+  --tree-color-text-muted: color-mix(in srgb, var(--tree-color-text-inverse) 72%, var(--t-card-solid-surface));
+  --tree-color-bg-primary: var(--t-card-solid-surface);
+  --tree-color-bg-surface: color-mix(in srgb, var(--tree-color-text-inverse) 8%, var(--t-card-solid-surface));
+  --tree-color-bg-subtle: color-mix(in srgb, var(--tree-color-text-inverse) 12%, var(--t-card-solid-surface));
+  --tree-color-border-default: color-mix(in srgb, var(--tree-color-text-inverse) 24%, var(--t-card-solid-surface));
+  --tree-color-border-strong: color-mix(in srgb, var(--tree-color-text-inverse) 40%, var(--t-card-solid-surface));
 }
 
 .t-card--inset {
@@ -3546,7 +3551,8 @@
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  overflow: hidden;
+  /* No overflow: hidden here — it would clip the status dot, which sits on the
+     bounding-box corner, outside the circular mask. Media layers clip themselves. */
   border-radius: var(--tree-radius-pill);
   background: var(--tree-color-bg-subtle);
   color: var(--tree-color-text-muted);
@@ -3587,6 +3593,8 @@
   justify-content: center;
   width: 100%;
   height: 100%;
+  border-radius: inherit;
+  overflow: hidden;
   line-height: 1;
 }
 
@@ -3599,7 +3607,7 @@
   min-width: 8px;
   min-height: 8px;
   border-radius: var(--tree-radius-pill);
-  border: 2px solid var(--tree-color-bg-primary);
+  border: 2px solid var(--tree-color-bg-surface);
   background: var(--tree-color-text-muted);
 }
 

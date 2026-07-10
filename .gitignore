@@ -8,7 +8,6 @@ storybook-static
 site
 .DS_Store
 .idea
-.vscode
 .pnpm-store
 .turbo
 *.log

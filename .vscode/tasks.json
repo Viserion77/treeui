@@ -1,0 +1,121 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    // ── Rodar localmente ────────────────────────────────────────────────
+    {
+      "label": "Dev: Storybook Vue (6006)",
+      "detail": "Builda os packages e sobe o Storybook do @treeui/docs em http://localhost:6006",
+      "type": "shell",
+      "command": "pnpm dev",
+      "icon": { "id": "book", "color": "terminal.ansiGreen" },
+      "isBackground": true,
+      "problemMatcher": [],
+      "presentation": {
+        "panel": "dedicated",
+        "group": "dev",
+        "reveal": "always",
+        "clear": true
+      }
+    },
+    {
+      "label": "Dev: Storybook React (6007)",
+      "detail": "Sobe o Storybook do @treeui/docs-react em http://localhost:6007 (rode o build de packages antes)",
+      "type": "shell",
+      "command": "pnpm --filter @treeui/docs-react docs:dev",
+      "icon": { "id": "book", "color": "terminal.ansiCyan" },
+      "isBackground": true,
+      "problemMatcher": [],
+      "presentation": {
+        "panel": "dedicated",
+        "group": "dev",
+        "reveal": "always",
+        "clear": true
+      }
+    },
+    {
+      "label": "Dev: Landing",
+      "detail": "Sobe a landing page (@treeui/landing) com Vite",
+      "type": "shell",
+      "command": "pnpm --filter @treeui/landing dev",
+      "icon": { "id": "globe", "color": "terminal.ansiMagenta" },
+      "isBackground": true,
+      "problemMatcher": [],
+      "presentation": {
+        "panel": "dedicated",
+        "group": "dev",
+        "reveal": "always",
+        "clear": true
+      }
+    },
+    {
+      "label": "Build: packages",
+      "detail": "Builda tokens → utils → icons → vue → react → mcp",
+      "type": "shell",
+      "command": "pnpm build:packages",
+      "icon": { "id": "package", "color": "terminal.ansiBlue" },
+      "problemMatcher": [],
+      "presentation": { "panel": "shared", "clear": true }
+    },
+
+    // ── Validar antes de commitar ───────────────────────────────────────
+    {
+      "label": "Lint",
+      "detail": "ESLint com zero warnings",
+      "type": "shell",
+      "command": "pnpm lint",
+      "icon": { "id": "search", "color": "terminal.ansiYellow" },
+      "problemMatcher": ["$eslint-stylish"],
+      "presentation": { "panel": "shared", "clear": true }
+    },
+    {
+      "label": "Typecheck",
+      "detail": "TypeScript strict em todos os packages e apps",
+      "type": "shell",
+      "command": "pnpm typecheck",
+      "icon": { "id": "symbol-type-parameter", "color": "terminal.ansiBlue" },
+      "problemMatcher": ["$tsc"],
+      "presentation": { "panel": "shared", "clear": true }
+    },
+    {
+      "label": "Test: unit",
+      "detail": "Vitest com coverage",
+      "type": "shell",
+      "command": "pnpm test",
+      "icon": { "id": "beaker", "color": "terminal.ansiMagenta" },
+      "group": { "kind": "test", "isDefault": true },
+      "problemMatcher": [],
+      "presentation": { "panel": "shared", "clear": true }
+    },
+    {
+      "label": "Test: e2e",
+      "detail": "Playwright — rode se mudou interação ou a11y",
+      "type": "shell",
+      "command": "pnpm test:e2e",
+      "icon": { "id": "browser", "color": "terminal.ansiCyan" },
+      "group": "test",
+      "problemMatcher": [],
+      "presentation": { "panel": "shared", "clear": true }
+    },
+    {
+      "label": "Build: completo",
+      "detail": "Build de packages + Storybook",
+      "type": "shell",
+      "command": "pnpm build",
+      "icon": { "id": "tools", "color": "terminal.ansiBlue" },
+      "problemMatcher": [],
+      "presentation": { "panel": "shared", "clear": true }
+    },
+    {
+      "label": "Validar (pré-commit)",
+      "detail": "Quality gate: lint → typecheck → test → build",
+      "type": "shell",
+      "command": "echo 'Tudo verde — pode commitar!'",
+      "icon": { "id": "verified-filled", "color": "terminal.ansiGreen" },
+      "dependsOrder": "sequence",
+      "dependsOn": ["Lint", "Typecheck", "Test: unit", "Build: completo"],
+      "group": { "kind": "build", "isDefault": true },
+      "problemMatcher": [],
+      "presentation": { "panel": "shared" }
+    }
+  ]
+}

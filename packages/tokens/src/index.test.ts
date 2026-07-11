@@ -10,9 +10,9 @@ import {
 describe('@treeui/tokens', () => {
   it('exports the base tokens and themes', () => {
     expect(treeTokens.radius.md).toBe('0.625rem');
-    expect(treeThemes.dark.color.bg.surface).toBe('#162131');
+    expect(treeThemes.dark.color.bg.surface).toBe('#22272e');
     expect(treeTokens.font.size['5xl']).toBe('3rem');
-    expect(treeThemes.light.color.brand.primary).toBe('#2057d4');
+    expect(treeThemes.light.color.brand.primary).toBe('#0969da');
   });
 
   it('creates CSS variables for foundation tokens', () => {

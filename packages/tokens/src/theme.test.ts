@@ -108,6 +108,6 @@ describe('@treeui/tokens theme generator', () => {
     // overridden value
     expect(css).toContain('--tree-color-brand-primary: #7c3aed;');
     // untouched neutrals inherited from the dark base
-    expect(css).toContain('--tree-color-bg-surface: #162131;');
+    expect(css).toContain('--tree-color-bg-surface: #22272e;');
   });
 });

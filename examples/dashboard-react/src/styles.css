@@ -144,6 +144,225 @@ body {
   letter-spacing: -0.02em;
 }
 
+.stat__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--tree-space-2);
+  width: 100%;
+}
+
+.kpi-spark {
+  flex-shrink: 1;
+  min-width: 0;
+}
+
+.kpi-spark__area {
+  fill: var(--tree-color-brand-primary);
+  opacity: 0.14;
+}
+
+.kpi-spark__line {
+  fill: none;
+  stroke: var(--tree-color-brand-primary);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.kpi-spark__dot {
+  fill: var(--tree-color-brand-primary);
+}
+
+.board {
+  display: grid;
+  grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
+  gap: var(--tree-space-5);
+  align-items: start;
+}
+
+.board__main,
+.board__side {
+  display: grid;
+  gap: var(--tree-space-5);
+  min-width: 0;
+}
+
+.card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--tree-space-3);
+  width: 100%;
+}
+
+/* Calibrated data-viz accents for the sessions chart. Same hue per channel in
+   both themes; each set passes CVD separation and 3:1 contrast on its surface. */
+.channels {
+  display: grid;
+  gap: var(--tree-space-3);
+  --example-chart-1: #0969da;
+  --example-chart-2: #1a7f37;
+  --example-chart-3: #8250df;
+  --example-chart-4: #bc4c00;
+  --example-chart-5: #bf3989;
+}
+
+[data-tree-theme='dark'] .channels {
+  --example-chart-1: #4c8fe6;
+  --example-chart-2: #54a857;
+  --example-chart-3: #986ee2;
+  --example-chart-4: #b78a26;
+  --example-chart-5: #e0625a;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-tree-theme='light']) .channels {
+    --example-chart-1: #4c8fe6;
+    --example-chart-2: #54a857;
+    --example-chart-3: #986ee2;
+    --example-chart-4: #b78a26;
+    --example-chart-5: #e0625a;
+  }
+}
+
+.channels__plot {
+  position: relative;
+  height: 13rem;
+  padding-left: var(--tree-space-8);
+}
+
+.channels__gridline {
+  position: absolute;
+  left: var(--tree-space-8);
+  right: 0;
+  border-top: var(--tree-border-width-subtle) solid var(--tree-color-border-default);
+  opacity: 0.6;
+}
+
+.channels__tick {
+  position: absolute;
+  right: calc(100% + var(--tree-space-2));
+  transform: translateY(-50%);
+  font-size: var(--tree-font-size-xs);
+  color: var(--tree-color-text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.channels__cols {
+  position: absolute;
+  inset: 0 0 0 var(--tree-space-8);
+  display: flex;
+  justify-content: space-around;
+}
+
+.channels__col {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: center;
+  gap: var(--tree-space-1);
+  width: 2.5rem;
+}
+
+.channels__total {
+  font-size: var(--tree-font-size-xs);
+  color: var(--tree-color-text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.channels__stack {
+  display: flex;
+  flex-direction: column-reverse;
+  gap: 2px;
+  width: 100%;
+}
+
+.channels__seg {
+  flex-basis: 0;
+  border-radius: 2px;
+  min-height: 2px;
+}
+
+.channels__seg:last-child {
+  border-radius: 4px 4px 2px 2px;
+}
+
+.channels__months {
+  display: flex;
+  justify-content: space-around;
+  padding-left: var(--tree-space-8);
+  font-size: var(--tree-font-size-xs);
+  color: var(--tree-color-text-muted);
+}
+
+.channels__months span {
+  width: 2.5rem;
+  text-align: center;
+}
+
+.channels__legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--tree-space-1) var(--tree-space-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: var(--tree-font-size-xs);
+  color: var(--tree-color-text-muted);
+}
+
+.channels__legend li {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--tree-space-1);
+}
+
+.channels__legend i {
+  width: 9px;
+  height: 9px;
+  border-radius: 3px;
+}
+
+.form {
+  display: grid;
+  gap: var(--tree-space-4);
+}
+
+.form__field {
+  display: grid;
+  gap: var(--tree-space-1);
+}
+
+.form__label {
+  font-size: var(--tree-font-size-sm);
+  font-weight: var(--tree-font-weight-semibold, 600);
+}
+
+.form__hint {
+  font-size: var(--tree-font-size-xs);
+  color: var(--tree-color-text-muted);
+}
+
+.form__error {
+  font-size: var(--tree-font-size-xs);
+  color: var(--tree-color-status-error);
+  font-weight: var(--tree-font-weight-medium, 500);
+}
+
+.form-foot {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--tree-space-2);
+  width: 100%;
+}
+
+@media (max-width: 960px) {
+  .board {
+    grid-template-columns: 1fr;
+  }
+}
+
 .orders-toolbar {
   display: flex;
   align-items: center;

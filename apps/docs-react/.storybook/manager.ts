@@ -4,8 +4,8 @@ import { create } from 'storybook/theming/create';
 addons.setConfig({
   theme: create({
     base: 'light',
-    colorPrimary: '#2057d4',
-    colorSecondary: '#2057d4',
+    colorPrimary: '#0969da',
+    colorSecondary: '#0969da',
     brandTitle: 'TreeUI · React',
     brandUrl: '../',
     brandImage: './treeui-wordmark.svg',

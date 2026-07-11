@@ -1,5 +1,12 @@
 # @treeui/vue
 
+## 0.11.0
+
+### Patch Changes
+
+- Updated dependencies [54afe01]
+  - @treeui/tokens@0.11.0
+
 ## 0.10.0
 
 ### Minor Changes

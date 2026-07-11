@@ -1,6 +1,6 @@
 {
   "name": "@treeui/react",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "React component package for TreeUI.",
   "type": "module",
   "sideEffects": [

@@ -27,8 +27,13 @@ describe('@treeui/mcp catalog', () => {
 
   it('finds recipes for shell layout', () => {
     const results = searchRecipes('sidebar app shell');
+    const ids = results.map((result) => result.recipe.id);
 
-    expect(results[0]?.recipe.id).toBe('sidebar-shell');
+    // Both shell recipes should surface for a shell-layout query.
+    expect(ids).toContain('app-shell');
+    expect(ids).toContain('sidebar-shell');
+    // The top hit is one of the shell recipes.
+    expect(['app-shell', 'sidebar-shell']).toContain(results[0]?.recipe.id);
   });
 
   it('searches components by semantic keywords', () => {

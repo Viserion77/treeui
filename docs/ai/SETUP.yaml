@@ -81,14 +81,22 @@ component_setup:
       - "Bind `modelValue` to `File[]`."
       - "Use `accept`, `multiple`, and size limits in the app layer to constrain uploads."
 
+  TAppShell:
+    notes:
+      - "Mount at the app root; it fills the viewport (100dvh, full width) and scrolls its content region independently."
+      - "Put navigation in the `sidebar` slot (e.g. `TNavMenu`) — it inherits collapsed state from the shell provider like `TSidebar`."
+      - "Leave `mobile` unset to auto-switch to an off-canvas drawer at `breakpoint`, or bind `mobile` to control it explicitly."
+      - "Use `v-model:collapsed` for the desktop rail and `v-model:sidebarOpen` for the mobile drawer when the app persists layout state."
+
   TSidebar:
     notes:
       - "Pair with `TNavMenu` for app-section navigation."
       - "Use controlled `collapsed` state when the app shell persists layout preferences."
+      - "Prefer `TAppShell` when you also want full-viewport sizing, a top header, and a responsive mobile drawer."
 
   TNavMenu:
     notes:
-      - "When nested inside `TSidebar`, `collapsed` can be inherited from the sidebar provider."
+      - "When nested inside `TSidebar` or `TAppShell`, `collapsed` can be inherited from the sidebar provider."
 
   TTreeView:
     notes:
@@ -120,6 +128,7 @@ app_patterns:
   common_compositions:
     - "TFormField + input-like control"
     - "TGrid + TStat"
+    - "TAppShell + TNavMenu"
     - "TSidebar + TNavMenu"
     - "TTable + TPagination"
     - "TPricing + TPricingCard"

@@ -6,6 +6,7 @@ import TStack from './TStack.vue';
 import TNavbar from './TNavbar.vue';
 import TNavMenu from './TNavMenu.vue';
 import TSidebar from './TSidebar.vue';
+import TAppShell from './TAppShell.vue';
 
 describe('Milestone 2 components', () => {
   it('renders container with sizing and polymorphic tag', () => {
@@ -145,6 +146,118 @@ describe('Milestone 2 components', () => {
     expect(wrapper.emitted('update:collapsed')?.[0]).toEqual([true]);
     expect(wrapper.classes()).toContain('is-collapsed');
     expect(wrapper.find('.t-nav-menu').classes()).toContain('is-collapsed');
+
+    wrapper.unmount();
+  });
+
+  it('renders app shell regions and full-viewport desktop layout', () => {
+    const wrapper = mount(TAppShell, {
+      props: {
+        side: 'left',
+      },
+      slots: {
+        header: '<strong>Brand</strong>',
+        sidebar: '<nav>Navigation</nav>',
+        default: '<p>Main content</p>',
+      },
+    });
+
+    expect(wrapper.classes()).toContain('t-app-shell');
+    expect(wrapper.classes()).toContain('t-app-shell--left');
+    expect(wrapper.classes()).not.toContain('is-mobile');
+    expect(wrapper.attributes('data-mobile')).toBe('false');
+
+    // Desktop keeps the sidebar in-flow (no overlay) and shows every region.
+    expect(wrapper.find('.t-app-shell__header').text()).toContain('Brand');
+    expect(wrapper.find('.t-app-shell__sidebar').text()).toContain('Navigation');
+    expect(wrapper.find('.t-app-shell__main').text()).toContain('Main content');
+    expect(wrapper.find('.t-app-shell__menu-button').exists()).toBe(false);
+    expect(wrapper.find('.t-app-shell__overlay').exists()).toBe(false);
+  });
+
+  it('provides collapsed state to a nested nav menu on desktop', async () => {
+    const wrapper = mount(TAppShell, {
+      props: {
+        collapsible: true,
+        defaultCollapsed: true,
+      },
+      slots: {
+        sidebar: `
+          <TNavMenu
+            aria-label="Nav"
+            :items="[
+              { label: 'Overview', value: 'overview', shortLabel: 'O' },
+              { label: 'Projects', value: 'projects', shortLabel: 'P' }
+            ]"
+            model-value="overview"
+          />
+        `,
+      },
+      global: {
+        components: {
+          TNavMenu,
+        },
+      },
+    });
+
+    expect(wrapper.classes()).toContain('is-collapsed');
+    expect(wrapper.find('.t-nav-menu').classes()).toContain('is-collapsed');
+  });
+
+  it('switches the sidebar to an off-canvas drawer in mobile mode', async () => {
+    const wrapper = mount(TAppShell, {
+      attachTo: document.body,
+      props: {
+        mobile: true,
+      },
+      slots: {
+        sidebar: '<nav>Mobile navigation</nav>',
+        default: '<p>Main content</p>',
+      },
+    });
+
+    expect(wrapper.classes()).toContain('is-mobile');
+    expect(wrapper.attributes('data-mobile')).toBe('true');
+    // The in-flow sidebar is removed; a menu button appears instead.
+    expect(wrapper.find('.t-app-shell__sidebar').exists()).toBe(false);
+    expect(wrapper.find('.t-app-shell__menu-button').exists()).toBe(true);
+    expect(wrapper.find('.t-app-shell__drawer').exists()).toBe(false);
+
+    await wrapper.get('.t-app-shell__menu-button').trigger('click');
+    await nextTick();
+
+    expect(wrapper.emitted('update:sidebarOpen')?.[0]).toEqual([true]);
+
+    const drawer = wrapper.find('.t-app-shell__drawer');
+    expect(drawer.exists()).toBe(true);
+    expect(drawer.attributes('role')).toBe('dialog');
+    expect(drawer.attributes('aria-modal')).toBe('true');
+    expect(drawer.text()).toContain('Mobile navigation');
+
+    wrapper.unmount();
+  });
+
+  it('closes the mobile drawer on Escape and backdrop click', async () => {
+    const wrapper = mount(TAppShell, {
+      attachTo: document.body,
+      props: {
+        mobile: true,
+        defaultSidebarOpen: true,
+      },
+      slots: {
+        sidebar: '<nav>Mobile navigation</nav>',
+      },
+    });
+
+    expect(wrapper.find('.t-app-shell__drawer').exists()).toBe(true);
+
+    await wrapper
+      .get('.t-app-shell__drawer')
+      .trigger('keydown', { key: 'Escape' });
+    await nextTick();
+
+    expect(wrapper.emitted('update:sidebarOpen')?.[0]).toEqual([false]);
+    expect(wrapper.find('.t-app-shell__drawer').exists()).toBe(false);
 
     wrapper.unmount();
   });

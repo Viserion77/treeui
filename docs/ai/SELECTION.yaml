@@ -132,6 +132,22 @@ component_profiles:
       - component: TEmptyState
         when: "The screen has no data and needs stronger guidance."
 
+  TAppShell:
+    keywords: [app shell, layout, dashboard, admin, header sidebar, full screen, responsive shell, off-canvas]
+    use_when:
+      - "You need a full-viewport application layout with a header, a side navigation, and a fluid content area."
+      - "The layout should use the entire page width (not a centered max-width) and switch the sidebar to an off-canvas drawer on small screens."
+    avoid_when:
+      - "You only need one region (just a top bar, or just a side rail) — compose TNavbar or TSidebar directly."
+      - "The page content should be centered with a readable max width — use TContainer inside the shell content instead."
+    alternatives:
+      - component: TSidebar
+        when: "You want a standalone collapsible side rail without the header/content orchestration or responsive drawer."
+      - component: TNavbar
+        when: "You only need the top application bar."
+      - component: TDrawer
+        when: "You need a general temporary overlay panel rather than the shell's responsive navigation."
+
   TCard:
     keywords: [card, panel, surface, section]
     use_when:

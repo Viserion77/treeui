@@ -127,6 +127,14 @@ form_contract:
   events:
     - update:modelValue
 
+responsive_contract:
+  props:
+    - mobile
+    - breakpoint
+  used_by:
+    - TAppShell
+  rule: "`mobile` is an optional boolean override; when left undefined the component derives the mode from `breakpoint` (a CSS max-width). An explicit `mobile` value always wins over the breakpoint."
+
 accessibility_baseline:
   focus_visible: true
   keyboard_support: true

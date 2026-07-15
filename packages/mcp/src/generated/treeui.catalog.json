@@ -1,7 +1,7 @@
 {
-  "generatedAt": "2026-07-10T23:28:05.015Z",
+  "generatedAt": "2026-07-14T23:26:01.467Z",
   "packageName": "@treeui/vue",
-  "packageVersion": "0.10.0",
+  "packageVersion": "0.12.0",
   "decisionGuides": [
     {
       "id": "single-choice",
@@ -249,10 +249,27 @@
       ]
     },
     {
+      "id": "app-shell",
+      "name": "Full-viewport application shell",
+      "useWhen": [
+        "The app needs a header plus side navigation that fills the whole screen and adapts to mobile.",
+        "The layout must use the full page width on large monitors, not a centered column."
+      ],
+      "compose": [
+        "TAppShell",
+        "TNavMenu"
+      ],
+      "notes": [
+        "`TAppShell` orchestrates the header, sidebar, and fluid content in one component; put a `TNavMenu` in its `sidebar` slot and it inherits collapsed state automatically.",
+        "Leave `mobile` unset to auto-switch at `breakpoint` (default 768px), or bind it to force mobile; the sidebar becomes an off-canvas drawer with a header menu button.",
+        "Mount it at the app root. Wrap only inner regions in `TContainer` if a specific area needs a constrained reading width."
+      ]
+    },
+    {
       "id": "sidebar-shell",
       "name": "Sidebar application shell",
       "useWhen": [
-        "The screen needs persistent section navigation."
+        "The screen needs persistent section navigation and you are composing the shell by hand."
       ],
       "compose": [
         "TSidebar",
@@ -261,7 +278,8 @@
         "TContainer"
       ],
       "notes": [
-        "Let `TNavMenu` inherit collapsed state from `TSidebar` when possible."
+        "Let `TNavMenu` inherit collapsed state from `TSidebar` when possible.",
+        "Prefer `TAppShell` (recipe `app-shell`) when you also need full-viewport sizing and a responsive mobile drawer."
       ]
     },
     {
@@ -517,17 +535,27 @@
           "Use `accept`, `multiple`, and size limits in the app layer to constrain uploads."
         ]
       },
+      "TAppShell": {
+        "required": [],
+        "notes": [
+          "Mount at the app root; it fills the viewport (100dvh, full width) and scrolls its content region independently.",
+          "Put navigation in the `sidebar` slot (e.g. `TNavMenu`) — it inherits collapsed state from the shell provider like `TSidebar`.",
+          "Leave `mobile` unset to auto-switch to an off-canvas drawer at `breakpoint`, or bind `mobile` to control it explicitly.",
+          "Use `v-model:collapsed` for the desktop rail and `v-model:sidebarOpen` for the mobile drawer when the app persists layout state."
+        ]
+      },
       "TSidebar": {
         "required": [],
         "notes": [
           "Pair with `TNavMenu` for app-section navigation.",
-          "Use controlled `collapsed` state when the app shell persists layout preferences."
+          "Use controlled `collapsed` state when the app shell persists layout preferences.",
+          "Prefer `TAppShell` when you also want full-viewport sizing, a top header, and a responsive mobile drawer."
         ]
       },
       "TNavMenu": {
         "required": [],
         "notes": [
-          "When nested inside `TSidebar`, `collapsed` can be inherited from the sidebar provider."
+          "When nested inside `TSidebar` or `TAppShell`, `collapsed` can be inherited from the sidebar provider."
         ]
       },
       "TTreeView": {
@@ -574,6 +602,7 @@
       "commonCompositions": [
         "TFormField + input-like control",
         "TGrid + TStat",
+        "TAppShell + TNavMenu",
         "TSidebar + TNavMenu",
         "TTable + TPagination",
         "TPricing + TPricingCard"
@@ -733,6 +762,211 @@
         "notes": []
       },
       "recipes": []
+    },
+    {
+      "name": "TAppShell",
+      "aliases": [],
+      "package": "@treeui/vue",
+      "kind": "layout",
+      "category": "Layout",
+      "status": "available",
+      "purpose": "Full-viewport application shell with a top header, a persistent side navigation, and a fluid content area that collapses the sidebar into an off-canvas drawer on small screens.",
+      "sourceFile": "packages/vue/src/components/TAppShell.vue",
+      "storyFile": "apps/docs/src/stories/AppShell.stories.ts",
+      "storyTitle": "Components/Layout/AppShell",
+      "manifestFile": "docs/ai/COMPONENTS/app-shell.yaml",
+      "props": [
+        {
+          "name": "as",
+          "type": "string",
+          "default": "div"
+        },
+        {
+          "name": "side",
+          "type": "TSidebarSide",
+          "default": "left",
+          "values": [
+            "left",
+            "right"
+          ]
+        },
+        {
+          "name": "sidebarWidth",
+          "type": "string",
+          "default": "17.5rem"
+        },
+        {
+          "name": "collapsedWidth",
+          "type": "string",
+          "default": "4.75rem"
+        },
+        {
+          "name": "collapsible",
+          "type": "boolean",
+          "default": "false"
+        },
+        {
+          "name": "collapsed",
+          "type": "boolean",
+          "default": "undefined"
+        },
+        {
+          "name": "defaultCollapsed",
+          "type": "boolean",
+          "default": "false"
+        },
+        {
+          "name": "mobile",
+          "type": "boolean",
+          "default": "undefined"
+        },
+        {
+          "name": "breakpoint",
+          "type": "string",
+          "default": "768px"
+        },
+        {
+          "name": "sidebarOpen",
+          "type": "boolean",
+          "default": "undefined"
+        },
+        {
+          "name": "defaultSidebarOpen",
+          "type": "boolean",
+          "default": "false"
+        },
+        {
+          "name": "closeOnEscape",
+          "type": "boolean",
+          "default": "true"
+        },
+        {
+          "name": "closeOnOverlay",
+          "type": "boolean",
+          "default": "true"
+        },
+        {
+          "name": "showMenuButton",
+          "type": "boolean",
+          "default": "true"
+        },
+        {
+          "name": "menuLabel",
+          "type": "string",
+          "default": "Open menu"
+        },
+        {
+          "name": "closeLabel",
+          "type": "string",
+          "default": "Close menu"
+        },
+        {
+          "name": "sidebarLabel",
+          "type": "string",
+          "default": "Sidebar"
+        }
+      ],
+      "events": [
+        {
+          "name": "update:collapsed"
+        },
+        {
+          "name": "collapse-change"
+        },
+        {
+          "name": "update:sidebarOpen"
+        },
+        {
+          "name": "sidebar-open-change"
+        }
+      ],
+      "slots": [
+        {
+          "name": "header"
+        },
+        {
+          "name": "sidebar"
+        },
+        {
+          "name": "default"
+        },
+        {
+          "name": "menu-icon"
+        }
+      ],
+      "a11y": [
+        "role: dialog",
+        "aria_modal: true",
+        "focus_trap: true",
+        "restores_focus_on_close: true",
+        "escape_closes_when_enabled: true",
+        "menu_button_aria_expanded: true",
+        "menu_button_aria_controls_drawer: true",
+        "sidebar_labelled_by_sidebar_label: true"
+      ],
+      "behavior": [
+        "fills_viewport_full_width_and_height: true",
+        "header_spans_full_width_above_sidebar_and_content: true",
+        "content_area_scrolls_independently: true",
+        "auto_switches_to_mobile_at_breakpoint_when_mobile_undefined: true",
+        "mobile_prop_forces_mobile_mode: true",
+        "mobile_sidebar_becomes_off_canvas_drawer: true",
+        "auto_menu_button_in_header_on_mobile: true",
+        "controlled_and_uncontrolled_collapsed_state: true",
+        "controlled_and_uncontrolled_sidebar_open_state: true",
+        "provides_collapsed_state_to_descendants: true",
+        "drawer_reports_collapsed_false_to_descendants_and_slots: true",
+        "left_and_right_variants: true",
+        "locks_body_scroll_while_drawer_open: true",
+        "overlay_click_closes_when_enabled: true",
+        "exposes_slot_props_with_mobile_collapsed_and_toggles: true"
+      ],
+      "selection": {
+        "keywords": [
+          "app shell",
+          "layout",
+          "dashboard",
+          "admin",
+          "header sidebar",
+          "full screen",
+          "responsive shell",
+          "off-canvas"
+        ],
+        "useWhen": [
+          "You need a full-viewport application layout with a header, a side navigation, and a fluid content area.",
+          "The layout should use the entire page width (not a centered max-width) and switch the sidebar to an off-canvas drawer on small screens."
+        ],
+        "avoidWhen": [
+          "You only need one region (just a top bar, or just a side rail) — compose TNavbar or TSidebar directly.",
+          "The page content should be centered with a readable max width — use TContainer inside the shell content instead."
+        ],
+        "alternatives": [
+          {
+            "component": "TSidebar",
+            "when": "You want a standalone collapsible side rail without the header/content orchestration or responsive drawer."
+          },
+          {
+            "component": "TNavbar",
+            "when": "You only need the top application bar."
+          },
+          {
+            "component": "TDrawer",
+            "when": "You need a general temporary overlay panel rather than the shell's responsive navigation."
+          }
+        ]
+      },
+      "setup": {
+        "required": [],
+        "notes": [
+          "Mount at the app root; it fills the viewport (100dvh, full width) and scrolls its content region independently.",
+          "Put navigation in the `sidebar` slot (e.g. `TNavMenu`) — it inherits collapsed state from the shell provider like `TSidebar`.",
+          "Leave `mobile` unset to auto-switch to an off-canvas drawer at `breakpoint`, or bind `mobile` to control it explicitly.",
+          "Use `v-model:collapsed` for the desktop rail and `v-model:sidebarOpen` for the mobile drawer when the app persists layout state."
+        ]
+      },
+      "recipes": [
+        "app-shell"
+      ]
     },
     {
       "name": "TAvatar",
@@ -3739,10 +3973,11 @@
       "setup": {
         "required": [],
         "notes": [
-          "When nested inside `TSidebar`, `collapsed` can be inherited from the sidebar provider."
+          "When nested inside `TSidebar` or `TAppShell`, `collapsed` can be inherited from the sidebar provider."
         ]
       },
       "recipes": [
+        "app-shell",
         "sidebar-shell"
       ]
     },
@@ -4851,7 +5086,8 @@
         "required": [],
         "notes": [
           "Pair with `TNavMenu` for app-section navigation.",
-          "Use controlled `collapsed` state when the app shell persists layout preferences."
+          "Use controlled `collapsed` state when the app shell persists layout preferences.",
+          "Prefer `TAppShell` when you also want full-viewport sizing, a top header, and a responsive mobile drawer."
         ]
       },
       "recipes": [

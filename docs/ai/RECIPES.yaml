@@ -36,10 +36,23 @@ recipes:
       - "Keep both values in `YYYY-MM-DDTHH:mm` format."
       - "Set end `min` from the selected start time when appropriate."
 
+  - id: app-shell
+    name: "Full-viewport application shell"
+    use_when:
+      - "The app needs a header plus side navigation that fills the whole screen and adapts to mobile."
+      - "The layout must use the full page width on large monitors, not a centered column."
+    compose:
+      - TAppShell
+      - TNavMenu
+    notes:
+      - "`TAppShell` orchestrates the header, sidebar, and fluid content in one component; put a `TNavMenu` in its `sidebar` slot and it inherits collapsed state automatically."
+      - "Leave `mobile` unset to auto-switch at `breakpoint` (default 768px), or bind it to force mobile; the sidebar becomes an off-canvas drawer with a header menu button."
+      - "Mount it at the app root. Wrap only inner regions in `TContainer` if a specific area needs a constrained reading width."
+
   - id: sidebar-shell
     name: "Sidebar application shell"
     use_when:
-      - "The screen needs persistent section navigation."
+      - "The screen needs persistent section navigation and you are composing the shell by hand."
     compose:
       - TSidebar
       - TNavMenu
@@ -47,6 +60,7 @@ recipes:
       - TContainer
     notes:
       - "Let `TNavMenu` inherit collapsed state from `TSidebar` when possible."
+      - "Prefer `TAppShell` (recipe `app-shell`) when you also need full-viewport sizing and a responsive mobile drawer."
 
   - id: stat-grid
     name: "Dashboard metric grid"

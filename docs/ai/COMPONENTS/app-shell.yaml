@@ -1,0 +1,118 @@
+name: TAppShell
+source_file: packages/vue/src/components/TAppShell.vue
+package: "@treeui/vue"
+kind: layout
+status: available
+purpose: "Full-viewport application shell with a top header, a persistent side navigation, and a fluid content area that collapses the sidebar into an off-canvas drawer on small screens."
+
+props:
+  as:
+    type: string
+    default: div
+  side:
+    type: TSidebarSide
+    default: left
+    values: [left, right]
+  sidebarWidth:
+    type: string
+    default: 17.5rem
+  collapsedWidth:
+    type: string
+    default: 4.75rem
+  collapsible:
+    type: boolean
+    default: false
+  collapsed:
+    type: boolean
+    default: undefined
+  defaultCollapsed:
+    type: boolean
+    default: false
+  mobile:
+    type: boolean
+    default: undefined
+  breakpoint:
+    type: string
+    default: 768px
+  sidebarOpen:
+    type: boolean
+    default: undefined
+  defaultSidebarOpen:
+    type: boolean
+    default: false
+  closeOnEscape:
+    type: boolean
+    default: true
+  closeOnOverlay:
+    type: boolean
+    default: true
+  showMenuButton:
+    type: boolean
+    default: true
+  menuLabel:
+    type: string
+    default: Open menu
+  closeLabel:
+    type: string
+    default: Close menu
+  sidebarLabel:
+    type: string
+    default: Sidebar
+
+events:
+  - update:collapsed
+  - collapse-change
+  - update:sidebarOpen
+  - sidebar-open-change
+
+slots:
+  - header
+  - sidebar
+  - default
+  - menu-icon
+
+a11y:
+  role: dialog
+  aria_modal: true
+  focus_trap: true
+  restores_focus_on_close: true
+  escape_closes_when_enabled: true
+  menu_button_aria_expanded: true
+  menu_button_aria_controls_drawer: true
+  sidebar_labelled_by_sidebar_label: true
+
+behavior:
+  fills_viewport_full_width_and_height: true
+  header_spans_full_width_above_sidebar_and_content: true
+  content_area_scrolls_independently: true
+  auto_switches_to_mobile_at_breakpoint_when_mobile_undefined: true
+  mobile_prop_forces_mobile_mode: true
+  mobile_sidebar_becomes_off_canvas_drawer: true
+  auto_menu_button_in_header_on_mobile: true
+  controlled_and_uncontrolled_collapsed_state: true
+  controlled_and_uncontrolled_sidebar_open_state: true
+  provides_collapsed_state_to_descendants: true
+  drawer_reports_collapsed_false_to_descendants_and_slots: true
+  left_and_right_variants: true
+  locks_body_scroll_while_drawer_open: true
+  overlay_click_closes_when_enabled: true
+  exposes_slot_props_with_mobile_collapsed_and_toggles: true
+
+usage:
+  vue_pattern: "Supports v-model:collapsed (desktop rail) and v-model:sidebarOpen (mobile drawer). Header and sidebar slots receive { mobile, collapsed, sidebarOpen, toggleSidebar, closeSidebar, toggleCollapsed }. Place a TNavMenu in the sidebar slot; it inherits collapsed state automatically. Set collapsible to enable the desktop rail. The shell fills 100dvh and 100% width, so mount it at the app root and do not wrap its content in a max-width TContainer unless a specific region needs constrained reading width."
+
+example: |
+  <TAppShell collapsible>
+    <template #header="{ mobile, toggleCollapsed }">
+      <strong>TreeUI</strong>
+    </template>
+    <template #sidebar="{ closeSidebar }">
+      <TNavMenu
+        aria-label="Workspace navigation"
+        :items="items"
+        v-model="section"
+        @update:model-value="closeSidebar"
+      />
+    </template>
+    <RouterView />
+  </TAppShell>

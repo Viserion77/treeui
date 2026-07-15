@@ -5814,3 +5814,246 @@ a.t-nav-menu__item.is-disabled {
   line-height: var(--tree-font-lineHeight-ui);
   color: var(--tree-color-text-muted);
 }
+
+/* ── App Shell ────────────────────────────────────────── */
+
+.t-app-shell {
+  --tree-app-shell-sidebar-width: 17.5rem;
+  --tree-app-shell-collapsed-width: 4.75rem;
+  --tree-app-shell-track: var(--tree-app-shell-sidebar-width);
+  /* The header + sidebar share one continuous "frame" surface (no divider
+     between them); the content area is a distinct panel that tucks under the
+     frame with a rounded inner corner. */
+  --tree-app-shell-frame: color-mix(
+    in srgb,
+    var(--tree-color-bg-surface) 88%,
+    var(--tree-color-bg-subtle)
+  );
+  --tree-app-shell-content: var(--tree-color-bg-primary);
+
+  display: grid;
+  grid-template-columns: var(--tree-app-shell-track) minmax(0, 1fr);
+  grid-template-rows: auto minmax(0, 1fr);
+  grid-template-areas:
+    'header header'
+    'sidebar main';
+  inline-size: 100%;
+  block-size: 100vh;
+  block-size: 100dvh;
+  overflow: hidden;
+  background: var(--tree-app-shell-frame);
+  color: var(--tree-color-text-primary);
+  font-family: var(--tree-font-family-sans);
+  transition: grid-template-columns var(--tree-motion-duration-moderate)
+    var(--tree-motion-easing-standard);
+}
+
+.t-app-shell--right {
+  grid-template-columns: minmax(0, 1fr) var(--tree-app-shell-track);
+  grid-template-areas:
+    'header header'
+    'main sidebar';
+}
+
+.t-app-shell.is-collapsed {
+  --tree-app-shell-track: var(--tree-app-shell-collapsed-width);
+}
+
+/* Mobile: sidebar leaves the grid and is presented as an off-canvas overlay. */
+.t-app-shell.is-mobile {
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-areas:
+    'header'
+    'main';
+}
+
+.t-app-shell__header {
+  grid-area: header;
+  display: flex;
+  align-items: center;
+  gap: var(--tree-space-3);
+  min-inline-size: 0;
+  min-block-size: 4rem;
+  padding-inline: clamp(var(--tree-space-4), 3vw, var(--tree-space-6));
+  /* Inherits the frame surface from the shell — no divider against the sidebar. */
+  background: transparent;
+}
+
+.t-app-shell__header-content {
+  flex: 1 1 auto;
+  min-inline-size: 0;
+}
+
+.t-app-shell__menu-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  inline-size: 2.75rem;
+  block-size: 2.75rem;
+  margin-inline-start: calc(-1 * var(--tree-space-2));
+  padding: 0;
+  border: none;
+  border-radius: var(--tree-radius-md);
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  transition: background var(--tree-motion-duration-fast)
+    var(--tree-motion-easing-standard);
+}
+
+.t-app-shell__menu-button:hover {
+  background: var(--tree-color-bg-subtle);
+}
+
+.t-app-shell__menu-button:focus-visible {
+  outline: var(--tree-border-width-strong) solid var(--tree-color-focus-ring);
+  outline-offset: 2px;
+}
+
+.t-app-shell__sidebar {
+  grid-area: sidebar;
+  display: flex;
+  flex-direction: column;
+  min-block-size: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  padding: var(--tree-space-4);
+  /* Shares the shell's frame surface — no divider against the header. */
+  background: transparent;
+  transition: padding var(--tree-motion-duration-moderate)
+    var(--tree-motion-easing-standard);
+}
+
+.t-app-shell.is-collapsed .t-app-shell__sidebar {
+  padding-inline: var(--tree-space-3);
+}
+
+.t-app-shell__main {
+  grid-area: main;
+  min-inline-size: 0;
+  min-block-size: 0;
+  overflow: auto;
+  background: var(--tree-app-shell-content);
+}
+
+/* The content panel tucks under the frame with a rounded inner corner
+   (top-left with a left sidebar, top-right with a right sidebar). */
+.t-app-shell--left:not(.is-mobile) .t-app-shell__main {
+  border-start-start-radius: var(--tree-radius-lg);
+}
+
+.t-app-shell--right:not(.is-mobile) .t-app-shell__main {
+  border-start-end-radius: var(--tree-radius-lg);
+}
+
+/* Off-canvas overlay (mobile) */
+.t-app-shell__overlay {
+  position: fixed;
+  inset: 0;
+  z-index: var(--tree-z-modal);
+}
+
+.t-app-shell__backdrop {
+  position: absolute;
+  inset: 0;
+  background: var(--tree-color-overlay);
+  backdrop-filter: blur(4px);
+}
+
+.t-app-shell__drawer {
+  position: absolute;
+  inset-block: 0;
+  inline-size: min(100%, var(--tree-app-shell-sidebar-width));
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  padding: var(--tree-space-3) var(--tree-space-4) var(--tree-space-4);
+  background: color-mix(
+    in srgb,
+    var(--tree-color-bg-surface) 96%,
+    var(--tree-color-bg-subtle)
+  );
+  color: var(--tree-color-text-primary);
+  box-shadow: var(--tree-shadow-md);
+}
+
+.t-app-shell__drawer:focus-visible {
+  outline: none;
+  box-shadow:
+    var(--tree-shadow-md),
+    0 0 0 4px var(--tree-color-focus-ring);
+}
+
+.t-app-shell--left .t-app-shell__drawer {
+  inset-inline-start: 0;
+  border-inline-end: var(--tree-border-width-subtle) solid
+    var(--tree-color-border-default);
+  border-radius: 0 var(--tree-radius-lg) var(--tree-radius-lg) 0;
+}
+
+.t-app-shell--right .t-app-shell__drawer {
+  inset-inline-end: 0;
+  border-inline-start: var(--tree-border-width-subtle) solid
+    var(--tree-color-border-default);
+  border-radius: var(--tree-radius-lg) 0 0 var(--tree-radius-lg);
+}
+
+.t-app-shell__drawer-topbar {
+  display: flex;
+  justify-content: flex-end;
+  min-block-size: 2.75rem;
+}
+
+.t-app-shell__drawer-close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  inline-size: 2.75rem;
+  block-size: 2.75rem;
+  padding: 0;
+  border: none;
+  border-radius: var(--tree-radius-md);
+  background: transparent;
+  color: var(--tree-color-text-muted);
+  cursor: pointer;
+  transition: background var(--tree-motion-duration-fast)
+    var(--tree-motion-easing-standard);
+}
+
+.t-app-shell__drawer-close:hover {
+  background: var(--tree-color-bg-subtle);
+  color: var(--tree-color-text-primary);
+}
+
+.t-app-shell__drawer-close:focus-visible {
+  outline: var(--tree-border-width-strong) solid var(--tree-color-focus-ring);
+  outline-offset: 2px;
+}
+
+.t-app-shell__drawer-body {
+  display: flex;
+  flex-direction: column;
+  min-block-size: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+.t-app-shell-fade-enter-active,
+.t-app-shell-fade-leave-active {
+  transition: opacity var(--tree-motion-duration-moderate)
+    var(--tree-motion-easing-standard);
+}
+
+.t-app-shell-fade-enter-from,
+.t-app-shell-fade-leave-to {
+  opacity: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .t-app-shell,
+  .t-app-shell__sidebar,
+  .t-app-shell-fade-enter-active,
+  .t-app-shell-fade-leave-active {
+    transition: none;
+  }
+}

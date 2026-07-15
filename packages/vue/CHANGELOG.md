@@ -1,5 +1,16 @@
 # @treeui/vue
 
+## 0.12.0
+
+### Minor Changes
+
+- Add `TAppShell`, a full-viewport application layout that pairs a top header with a persistent side navigation and a fluid content area.
+
+  - Fills the entire viewport (`100dvh`, full width) so the content stretches across large monitors instead of sitting in a centered column, while the content region scrolls independently.
+  - Switches the sidebar into an off-canvas drawer when `mobile` is set, or automatically below `breakpoint` (default `768px`) when `mobile` is left undefined. The mobile drawer ships with a header menu button, backdrop, body-scroll lock, focus trap, and Escape-to-close.
+  - Supports a `left`/`right` sidebar, an optional collapsible desktop rail via `v-model:collapsed`, and a controllable mobile drawer via `v-model:sidebarOpen`.
+  - Provides collapsed state to descendants, so a `TNavMenu` placed in the `sidebar` slot adapts automatically, matching `TSidebar`.
+
 ## 0.11.0
 
 ### Patch Changes

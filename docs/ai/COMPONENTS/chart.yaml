@@ -29,7 +29,7 @@ props:
   stacked:
     type: boolean
     default: false
-    note: "Stacks bar series; ignored for line/area."
+    note: "Stacks bar series; ignored for line/area. Negative values are clamped to 0 in stacked mode (grouped mode renders them)."
   showGrid:
     type: boolean
     default: true

@@ -153,8 +153,9 @@ export const treeThemes = {
         info: '#0969da',
       },
       // Categorical data-viz palette. Fixed hue order (blue → orange), validated
-      // for CVD separation and contrast against the light surface. Assign in
-      // order, never cycle a 9th hue — fold extras into "Other".
+      // for CVD separation and contrast against the light surface. Assign in order;
+      // the components cycle after 8 as a fallback, but prefer folding a 9th+
+      // category into "Other".
       chart: {
         1: '#2a78d6',
         2: '#1baf7a',

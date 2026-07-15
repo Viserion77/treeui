@@ -3459,6 +3459,25 @@ describe('TChart', () => {
     expect(table.findAll('thead th')).toHaveLength(5); // "Series" + 4 quarters
   });
 
+  it('keeps the a11y table rectangular when series lengths differ', () => {
+    const wrapper = mount(TChart, {
+      props: {
+        series: [
+          { name: 'Long', data: [1, 2, 3, 4] },
+          { name: 'Short', data: [5, 6] },
+        ],
+        labels: ['A', 'B', 'C', 'D'],
+      },
+    });
+
+    const table = wrapper.find('table.t-chart__a11y');
+    const categoryColumns = table.findAll('thead th').length - 1; // minus the "Series" column
+    expect(categoryColumns).toBe(4);
+    table.findAll('tbody tr').forEach((tr) => {
+      expect(tr.findAll('td')).toHaveLength(categoryColumns);
+    });
+  });
+
   it('renders the empty slot when there is no data', () => {
     const wrapper = mount(TChart, {
       props: { series: [] },

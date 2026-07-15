@@ -37,7 +37,10 @@ const props = withDefaults(
     height?: number;
     /** Smooth (curved) line/area. */
     smooth?: boolean;
-    /** Stack bar series on top of each other instead of grouping side by side. */
+    /**
+     * Stack bar series on top of each other instead of grouping side by side.
+     * Negative values are clamped to 0 in stacked mode (grouped mode renders them).
+     */
     stacked?: boolean;
     /** Draw horizontal gridlines. */
     showGrid?: boolean;
@@ -125,6 +128,12 @@ const validSeries = computed(() => props.series.filter((item) => item.data.lengt
 
 const categoryCount = computed(() =>
   Math.max(0, ...validSeries.value.map((item) => item.data.length)),
+);
+
+// Shared category index range, so the a11y table stays rectangular even when
+// series have different lengths.
+const axisIndices = computed(() =>
+  Array.from({ length: categoryCount.value }, (_, index) => index),
 );
 
 const hasData = computed(() => validSeries.value.length > 0 && categoryCount.value > 0);
@@ -622,11 +631,11 @@ const rootClasses = computed(() => [
             Series
           </th>
           <th
-            v-for="(label, index) in labels.slice(0, categoryCount)"
+            v-for="index in axisIndices"
             :key="index"
             scope="col"
           >
-            {{ label }}
+            {{ labels[index] ?? '' }}
           </th>
         </tr>
       </thead>
@@ -639,10 +648,10 @@ const rootClasses = computed(() => [
             {{ row.name }}
           </th>
           <td
-            v-for="(value, index) in row.data"
+            v-for="index in axisIndices"
             :key="index"
           >
-            {{ formatValue(value) }}
+            {{ row.data[index] === undefined ? '' : formatValue(row.data[index]) }}
           </td>
         </tr>
       </tbody>

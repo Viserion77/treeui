@@ -132,13 +132,32 @@ recipes:
   - id: chart-surface
     name: "Chart surface"
     use_when:
-      - "A screen needs data visualization, but the charting engine should stay external to TreeUI."
+      - "A screen needs data visualization inside a framed, titled surface."
     compose:
       - TCard
       - TStack
-      - external chart library
+      - TChart
+      - TSelect
     notes:
-      - "Use TreeUI for the surrounding surface, headings, badges, filters, and empty/loading states."
+      - "Prefer the native TChart / TDonutChart / TSparkline — no external charting library is required."
+      - "Use TreeUI for the surrounding surface, headings, badges, range filters, and empty/loading states."
+      - "TChart has its own loading and empty slots; you can still wrap it in TCard for the frame."
+      - "Only reach for an external chart engine for chart types TreeUI does not cover yet (e.g. scatter, heatmap)."
+
+  - id: metric-dashboard
+    name: "Metric dashboard"
+    use_when:
+      - "A dashboard shows KPIs alongside trends and breakdowns."
+    compose:
+      - TStat
+      - TSparkline
+      - TChart
+      - TDonutChart
+      - TGrid
+    notes:
+      - "Lead with TStat tiles; embed a TSparkline in a stat's meta slot for the inline trend."
+      - "Use one TChart for the main time series and a TDonutChart for a part-of-whole split."
+      - "Keep series colors stable across the dashboard — rely on the --tree-color-chart-* order, do not remap by rank."
 
   - id: anchored-help
     name: "Anchored help affordance"

@@ -1,0 +1,57 @@
+name: TSparkline
+source_file: packages/vue/src/components/TSparkline.vue
+package: "@treeui/vue"
+kind: data-display
+status: available
+purpose: "Tiny, axis-less inline trend chart (line, area, or bar) sized for stat tiles, table cells, and running text."
+
+props:
+  data:
+    type: "number[]"
+    default: "[]"
+  type:
+    type: "line | area | bar"
+    default: line
+  color:
+    type: string
+    default: "var(--tree-color-chart-1)"
+    note: "Any CSS color."
+  width:
+    type: number
+    default: 120
+  height:
+    type: number
+    default: 32
+  smooth:
+    type: boolean
+    default: false
+    note: "Curved line/area."
+  strokeWidth:
+    type: number
+    default: 2
+    note: "Line/area only."
+  min:
+    type: number
+    default: "data min"
+  max:
+    type: number
+    default: "data max"
+  showLastPoint:
+    type: boolean
+    default: false
+    note: "Marker on the final point (line/area)."
+  ariaLabel:
+    type: string
+    default: "Trend sparkline"
+
+behavior:
+  no_axes_or_legend: true
+  flat_series_renders_centered: true
+  scales_to_intrinsic_width_and_height: true
+
+a11y:
+  - "Renders role=img with an aria-label; pass a specific one for meaningful trends."
+  - "Pair with a visible number — a sparkline supplements a value, it does not replace it."
+
+example: |
+  <TSparkline :data="[12, 18, 9, 22, 30, 24, 28]" type="area" smooth show-last-point />

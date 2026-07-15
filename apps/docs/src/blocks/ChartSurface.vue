@@ -1,10 +1,20 @@
 <script setup lang="ts">
 // ChartSurface — recipe: chart-surface
-// A TreeUI card "surface" that frames an external chart engine: heading, status badge,
-// a range filter, and loading/empty states. The chart itself is a stand-in inline SVG;
-// a real app drops its chart engine (e.g. Chart.js, ECharts, D3) into the marked slot.
+// A TreeUI card "surface" that frames the native TChart: heading, status badge,
+// a range filter, and loading/empty states. No external charting library — the
+// plot is TreeUI's own TChart. Reach for an external engine only for chart types
+// TreeUI does not cover yet (scatter, heatmap, …).
 import { computed, ref } from 'vue';
-import { TBadge, TButton, TCard, TEmptyState, TSelect, TSkeleton, TStack } from '@treeui/vue';
+import {
+  TBadge,
+  TButton,
+  TCard,
+  TChart,
+  TEmptyState,
+  TSelect,
+  TSkeleton,
+  TStack,
+} from '@treeui/vue';
 
 type RangeKey = '7d' | '30d' | '90d';
 
@@ -28,24 +38,8 @@ const loading = ref(false);
 const data = computed(() => series[range.value as RangeKey] ?? []);
 const isEmpty = computed(() => !loading.value && data.value.length === 0);
 
-const maxValue = computed(() => Math.max(1, ...data.value));
-
-// Map the series to evenly spaced bars within a 280x120 viewBox.
-const bars = computed(() => {
-  const count = data.value.length;
-  if (count === 0) return [];
-  const gap = 6;
-  const barWidth = (280 - gap * (count - 1)) / count;
-  return data.value.map((value, index) => {
-    const height = (value / maxValue.value) * 110;
-    return {
-      x: index * (barWidth + gap),
-      y: 120 - height,
-      width: barWidth,
-      height,
-    };
-  });
-});
+const labels = computed(() => data.value.map((_, index) => `D${index + 1}`));
+const chartSeries = computed(() => [{ name: 'Active users', data: data.value }]);
 
 function reload() {
   loading.value = true;
@@ -96,7 +90,7 @@ function reload() {
     <TSkeleton
       v-if="loading"
       width="100%"
-      height="120px"
+      height="160px"
     />
 
     <!-- Empty state -->
@@ -117,30 +111,16 @@ function reload() {
       </template>
     </TEmptyState>
 
-    <!--
-      Chart surface. A real app drops its chart engine here (Chart.js, ECharts, D3, …).
-      This inline SVG is a token-agnostic stand-in so the surface renders without a chart library.
-    -->
-    <svg
+    <!-- Native TreeUI chart — no external charting library. -->
+    <TChart
       v-else
-      viewBox="0 0 280 120"
-      width="100%"
-      height="120"
-      role="img"
-      aria-label="Active users bar chart"
-    >
-      <rect
-        v-for="(bar, index) in bars"
-        :key="index"
-        :x="bar.x"
-        :y="bar.y"
-        :width="bar.width"
-        :height="bar.height"
-        rx="2"
-        fill="currentColor"
-        opacity="0.75"
-      />
-    </svg>
+      type="area"
+      smooth
+      :series="chartSeries"
+      :labels="labels"
+      :height="160"
+      aria-label="Active users over the selected range"
+    />
 
     <template #footer>
       <TStack

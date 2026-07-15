@@ -5,6 +5,7 @@ import {
   TBadge,
   TButton,
   TCard,
+  TChart,
   TFormField,
   TGrid,
   TInput,
@@ -363,7 +364,7 @@ export const ColorField: Story = {
 
 export const ChartSurface: Story = {
   render: () => ({
-    components: { TBadge, TCard, TStack },
+    components: { TBadge, TCard, TChart, TStack },
     template: `
       <div style="max-width: 32rem;">
         <TCard>
@@ -375,22 +376,16 @@ export const ChartSurface: Story = {
           </template>
 
           <TStack gap="var(--tree-space-3)">
-            <svg
-              viewBox="0 0 320 120"
-              role="img"
+            <TChart
+              type="bar"
+              :series="[{ name: 'Sessions', data: [46, 68, 56, 84, 62, 74] }]"
+              :labels="['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun']"
+              :height="180"
               aria-label="Monthly activity bar chart"
-              style="width: 100%; height: auto;"
-            >
-              <rect x="24" y="58" width="32" height="46" rx="8" fill="var(--tree-color-brand-soft)" />
-              <rect x="74" y="36" width="32" height="68" rx="8" fill="var(--tree-color-brand-primary)" />
-              <rect x="124" y="48" width="32" height="56" rx="8" fill="var(--tree-color-brand-soft)" />
-              <rect x="174" y="20" width="32" height="84" rx="8" fill="var(--tree-color-status-success)" />
-              <rect x="224" y="42" width="32" height="62" rx="8" fill="var(--tree-color-brand-soft)" />
-              <rect x="274" y="30" width="32" height="74" rx="8" fill="var(--tree-color-brand-soft)" />
-            </svg>
+            />
 
             <p style="margin: 0; color: var(--tree-color-text-muted); font-size: var(--tree-font-size-sm);">
-              Use TCard, TStack, tokens, and your preferred chart library instead of a TreeUI-specific chart primitive.
+              Frame the native TChart in TCard + TStack — no external chart library needed.
             </p>
           </TStack>
         </TCard>

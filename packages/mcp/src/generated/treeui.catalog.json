@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-14T23:26:01.467Z",
+  "generatedAt": "2026-07-15T22:15:43.416Z",
   "packageName": "@treeui/vue",
   "packageVersion": "0.12.0",
   "decisionGuides": [
@@ -199,6 +199,50 @@
           "notes": []
         }
       ]
+    },
+    {
+      "id": "data-viz-choice",
+      "question": "Visualize numeric data",
+      "options": [
+        {
+          "use": "TStat",
+          "when": [
+            "The story is a single headline number, optionally with a trend and delta.",
+            "It is not a plot — prefer the number over a chart when one value says it."
+          ],
+          "notes": []
+        },
+        {
+          "use": "TSparkline",
+          "when": [
+            "You want an inline micro-trend next to a value, in a table cell, or in text.",
+            "No axes, legend, or tooltip are needed."
+          ],
+          "notes": []
+        },
+        {
+          "use": "TChart",
+          "when": [
+            "You need line, area, or bar plots with axes, gridlines, legend, and hover tooltip.",
+            "There are one or more series over shared categories."
+          ],
+          "notes": []
+        },
+        {
+          "use": "TDonutChart",
+          "when": [
+            "The data is a part-of-whole breakdown (donut or pie)."
+          ],
+          "notes": []
+        },
+        {
+          "use": "TProgress",
+          "when": [
+            "You are showing completion toward a single target, not a distribution or trend."
+          ],
+          "notes": []
+        }
+      ]
     }
   ],
   "recipes": [
@@ -377,15 +421,38 @@
       "id": "chart-surface",
       "name": "Chart surface",
       "useWhen": [
-        "A screen needs data visualization, but the charting engine should stay external to TreeUI."
+        "A screen needs data visualization inside a framed, titled surface."
       ],
       "compose": [
         "TCard",
         "TStack",
-        "external chart library"
+        "TChart",
+        "TSelect"
       ],
       "notes": [
-        "Use TreeUI for the surrounding surface, headings, badges, filters, and empty/loading states."
+        "Prefer the native TChart / TDonutChart / TSparkline — no external charting library is required.",
+        "Use TreeUI for the surrounding surface, headings, badges, range filters, and empty/loading states.",
+        "TChart has its own loading and empty slots; you can still wrap it in TCard for the frame.",
+        "Only reach for an external chart engine for chart types TreeUI does not cover yet (e.g. scatter, heatmap)."
+      ]
+    },
+    {
+      "id": "metric-dashboard",
+      "name": "Metric dashboard",
+      "useWhen": [
+        "A dashboard shows KPIs alongside trends and breakdowns."
+      ],
+      "compose": [
+        "TStat",
+        "TSparkline",
+        "TChart",
+        "TDonutChart",
+        "TGrid"
+      ],
+      "notes": [
+        "Lead with TStat tiles; embed a TSparkline in a stat's meta slot for the inline trend.",
+        "Use one TChart for the main time series and a TDonutChart for a part-of-whole split.",
+        "Keep series colors stable across the dashboard — rely on the --tree-color-chart-* order, do not remap by rank."
       ]
     },
     {
@@ -589,6 +656,32 @@
           "Use `href` for native links.",
           "Use `to` when the app has vue-router and breadcrumb items should render RouterLink."
         ]
+      },
+      "TChart": {
+        "required": [],
+        "notes": [
+          "Pass `series` as `{ name, data, color? }[]` and `labels` as a parallel `string[]` (one label per data index).",
+          "Set `type` to `line`, `area`, or `bar`; use `stacked` only with `bar`.",
+          "Series colors come from `--tree-color-chart-1..8` in order; pass `color` per series to override — do not remap colors when the series set changes.",
+          "Pass `valueFormat: (n) => string` to format axis and tooltip values (currency, compact, etc.).",
+          "No charting library or provider is required — the SVG and geometry are built in."
+        ]
+      },
+      "TSparkline": {
+        "required": [],
+        "notes": [
+          "Pass `data` as `number[]`; there are no axes, legend, or tooltip by design.",
+          "Size it with `width`/`height`; use it inside `TStat`, table cells, or text.",
+          "Always keep a visible number nearby — a sparkline supplements a value, it does not replace it."
+        ]
+      },
+      "TDonutChart": {
+        "required": [],
+        "notes": [
+          "Pass `segments` as `{ label, value, color? }[]`; non-positive values are dropped.",
+          "Set `thickness: 0` for a full pie; keep the default for a donut with a center readout.",
+          "Use the `center` slot (donut only) for a custom center; otherwise it shows the total or the hovered slice."
+        ]
       }
     },
     "appPatterns": {
@@ -602,6 +695,8 @@
       "commonCompositions": [
         "TFormField + input-like control",
         "TGrid + TStat",
+        "TStat + TSparkline",
+        "TCard + TChart",
         "TAppShell + TNavMenu",
         "TSidebar + TNavMenu",
         "TTable + TPagination",
@@ -1363,6 +1458,202 @@
       },
       "recipes": [
         "chart-surface"
+      ]
+    },
+    {
+      "name": "TChart",
+      "aliases": [],
+      "package": "@treeui/vue",
+      "kind": "data-display",
+      "category": "Data Display",
+      "status": "available",
+      "purpose": "Lightweight cartesian chart (line, area, bar) for multi-series data, with axes, gridlines, hover tooltip, legend, and an accessible data table. No external charting dependency.",
+      "sourceFile": "packages/vue/src/components/TChart.vue",
+      "storyFile": "apps/docs/src/stories/Chart.stories.ts",
+      "storyTitle": "Components/Data Display/Chart",
+      "manifestFile": "docs/ai/COMPONENTS/chart.yaml",
+      "props": [
+        {
+          "name": "type",
+          "type": "TChartType",
+          "default": "line",
+          "values": [
+            "line",
+            "area",
+            "bar"
+          ]
+        },
+        {
+          "name": "series",
+          "type": "TChartSeries[]",
+          "default": "[]",
+          "note": "Each item is { name: string; data: number[]; color?: string }."
+        },
+        {
+          "name": "labels",
+          "type": "string[]",
+          "default": "[]",
+          "note": "X-axis categories, aligned index-for-index to each series' data."
+        },
+        {
+          "name": "height",
+          "type": "number",
+          "default": "260",
+          "note": "Width is fluid (measured via ResizeObserver)."
+        },
+        {
+          "name": "smooth",
+          "type": "boolean",
+          "default": "false",
+          "note": "Curved line/area."
+        },
+        {
+          "name": "stacked",
+          "type": "boolean",
+          "default": "false",
+          "note": "Stacks bar series; ignored for line/area."
+        },
+        {
+          "name": "showGrid",
+          "type": "boolean",
+          "default": "true"
+        },
+        {
+          "name": "showLegend",
+          "type": "boolean",
+          "default": "auto (true when more than one series)"
+        },
+        {
+          "name": "showXAxis",
+          "type": "boolean",
+          "default": "true"
+        },
+        {
+          "name": "showYAxis",
+          "type": "boolean",
+          "default": "true"
+        },
+        {
+          "name": "showTooltip",
+          "type": "boolean",
+          "default": "true"
+        },
+        {
+          "name": "showPoints",
+          "type": "boolean",
+          "default": "false",
+          "note": "Always draw markers on line/area points."
+        },
+        {
+          "name": "yTicks",
+          "type": "number",
+          "default": "5"
+        },
+        {
+          "name": "valueFormat",
+          "type": "(value: number) => string",
+          "default": "locale integers for |value| >= 1000"
+        },
+        {
+          "name": "minY",
+          "type": "number",
+          "default": "auto"
+        },
+        {
+          "name": "maxY",
+          "type": "number",
+          "default": "auto"
+        },
+        {
+          "name": "animated",
+          "type": "boolean",
+          "default": "true",
+          "note": "Draw-in animation; disabled under prefers-reduced-motion."
+        },
+        {
+          "name": "loading",
+          "type": "boolean",
+          "default": "false"
+        },
+        {
+          "name": "ariaLabel",
+          "type": "string",
+          "default": "auto-generated summary"
+        }
+      ],
+      "events": [
+        {
+          "name": "point-click",
+          "payload": "{ index: number; label: string; values: { name: string; value: number; color: string }[] }"
+        }
+      ],
+      "slots": [
+        {
+          "name": "legend"
+        },
+        {
+          "name": "tooltip"
+        },
+        {
+          "name": "empty"
+        }
+      ],
+      "a11y": [
+        "SVG is aria-hidden; a visually-hidden <table> mirrors the series data for assistive tech.",
+        "Legend defaults on for multiple series so identity is not color-only.",
+        "Provide a meaningful ariaLabel describing what the chart shows."
+      ],
+      "behavior": [
+        "colors_auto_assign_from_chart_palette: --tree-color-chart-1..8, cycling; per-series color overrides",
+        "bar_zero_baseline: true",
+        "line_domain_uses_nice_ticks: true",
+        "hover_shows_crosshair_and_tooltip: true"
+      ],
+      "selection": {
+        "keywords": [
+          "chart",
+          "graph",
+          "line chart",
+          "area chart",
+          "bar chart",
+          "plot",
+          "dashboard",
+          "time series",
+          "analytics"
+        ],
+        "useWhen": [
+          "You need a line, area, or bar chart with axes, gridlines, legend, and a hover tooltip.",
+          "One or more series share a set of category labels."
+        ],
+        "avoidWhen": [
+          "A single value tells the story — use TStat.",
+          "You only need an inline trend with no axes — use TSparkline.",
+          "The data is a part-of-whole breakdown — use TDonutChart."
+        ],
+        "alternatives": [
+          {
+            "component": "TSparkline",
+            "when": "The trend should be inline and axis-less."
+          },
+          {
+            "component": "TDonutChart",
+            "when": "The data is proportional (parts of a whole)."
+          }
+        ]
+      },
+      "setup": {
+        "required": [],
+        "notes": [
+          "Pass `series` as `{ name, data, color? }[]` and `labels` as a parallel `string[]` (one label per data index).",
+          "Set `type` to `line`, `area`, or `bar`; use `stacked` only with `bar`.",
+          "Series colors come from `--tree-color-chart-1..8` in order; pass `color` per series to override — do not remap colors when the series set changes.",
+          "Pass `valueFormat: (n) => string` to format axis and tooltip values (currency, compact, etc.).",
+          "No charting library or provider is required — the SVG and geometry are built in."
+        ]
+      },
+      "recipes": [
+        "chart-surface",
+        "metric-dashboard"
       ]
     },
     {
@@ -2337,6 +2628,142 @@
       "recipes": []
     },
     {
+      "name": "TDonutChart",
+      "aliases": [],
+      "package": "@treeui/vue",
+      "kind": "data-display",
+      "category": "Data Display",
+      "status": "available",
+      "purpose": "Part-of-whole chart rendered as a donut (default) or full pie, with a legend, percentages, an interactive center readout, and an accessible label.",
+      "sourceFile": "packages/vue/src/components/TDonutChart.vue",
+      "storyFile": "apps/docs/src/stories/DonutChart.stories.ts",
+      "storyTitle": "Components/Data Display/Donut Chart",
+      "manifestFile": "docs/ai/COMPONENTS/donut-chart.yaml",
+      "props": [
+        {
+          "name": "segments",
+          "type": "TDonutSegment[]",
+          "default": "[]",
+          "note": "Each item is { label: string; value: number; color?: string }. Non-positive values are omitted."
+        },
+        {
+          "name": "size",
+          "type": "number",
+          "default": "200",
+          "note": "Square canvas in px."
+        },
+        {
+          "name": "thickness",
+          "type": "number",
+          "default": "26",
+          "note": "Ring thickness; 0 renders a full pie."
+        },
+        {
+          "name": "gap",
+          "type": "number",
+          "default": "2",
+          "note": "Gap between slices, in degrees."
+        },
+        {
+          "name": "rounded",
+          "type": "boolean",
+          "default": "false",
+          "note": "Round the ends of donut segments (widens the gap to make room). Best with a thinner ring."
+        },
+        {
+          "name": "showLegend",
+          "type": "boolean",
+          "default": "true"
+        },
+        {
+          "name": "showPercent",
+          "type": "boolean",
+          "default": "true"
+        },
+        {
+          "name": "centerLabel",
+          "type": "string",
+          "default": "Total",
+          "note": "Donut only; ignored for pie."
+        },
+        {
+          "name": "centerValue",
+          "type": "string | number",
+          "default": "auto (sum of values)"
+        },
+        {
+          "name": "valueFormat",
+          "type": "(value: number) => string",
+          "default": "locale integers for |value| >= 1000"
+        },
+        {
+          "name": "loading",
+          "type": "boolean",
+          "default": "false"
+        },
+        {
+          "name": "ariaLabel",
+          "type": "string",
+          "default": "auto-generated summary"
+        }
+      ],
+      "events": [],
+      "slots": [
+        {
+          "name": "center"
+        },
+        {
+          "name": "empty"
+        }
+      ],
+      "a11y": [
+        "Renders role=img with an aria-label summarizing the chart.",
+        "Legend + percentages give a non-visual reading of each slice."
+      ],
+      "behavior": [
+        "colors_auto_assign_from_chart_palette: --tree-color-chart-1..8, cycling; per-segment color overrides",
+        "hovering_a_slice_dims_the_rest_and_updates_center: true",
+        "center_shows_total_or_the_hovered_segment: true"
+      ],
+      "selection": {
+        "keywords": [
+          "donut",
+          "doughnut",
+          "pie",
+          "proportion",
+          "share",
+          "breakdown",
+          "part of whole",
+          "percentage"
+        ],
+        "useWhen": [
+          "You are showing how a total splits into a handful of categories.",
+          "A donut center readout (total or hovered slice) is useful."
+        ],
+        "avoidWhen": [
+          "There are many categories or precise comparison matters — use TChart bars.",
+          "The data is a trend over time — use TChart or TSparkline."
+        ],
+        "alternatives": [
+          {
+            "component": "TChart",
+            "when": "Precise magnitude comparison across categories is needed (bars)."
+          }
+        ]
+      },
+      "setup": {
+        "required": [],
+        "notes": [
+          "Pass `segments` as `{ label, value, color? }[]`; non-positive values are dropped.",
+          "Set `thickness: 0` for a full pie; keep the default for a donut with a center readout.",
+          "Use the `center` slot (donut only) for a custom center; otherwise it shows the total or the hovered slice."
+        ]
+      },
+      "recipes": [
+        "metric-dashboard"
+      ]
+    },
+    {
       "name": "TDrawer",
       "aliases": [],
       "package": "@treeui/vue",
@@ -3083,7 +3510,8 @@
       },
       "recipes": [
         "date-range-form",
-        "stat-grid"
+        "stat-grid",
+        "metric-dashboard"
       ]
     },
     {
@@ -4838,7 +5266,9 @@
           "Use `placeholder` when no selection has been made."
         ]
       },
-      "recipes": []
+      "recipes": [
+        "chart-surface"
+      ]
     },
     {
       "name": "TSelectableList",
@@ -5158,6 +5588,129 @@
       "recipes": []
     },
     {
+      "name": "TSparkline",
+      "aliases": [],
+      "package": "@treeui/vue",
+      "kind": "data-display",
+      "category": "Data Display",
+      "status": "available",
+      "purpose": "Tiny, axis-less inline trend chart (line, area, or bar) sized for stat tiles, table cells, and running text.",
+      "sourceFile": "packages/vue/src/components/TSparkline.vue",
+      "storyFile": "apps/docs/src/stories/Sparkline.stories.ts",
+      "storyTitle": "Components/Data Display/Sparkline",
+      "manifestFile": "docs/ai/COMPONENTS/sparkline.yaml",
+      "props": [
+        {
+          "name": "data",
+          "type": "number[]",
+          "default": "[]"
+        },
+        {
+          "name": "type",
+          "type": "line | area | bar",
+          "default": "line"
+        },
+        {
+          "name": "color",
+          "type": "string",
+          "default": "var(--tree-color-chart-1)",
+          "note": "Any CSS color."
+        },
+        {
+          "name": "width",
+          "type": "number",
+          "default": "120"
+        },
+        {
+          "name": "height",
+          "type": "number",
+          "default": "32"
+        },
+        {
+          "name": "smooth",
+          "type": "boolean",
+          "default": "false",
+          "note": "Curved line/area."
+        },
+        {
+          "name": "strokeWidth",
+          "type": "number",
+          "default": "2",
+          "note": "Line/area only."
+        },
+        {
+          "name": "min",
+          "type": "number",
+          "default": "data min"
+        },
+        {
+          "name": "max",
+          "type": "number",
+          "default": "data max"
+        },
+        {
+          "name": "showLastPoint",
+          "type": "boolean",
+          "default": "false",
+          "note": "Marker on the final point (line/area)."
+        },
+        {
+          "name": "ariaLabel",
+          "type": "string",
+          "default": "Trend sparkline"
+        }
+      ],
+      "events": [],
+      "slots": [],
+      "a11y": [
+        "Renders role=img with an aria-label; pass a specific one for meaningful trends.",
+        "Pair with a visible number — a sparkline supplements a value, it does not replace it."
+      ],
+      "behavior": [
+        "no_axes_or_legend: true",
+        "flat_series_renders_centered: true",
+        "scales_to_intrinsic_width_and_height: true"
+      ],
+      "selection": {
+        "keywords": [
+          "sparkline",
+          "mini chart",
+          "inline chart",
+          "micro trend",
+          "trend line",
+          "table chart"
+        ],
+        "useWhen": [
+          "You want a compact trend beside a value, in a table cell, or inline in text.",
+          "No axes, legend, or tooltip are required."
+        ],
+        "avoidWhen": [
+          "You need axes, multiple labeled series, or a tooltip — use TChart."
+        ],
+        "alternatives": [
+          {
+            "component": "TChart",
+            "when": "The chart needs axes, a legend, or a tooltip."
+          },
+          {
+            "component": "TStat",
+            "when": "A single value with a trend badge is enough."
+          }
+        ]
+      },
+      "setup": {
+        "required": [],
+        "notes": [
+          "Pass `data` as `number[]`; there are no axes, legend, or tooltip by design.",
+          "Size it with `width`/`height`; use it inside `TStat`, table cells, or text.",
+          "Always keep a visible number nearby — a sparkline supplements a value, it does not replace it."
+        ]
+      },
+      "recipes": [
+        "metric-dashboard"
+      ]
+    },
+    {
       "name": "TSpinner",
       "aliases": [],
       "package": "@treeui/vue",
@@ -5410,6 +5963,10 @@
           {
             "component": "TCard",
             "when": "The content is not a metric."
+          },
+          {
+            "component": "TSparkline",
+            "when": "You want to show the metric's trend as an inline mini-chart."
           }
         ]
       },
@@ -5418,7 +5975,8 @@
         "notes": []
       },
       "recipes": [
-        "stat-grid"
+        "stat-grid",
+        "metric-dashboard"
       ]
     },
     {

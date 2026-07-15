@@ -40,6 +40,9 @@ primary_exports:
   - TTag
   - TTimeline
   - TLink
+  - TChart
+  - TSparkline
+  - TDonutChart
 
 shared_sizes:
   values: [sm, md, lg]
@@ -77,7 +80,7 @@ shared_props:
   disabled:
     used_by: [TButton, TCheckbox, TCombobox, TConfirmDialog, TDatePicker, TDropdown, TFileUpload, TInput, TModal, TRadio, TRadioGroup, TSelect, TSwitch, TTextarea, TTooltip]
   loading:
-    used_by: [TButton, TCombobox, TConfirmDialog, TFileUpload, TInput, TSelect, TTextarea]
+    used_by: [TButton, TCombobox, TConfirmDialog, TFileUpload, TInput, TSelect, TTextarea, TChart, TDonutChart]
   as:
     used_by: [TButton, TCard]
   class:
@@ -111,6 +114,31 @@ shared_slots:
 
 value_formats:
   date: "YYYY-MM-DD"
+
+dataviz_contract:
+  components: [TChart, TSparkline, TDonutChart]
+  engine: "Pure geometry helpers live in @treeui/utils (niceScale, linearScale, buildLinePath, buildAreaPath, donutSegments) — framework-agnostic and reusable from React."
+  series_shape:
+    used_by: [TChart]
+    type: "{ name: string; data: number[]; color?: string }"
+    note: "Each series' `data` is aligned index-for-index to the `labels` array."
+  segment_shape:
+    used_by: [TDonutChart]
+    type: "{ label: string; value: number; color?: string }"
+    note: "Non-positive `value`s are omitted; fractions are computed from the sum of the rest."
+  palette:
+    tokens: "--tree-color-chart-1 … --tree-color-chart-8"
+    rule: "Series/segments auto-assign these in order (cycling after 8). A per-series `color` overrides. Never map color to rank — keep a series' color stable when the set changes."
+  value_format:
+    prop: valueFormat
+    type: "(value: number) => string"
+    used_by: [TChart, TDonutChart]
+    default: "Locale-grouped integers for |value| >= 1000, raw otherwise."
+  accessibility:
+    - "TChart renders a visually-hidden <table> mirror of the series data; the SVG is aria-hidden."
+    - "TSparkline and TDonutChart expose role=img with an aria-label (auto-generated, overridable)."
+    - "A legend is shown by default for >= 2 series/segments so identity never relies on color alone."
+    - "Entrance animation is gated behind prefers-reduced-motion."
 
 overlay_contract:
   props:

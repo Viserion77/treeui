@@ -63,6 +63,9 @@ import {
   TPricing,
   TPricingCard,
   TMarkdownEditor,
+  TChart,
+  TSparkline,
+  TDonutChart,
   TIcon,
 } from './components';
 
@@ -130,6 +133,9 @@ const components = {
   TPricing,
   TPricingCard,
   TMarkdownEditor,
+  TChart,
+  TSparkline,
+  TDonutChart,
   TIcon,
 };
 

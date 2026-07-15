@@ -152,6 +152,20 @@ export const treeThemes = {
         error: '#d1242f',
         info: '#0969da',
       },
+      // Categorical data-viz palette. Fixed hue order (blue → orange), validated
+      // for CVD separation and contrast against the light surface. Assign in order;
+      // the components cycle after 8 as a fallback, but prefer folding a 9th+
+      // category into "Other".
+      chart: {
+        1: '#2a78d6',
+        2: '#1baf7a',
+        3: '#eda100',
+        4: '#008300',
+        5: '#4a3aa7',
+        6: '#e34948',
+        7: '#e87ba4',
+        8: '#eb6834',
+      },
       overlay: 'rgba(31, 35, 40, 0.5)',
       'focus-ring': 'rgba(9, 105, 218, 0.32)',
     },
@@ -183,6 +197,18 @@ export const treeThemes = {
         warning: '#c69026',
         error: '#f47067',
         info: '#6cb6ff',
+      },
+      // Same hue order stepped for the dark surface (not a separate palette) —
+      // each step re-validated for the dark band and >= 3:1 on the dark surface.
+      chart: {
+        1: '#3987e5',
+        2: '#199e70',
+        3: '#c98500',
+        4: '#008300',
+        5: '#9085e9',
+        6: '#e66767',
+        7: '#d55181',
+        8: '#d95926',
       },
       overlay: 'rgba(13, 17, 23, 0.6)',
       'focus-ring': 'rgba(83, 155, 245, 0.32)',

@@ -51,7 +51,7 @@ If a public API changes, update the matching file here in the same change. If a 
 
 ## Coverage
 
-`docs/ai/COMPONENTS/` covers the Storybook-documented public components and key composition subcomponents such as `TAccordionItem`, `TRadioGroup`, `TTabList`, `TTab`, `TTabPanel`, and `TPricingCard`.
+`docs/ai/COMPONENTS/` covers the Storybook-documented public components and key composition subcomponents such as `TAccordionItem`, `TRadioGroup`, `TTabList`, `TTab`, `TTabPanel`, and `TPricingCard`. Data-viz components (`TChart`, `TSparkline`, `TDonutChart`) share a framework-agnostic geometry engine in `@treeui/utils` and the `--tree-color-chart-*` palette.
 
 ## Non-goals
 

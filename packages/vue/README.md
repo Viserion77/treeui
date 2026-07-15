@@ -55,6 +55,10 @@ import '@treeui/vue/style.css'
 
 `TBadge` · `TAlert` · `TAvatar` · `TEmptyState` · `TTag` · `TTimeline` · `TSpinner` · `TProgress` · `TSkeleton` · `TStat`
 
+### Charts
+
+`TChart` (line / area / bar) · `TSparkline` · `TDonutChart` — a lightweight, dependency-free data-viz set sharing a framework-agnostic geometry engine in `@treeui/utils` and the `--tree-color-chart-*` palette.
+
 ### Overlay & Interaction
 
 `TButton` · `TModal` · `TConfirmDialog` · `TDrawer` · `TDropdown` · `TPopover` · `TTooltip` · `TContextMenu` · `TPagination` · `TToast` · `TToastProvider`
@@ -124,7 +128,7 @@ Some repeated app UI intentionally stays documented as composition guidance inst
 - Color fields: `TFormField` + native `input[type="color"]`
 - Tag inputs: `TFormField` + `TInput` + removable `TTag`
 - Router-backed tabs: `TTabs` + app route state
-- Charts: `TCard` + `TStack` + your preferred chart library
+- Charts: `TChart` / `TSparkline` / `TDonutChart` (native, no chart library) — frame them in `TCard` + `TStack` when a titled surface is wanted
 
 ## TypeScript
 

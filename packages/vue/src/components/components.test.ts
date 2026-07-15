@@ -46,6 +46,9 @@ import TPricingCard from './TPricingCard.vue';
 import TPricing from './TPricing.vue';
 import TMarkdownEditor from './TMarkdownEditor.vue';
 import TIcon from './TIcon.vue';
+import TChart from './TChart.vue';
+import TSparkline from './TSparkline.vue';
+import TDonutChart from './TDonutChart.vue';
 import TLink from './TLink.vue';
 import TNavMenu from './TNavMenu.vue';
 import { useToast } from '../composables/useToast';
@@ -3350,5 +3353,238 @@ describe('TIcon', () => {
     const svg = wrapper.find('svg');
     expect(svg.attributes('width')).toBe('32');
     expect(svg.attributes('height')).toBe('32');
+  });
+});
+
+describe('TSparkline', () => {
+  it('renders a line path for line type', () => {
+    const wrapper = mount(TSparkline, {
+      props: { data: [1, 4, 2, 8, 5], type: 'line' },
+    });
+
+    const line = wrapper.find('.t-sparkline__line');
+    expect(line.exists()).toBe(true);
+    expect(line.attributes('d')).toBeTruthy();
+    expect(wrapper.attributes('role')).toBe('img');
+    expect(wrapper.attributes('aria-label')).toBe('Trend sparkline');
+  });
+
+  it('renders one bar per value for bar type', () => {
+    const wrapper = mount(TSparkline, {
+      props: { data: [1, 4, 2], type: 'bar' },
+    });
+
+    expect(wrapper.findAll('.t-sparkline__bar')).toHaveLength(3);
+    expect(wrapper.find('.t-sparkline__line').exists()).toBe(false);
+  });
+
+  it('renders an area path and honors a custom aria-label', () => {
+    const wrapper = mount(TSparkline, {
+      props: { data: [3, 1, 5], type: 'area', ariaLabel: 'Latency trend' },
+    });
+
+    expect(wrapper.find('.t-sparkline__area').exists()).toBe(true);
+    expect(wrapper.attributes('aria-label')).toBe('Latency trend');
+  });
+
+  it('draws the last point marker only when requested', () => {
+    const off = mount(TSparkline, { props: { data: [1, 2, 3] } });
+    expect(off.find('.t-sparkline__point').exists()).toBe(false);
+
+    const on = mount(TSparkline, { props: { data: [1, 2, 3], showLastPoint: true } });
+    expect(on.find('.t-sparkline__point').exists()).toBe(true);
+  });
+
+  it('renders no marks for empty data', () => {
+    const wrapper = mount(TSparkline, { props: { data: [] } });
+    expect(wrapper.find('.t-sparkline__line').exists()).toBe(false);
+    expect(wrapper.findAll('.t-sparkline__bar')).toHaveLength(0);
+  });
+});
+
+describe('TChart', () => {
+  const baseSeries = [
+    { name: 'Revenue', data: [10, 20, 15, 30] },
+    { name: 'Cost', data: [5, 8, 6, 12] },
+  ];
+  const labels = ['Q1', 'Q2', 'Q3', 'Q4'];
+
+  it('renders a line per series with a legend for multiple series', () => {
+    const wrapper = mount(TChart, {
+      props: { type: 'line', series: baseSeries, labels },
+    });
+
+    expect(wrapper.classes()).toContain('t-chart--line');
+    expect(wrapper.findAll('.t-chart__line')).toHaveLength(2);
+    expect(wrapper.findAll('.t-chart__legend-item')).toHaveLength(2);
+  });
+
+  it('hides the legend for a single series by default', () => {
+    const wrapper = mount(TChart, {
+      props: { series: [baseSeries[0]], labels },
+    });
+
+    expect(wrapper.find('.t-chart__legend').exists()).toBe(false);
+  });
+
+  it('renders grouped bars for bar type', () => {
+    const wrapper = mount(TChart, {
+      props: { type: 'bar', series: baseSeries, labels },
+    });
+
+    // 2 series * 4 categories.
+    expect(wrapper.findAll('.t-chart__bar')).toHaveLength(8);
+    expect(wrapper.find('.t-chart__line').exists()).toBe(false);
+  });
+
+  it('renders a filled area path for area type', () => {
+    const wrapper = mount(TChart, {
+      props: { type: 'area', series: [baseSeries[0]], labels },
+    });
+
+    const area = wrapper.find('.t-chart__area');
+    expect(area.exists()).toBe(true);
+    expect(area.attributes('d')).toBeTruthy();
+  });
+
+  it('exposes the data as an accessible table', () => {
+    const wrapper = mount(TChart, {
+      props: { series: baseSeries, labels, ariaLabel: 'Quarterly finance' },
+    });
+
+    const table = wrapper.find('table.t-chart__a11y');
+    expect(table.exists()).toBe(true);
+    expect(table.find('caption').text()).toBe('Quarterly finance');
+    expect(table.findAll('tbody tr')).toHaveLength(2);
+    expect(table.findAll('thead th')).toHaveLength(5); // "Series" + 4 quarters
+  });
+
+  it('keeps the a11y table rectangular when series lengths differ', () => {
+    const wrapper = mount(TChart, {
+      props: {
+        series: [
+          { name: 'Long', data: [1, 2, 3, 4] },
+          { name: 'Short', data: [5, 6] },
+        ],
+        labels: ['A', 'B', 'C', 'D'],
+      },
+    });
+
+    const table = wrapper.find('table.t-chart__a11y');
+    const categoryColumns = table.findAll('thead th').length - 1; // minus the "Series" column
+    expect(categoryColumns).toBe(4);
+    table.findAll('tbody tr').forEach((tr) => {
+      expect(tr.findAll('td')).toHaveLength(categoryColumns);
+    });
+  });
+
+  it('renders the empty slot when there is no data', () => {
+    const wrapper = mount(TChart, {
+      props: { series: [] },
+      slots: { empty: 'Nothing here' },
+    });
+
+    expect(wrapper.find('.t-chart__empty').text()).toBe('Nothing here');
+    expect(wrapper.find('.t-chart__svg').exists()).toBe(false);
+  });
+
+  it('renders loading placeholders', () => {
+    const wrapper = mount(TChart, {
+      props: { series: baseSeries, labels, loading: true },
+    });
+
+    expect(wrapper.classes()).toContain('is-loading');
+    expect(wrapper.find('.t-chart__loading').exists()).toBe(true);
+    expect(wrapper.find('.t-chart__svg').exists()).toBe(false);
+  });
+
+  it('shows a tooltip on hover and emits point-click', async () => {
+    const wrapper = mount(TChart, {
+      props: { series: baseSeries, labels },
+    });
+
+    const svg = wrapper.find('.t-chart__svg');
+    await svg.trigger('pointermove', { clientX: 120 });
+
+    expect(wrapper.find('.t-chart__tooltip').exists()).toBe(true);
+    expect(wrapper.findAll('.t-chart__tooltip-item')).toHaveLength(2);
+
+    await svg.trigger('click');
+    expect(wrapper.emitted('point-click')).toBeTruthy();
+
+    await svg.trigger('pointerleave');
+    expect(wrapper.find('.t-chart__tooltip').exists()).toBe(false);
+  });
+
+  it('respects an explicit showLegend override', () => {
+    const wrapper = mount(TChart, {
+      props: { series: [baseSeries[0]], labels, showLegend: true },
+    });
+
+    expect(wrapper.find('.t-chart__legend').exists()).toBe(true);
+  });
+});
+
+describe('TDonutChart', () => {
+  const segments = [
+    { label: 'Direct', value: 45 },
+    { label: 'Referral', value: 30 },
+    { label: 'Social', value: 25 },
+  ];
+
+  it('renders one arc per positive value for a donut', () => {
+    const wrapper = mount(TDonutChart, { props: { segments } });
+
+    expect(wrapper.findAll('.t-donut-chart__segment')).toHaveLength(3);
+    expect(wrapper.findAll('.t-donut-chart__legend-item')).toHaveLength(3);
+    expect(wrapper.find('.t-donut-chart__segment').attributes('stroke-dasharray')).toBeTruthy();
+  });
+
+  it('renders filled wedges for a pie', () => {
+    const wrapper = mount(TDonutChart, { props: { segments, thickness: 0 } });
+
+    expect(wrapper.findAll('.t-donut-chart__segment')).toHaveLength(3);
+    expect(wrapper.find('.t-donut-chart__segment').attributes('d')).toBeTruthy();
+  });
+
+  it('omits zero and negative values', () => {
+    const wrapper = mount(TDonutChart, {
+      props: { segments: [{ label: 'A', value: 10 }, { label: 'B', value: 0 }, { label: 'C', value: -4 }] },
+    });
+
+    expect(wrapper.findAll('.t-donut-chart__segment')).toHaveLength(1);
+  });
+
+  it('shows the center total for a donut and hides it for a pie', () => {
+    const donut = mount(TDonutChart, { props: { segments, centerLabel: 'Sessions' } });
+    expect(donut.find('.t-donut-chart__center').exists()).toBe(true);
+    expect(donut.find('.t-donut-chart__center-value').text()).toBe('100');
+    expect(donut.find('.t-donut-chart__center-label').text()).toBe('Sessions');
+
+    const pie = mount(TDonutChart, { props: { segments, thickness: 0 } });
+    expect(pie.find('.t-donut-chart__center').exists()).toBe(false);
+  });
+
+  it('renders percentages in the legend', () => {
+    const wrapper = mount(TDonutChart, { props: { segments } });
+    const percents = wrapper.findAll('.t-donut-chart__legend-percent');
+    expect(percents).toHaveLength(3);
+    expect(percents[0].text()).toBe('45%');
+  });
+
+  it('supports a custom center slot', () => {
+    const wrapper = mount(TDonutChart, {
+      props: { segments },
+      slots: { center: '<span class="custom-center">hi</span>' },
+    });
+
+    expect(wrapper.find('.custom-center').exists()).toBe(true);
+    expect(wrapper.find('.t-donut-chart__center-value').exists()).toBe(false);
+  });
+
+  it('renders the empty state when the total is zero', () => {
+    const wrapper = mount(TDonutChart, { props: { segments: [] } });
+    expect(wrapper.find('.t-donut-chart__empty').exists()).toBe(true);
+    expect(wrapper.find('.t-donut-chart__svg').exists()).toBe(false);
   });
 });

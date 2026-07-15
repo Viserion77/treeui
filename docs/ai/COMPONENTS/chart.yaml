@@ -1,0 +1,108 @@
+name: TChart
+source_file: packages/vue/src/components/TChart.vue
+package: "@treeui/vue"
+kind: data-display
+status: available
+purpose: "Lightweight cartesian chart (line, area, bar) for multi-series data, with axes, gridlines, hover tooltip, legend, and an accessible data table. No external charting dependency."
+
+props:
+  type:
+    type: TChartType
+    default: line
+    values: [line, area, bar]
+  series:
+    type: "TChartSeries[]"
+    default: "[]"
+    note: "Each item is { name: string; data: number[]; color?: string }."
+  labels:
+    type: "string[]"
+    default: "[]"
+    note: "X-axis categories, aligned index-for-index to each series' data."
+  height:
+    type: number
+    default: 260
+    note: "Width is fluid (measured via ResizeObserver)."
+  smooth:
+    type: boolean
+    default: false
+    note: "Curved line/area."
+  stacked:
+    type: boolean
+    default: false
+    note: "Stacks bar series; ignored for line/area. Negative values are clamped to 0 in stacked mode (grouped mode renders them)."
+  showGrid:
+    type: boolean
+    default: true
+  showLegend:
+    type: boolean
+    default: "auto (true when more than one series)"
+  showXAxis:
+    type: boolean
+    default: true
+  showYAxis:
+    type: boolean
+    default: true
+  showTooltip:
+    type: boolean
+    default: true
+  showPoints:
+    type: boolean
+    default: false
+    note: "Always draw markers on line/area points."
+  yTicks:
+    type: number
+    default: 5
+  valueFormat:
+    type: "(value: number) => string"
+    default: "locale integers for |value| >= 1000"
+  minY:
+    type: number
+    default: "auto"
+  maxY:
+    type: number
+    default: "auto"
+  animated:
+    type: boolean
+    default: true
+    note: "Draw-in animation; disabled under prefers-reduced-motion."
+  loading:
+    type: boolean
+    default: false
+  ariaLabel:
+    type: string
+    default: "auto-generated summary"
+
+events:
+  point-click:
+    payload: "{ index: number; label: string; values: { name: string; value: number; color: string }[] }"
+    note: "Fires on click at the hovered category."
+
+slots:
+  - legend    # scope: { series: { name: string; color: string }[] }
+  - tooltip   # scope: { index, label, values }
+  - empty
+
+types:
+  TChartType: "line | bar | area"
+  TChartSeries: "{ name: string; data: number[]; color?: string }"
+  TChartActivePayload: "{ index: number; label: string; values: { name: string; value: number; color: string }[] }"
+
+behavior:
+  colors_auto_assign_from_chart_palette: "--tree-color-chart-1..8, cycling; per-series color overrides"
+  bar_zero_baseline: true
+  line_domain_uses_nice_ticks: true
+  hover_shows_crosshair_and_tooltip: true
+
+a11y:
+  - "SVG is aria-hidden; a visually-hidden <table> mirrors the series data for assistive tech."
+  - "Legend defaults on for multiple series so identity is not color-only."
+  - "Provide a meaningful ariaLabel describing what the chart shows."
+
+example: |
+  <TChart
+    type="area"
+    :series="[{ name: 'Revenue', data: [12, 19, 15, 27, 24, 31] }]"
+    :labels="['Jan','Feb','Mar','Apr','May','Jun']"
+    smooth
+    aria-label="Monthly revenue"
+  />

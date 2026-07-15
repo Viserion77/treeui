@@ -105,6 +105,28 @@ decision_guides:
         when:
           - "You want loading placeholders that preserve layout."
 
+  - id: data-viz-choice
+    question: "Visualize numeric data"
+    options:
+      - use: TStat
+        when:
+          - "The story is a single headline number, optionally with a trend and delta."
+          - "It is not a plot — prefer the number over a chart when one value says it."
+      - use: TSparkline
+        when:
+          - "You want an inline micro-trend next to a value, in a table cell, or in text."
+          - "No axes, legend, or tooltip are needed."
+      - use: TChart
+        when:
+          - "You need line, area, or bar plots with axes, gridlines, legend, and hover tooltip."
+          - "There are one or more series over shared categories."
+      - use: TDonutChart
+        when:
+          - "The data is a part-of-whole breakdown (donut or pie)."
+      - use: TProgress
+        when:
+          - "You are showing completion toward a single target, not a distribution or trend."
+
 component_profiles:
   TAccordion:
     keywords: [accordion, collapsible, disclosure, details, faq]
@@ -160,6 +182,21 @@ component_profiles:
         when: "The main need is width constraint."
       - component: TStack
         when: "The main need is spacing between children."
+
+  TChart:
+    keywords: [chart, graph, line chart, area chart, bar chart, plot, dashboard, time series, analytics]
+    use_when:
+      - "You need a line, area, or bar chart with axes, gridlines, legend, and a hover tooltip."
+      - "One or more series share a set of category labels."
+    avoid_when:
+      - "A single value tells the story — use TStat."
+      - "You only need an inline trend with no axes — use TSparkline."
+      - "The data is a part-of-whole breakdown — use TDonutChart."
+    alternatives:
+      - component: TSparkline
+        when: "The trend should be inline and axis-less."
+      - component: TDonutChart
+        when: "The data is proportional (parts of a whole)."
 
   TCheckbox:
     keywords: [checkbox, checklist, boolean, consent, multiple choice]
@@ -230,6 +267,18 @@ component_profiles:
     alternatives:
       - component: TDatePicker
         when: "Only the date matters."
+
+  TDonutChart:
+    keywords: [donut, doughnut, pie, proportion, share, breakdown, part of whole, percentage]
+    use_when:
+      - "You are showing how a total splits into a handful of categories."
+      - "A donut center readout (total or hovered slice) is useful."
+    avoid_when:
+      - "There are many categories or precise comparison matters — use TChart bars."
+      - "The data is a trend over time — use TChart or TSparkline."
+    alternatives:
+      - component: TChart
+        when: "Precise magnitude comparison across categories is needed (bars)."
 
   TDrawer:
     keywords: [drawer, side panel, slide-over]
@@ -441,6 +490,19 @@ component_profiles:
       - component: TGrid
         when: "You need multi-column layout."
 
+  TSparkline:
+    keywords: [sparkline, mini chart, inline chart, micro trend, trend line, table chart]
+    use_when:
+      - "You want a compact trend beside a value, in a table cell, or inline in text."
+      - "No axes, legend, or tooltip are required."
+    avoid_when:
+      - "You need axes, multiple labeled series, or a tooltip — use TChart."
+    alternatives:
+      - component: TChart
+        when: "The chart needs axes, a legend, or a tooltip."
+      - component: TStat
+        when: "A single value with a trend badge is enough."
+
   TStat:
     keywords: [stat, metric, KPI, dashboard]
     use_when:
@@ -450,6 +512,8 @@ component_profiles:
     alternatives:
       - component: TCard
         when: "The content is not a metric."
+      - component: TSparkline
+        when: "You want to show the metric's trend as an inline mini-chart."
 
   TSteps:
     keywords: [steps, stepper, progress steps, wizard]

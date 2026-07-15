@@ -10,7 +10,17 @@ semantic_color_roles:
   text: [primary, muted, inverse]
   brand: [primary, hover, soft, contrast]
   status: [success, warning, error, info]
+  chart: [1, 2, 3, 4, 5, 6, 7, 8]
   misc: [overlay, focus-ring]
+
+data_viz_palette:
+  variables: "--tree-color-chart-1 … --tree-color-chart-8"
+  purpose: "Categorical series colors for TChart, TSparkline, and TDonutChart."
+  rules:
+    - "Fixed hue order (blue → orange); assign in order and never remap to a series' rank."
+    - "Cycle back to slot 1 after 8; fold a 9th category into 'Other'."
+    - "Validated for CVD separation and contrast against the light/dark surfaces; dark is a re-stepped set, not an auto-flip."
+    - "Components pair the palette with a legend and (in TChart) 2px surface gaps so identity is never color-only."
 
 font:
   family:
@@ -146,6 +156,15 @@ theme_values:
         warning: "#9a6700"
         error: "#d1242f"
         info: "#0969da"
+      chart:
+        1: "#2a78d6"
+        2: "#1baf7a"
+        3: "#eda100"
+        4: "#008300"
+        5: "#4a3aa7"
+        6: "#e34948"
+        7: "#e87ba4"
+        8: "#eb6834"
       overlay: "rgba(31, 35, 40, 0.5)"
       focus-ring: "rgba(9, 105, 218, 0.32)"
   dark:
@@ -171,6 +190,15 @@ theme_values:
         warning: "#c69026"
         error: "#f47067"
         info: "#6cb6ff"
+      chart:
+        1: "#3987e5"
+        2: "#199e70"
+        3: "#c98500"
+        4: "#008300"
+        5: "#9085e9"
+        6: "#e66767"
+        7: "#d55181"
+        8: "#d95926"
       overlay: "rgba(13, 17, 23, 0.6)"
       focus-ring: "rgba(83, 155, 245, 0.32)"
 

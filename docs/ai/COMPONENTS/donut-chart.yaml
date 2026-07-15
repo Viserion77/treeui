@@ -1,0 +1,76 @@
+name: TDonutChart
+source_file: packages/vue/src/components/TDonutChart.vue
+package: "@treeui/vue"
+kind: data-display
+status: available
+purpose: "Part-of-whole chart rendered as a donut (default) or full pie, with a legend, percentages, an interactive center readout, and an accessible label."
+
+props:
+  segments:
+    type: "TDonutSegment[]"
+    default: "[]"
+    note: "Each item is { label: string; value: number; color?: string }. Non-positive values are omitted."
+  size:
+    type: number
+    default: 200
+    note: "Square canvas in px."
+  thickness:
+    type: number
+    default: 26
+    note: "Ring thickness; 0 renders a full pie."
+  gap:
+    type: number
+    default: 2
+    note: "Gap between slices, in degrees."
+  rounded:
+    type: boolean
+    default: false
+    note: "Round the ends of donut segments (widens the gap to make room). Best with a thinner ring."
+  showLegend:
+    type: boolean
+    default: true
+  showPercent:
+    type: boolean
+    default: true
+  centerLabel:
+    type: string
+    default: "Total"
+    note: "Donut only; ignored for pie."
+  centerValue:
+    type: "string | number"
+    default: "auto (sum of values)"
+  valueFormat:
+    type: "(value: number) => string"
+    default: "locale integers for |value| >= 1000"
+  loading:
+    type: boolean
+    default: false
+  ariaLabel:
+    type: string
+    default: "auto-generated summary"
+
+slots:
+  - center   # scope: { total: number; active: TDonutSegment | null }  — donut only
+  - empty
+
+types:
+  TDonutSegment: "{ label: string; value: number; color?: string }"
+
+behavior:
+  colors_auto_assign_from_chart_palette: "--tree-color-chart-1..8, cycling; per-segment color overrides"
+  hovering_a_slice_dims_the_rest_and_updates_center: true
+  center_shows_total_or_the_hovered_segment: true
+
+a11y:
+  - "Renders role=img with an aria-label summarizing the chart."
+  - "Legend + percentages give a non-visual reading of each slice."
+
+example: |
+  <TDonutChart
+    :segments="[
+      { label: 'Direct', value: 45 },
+      { label: 'Referral', value: 30 },
+      { label: 'Social', value: 25 },
+    ]"
+    center-label="Sessions"
+  />

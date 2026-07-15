@@ -120,6 +120,26 @@ component_setup:
       - "Use `href` for native links."
       - "Use `to` when the app has vue-router and breadcrumb items should render RouterLink."
 
+  TChart:
+    notes:
+      - "Pass `series` as `{ name, data, color? }[]` and `labels` as a parallel `string[]` (one label per data index)."
+      - "Set `type` to `line`, `area`, or `bar`; use `stacked` only with `bar`."
+      - "Series colors come from `--tree-color-chart-1..8` in order; pass `color` per series to override — do not remap colors when the series set changes."
+      - "Pass `valueFormat: (n) => string` to format axis and tooltip values (currency, compact, etc.)."
+      - "No charting library or provider is required — the SVG and geometry are built in."
+
+  TSparkline:
+    notes:
+      - "Pass `data` as `number[]`; there are no axes, legend, or tooltip by design."
+      - "Size it with `width`/`height`; use it inside `TStat`, table cells, or text."
+      - "Always keep a visible number nearby — a sparkline supplements a value, it does not replace it."
+
+  TDonutChart:
+    notes:
+      - "Pass `segments` as `{ label, value, color? }[]`; non-positive values are dropped."
+      - "Set `thickness: 0` for a full pie; keep the default for a donut with a center readout."
+      - "Use the `center` slot (donut only) for a custom center; otherwise it shows the total or the hovered slice."
+
 app_patterns:
   providers:
     - component: TToastProvider
@@ -128,6 +148,8 @@ app_patterns:
   common_compositions:
     - "TFormField + input-like control"
     - "TGrid + TStat"
+    - "TStat + TSparkline"
+    - "TCard + TChart"
     - "TAppShell + TNavMenu"
     - "TSidebar + TNavMenu"
     - "TTable + TPagination"

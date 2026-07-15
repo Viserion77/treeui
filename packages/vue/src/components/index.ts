@@ -40,6 +40,7 @@ export type { TSelectOption } from './TSelect.vue';
 export { default as TSidebar } from './TSidebar.vue';
 export type { TSidebarSide } from './TSidebar.vue';
 export { default as TAppShell } from './TAppShell.vue';
+export type { AppShellSlotProps } from './TAppShell.vue';
 export { default as TInput } from './TInput.vue';
 export { default as TNumberInput } from './TNumberInput.vue';
 export { default as TSelectableList } from './TSelectableList.vue';

@@ -76,7 +76,7 @@ const emit = defineEmits<{
   'sidebar-open-change': [value: boolean];
 }>();
 
-interface AppShellSlotProps {
+export interface AppShellSlotProps {
   mobile: boolean;
   collapsed: boolean;
   sidebarOpen: boolean;

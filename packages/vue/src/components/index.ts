@@ -24,8 +24,14 @@ export { default as TMultiSelect } from './TMultiSelect.vue';
 export type { TMultiSelectOption } from './TMultiSelect.vue';
 export { default as TGrid } from './TGrid.vue';
 export type {
+  TFileUploadCancelPayload,
+  TFileUploadFileSlotProps,
   TFileUploadRejection,
   TFileUploadRejectionReason,
+  TFileUploadRetryPayload,
+  TFileUploadState,
+  TFileUploadStateSource,
+  TFileUploadStatus,
 } from './TFileUpload.vue';
 export { default as TNavbar } from './TNavbar.vue';
 export { default as TAppBar } from './TNavbar.vue';

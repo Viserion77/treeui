@@ -81,6 +81,11 @@ shared_props:
     used_by: [TButton, TCheckbox, TCombobox, TConfirmDialog, TDatePicker, TDropdown, TFileUpload, TInput, TModal, TRadio, TRadioGroup, TSelect, TSwitch, TTextarea, TTooltip]
   loading:
     used_by: [TButton, TCombobox, TConfirmDialog, TFileUpload, TInput, TSelect, TTextarea, TChart, TDonutChart]
+    note: >-
+      loading conveys busy state. On single action controls (TButton, TConfirmDialog)
+      it also disables that one control to prevent double submission. On form value
+      controls (TFileUpload, TInput, TSelect, TTextarea, TCombobox) it is presentational
+      only and must never gate interaction.
   as:
     used_by: [TButton, TCard]
   class:

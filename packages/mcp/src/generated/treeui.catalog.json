@@ -1,7 +1,7 @@
 {
-  "generatedAt": "2026-07-15T22:37:24.300Z",
+  "generatedAt": "2026-07-16T01:21:59.943Z",
   "packageName": "@treeui/vue",
-  "packageVersion": "0.12.0",
+  "packageVersion": "0.13.0",
   "decisionGuides": [
     {
       "id": "single-choice",
@@ -3140,7 +3140,7 @@
       "kind": "form",
       "category": "Form",
       "status": "available",
-      "purpose": "Composable dropzone and file picker with browse, drag-and-drop, and Ctrl+V paste support.",
+      "purpose": "Composable dropzone and file picker with browse, drag-and-drop, and Ctrl+V paste support, plus per-file upload state: progress, remaining time, thumbnails, and independent per-file retry/resume.",
       "sourceFile": "packages/vue/src/components/TFileUpload.vue",
       "storyFile": "apps/docs/src/stories/FileUpload.stories.ts",
       "storyTitle": "Components/Form/FileUpload",
@@ -3164,12 +3164,14 @@
         {
           "name": "disabled",
           "type": "boolean",
-          "default": "false"
+          "default": "false",
+          "description": "The ONLY prop that gates interaction. Disables the dropzone, the native input, Clear all, and every per-row Remove/Retry."
         },
         {
           "name": "loading",
           "type": "boolean",
-          "default": "false"
+          "default": "false",
+          "description": "Presentational only. Applies `is-loading`, `aria-busy` on the dropzone, and the corner spinner. It gates NO interaction — see behavior.loading_is_presentational."
         },
         {
           "name": "invalid",
@@ -3230,44 +3232,142 @@
           "name": "showFileList",
           "type": "boolean",
           "default": "true"
+        },
+        {
+          "name": "uploadState",
+          "type": "TFileUploadStateSource",
+          "default": "none",
+          "description": "Per-file transport state, keyed by File OBJECT IDENTITY. Accepts a ReadonlyMap<File, TFileUploadState> or a (file, index) => TFileUploadState | undefined resolver. Omit it and the component renders exactly as before: no bars, no status lines, no retry."
+        },
+        {
+          "name": "dragLabel",
+          "type": "string",
+          "default": "Release to upload",
+          "description": "Replaces `label` in the dropzone while an acceptable drag is over it. Set it to the same value as `label` to opt out of the text swap."
+        },
+        {
+          "name": "dragRejectLabel",
+          "type": "string",
+          "default": "This file type is not accepted",
+          "description": "Replaces `label` while a drag that cannot work is over the dropzone. Only reachable when drag-reject detection is possible — see behavior.drag_reject_detection_is_mime_only."
+        },
+        {
+          "name": "thumbnails",
+          "type": "boolean",
+          "default": "true",
+          "description": "Mint object-URL previews and decode dimensions for image/* files. Set false when you always supply `state.thumbnailUrl` yourself."
+        },
+        {
+          "name": "maxThumbnailSize",
+          "type": "number | null",
+          "default": "10 * 1024 * 1024",
+          "description": "Skip auto-thumbnailing above this byte size. null removes the cap."
+        },
+        {
+          "name": "retryLabel",
+          "type": "string",
+          "default": "Retry"
+        },
+        {
+          "name": "resumeLabel",
+          "type": "(percent: number) => string",
+          "default": "(percent) => `Resume from ${percent}%`",
+          "description": "Receives Math.round(state.progress). Used only when state.resumable === true AND state.progress is a number."
+        },
+        {
+          "name": "remainingTimeFormat",
+          "type": "(remainingMs: number) => string",
+          "default": "5s/60s/60min thresholds — see behavior.remaining_time_strings",
+          "description": "Formats state.remainingMs. Ignored for a row that supplies state.remainingLabel."
+        },
+        {
+          "name": "statusLabels",
+          "type": "Partial<Record<TFileUploadStatus, string>>",
+          "default": "{}",
+          "description": "MERGED over the defaults { pending: Waiting, uploading: Uploading, paused: Paused, error: Upload failed, success: Uploaded } — pass only the keys you override."
         }
       ],
       "events": [
         {
-          "name": "update:modelValue"
+          "name": "update:modelValue",
+          "description": "Emitted with the next file list when files are added, removed, or cleared.",
+          "payload": "File[]"
         },
         {
-          "name": "files-accepted"
+          "name": "files-accepted",
+          "description": "Emitted with only the newly accepted files, after accept/maxFiles/maxFileSize validation.",
+          "payload": "File[]"
         },
         {
-          "name": "files-rejected"
+          "name": "files-rejected",
+          "description": "Pre-acceptance validation failures. Unrelated to transport errors, which you report through `uploadState`.",
+          "payload": "TFileUploadRejection[]"
+        },
+        {
+          "name": "retry",
+          "description": "Emitted when a row's retry affordance is activated. Pure intent — the component performs no upload. Use `payload.mode` ('resume' | 'restart'); it reports the affordance the component ACTUALLY DREW, so never re-derive it from your own state.",
+          "payload": "TFileUploadRetryPayload"
+        },
+        {
+          "name": "cancel",
+          "description": "Emitted ONLY for rows whose status is 'uploading' or 'paused', immediately BEFORE the `update:modelValue` that drops them — so the file is still in the list when your handler runs and you can abort the request. `reason` is 'remove' for one row or 'clear' (one event per in-flight file) for Clear all.",
+          "payload": "TFileUploadCancelPayload"
         }
       ],
       "slots": [
         {
-          "name": "icon"
+          "name": "icon",
+          "description": "Replaces the dropzone icon."
         },
         {
-          "name": "default"
+          "name": "default",
+          "description": "Replaces the dropzone body. Receives `{ files, isDragActive, isDragReject, openFileDialog, clearFiles }`."
         },
         {
-          "name": "file"
+          "name": "file",
+          "description": "Full row override. Receives all of TFileUploadFileSlotProps, including every derived label, so a custom row re-derives nothing."
         },
         {
-          "name": "actions"
+          "name": "file-status",
+          "description": "Replaces ONLY the progress bar + status line + error block inside the default row. Receives TFileUploadFileSlotProps. Name, meta, thumbnail, Retry, and Remove keep rendering. Ignored when the `file` slot is provided."
+        },
+        {
+          "name": "actions",
+          "description": "Footer actions. Receives `{ files, openFileDialog, clearFiles }` — no upload state."
         }
       ],
       "a11y": [
         "dropzone_role: button",
         "keyboard_activation: Enter_and_Space_open_the_file_picker",
         "supports_paste_when_component_is_focused: true",
-        "file_feedback_announced_via_live_region: true"
+        "file_feedback_announced_via_live_region: true",
+        "aria_busy_on_dropzone_tracks_loading_prop: true",
+        "aria_busy_on_row_tracks_that_rows_uploading_status: true",
+        "per_row_progressbar_is_labelled_with_status_and_filename: e.g. 'Uploading hero.png' — every row's bar has a distinct accessible name.",
+        "terminal_transitions_announced_with_filenames: One polite root live region (`role=log`) announces only success/error, e.g. 'alpha.txt uploaded.' / 'alpha.txt failed. Connection lost.'",
+        "repeated_identical_messages_are_still_announced: The log appends each message as a new node rather than overwriting one string, so a retry that fails with the byte-identical error still mutates the region and is announced. It is not aria-atomic: only the appended message is read, and the trimmed history (5 most recent) is not.",
+        "percentages_are_never_announced: Percent and ETA live in non-live text; the value reaches assistive tech through the progressbar's aria-valuenow.",
+        "retry_button_is_described_by_its_row_error: Announces 'Resume from 90%, Connection lost at 90%'.",
+        "focus_is_rescued_when_retry_unmounts: Flipping error -> uploading removes the focused Retry; focus moves to that row's Remove (or the dropzone), and only when it was genuinely lost.",
+        "remove_and_retry_meet_the_44px_target: true"
       ],
       "behavior": [
         "accepts_files_from_input_drop_and_paste: true",
         "multiple_false_replaces_existing_selection: true",
         "accept_maxFiles_and_maxFileSize_apply_to_all_entry_points: true",
-        "selected_files_can_be_removed_or_cleared: true"
+        "selected_files_can_be_removed_or_cleared: true",
+        "upload_state_is_keyed_by_file_identity: Both source shapes key on the File object, never on index or name. Key your own store with the File objects you receive from `files-accepted`.",
+        "a_lookup_miss_renders_nothing: An unknown File yields `undefined` and the row falls back to name + meta only — no bar, no status, no retry. This fail-blank is deliberate: it is the back-compat path and it fails loudly instead of showing another file's percentage.",
+        "loading_is_presentational: BREAKING since 0.14.0 — `loading` no longer disables anything. It was freezing the dropzone, Clear all, and every Remove, which blocked removing file 1 while file 4 uploaded. Use `:disabled` to reproduce the old behavior; prefer `uploadState` and freeze nothing.",
+        "each_file_has_an_independent_track: One row's error, progress, or retry never gates another's. Remove stays enabled for in-flight rows and emits `cancel` so you can abort.",
+        "errors_are_per_row: Transport errors go in `state.error` and render under their own row. They never enter the dropzone feedback list, which Remove and Clear all wipe.",
+        "drag_feedback_has_three_signals: Border, glow, and a text swap to `dragLabel` — all three fire together, including when files are already listed.",
+        "drag_reject_detection_is_mime_only: `is-drag-reject` + `dragRejectLabel` require every `accept` token to be a MIME token; with any `.ext` token the dropzone stays neutral, because a drag exposes only `.type`. A mixed drag (one good file, one bad) is NOT rejected, and the drop is never blocked — rejected files always get the normal `files-rejected` explanation.",
+        "progress_bar_visibility: Shown on uploading/paused/error, and on success only with numeric progress. 'uploading' without progress is indeterminate; paused/error without progress is a determinate 0 — an errored bar must never animate.",
+        "the_bar_is_never_reset_on_error: It holds `state.progress` in the error tone. That retained 90% is what makes the resume promise legible.",
+        "remaining_time_strings: < 5000ms -> 'Less than 5s left'; < 60s -> 'About 12s left'; < 60min -> 'About 2 min left'; else 'About 2h left'. Negative, NaN, and Infinity render nothing.",
+        "status_line_composition: Joins the present parts with ' · ': 'Uploading · 62% · About 12s left' while uploading, 'Upload failed · 2.1 MB of 2.4 MB uploaded' on a resumable error.",
+        "thumbnails_are_client_only: Object URLs are minted after mount and revoked on removal and unmount. SSR and the hydrating render both show the extension chip, so there is no mismatch."
       ],
       "selection": {
         "keywords": [],

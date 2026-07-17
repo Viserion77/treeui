@@ -333,7 +333,18 @@
 
 .t-file-upload.is-drag-active .t-file-upload__dropzone {
   border-color: var(--tree-color-brand-primary);
+  border-style: solid;
   background: color-mix(in srgb, var(--tree-color-brand-soft) 55%, var(--tree-color-bg-surface));
+  box-shadow: 0 0 0 6px color-mix(in srgb, var(--tree-color-brand-primary) 24%, transparent);
+  transform: translateY(-2px);
+}
+
+.t-file-upload.is-drag-reject .t-file-upload__dropzone {
+  border-color: var(--tree-color-status-error);
+  border-style: solid;
+  background: color-mix(in srgb, var(--tree-color-status-error) 10%, var(--tree-color-bg-surface));
+  box-shadow: 0 0 0 6px color-mix(in srgb, var(--tree-color-status-error) 24%, transparent);
+  transform: translateY(-2px);
 }
 
 .t-file-upload.has-files .t-file-upload__dropzone {
@@ -462,8 +473,88 @@
 
 .t-file-upload__file-copy {
   display: grid;
-  gap: 0.125rem;
+  flex: 1 1 auto;
+  gap: var(--tree-space-1);
   min-width: 0;
+}
+
+.t-file-upload__thumb {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: var(--tree-size-control-lg);
+  height: var(--tree-size-control-lg);
+  border-radius: var(--tree-radius-sm);
+  background: var(--tree-color-bg-subtle);
+  color: var(--tree-color-text-muted);
+  overflow: hidden;
+}
+
+.t-file-upload__thumb-image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.t-file-upload__thumb-fallback {
+  font-size: var(--tree-font-size-xs);
+  font-weight: var(--tree-font-weight-semibold);
+  line-height: var(--tree-font-lineHeight-ui);
+}
+
+.t-file-upload__file-progress {
+  width: 100%;
+  margin-block-start: var(--tree-space-1);
+}
+
+.t-file-upload__file-status,
+.t-file-upload__file-error {
+  margin: 0;
+  font-size: var(--tree-font-size-xs);
+  line-height: var(--tree-font-lineHeight-ui);
+}
+
+.t-file-upload__file-status {
+  color: var(--tree-color-text-muted);
+}
+
+.t-file-upload__file-error {
+  color: var(--tree-color-status-error);
+}
+
+.t-file-upload__proof {
+  margin-inline-end: var(--tree-space-1);
+}
+
+.t-file-upload__file.is-error {
+  border-color: var(--tree-color-status-error);
+  background: color-mix(in srgb, var(--tree-color-status-error) 8%, var(--tree-color-bg-surface));
+}
+
+.t-file-upload__file.is-success {
+  border-color: color-mix(in srgb, var(--tree-color-status-success) 45%, var(--tree-color-border-default));
+}
+
+.t-file-upload__file.is-error .t-file-upload__file-status {
+  color: var(--tree-color-status-error);
+}
+
+.t-file-upload__file.is-success .t-file-upload__file-status {
+  color: var(--tree-color-status-success);
+}
+
+.t-file-upload__file.is-error .t-progress {
+  color: var(--tree-color-status-error);
+}
+
+.t-file-upload__file.is-paused .t-progress {
+  color: var(--tree-color-text-muted);
+}
+
+.t-file-upload__file.is-success .t-progress {
+  color: var(--tree-color-status-success);
 }
 
 .t-file-upload__file-name,
@@ -485,25 +576,48 @@
   line-height: var(--tree-font-lineHeight-ui);
 }
 
-.t-file-upload__clear,
-.t-file-upload__remove {
+.t-file-upload__clear {
   border: 0;
   padding: 0;
-  background: transparent;
+  background: none;
   color: var(--tree-color-brand-primary);
   font-size: var(--tree-font-size-sm);
   font-weight: var(--tree-font-weight-medium);
   cursor: pointer;
 }
 
+.t-file-upload__remove,
+.t-file-upload__retry {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  min-block-size: var(--tree-size-control-lg);
+  padding-inline: var(--tree-space-2);
+  border: 0;
+  border-radius: var(--tree-radius-sm);
+  background: none;
+  color: var(--tree-color-brand-primary);
+  font-size: var(--tree-font-size-sm);
+  font-weight: var(--tree-font-weight-medium);
+  cursor: pointer;
+}
+
+.t-file-upload__retry {
+  color: var(--tree-color-status-error);
+  font-weight: var(--tree-font-weight-semibold);
+}
+
 .t-file-upload__clear:disabled,
-.t-file-upload__remove:disabled {
+.t-file-upload__remove:disabled,
+.t-file-upload__retry:disabled {
   opacity: 0.5;
   cursor: not-allowed;
 }
 
 .t-file-upload__clear:focus-visible,
-.t-file-upload__remove:focus-visible {
+.t-file-upload__remove:focus-visible,
+.t-file-upload__retry:focus-visible {
   outline: none;
   box-shadow: 0 0 0 4px var(--tree-color-focus-ring);
   border-radius: var(--tree-radius-sm);

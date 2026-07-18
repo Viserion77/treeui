@@ -1,5 +1,6 @@
-import { nextTick, reactive } from 'vue';
+import { defineComponent, nextTick, reactive } from 'vue';
 import { mount } from '@vue/test-utils';
+import { useTheme } from '../composables/useTheme';
 import TBadge from './TBadge.vue';
 import TButton from './TButton.vue';
 import TAlert from './TAlert.vue';
@@ -41,6 +42,7 @@ import TTabPanel from './TTabPanel.vue';
 import TToastProvider from './TToastProvider.vue';
 import TAvatar from './TAvatar.vue';
 import TDivider from './TDivider.vue';
+import TColorSwatch from './TColorSwatch.vue';
 import TStack from './TStack.vue';
 import TStackItem from './TStackItem.vue';
 import TSplit from './TSplit.vue';
@@ -4048,5 +4050,97 @@ describe('TDonutChart', () => {
   it('supports a numeric grow factor on a stack item', () => {
     const wrapper = mount(TStackItem, { props: { grow: 3 }, slots: { default: 'x' } });
     expect(wrapper.attributes('style')).toContain('flex-grow: 3');
+  });
+
+  it('marks the selected colour swatch and emits the picked preset', async () => {
+    const options = [
+      { label: 'Ocean blue', value: '#0969da' },
+      { label: 'Forest green', value: '#1a7f37' },
+    ];
+    const wrapper = mount(TColorSwatch, {
+      props: { modelValue: '#0969da', options, label: 'Accent color' },
+    });
+
+    expect(wrapper.attributes('role')).toBe('group');
+    expect(wrapper.attributes('aria-label')).toBe('Accent color');
+
+    const swatches = wrapper.findAll('.t-color-swatch__option');
+    expect(swatches).toHaveLength(2);
+    expect(swatches[0].classes()).toContain('is-selected');
+    expect(swatches[0].attributes('aria-pressed')).toBe('true');
+    expect(swatches[1].attributes('aria-pressed')).toBe('false');
+    expect(swatches[1].attributes('aria-label')).toBe('Forest green');
+
+    await swatches[1].trigger('click');
+    expect(wrapper.emitted('update:modelValue')?.[0]).toEqual(['#1a7f37']);
+  });
+
+  it('omits the custom colour input unless allowCustom is set', async () => {
+    const wrapper = mount(TColorSwatch, { props: { options: [] } });
+    expect(wrapper.find('.t-color-swatch__custom').exists()).toBe(false);
+
+    await wrapper.setProps({ allowCustom: true });
+    expect(wrapper.find('.t-color-swatch__custom').attributes('type')).toBe('color');
+  });
+
+  it('does not emit from a disabled colour swatch', async () => {
+    const wrapper = mount(TColorSwatch, {
+      props: { options: [{ label: 'Blue', value: '#0969da' }], disabled: true },
+    });
+
+    await wrapper.find('.t-color-swatch__option').trigger('click');
+    expect(wrapper.emitted('update:modelValue')).toBeUndefined();
+  });
+
+  // Single definition keeps `vue/one-component-per-file` happy while both theme
+  // tests still get their own isolated controller.
+  const mountThemeHost = (options: Parameters<typeof useTheme>[0]) =>
+    mount(
+      defineComponent({
+        setup: () => useTheme(options),
+        template: '<div />',
+      }),
+    );
+
+  it('writes the resolved theme and re-derives the accent when the theme flips', async () => {
+    const wrapper = mountThemeHost({
+      storageKey: null,
+      defaultMode: 'light',
+      defaultAccent: '#0969da',
+    });
+    const root = document.documentElement;
+
+    expect(root.dataset.treeTheme).toBe('light');
+    const lightBrand = root.style.getPropertyValue('--tree-color-brand-primary');
+    // Light mode nudges this accent a touch darker — it lands at 4.25:1 on its
+    // own soft tint verbatim, just under AA.
+    expect(lightBrand).not.toBe('');
+    expect(root.style.getPropertyValue('--tree-color-brand-contrast')).toBe('#ffffff');
+
+    wrapper.vm.mode = 'dark';
+    await nextTick();
+
+    expect(root.dataset.treeTheme).toBe('dark');
+    // Same accent, different ramp: dark mode must lighten it to stay readable.
+    expect(root.style.getPropertyValue('--tree-color-brand-primary')).not.toBe(lightBrand);
+    expect(root.style.getPropertyValue('--tree-color-brand-contrast')).toBe('#1c2128');
+
+    wrapper.unmount();
+  });
+
+  it('clears the accent variables when the accent is removed', async () => {
+    const wrapper = mountThemeHost({
+      storageKey: null,
+      defaultMode: 'light',
+      defaultAccent: '#1a7f37',
+    });
+    const root = document.documentElement;
+    expect(root.style.getPropertyValue('--tree-color-brand-primary')).not.toBe('');
+
+    wrapper.vm.accent = null;
+    await nextTick();
+
+    expect(root.style.getPropertyValue('--tree-color-brand-primary')).toBe('');
+    wrapper.unmount();
   });
 });

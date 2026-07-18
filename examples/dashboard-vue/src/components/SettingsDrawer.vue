@@ -3,6 +3,7 @@ import { computed } from 'vue';
 import {
   TButton,
   TCheckbox,
+  TColorSwatch,
   TDivider,
   TDrawer,
   TFormField,
@@ -11,8 +12,8 @@ import {
   TToggleGroup,
   useToast,
 } from '@treeui/vue';
-import type { TCardVariant, TSize } from '@treeui/vue';
-import { useDashboardConfig, type ThemeMode } from '../composables/useDashboardConfig';
+import type { TCardVariant, TSize, TThemeMode } from '@treeui/vue';
+import { useAppTheme, useDashboardConfig } from '../composables/useDashboardConfig';
 
 const props = defineProps<{
   open: boolean;
@@ -23,6 +24,7 @@ const emit = defineEmits<{
 }>();
 
 const { config, reset } = useDashboardConfig();
+const theme = useAppTheme();
 const toast = useToast();
 
 const isOpen = computed({
@@ -30,7 +32,7 @@ const isOpen = computed({
   set: (value: boolean) => emit('update:open', value),
 });
 
-const themeOptions: Array<{ label: string; value: ThemeMode }> = [
+const themeOptions: Array<{ label: string; value: TThemeMode }> = [
   { label: 'System', value: 'system' },
   { label: 'Light', value: 'light' },
   { label: 'Dark', value: 'dark' },
@@ -89,38 +91,25 @@ function restoreDefaults() {
         hint="System follows your OS preference."
       >
         <TToggleGroup
-          v-model="config.theme"
+          v-model="theme.mode.value"
           aria-label="Theme"
           :options="themeOptions"
           size="sm"
         />
       </TFormField>
 
-      <TFormField label="Accent color">
-        <TStack
-          direction="horizontal"
-          align="center"
-          wrap
-          gap="var(--tree-space-2)"
-        >
-          <button
-            v-for="preset in accentPresets"
-            :key="preset.value"
-            type="button"
-            class="accent__swatch"
-            :class="{ 'is-active': config.accent === preset.value }"
-            :style="{ background: preset.value }"
-            :aria-label="preset.label"
-            :aria-pressed="config.accent === preset.value"
-            @click="config.accent = preset.value"
-          />
-          <input
-            v-model="config.accent"
-            type="color"
-            class="accent__picker"
-            aria-label="Custom accent color"
-          >
-        </TStack>
+      <TFormField
+        label="Accent color"
+        hint="Re-derived per theme so it stays readable in light and dark."
+      >
+        <TColorSwatch
+          :model-value="theme.accent.value ?? undefined"
+          :options="accentPresets"
+          allow-custom
+          label="Accent color"
+          custom-label="Custom accent color"
+          @update:model-value="theme.setAccent($event)"
+        />
       </TFormField>
 
       <TFormField
@@ -183,31 +172,3 @@ function restoreDefaults() {
     </template>
   </TDrawer>
 </template>
-
-<style scoped>
-/* Bespoke: styling native color inputs (swatch buttons + <input type="color">)
-   is app-specific chrome — not something a general component library owns. */
-.accent__swatch {
-  width: 28px;
-  height: 28px;
-  border-radius: var(--tree-radius-full, 999px);
-  border: var(--tree-border-width-subtle) solid var(--tree-color-border-default);
-  cursor: pointer;
-  padding: 0;
-}
-
-.accent__swatch.is-active {
-  outline: 2px solid var(--tree-color-brand-primary);
-  outline-offset: 2px;
-}
-
-.accent__picker {
-  width: 36px;
-  height: 28px;
-  padding: 0;
-  border: var(--tree-border-width-subtle) solid var(--tree-color-border-default);
-  border-radius: var(--tree-radius-sm, 6px);
-  background: var(--tree-color-bg-surface);
-  cursor: pointer;
-}
-</style>

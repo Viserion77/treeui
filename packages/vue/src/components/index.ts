@@ -51,6 +51,8 @@ export { default as TInput } from './TInput.vue';
 export { default as TNumberInput } from './TNumberInput.vue';
 export { default as TSelectableList } from './TSelectableList.vue';
 export type { TSelectableListItem } from './TSelectableList.vue';
+export { default as TColorSwatch } from './TColorSwatch.vue';
+export type { TColorSwatchOption } from './TColorSwatch.vue';
 export { default as TStack } from './TStack.vue';
 export type { TStackDirection } from './TStack.vue';
 export { default as TStackItem } from './TStackItem.vue';

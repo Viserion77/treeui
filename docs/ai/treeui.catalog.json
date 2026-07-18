@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-18T14:47:21.427Z",
+  "generatedAt": "2026-07-18T15:05:23.434Z",
   "packageName": "@treeui/vue",
   "packageVersion": "0.14.0",
   "decisionGuides": [
@@ -1761,6 +1761,92 @@
             "when": "The choice is a single immediate on/off state."
           }
         ]
+      },
+      "setup": {
+        "required": [],
+        "notes": []
+      },
+      "recipes": []
+    },
+    {
+      "name": "TColorSwatch",
+      "aliases": [],
+      "package": "@treeui/vue",
+      "kind": "form",
+      "category": "Data Entry",
+      "status": "available",
+      "purpose": "Pick a colour from a row of preset swatches, with an optional native colour input for an arbitrary value. Built for accent/brand pickers.",
+      "sourceFile": "packages/vue/src/components/TColorSwatch.vue",
+      "storyFile": "apps/docs/src/stories/ColorSwatch.stories.ts",
+      "storyTitle": "Components/Data Entry/ColorSwatch",
+      "manifestFile": "docs/ai/COMPONENTS/color-swatch.yaml",
+      "props": [
+        {
+          "name": "modelValue",
+          "type": "string",
+          "default": "undefined",
+          "note": "Selected colour as a hex string. Matching is case-insensitive."
+        },
+        {
+          "name": "options",
+          "type": "TColorSwatchOption[]",
+          "default": "[]",
+          "note": "Preset swatches, each `{ label, value }`. `label` becomes the button's accessible name."
+        },
+        {
+          "name": "allowCustom",
+          "type": "boolean",
+          "default": "false",
+          "note": "Appends a native `<input type=\"color\">` for values outside the presets."
+        },
+        {
+          "name": "size",
+          "type": "TSize",
+          "default": "md",
+          "values": [
+            "sm",
+            "md",
+            "lg"
+          ]
+        },
+        {
+          "name": "label",
+          "type": "string",
+          "default": "Color",
+          "note": "Accessible label for the swatch group (`role=\"group\"`)."
+        },
+        {
+          "name": "customLabel",
+          "type": "string",
+          "default": "Custom color"
+        },
+        {
+          "name": "disabled",
+          "type": "boolean",
+          "default": "false"
+        }
+      ],
+      "events": [
+        {
+          "name": "update:modelValue"
+        }
+      ],
+      "slots": [],
+      "a11y": [
+        "Wrapper is `role=\"group\"` labelled by `label`.",
+        "Each swatch is a native button with `aria-pressed` reflecting selection and `aria-label` from the option label.",
+        "Selection is conveyed by an outline (not colour alone), since the swatch's own colour is the content."
+      ],
+      "behavior": [
+        "emits_on_preset_click: true",
+        "emits_on_custom_input: true",
+        "blocks_interaction_when_disabled: true"
+      ],
+      "selection": {
+        "keywords": [],
+        "useWhen": [],
+        "avoidWhen": [],
+        "alternatives": []
       },
       "setup": {
         "required": [],

@@ -1,11 +1,24 @@
 import { reactive, watch } from 'vue';
+import { useTheme } from '@treeui/vue';
 import type { TCardVariant, TSize } from '@treeui/vue';
 
-export type ThemeMode = 'system' | 'light' | 'dark';
+/**
+ * Theme mode + accent are a design-system concern, so they live in TreeUI's
+ * `useTheme` rather than in this app config: it resolves `system` against the
+ * OS, writes `data-tree-theme`, and re-derives the accent ramp per theme so a
+ * custom brand colour stays legible in both. Created once at module scope so
+ * every component shares the same controller.
+ */
+const theme = useTheme({
+  storageKey: 'treeui-example-theme',
+  defaultAccent: '#0969da',
+});
+
+export function useAppTheme() {
+  return theme;
+}
 
 export interface DashboardConfig {
-  theme: ThemeMode;
-  accent: string;
   density: TSize;
   cardVariant: TCardVariant;
   widgets: {
@@ -21,8 +34,6 @@ export interface DashboardConfig {
 const STORAGE_KEY = 'treeui-example-dashboard-config';
 
 const DEFAULTS: DashboardConfig = {
-  theme: 'system',
-  accent: '#0969da',
   density: 'md',
   cardVariant: 'outline',
   widgets: {
@@ -52,48 +63,11 @@ function load(): DashboardConfig {
   }
 }
 
-function hexToRgb(hex: string): [number, number, number] | null {
-  const match = /^#([0-9a-f]{6})$/i.exec(hex);
-  if (!match) {
-    return null;
-  }
-  const value = Number.parseInt(match[1], 16);
-  return [(value >> 16) & 0xff, (value >> 8) & 0xff, value & 0xff];
-}
-
-function applyAccent(hex: string) {
-  const rgb = hexToRgb(hex);
-  const style = document.documentElement.style;
-  if (!rgb) {
-    for (const name of ['primary', 'hover', 'soft'] as const) {
-      style.removeProperty(`--tree-color-brand-${name}`);
-    }
-    style.removeProperty('--tree-color-focus-ring');
-    return;
-  }
-  const [r, g, b] = rgb;
-  const hover = rgb.map((channel) => Math.round(channel * 0.8)).join(', ');
-  style.setProperty('--tree-color-brand-primary', hex);
-  style.setProperty('--tree-color-brand-hover', `rgb(${hover})`);
-  style.setProperty('--tree-color-brand-soft', `rgba(${r}, ${g}, ${b}, 0.14)`);
-  style.setProperty('--tree-color-focus-ring', `rgba(${r}, ${g}, ${b}, 0.32)`);
-}
-
-function applyTheme(mode: ThemeMode) {
-  if (mode === 'system') {
-    delete document.documentElement.dataset.treeTheme;
-  } else {
-    document.documentElement.dataset.treeTheme = mode;
-  }
-}
-
 const config = reactive<DashboardConfig>(load());
 
 watch(
   config,
   (next) => {
-    applyTheme(next.theme);
-    applyAccent(next.accent);
     try {
       window.localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
     } catch {
@@ -106,6 +80,8 @@ watch(
 export function useDashboardConfig() {
   const reset = () => {
     Object.assign(config, structuredClone(DEFAULTS));
+    theme.setMode('system');
+    theme.setAccent('#0969da');
   };
 
   return { config, reset };

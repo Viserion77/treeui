@@ -1,4 +1,5 @@
 import {
+  accentCssVariables,
   bestContrast,
   contrastRatio,
   createBrandTheme,
@@ -71,6 +72,41 @@ describe('@treeui/tokens theme generator', () => {
 
     expect(relativeLuminance(parseHex(ramp.hover))).toBeGreaterThan(relativeLuminance(primary));
     expect(relativeLuminance(parseHex(ramp.soft))).toBeLessThan(relativeLuminance(primary));
+  });
+
+  it('lightens a mid-tone accent in dark mode until it is readable on its own tint', () => {
+    // Regression: #0969da reads fine on a light tint but lands at ~2.7:1 on the
+    // dark one, so soft buttons/badges/selected nav became unreadable.
+    const raw = parseHex('#0969da');
+    const ramp = deriveBrandRamp('#0969da', 'dark');
+    const primary = parseHex(ramp.primary);
+
+    expect(relativeLuminance(primary)).toBeGreaterThan(relativeLuminance(raw));
+    expect(contrastRatio(primary, parseHex(ramp.soft))).toBeGreaterThanOrEqual(4.5);
+  });
+
+  it('keeps an already-legible accent verbatim, and can be opted out of', () => {
+    expect(deriveBrandRamp('#2057d4', 'light').primary).toBe('#2057d4');
+    expect(deriveBrandRamp('#0969da', 'dark', { ensureLegible: false }).primary).toBe('#0969da');
+  });
+
+  it('flips the on-brand text color with the derived brand color', () => {
+    // Dark mode lightens the brand, so text on top of it must go dark.
+    expect(deriveBrandRamp('#0969da', 'light').contrast).toBe('#ffffff');
+    expect(deriveBrandRamp('#0969da', 'dark').contrast).toBe('#1c2128');
+  });
+
+  it('maps the ramp onto runtime-applicable css variables', () => {
+    const vars = accentCssVariables('#0969da', 'dark');
+
+    expect(Object.keys(vars)).toEqual([
+      '--tree-color-brand-primary',
+      '--tree-color-brand-hover',
+      '--tree-color-brand-soft',
+      '--tree-color-brand-contrast',
+      '--tree-color-focus-ring',
+    ]);
+    expect(vars['--tree-color-brand-primary']).toBe(deriveBrandRamp('#0969da', 'dark').primary);
   });
 
   it('emits a brand overlay scoped to the theme attribute', () => {

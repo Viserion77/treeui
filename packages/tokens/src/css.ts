@@ -1,5 +1,6 @@
 import {
   bestContrast,
+  contrastRatio,
   darken,
   formatHex,
   lighten,
@@ -100,20 +101,48 @@ export interface BrandThemeOptions {
   overrides?: Partial<BrandRamp>;
 }
 
+/** WCAG AA contrast for normal-size text. */
+const AA_NORMAL = 4.5;
+/** Step used while walking a brand color toward legibility. */
+const LEGIBILITY_STEP = 0.04;
+const LEGIBILITY_MAX_STEPS = 20;
+
 /**
  * Derive a full brand ramp (hover, soft tint, readable contrast, focus ring)
  * from a single primary color. Operates in sRGB; contrast uses WCAG luminance.
+ *
+ * The brand color doubles as *text* on its own soft tint (soft buttons, badges,
+ * selected nav items). A raw accent frequently fails AA there — a mid-tone blue
+ * that reads fine on a light tint drops to ~2.7:1 on the dark one — so by
+ * default the primary is walked darker (light mode) or lighter (dark mode)
+ * until it clears. Pass `ensureLegible: false` to keep the color verbatim.
  */
 export const deriveBrandRamp = (
   primary: string,
   mode: 'light' | 'dark' = 'light',
+  options: { ensureLegible?: boolean } = {},
 ): BrandRamp => {
-  const base = parseHex(primary);
-  const hover = mode === 'light' ? darken(base, 0.18) : lighten(base, 0.16);
-  const soft =
+  const { ensureLegible = true } = options;
+
+  const softFor = (color: Rgb) =>
     mode === 'light'
-      ? mixColors(base, CONTRAST_LIGHT, 0.88)
-      : mixColors(base, SOFT_DARK_BASE, 0.76);
+      ? mixColors(color, CONTRAST_LIGHT, 0.88)
+      : mixColors(color, SOFT_DARK_BASE, 0.76);
+
+  let base = parseHex(primary);
+
+  if (ensureLegible) {
+    for (
+      let step = 0;
+      step < LEGIBILITY_MAX_STEPS && contrastRatio(base, softFor(base)) < AA_NORMAL;
+      step += 1
+    ) {
+      base = mode === 'light' ? darken(base, LEGIBILITY_STEP) : lighten(base, LEGIBILITY_STEP);
+    }
+  }
+
+  const hover = mode === 'light' ? darken(base, 0.18) : lighten(base, 0.16);
+  const soft = softFor(base);
 
   return {
     primary: formatHex(base),
@@ -121,6 +150,26 @@ export const deriveBrandRamp = (
     soft: formatHex(soft),
     contrast: formatHex(bestContrast(base, [CONTRAST_LIGHT, CONTRAST_DARK])),
     focusRing: withAlpha(base, 0.32),
+  };
+};
+
+/**
+ * The brand ramp as the CSS custom properties it maps to, ready to apply at
+ * runtime (e.g. `el.style.setProperty(name, value)`) when an app lets users
+ * pick their own accent color. Re-derive whenever the active theme flips.
+ */
+export const accentCssVariables = (
+  accent: string,
+  mode: 'light' | 'dark' = 'light',
+): Record<string, string> => {
+  const ramp = deriveBrandRamp(accent, mode);
+
+  return {
+    '--tree-color-brand-primary': ramp.primary,
+    '--tree-color-brand-hover': ramp.hover,
+    '--tree-color-brand-soft': ramp.soft,
+    '--tree-color-brand-contrast': ramp.contrast,
+    '--tree-color-focus-ring': ramp.focusRing,
   };
 };
 

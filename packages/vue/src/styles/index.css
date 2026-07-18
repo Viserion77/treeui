@@ -5707,6 +5707,61 @@
   order: -1;
 }
 
+/* ── Color swatch ─────────────────────────────────────── */
+
+.t-color-swatch {
+  --tree-color-swatch-size: 1.75rem;
+
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--tree-space-2);
+}
+
+.t-color-swatch--sm {
+  --tree-color-swatch-size: 1.5rem;
+}
+
+.t-color-swatch--lg {
+  --tree-color-swatch-size: 2rem;
+}
+
+.t-color-swatch__option,
+.t-color-swatch__custom {
+  inline-size: var(--tree-color-swatch-size);
+  block-size: var(--tree-color-swatch-size);
+  padding: 0;
+  border: var(--tree-border-width-subtle) solid var(--tree-color-border-default);
+  cursor: pointer;
+}
+
+.t-color-swatch__option {
+  border-radius: var(--tree-radius-pill);
+}
+
+.t-color-swatch__option.is-selected {
+  outline: 2px solid var(--tree-color-brand-primary);
+  outline-offset: 2px;
+}
+
+.t-color-swatch__option:focus-visible,
+.t-color-swatch__custom:focus-visible {
+  outline: 2px solid var(--tree-color-focus-ring);
+  outline-offset: 2px;
+}
+
+.t-color-swatch__custom {
+  inline-size: calc(var(--tree-color-swatch-size) + var(--tree-space-2));
+  border-radius: var(--tree-radius-sm);
+  background: var(--tree-color-bg-surface);
+}
+
+.t-color-swatch__option:disabled,
+.t-color-swatch__custom:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 /* ── Spacer ───────────────────────────────────────────── */
 
 .t-spacer {

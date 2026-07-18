@@ -1,0 +1,60 @@
+name: TColorSwatch
+source_file: packages/vue/src/components/TColorSwatch.vue
+package: "@treeui/vue"
+kind: form
+status: available
+purpose: "Pick a colour from a row of preset swatches, with an optional native colour input for an arbitrary value. Built for accent/brand pickers."
+
+props:
+  modelValue:
+    type: string
+    default: undefined
+    note: "Selected colour as a hex string. Matching is case-insensitive."
+  options:
+    type: "TColorSwatchOption[]"
+    default: "[]"
+    note: "Preset swatches, each `{ label, value }`. `label` becomes the button's accessible name."
+  allowCustom:
+    type: boolean
+    default: false
+    note: "Appends a native `<input type=\"color\">` for values outside the presets."
+  size:
+    type: TSize
+    default: md
+    values: [sm, md, lg]
+  label:
+    type: string
+    default: Color
+    note: "Accessible label for the swatch group (`role=\"group\"`)."
+  customLabel:
+    type: string
+    default: Custom color
+  disabled:
+    type: boolean
+    default: false
+
+events:
+  - "update:modelValue"
+
+slots: []
+
+a11y:
+  - "Wrapper is `role=\"group\"` labelled by `label`."
+  - "Each swatch is a native button with `aria-pressed` reflecting selection and `aria-label` from the option label."
+  - "Selection is conveyed by an outline (not colour alone), since the swatch's own colour is the content."
+
+behavior:
+  emits_on_preset_click: true
+  emits_on_custom_input: true
+  blocks_interaction_when_disabled: true
+
+related:
+  - "Pair with `useTheme()` to apply the picked colour as the app accent — it re-derives a legible brand ramp per theme."
+
+example: |
+  <TColorSwatch
+    v-model="accent"
+    :options="[{ label: 'Ocean blue', value: '#0969da' }]"
+    allow-custom
+    label="Accent color"
+  />

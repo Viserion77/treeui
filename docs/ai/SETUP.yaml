@@ -30,6 +30,25 @@ global_rules:
   - "Date-only values use `YYYY-MM-DD`."
   - "Date-time values use `YYYY-MM-DDTHH:mm`."
 
+theming:
+  useTheme:
+    purpose: "Theme-mode + accent controller for the app root. Owns the parts of theming that belong to the design system rather than the app."
+    responsibilities:
+      - "Resolves `system` against the OS via `prefers-color-scheme`."
+      - "Writes the resolved theme to `data-tree-theme` on the target element (defaults to `<html>`)."
+      - "Persists `{ mode, accent }` to localStorage (`storageKey`, default `treeui-theme`; pass `null` to disable)."
+      - "Applies a custom accent as `--tree-color-brand-*` / `--tree-color-focus-ring` and RE-DERIVES it whenever the theme flips."
+    returns: "{ mode, resolved, accent, setMode, setAccent }"
+    required:
+      - "Call once near the application root — it mutates a shared element."
+    notes:
+      - "Do not hand-roll accent variables: a raw hex is not legible in both themes. `deriveBrandRamp`/`accentCssVariables` from `@treeui/tokens` walk the colour until it clears WCAG AA on its own soft tint and flip the on-brand text colour with it."
+      - "Pair with `TColorSwatch` for the accent picker UI."
+    example: |
+      const { mode, resolved, accent } = useTheme({ storageKey: 'my-app-theme' });
+      mode.value = 'dark';        // 'system' | 'light' | 'dark'
+      accent.value = '#0969da';   // re-derived per theme automatically
+
 component_setup:
   TToast:
     required:

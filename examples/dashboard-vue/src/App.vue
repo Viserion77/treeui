@@ -22,7 +22,7 @@ import {
 } from '@treeui/vue';
 import type { TNavMenuItem } from '@treeui/vue';
 import logoUrl from './assets/treeui-logo.svg';
-import { useDashboardConfig } from './composables/useDashboardConfig';
+import { useAppTheme, useDashboardConfig } from './composables/useDashboardConfig';
 import {
   IconBell,
   IconGear,
@@ -76,10 +76,11 @@ const viewTitles: Record<string, string> = {
   customers: 'Customers',
 };
 
-const isDark = computed(() => config.theme === 'dark');
+const theme = useAppTheme();
+const isDark = computed(() => theme.resolved.value === 'dark');
 
 function toggleTheme() {
-  config.theme = isDark.value ? 'light' : 'dark';
+  theme.setMode(isDark.value ? 'light' : 'dark');
 }
 
 const userMenu = [

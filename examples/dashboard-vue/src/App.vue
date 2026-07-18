@@ -1,15 +1,14 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 import {
+  TAppShell,
   TAvatar,
   TBadge,
   TButton,
   TDropdown,
   TInput,
   TNavMenu,
-  TNavbar,
   TProgress,
-  TSidebar,
   TToastProvider,
   TTooltip,
   useToast,
@@ -24,6 +23,7 @@ import {
   IconMoon,
   IconOrders,
   IconSearch,
+  IconSidebar,
   IconSun,
   IconUsers,
 } from './icons';
@@ -86,17 +86,118 @@ function onUserMenu(action: string) {
     variant: 'info',
   });
 }
+
+function selectView(value: string, closeSidebar: () => void) {
+  view.value = value;
+  closeSidebar();
+}
 </script>
 
 <template>
   <TToastProvider position="bottom-right">
-    <div class="shell">
-      <TSidebar
-        sticky
-        default-collapsed
-        class="shell__sidebar"
-      >
-        <template #header="{ collapsed }">
+    <TAppShell
+      collapsible
+      sidebar-label="Dashboard navigation"
+      menu-label="Open navigation"
+      class="app"
+    >
+      <template #header="{ mobile, collapsed, toggleCollapsed }">
+        <div class="topbar">
+          <div class="page-title">
+            <h1>{{ viewTitles[view] }}</h1>
+            <TBadge
+              tone="info"
+              size="sm"
+            >
+              Demo
+            </TBadge>
+          </div>
+
+          <div class="topbar__search">
+            <TInput
+              v-model="search"
+              type="search"
+              size="sm"
+              class="navbar-search"
+              placeholder="Search orders, customers…"
+              aria-label="Search"
+            >
+              <template #prefix>
+                <IconSearch
+                  width="16"
+                  height="16"
+                />
+              </template>
+              <template #suffix>
+                <kbd class="navbar-search__kbd">⌘K</kbd>
+              </template>
+            </TInput>
+          </div>
+
+          <!--
+            On mobile the header has no room for these; they move into the
+            navigation drawer (see the #sidebar slot) so nothing overflows.
+          -->
+          <div
+            v-if="!mobile"
+            class="navbar-actions"
+          >
+            <TTooltip :content="collapsed ? 'Expand sidebar' : 'Collapse sidebar'">
+              <TButton
+                variant="ghost"
+                size="sm"
+                :aria-label="collapsed ? 'Expand sidebar' : 'Collapse sidebar'"
+                @click="toggleCollapsed"
+              >
+                <IconSidebar />
+              </TButton>
+            </TTooltip>
+            <TTooltip content="Notifications">
+              <TButton
+                variant="ghost"
+                size="sm"
+                aria-label="Notifications"
+                @click="onNotifications"
+              >
+                <IconBell />
+              </TButton>
+            </TTooltip>
+            <TTooltip :content="isDark ? 'Switch to light theme' : 'Switch to dark theme'">
+              <TButton
+                variant="ghost"
+                size="sm"
+                :aria-label="isDark ? 'Switch to light theme' : 'Switch to dark theme'"
+                @click="toggleTheme"
+              >
+                <component :is="isDark ? IconSun : IconMoon" />
+              </TButton>
+            </TTooltip>
+            <TTooltip content="Customize dashboard">
+              <TButton
+                variant="ghost"
+                size="sm"
+                aria-label="Customize dashboard"
+                @click="settingsOpen = true"
+              >
+                <IconGear />
+              </TButton>
+            </TTooltip>
+            <TDropdown
+              :items="userMenu"
+              size="sm"
+              label="Jef"
+              aria-label="User menu"
+              @select="onUserMenu"
+            />
+          </div>
+        </div>
+      </template>
+
+      <template #sidebar="{ mobile, collapsed, closeSidebar }">
+        <div
+          class="sidebar"
+          :class="{ 'sidebar--collapsed': collapsed }"
+        >
           <div class="brand">
             <img
               :src="logoUrl"
@@ -108,17 +209,53 @@ function onUserMenu(action: string) {
               class="brand__name"
             >Orchard</span>
           </div>
-        </template>
 
-        <TNavMenu
-          v-model="view"
-          aria-label="Dashboard sections"
-          :items="navItems"
-          :size="config.density"
-        />
+          <TNavMenu
+            :model-value="view"
+            aria-label="Dashboard sections"
+            :items="navItems"
+            :size="config.density"
+            @update:model-value="(value) => selectView(value, closeSidebar)"
+          />
 
-        <template #footer="{ collapsed }">
-          <div class="sidebar-foot-group">
+          <div class="sidebar__footer">
+            <!-- Header actions that don't fit the mobile top bar live here. -->
+            <div
+              v-if="mobile"
+              class="drawer-actions"
+            >
+              <TButton
+                variant="ghost"
+                :size="config.density"
+                @click="() => { onNotifications(); closeSidebar(); }"
+              >
+                <template #icon>
+                  <IconBell />
+                </template>
+                Notifications
+              </TButton>
+              <TButton
+                variant="ghost"
+                :size="config.density"
+                @click="toggleTheme"
+              >
+                <template #icon>
+                  <component :is="isDark ? IconSun : IconMoon" />
+                </template>
+                {{ isDark ? 'Light theme' : 'Dark theme' }}
+              </TButton>
+              <TButton
+                variant="ghost"
+                :size="config.density"
+                @click="() => { settingsOpen = true; closeSidebar(); }"
+              >
+                <template #icon>
+                  <IconGear />
+                </template>
+                Settings
+              </TButton>
+            </div>
+
             <div
               v-if="!collapsed"
               class="storage"
@@ -144,124 +281,84 @@ function onUserMenu(action: string) {
               >Jef Almeida</span>
             </div>
           </div>
-        </template>
-      </TSidebar>
+        </div>
+      </template>
 
-      <div class="shell__main">
-        <TNavbar
-          sticky
-          class="shell__navbar"
-        >
-          <template #start>
-            <div class="page-title">
-              <h1>{{ viewTitles[view] }}</h1>
-              <TBadge
-                tone="info"
-                size="sm"
-              >
-                Demo
-              </TBadge>
-            </div>
-          </template>
-          <template #center>
-            <TInput
-              v-model="search"
-              type="search"
-              size="sm"
-              class="navbar-search"
-              placeholder="Search orders, customers…"
-              aria-label="Search"
-            >
-              <template #prefix>
-                <IconSearch
-                  width="16"
-                  height="16"
-                />
-              </template>
-              <template #suffix>
-                <kbd class="navbar-search__kbd">⌘K</kbd>
-              </template>
-            </TInput>
-          </template>
-          <template #end>
-            <div class="navbar-actions">
-              <TTooltip content="Notifications">
-                <TButton
-                  variant="ghost"
-                  size="sm"
-                  aria-label="Notifications"
-                  @click="onNotifications"
-                >
-                  <IconBell />
-                </TButton>
-              </TTooltip>
-              <TTooltip :content="isDark ? 'Switch to light theme' : 'Switch to dark theme'">
-                <TButton
-                  variant="ghost"
-                  size="sm"
-                  :aria-label="isDark ? 'Switch to light theme' : 'Switch to dark theme'"
-                  @click="toggleTheme"
-                >
-                  <component :is="isDark ? IconSun : IconMoon" />
-                </TButton>
-              </TTooltip>
-              <TTooltip content="Customize dashboard">
-                <TButton
-                  variant="ghost"
-                  size="sm"
-                  aria-label="Customize dashboard"
-                  @click="settingsOpen = true"
-                >
-                  <IconGear />
-                </TButton>
-              </TTooltip>
-              <TDropdown
-                :items="userMenu"
-                size="sm"
-                label="Jef"
-                aria-label="User menu"
-                @select="onUserMenu"
-              />
-            </div>
-          </template>
-        </TNavbar>
-
-        <main class="shell__content">
+      <template #default>
+        <div class="content">
           <component
             :is="currentView"
             @navigate="view = $event"
           />
-        </main>
-      </div>
-    </div>
+        </div>
+      </template>
+    </TAppShell>
 
     <SettingsDrawer v-model:open="settingsOpen" />
   </TToastProvider>
 </template>
 
 <style scoped>
-.shell {
-  display: flex;
-  min-height: 100vh;
-  background: var(--tree-color-bg-primary);
-  color: var(--tree-color-text-primary);
+.app {
   font-family: var(--tree-font-family-sans);
 }
 
-.shell__sidebar {
-  height: 100vh;
+/* Header (spans the full width of the shell frame) */
+.topbar {
+  display: flex;
+  align-items: center;
+  gap: var(--tree-space-4);
+  width: 100%;
+  min-width: 0;
 }
 
-.shell__main {
-  flex: 1;
+.page-title {
+  display: flex;
+  align-items: center;
+  gap: var(--tree-space-3);
+  flex-shrink: 0;
+}
+
+.page-title h1 {
+  margin: 0;
+  font-size: var(--tree-font-size-lg);
+  letter-spacing: -0.01em;
+}
+
+.topbar__search {
+  flex: 1 1 auto;
+  display: flex;
+  justify-content: center;
   min-width: 0;
+}
+
+.navbar-search {
+  width: min(22rem, 100%);
+}
+
+.navbar-search__kbd {
+  font-family: var(--tree-font-family-mono);
+  font-size: var(--tree-font-size-xs);
+  color: var(--tree-color-text-muted);
+  border: var(--tree-border-width-subtle) solid var(--tree-color-border-default);
+  border-radius: var(--tree-radius-sm);
+  padding: 0 var(--tree-space-1);
+}
+
+.navbar-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--tree-space-2);
+  flex-shrink: 0;
+}
+
+/* Sidebar (below the header on the left of the frame) */
+.sidebar {
   display: flex;
   flex-direction: column;
-}
-
-.shell__content {
-  padding: var(--tree-space-6);
+  gap: var(--tree-space-4);
   flex: 1;
+  min-height: 0;
 }
 
 .brand {
@@ -269,6 +366,7 @@ function onUserMenu(action: string) {
   align-items: center;
   gap: var(--tree-space-2);
   min-width: 0;
+  min-height: 2rem;
 }
 
 .brand__logo {
@@ -282,7 +380,8 @@ function onUserMenu(action: string) {
   letter-spacing: -0.01em;
 }
 
-.sidebar-foot-group {
+.sidebar__footer {
+  margin-top: auto;
   display: grid;
   gap: var(--tree-space-3);
   min-width: 0;
@@ -322,41 +421,34 @@ function onUserMenu(action: string) {
   white-space: nowrap;
 }
 
-.page-title {
-  display: flex;
-  align-items: center;
-  gap: var(--tree-space-3);
+/* When collapsed, center the logo and avatar on the same axis as the
+   (now icon-only) nav items, so the whole rail lines up. */
+.sidebar--collapsed .brand,
+.sidebar--collapsed .sidebar-foot {
+  justify-content: center;
 }
 
-.page-title h1 {
-  margin: 0;
-  font-size: var(--tree-font-size-lg);
-  letter-spacing: -0.01em;
+/* Header actions relocated into the mobile drawer */
+.drawer-actions {
+  display: grid;
+  gap: var(--tree-space-1);
+  padding-block-end: var(--tree-space-2);
+  border-bottom: var(--tree-border-width-subtle) solid var(--tree-color-border-default);
 }
 
-.navbar-actions {
-  display: flex;
-  align-items: center;
-  gap: var(--tree-space-2);
+.drawer-actions :deep(.t-button) {
+  width: 100%;
+  justify-content: flex-start;
 }
 
-.navbar-search {
-  width: min(20rem, 100%);
-}
-
-.navbar-search__kbd {
-  font-family: var(--tree-font-family-mono);
-  font-size: var(--tree-font-size-xs);
-  color: var(--tree-color-text-muted);
-  border: var(--tree-border-width-subtle) solid var(--tree-color-border-default);
-  border-radius: var(--tree-radius-sm);
-  padding: 0 var(--tree-space-1);
+/* Content panel (inset area to the right of the frame) */
+.content {
+  padding: var(--tree-space-6);
 }
 
 @media (max-width: 768px) {
-  .navbar-search {
+  .topbar__search {
     display: none;
   }
 }
-
 </style>

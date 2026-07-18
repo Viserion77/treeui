@@ -14,6 +14,7 @@ export default [
       '**/node_modules/**',
       'playwright-report/**',
       'test-results/**',
+      '.claude/**',
     ],
   },
   js.configs.recommended,

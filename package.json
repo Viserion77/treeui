@@ -33,8 +33,6 @@
     "typecheck": "pnpm --filter @treeui/tokens typecheck && pnpm --filter @treeui/utils typecheck && pnpm --filter @treeui/icons typecheck && pnpm --filter @treeui/vue typecheck && pnpm --filter @treeui/react typecheck && pnpm --filter @treeui/mcp typecheck && pnpm --filter @treeui/docs typecheck && pnpm --filter @treeui/docs-react typecheck && pnpm --filter @treeui/landing typecheck && pnpm --filter @treeui/example-dashboard-vue typecheck && pnpm --filter @treeui/example-dashboard-react typecheck",
     "test": "pnpm -w exec vitest run --coverage",
     "test:e2e": "pnpm -w exec playwright test",
-    "screenshots": "pnpm -w exec tsx scripts/screenshot-components.ts",
-    "screenshots:only": "pnpm -w exec tsx scripts/screenshot-components.ts --skip-build",
     "render:logos": "node scripts/render-logos.mjs",
     "changeset": "pnpm -w exec changeset",
     "version-packages": "pnpm -w exec changeset version",

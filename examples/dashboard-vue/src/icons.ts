@@ -84,3 +84,8 @@ export const IconPlus = createIcon([
   ['path', { d: 'M12 5v14' }],
   ['path', { d: 'M5 12h14' }],
 ]);
+
+export const IconSidebar = createIcon([
+  ['rect', { x: '3', y: '3', width: '18', height: '18', rx: '2' }],
+  ['path', { d: 'M9 3v18' }],
+]);

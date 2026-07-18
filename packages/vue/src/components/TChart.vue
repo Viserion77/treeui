@@ -622,39 +622,46 @@ const rootClasses = computed(() => [
       </slot>
     </div>
 
-    <!-- Accessible data table: the chart's data as text for assistive tech. -->
-    <table class="t-chart__a11y t-visually-hidden">
-      <caption>{{ resolvedLabel }}</caption>
-      <thead>
-        <tr>
-          <th scope="col">
-            Series
-          </th>
-          <th
-            v-for="index in axisIndices"
-            :key="index"
-            scope="col"
+    <!--
+      Accessible data table: the chart's data as text for assistive tech.
+      The visually-hidden class goes on a wrapper, not the table: a <table>
+      ignores a width below its min-content, so hiding it directly leaves a
+      full-width box that pushes the page's scroll width.
+    -->
+    <div class="t-visually-hidden">
+      <table class="t-chart__a11y">
+        <caption>{{ resolvedLabel }}</caption>
+        <thead>
+          <tr>
+            <th scope="col">
+              Series
+            </th>
+            <th
+              v-for="index in axisIndices"
+              :key="index"
+              scope="col"
+            >
+              {{ labels[index] ?? '' }}
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr
+            v-for="(row, rowIndex) in validSeries"
+            :key="rowIndex"
           >
-            {{ labels[index] ?? '' }}
-          </th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr
-          v-for="(row, rowIndex) in validSeries"
-          :key="rowIndex"
-        >
-          <th scope="row">
-            {{ row.name }}
-          </th>
-          <td
-            v-for="index in axisIndices"
-            :key="index"
-          >
-            {{ row.data[index] === undefined ? '' : formatValue(row.data[index]) }}
-          </td>
-        </tr>
-      </tbody>
-    </table>
+            <th scope="row">
+              {{ row.name }}
+            </th>
+            <td
+              v-for="index in axisIndices"
+              :key="index"
+            >
+              {{ row.data[index] === undefined ? '' : formatValue(row.data[index]) }}
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 </template>

@@ -15,8 +15,17 @@
   margin: -1px;
   overflow: hidden;
   clip: rect(0, 0, 0, 0);
+  /* Modern equivalent of `clip`; also keeps the box from contributing paint. */
+  clip-path: inset(50%);
   white-space: nowrap;
   border: 0;
+}
+
+/* A <table> ignores a width below its min-content, so it would stay full size
+   and add to the page's scroll width. Prefer wrapping a table in a hidden
+   <div>; this is a safety net if the class lands on the table itself. */
+table.t-visually-hidden {
+  table-layout: fixed;
 }
 
 .t-button,
@@ -5656,8 +5665,11 @@
 /* ── Stack ────────────────────────────────────────────── */
 
 .t-stack {
+  /* No explicit width: as a block-level box a flex container already fills its
+     container, while as a flex/grid item it sizes to content. Forcing 100% here
+     made nested stacks (e.g. header clusters) claim the whole row and starve
+     sibling TSpacers of the free space they exist to absorb. */
   display: flex;
-  width: 100%;
 }
 
 .t-stack--vertical {
@@ -6325,6 +6337,15 @@ a.t-nav-menu__item.is-disabled {
 .t-app-shell__menu-button:focus-visible {
   outline: var(--tree-border-width-strong) solid var(--tree-color-focus-ring);
   outline-offset: 2px;
+}
+
+/* The shell is sized to the viewport, which the browser's default 8px body
+   margin breaks (it offsets the frame and adds a stray page scrollbar). Scoped
+   with :has() so it only applies to pages that actually mount an app shell —
+   the library never restyles a consumer's body otherwise. */
+body:has(> .t-app-shell),
+body:has(> * > .t-app-shell) {
+  margin: 0;
 }
 
 .t-app-shell__sidebar {

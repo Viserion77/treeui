@@ -4084,6 +4084,19 @@ describe('TDonutChart', () => {
     expect(wrapper.find('.t-color-swatch__custom').attributes('type')).toBe('color');
   });
 
+  it('wraps the chart data table in a hidden container so it cannot widen the page', () => {
+    // Regression: the class sat on the <table>, which ignores a width below its
+    // min-content, leaving a full-width box that added page scroll width.
+    const wrapper = mount(TChart, {
+      props: { series: [{ name: 'A', data: [1, 2] }], labels: ['a', 'b'] },
+    });
+
+    const hidden = wrapper.find('.t-visually-hidden');
+    expect(hidden.exists()).toBe(true);
+    expect(hidden.element.tagName).toBe('DIV');
+    expect(hidden.find('table.t-chart__a11y').exists()).toBe(true);
+  });
+
   it('renders sidebar header/footer regions and the built-in collapse toggle', async () => {
     const wrapper = mount(TAppShell, {
       props: { mobile: false, collapsible: true },

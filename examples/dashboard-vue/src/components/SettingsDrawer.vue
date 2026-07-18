@@ -97,7 +97,12 @@ function restoreDefaults() {
       </TFormField>
 
       <TFormField label="Accent color">
-        <div class="accent">
+        <TStack
+          direction="horizontal"
+          align="center"
+          wrap
+          gap="var(--tree-space-2)"
+        >
           <button
             v-for="preset in accentPresets"
             :key="preset.value"
@@ -115,7 +120,7 @@ function restoreDefaults() {
             class="accent__picker"
             aria-label="Custom accent color"
           >
-        </div>
+        </TStack>
       </TFormField>
 
       <TFormField
@@ -156,7 +161,11 @@ function restoreDefaults() {
     </TStack>
 
     <template #footer>
-      <div class="drawer-footer">
+      <TStack
+        direction="horizontal"
+        justify="space-between"
+        gap="var(--tree-space-3)"
+      >
         <TButton
           variant="outline"
           size="sm"
@@ -170,19 +179,14 @@ function restoreDefaults() {
         >
           Done
         </TButton>
-      </div>
+      </TStack>
     </template>
   </TDrawer>
 </template>
 
 <style scoped>
-.accent {
-  display: flex;
-  align-items: center;
-  gap: var(--tree-space-2);
-  flex-wrap: wrap;
-}
-
+/* Bespoke: styling native color inputs (swatch buttons + <input type="color">)
+   is app-specific chrome — not something a general component library owns. */
 .accent__swatch {
   width: 28px;
   height: 28px;
@@ -205,12 +209,5 @@ function restoreDefaults() {
   border-radius: var(--tree-radius-sm, 6px);
   background: var(--tree-color-bg-surface);
   cursor: pointer;
-}
-
-.drawer-footer {
-  display: flex;
-  justify-content: space-between;
-  gap: var(--tree-space-3);
-  width: 100%;
 }
 </style>

@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-18T14:11:52.393Z",
+  "generatedAt": "2026-07-18T14:47:21.427Z",
   "packageName": "@treeui/vue",
   "packageVersion": "0.14.0",
   "decisionGuides": [
@@ -6149,6 +6149,82 @@
       "recipes": []
     },
     {
+      "name": "TSplit",
+      "aliases": [],
+      "package": "@treeui/vue",
+      "kind": "layout",
+      "category": "Layout",
+      "status": "available",
+      "purpose": "Responsive two-pane layout (a wider main pane + a narrower aside) that sits side by side and stacks to one column when narrow — no media query.",
+      "sourceFile": "packages/vue/src/components/TSplit.vue",
+      "storyFile": "apps/docs/src/stories/Split.stories.ts",
+      "storyTitle": "Components/Layout/Split",
+      "manifestFile": "docs/ai/COMPONENTS/split.yaml",
+      "props": [
+        {
+          "name": "as",
+          "type": "string",
+          "default": "div"
+        },
+        {
+          "name": "gap",
+          "type": "string",
+          "default": "var(--tree-space-5)"
+        },
+        {
+          "name": "ratio",
+          "type": "number",
+          "default": "2",
+          "note": "How many times faster the main pane grows than the aside pane."
+        },
+        {
+          "name": "minWidth",
+          "type": "string",
+          "default": "18rem",
+          "note": "Min width each pane keeps before the layout wraps to a single column (flex-wrap, no @media)."
+        },
+        {
+          "name": "side",
+          "type": "start | end",
+          "default": "end",
+          "note": "Which side the aside pane sits on when side by side."
+        },
+        {
+          "name": "align",
+          "type": "string",
+          "default": "start",
+          "note": "Cross-axis alignment (align-items)."
+        }
+      ],
+      "events": [],
+      "slots": [
+        {
+          "name": "default"
+        },
+        {
+          "name": "aside"
+        }
+      ],
+      "a11y": [
+        "Layout-only wrapper; semantics come from the slotted content."
+      ],
+      "behavior": [
+        "wraps_to_single_column_when_narrow: true",
+        "media_query_free: true"
+      ],
+      "selection": {
+        "keywords": [],
+        "useWhen": [],
+        "avoidWhen": [],
+        "alternatives": []
+      },
+      "setup": {
+        "required": [],
+        "notes": []
+      },
+      "recipes": []
+    },
+    {
       "name": "TStack",
       "aliases": [],
       "package": "@treeui/vue",
@@ -6251,6 +6327,80 @@
         "data-listing",
         "chart-surface"
       ]
+    },
+    {
+      "name": "TStackItem",
+      "aliases": [],
+      "package": "@treeui/vue",
+      "kind": "layout",
+      "category": "Layout",
+      "status": "available",
+      "purpose": "Per-child flex control inside a TStack — grow, shrink, basis, min width and align-self — so one item can fill the row without hand-written CSS.",
+      "sourceFile": "packages/vue/src/components/TStackItem.vue",
+      "storyFile": "apps/docs/src/stories/StackItem.stories.ts",
+      "storyTitle": "Components/Layout/StackItem",
+      "manifestFile": "docs/ai/COMPONENTS/stack-item.yaml",
+      "props": [
+        {
+          "name": "as",
+          "type": "string",
+          "default": "div"
+        },
+        {
+          "name": "grow",
+          "type": "boolean | number",
+          "default": "false",
+          "note": "true = flex-grow 1; a number sets the grow factor."
+        },
+        {
+          "name": "shrink",
+          "type": "boolean | number",
+          "default": "undefined",
+          "note": "false prevents shrinking; a number sets the shrink factor."
+        },
+        {
+          "name": "basis",
+          "type": "string",
+          "default": "undefined",
+          "note": "flex-basis (initial main-axis size)."
+        },
+        {
+          "name": "minWidth",
+          "type": "string",
+          "default": "undefined",
+          "note": "Minimum main-axis size before it wraps/shrinks."
+        },
+        {
+          "name": "align",
+          "type": "string",
+          "default": "undefined",
+          "note": "Per-item cross-axis alignment (align-self)."
+        }
+      ],
+      "events": [],
+      "slots": [
+        {
+          "name": "default"
+        }
+      ],
+      "a11y": [
+        "Layout-only wrapper; semantics come from the slotted content."
+      ],
+      "behavior": [
+        "controls_single_flex_child: true",
+        "defaults_min_inline_size_zero: true"
+      ],
+      "selection": {
+        "keywords": [],
+        "useWhen": [],
+        "avoidWhen": [],
+        "alternatives": []
+      },
+      "setup": {
+        "required": [],
+        "notes": []
+      },
+      "recipes": []
     },
     {
       "name": "TStat",

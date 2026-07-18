@@ -14,6 +14,7 @@ import {
   TPagination,
   TSelect,
   TStack,
+  TStackItem,
   TTable,
   TText,
   useToast,
@@ -187,18 +188,24 @@ function createOrder() {
         wrap
         gap="var(--tree-space-3)"
       >
-        <TInput
-          v-model="search"
-          type="search"
-          placeholder="Search orders…"
-          aria-label="Search orders"
-          :size="config.density"
-          class="toolbar__search"
+        <TStackItem
+          grow
+          basis="0"
+          min-width="14rem"
         >
-          <template #prefix>
-            <TIcon name="search" />
-          </template>
-        </TInput>
+          <TInput
+            v-model="search"
+            type="search"
+            placeholder="Search orders…"
+            aria-label="Search orders"
+            :size="config.density"
+            style="width: 100%"
+          >
+            <template #prefix>
+              <TIcon name="search" />
+            </template>
+          </TInput>
+        </TStackItem>
         <TSelect
           v-model="statusFilter"
           aria-label="Filter by status"
@@ -346,13 +353,3 @@ function createOrder() {
     @confirm="confirmDelete"
   />
 </template>
-
-<style scoped>
-/* Let the search grow to fill the toolbar row.
-   GAP: TStack grows the container, not an individual child — there is no
-   `grow` on a stack *item* (or a <TStackItem grow>) yet. */
-.toolbar__search {
-  flex: 1;
-  min-width: 14rem;
-}
-</style>

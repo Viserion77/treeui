@@ -1,0 +1,47 @@
+name: TStackItem
+source_file: packages/vue/src/components/TStackItem.vue
+package: "@treeui/vue"
+kind: layout
+status: available
+purpose: "Per-child flex control inside a TStack — grow, shrink, basis, min width and align-self — so one item can fill the row without hand-written CSS."
+
+props:
+  as:
+    type: string
+    default: div
+  grow:
+    type: "boolean | number"
+    default: false
+    note: "true = flex-grow 1; a number sets the grow factor."
+  shrink:
+    type: "boolean | number"
+    default: undefined
+    note: "false prevents shrinking; a number sets the shrink factor."
+  basis:
+    type: string
+    default: undefined
+    note: "flex-basis (initial main-axis size)."
+  minWidth:
+    type: string
+    default: undefined
+    note: "Minimum main-axis size before it wraps/shrinks."
+  align:
+    type: string
+    default: undefined
+    note: "Per-item cross-axis alignment (align-self)."
+
+slots:
+  - default
+
+behavior:
+  controls_single_flex_child: true
+  defaults_min_inline_size_zero: true
+
+a11y:
+  - "Layout-only wrapper; semantics come from the slotted content."
+
+example: |
+  <TStack direction="horizontal" align="center" gap="var(--tree-space-3)">
+    <TStackItem grow min-width="14rem"><TInput placeholder="Search…" /></TStackItem>
+    <TButton>New</TButton>
+  </TStack>

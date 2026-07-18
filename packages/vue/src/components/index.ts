@@ -53,6 +53,8 @@ export { default as TSelectableList } from './TSelectableList.vue';
 export type { TSelectableListItem } from './TSelectableList.vue';
 export { default as TStack } from './TStack.vue';
 export type { TStackDirection } from './TStack.vue';
+export { default as TStackItem } from './TStackItem.vue';
+export { default as TSplit } from './TSplit.vue';
 export { default as TSpacer } from './TSpacer.vue';
 export { default as TKbd } from './TKbd.vue';
 export { default as TText } from './TText.vue';

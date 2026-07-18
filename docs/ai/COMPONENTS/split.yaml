@@ -1,0 +1,47 @@
+name: TSplit
+source_file: packages/vue/src/components/TSplit.vue
+package: "@treeui/vue"
+kind: layout
+status: available
+purpose: "Responsive two-pane layout (a wider main pane + a narrower aside) that sits side by side and stacks to one column when narrow — no media query."
+
+props:
+  as:
+    type: string
+    default: div
+  gap:
+    type: string
+    default: var(--tree-space-5)
+  ratio:
+    type: number
+    default: 2
+    note: "How many times faster the main pane grows than the aside pane."
+  minWidth:
+    type: string
+    default: 18rem
+    note: "Min width each pane keeps before the layout wraps to a single column (flex-wrap, no @media)."
+  side:
+    type: "start | end"
+    default: end
+    note: "Which side the aside pane sits on when side by side."
+  align:
+    type: string
+    default: start
+    note: "Cross-axis alignment (align-items)."
+
+slots:
+  - default   # main pane
+  - aside     # secondary pane (omitted → main fills full width)
+
+behavior:
+  wraps_to_single_column_when_narrow: true
+  media_query_free: true
+
+a11y:
+  - "Layout-only wrapper; semantics come from the slotted content."
+
+example: |
+  <TSplit :ratio="1.6" min-width="26rem">
+    <MainDashboard />
+    <template #aside><SidePanel /></template>
+  </TSplit>

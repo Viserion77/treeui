@@ -5680,6 +5680,33 @@
   min-block-size: 0;
 }
 
+.t-stack-item {
+  min-inline-size: 0;
+}
+
+/* ── Split (responsive main + aside) ──────────────────── */
+
+.t-split {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--tree-split-gap, var(--tree-space-5));
+  align-items: var(--tree-split-align, flex-start);
+}
+
+.t-split__main {
+  flex: var(--tree-split-ratio, 2) 1 0;
+  min-inline-size: min(var(--tree-split-min, 18rem), 100%);
+}
+
+.t-split__aside {
+  flex: 1 1 0;
+  min-inline-size: min(var(--tree-split-min, 18rem), 100%);
+}
+
+.t-split--start > .t-split__aside {
+  order: -1;
+}
+
 /* ── Spacer ───────────────────────────────────────────── */
 
 .t-spacer {

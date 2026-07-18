@@ -42,6 +42,8 @@ import TToastProvider from './TToastProvider.vue';
 import TAvatar from './TAvatar.vue';
 import TDivider from './TDivider.vue';
 import TStack from './TStack.vue';
+import TStackItem from './TStackItem.vue';
+import TSplit from './TSplit.vue';
 import TSpacer from './TSpacer.vue';
 import TKbd from './TKbd.vue';
 import TText from './TText.vue';
@@ -4009,5 +4011,42 @@ describe('TDonutChart', () => {
     expect(wrapper.element.tagName).toBe('SPAN');
     expect(wrapper.classes()).toContain('t-text');
     expect(wrapper.classes().some((c) => c.startsWith('t-text--'))).toBe(false);
+  });
+
+  it('renders a split with main and aside panes and honours side', () => {
+    const wrapper = mount(TSplit, {
+      props: { side: 'start', ratio: 1.6, minWidth: '20rem' },
+      slots: { default: '<p class="main">Main</p>', aside: '<p class="aside">Aside</p>' },
+    });
+
+    expect(wrapper.classes()).toContain('t-split');
+    expect(wrapper.classes()).toContain('t-split--start');
+    expect(wrapper.find('.t-split__main .main').exists()).toBe(true);
+    expect(wrapper.find('.t-split__aside .aside').exists()).toBe(true);
+    expect(wrapper.attributes('style')).toContain('--tree-split-ratio: 1.6');
+    expect(wrapper.attributes('style')).toContain('--tree-split-min: 20rem');
+  });
+
+  it('omits the split aside pane when the slot is empty', () => {
+    const wrapper = mount(TSplit, { slots: { default: 'Only main' } });
+    expect(wrapper.find('.t-split__aside').exists()).toBe(false);
+  });
+
+  it('applies flex sizing to a stack item', () => {
+    const wrapper = mount(TStackItem, {
+      props: { grow: true, shrink: false, minWidth: '14rem' },
+      slots: { default: 'Cell' },
+    });
+
+    expect(wrapper.classes()).toContain('t-stack-item');
+    const style = wrapper.attributes('style') ?? '';
+    expect(style).toContain('flex-grow: 1');
+    expect(style).toContain('flex-shrink: 0');
+    expect(style).toContain('min-inline-size: 14rem');
+  });
+
+  it('supports a numeric grow factor on a stack item', () => {
+    const wrapper = mount(TStackItem, { props: { grow: 3 }, slots: { default: 'x' } });
+    expect(wrapper.attributes('style')).toContain('flex-grow: 3');
   });
 });

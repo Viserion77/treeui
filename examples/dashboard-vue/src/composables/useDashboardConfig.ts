@@ -1,5 +1,5 @@
 import { reactive, watch } from 'vue';
-import { useTheme } from '@treeui/vue';
+import { treeCardVariants, treeSizes, useTheme } from '@treeui/vue';
 import type { TCardVariant, TSize } from '@treeui/vue';
 
 /**
@@ -19,6 +19,11 @@ export function useAppTheme() {
 }
 
 export interface DashboardConfig {
+  /**
+   * Presented as "Density" in the settings drawer, but it is TreeUI's `size`
+   * prop — the design system has no density axis of its own. See
+   * docs/ai/DECISIONS.md → "Density".
+   */
   density: TSize;
   cardVariant: TCardVariant;
   widgets: {
@@ -46,6 +51,16 @@ const DEFAULTS: DashboardConfig = {
   },
 };
 
+/**
+ * Persisted values outlive the version of TreeUI that wrote them, so anything
+ * restored from storage is checked against the current contract before use —
+ * a browser holding the retired card variant `solid` falls back to the default
+ * instead of rendering an unstyled card.
+ */
+function pick<T extends string>(value: unknown, allowed: readonly T[], fallback: T): T {
+  return allowed.includes(value as T) ? (value as T) : fallback;
+}
+
 function load(): DashboardConfig {
   try {
     const raw = window.localStorage.getItem(STORAGE_KEY);
@@ -56,6 +71,8 @@ function load(): DashboardConfig {
     return {
       ...structuredClone(DEFAULTS),
       ...saved,
+      density: pick(saved.density, treeSizes, DEFAULTS.density),
+      cardVariant: pick(saved.cardVariant, treeCardVariants, DEFAULTS.cardVariant),
       widgets: { ...DEFAULTS.widgets, ...saved.widgets },
     };
   } catch {

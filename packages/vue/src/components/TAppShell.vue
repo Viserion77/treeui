@@ -94,6 +94,8 @@ export interface AppShellSlotProps {
 
 defineSlots<{
   header?: (props: AppShellSlotProps) => unknown;
+  /** Header region over the sidebar rail; the `header` slot then aligns with the content panel. */
+  'header-start'?: (props: AppShellSlotProps) => unknown;
   /** Pinned above the sidebar body, inset to line up with nav item icons. */
   'sidebar-header'?: (props: AppShellSlotProps) => unknown;
   sidebar?: (props: AppShellSlotProps) => unknown;
@@ -368,7 +370,10 @@ const slotProps = computed<AppShellSlotProps>(() => ({
     :style="rootStyle"
     :data-mobile="isMobile ? 'true' : 'false'"
   >
-    <header class="t-app-shell__header">
+    <header
+      class="t-app-shell__header"
+      :class="{ 'has-start': Boolean($slots['header-start']) }"
+    >
       <button
         v-if="isMobile && showMenuButton"
         type="button"
@@ -415,6 +420,16 @@ const slotProps = computed<AppShellSlotProps>(() => ({
           </svg>
         </slot>
       </button>
+
+      <div
+        v-if="$slots['header-start']"
+        class="t-app-shell__header-start"
+      >
+        <slot
+          name="header-start"
+          v-bind="slotProps"
+        />
+      </div>
 
       <div class="t-app-shell__header-content">
         <slot

@@ -1113,29 +1113,6 @@ table.t-visually-hidden {
   background: var(--tree-color-bg-subtle);
 }
 
-.t-card--solid {
-  /* Captured here, before the child scope below redefines text-primary. */
-  --t-card-solid-surface: var(--tree-color-text-primary);
-
-  background: var(--t-card-solid-surface);
-  color: var(--tree-color-bg-surface);
-  border-color: transparent;
-}
-
-/* The solid variant inverts its surface, so re-scope the core color tokens for
-   nested content (titles, tables, timelines, dividers, …) to stay legible.
-   Backgrounds are mixed over the captured surface color (not transparency) so
-   floating layers like dropdown menus and select listboxes remain opaque. */
-.t-card--solid > * {
-  --tree-color-text-primary: var(--tree-color-text-inverse);
-  --tree-color-text-muted: color-mix(in srgb, var(--tree-color-text-inverse) 72%, var(--t-card-solid-surface));
-  --tree-color-bg-primary: var(--t-card-solid-surface);
-  --tree-color-bg-surface: color-mix(in srgb, var(--tree-color-text-inverse) 8%, var(--t-card-solid-surface));
-  --tree-color-bg-subtle: color-mix(in srgb, var(--tree-color-text-inverse) 12%, var(--t-card-solid-surface));
-  --tree-color-border-default: color-mix(in srgb, var(--tree-color-text-inverse) 24%, var(--t-card-solid-surface));
-  --tree-color-border-strong: color-mix(in srgb, var(--tree-color-text-inverse) 40%, var(--t-card-solid-surface));
-}
-
 .t-card--inset {
   background: var(--tree-color-bg-subtle);
   border-color: var(--tree-color-border-default);
@@ -1548,6 +1525,16 @@ table.t-visually-hidden {
 
 .t-drawer {
   display: inline-flex;
+}
+
+/* These wrappers only exist to host an optional trigger; the overlay itself is
+   teleported to <body>. Used without a trigger they are empty inline-level
+   boxes that still generate a line box (~1 line tall), silently adding height
+   to the page — enough to push a viewport-sized shell past 100vh and produce a
+   second scrollbar. Take them out of layout when there is nothing to host. */
+.t-drawer:not(:has(> .t-drawer__trigger)),
+.t-modal:not(:has(> .t-modal__trigger)) {
+  display: contents;
 }
 
 .t-drawer__trigger {
@@ -6296,13 +6283,15 @@ a.t-nav-menu__item.is-disabled {
 }
 
 .t-app-shell__header {
+  --tree-app-shell-header-pad: clamp(var(--tree-space-4), 3vw, var(--tree-space-6));
+
   grid-area: header;
   display: flex;
   align-items: center;
   gap: var(--tree-space-3);
   min-inline-size: 0;
   min-block-size: 4rem;
-  padding-inline: clamp(var(--tree-space-4), 3vw, var(--tree-space-6));
+  padding-inline: var(--tree-app-shell-header-pad);
   /* Inherits the frame surface from the shell — no divider against the sidebar. */
   background: transparent;
 }
@@ -6310,6 +6299,43 @@ a.t-nav-menu__item.is-disabled {
 .t-app-shell__header-content {
   flex: 1 1 auto;
   min-inline-size: 0;
+}
+
+/* With a start region the header mirrors the shell's own columns, so whatever
+   sits in the `header` slot lines up with the content panel underneath it
+   instead of floating over the rail boundary. */
+.t-app-shell__header.has-start {
+  display: grid;
+  grid-template-columns: var(--tree-app-shell-track) minmax(0, 1fr);
+  /* The regions carry their own padding; a column gap here would push the main
+     region off the content panel's edge. */
+  gap: 0;
+  padding-inline: 0;
+  transition: grid-template-columns var(--tree-motion-duration-moderate)
+    var(--tree-motion-easing-standard);
+}
+
+.t-app-shell__header.has-start > .t-app-shell__header-start {
+  min-inline-size: 0;
+  padding-inline: var(--tree-app-shell-header-pad);
+}
+
+.t-app-shell__header.has-start > .t-app-shell__header-content {
+  min-inline-size: 0;
+  /* No leading padding: the region already starts on the content panel's edge. */
+  padding-inline: 0 var(--tree-app-shell-header-pad);
+}
+
+/* Mobile has no rail, so fall back to a single flowing row. */
+.t-app-shell.is-mobile .t-app-shell__header.has-start {
+  display: flex;
+  gap: var(--tree-space-3);
+  padding-inline: var(--tree-app-shell-header-pad);
+}
+
+.t-app-shell.is-mobile .t-app-shell__header.has-start > .t-app-shell__header-start,
+.t-app-shell.is-mobile .t-app-shell__header.has-start > .t-app-shell__header-content {
+  padding-inline: 0;
 }
 
 .t-app-shell__menu-button {

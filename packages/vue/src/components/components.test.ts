@@ -4119,6 +4119,22 @@ describe('TDonutChart', () => {
     expect(wrapper.emitted('update:collapsed')?.[0]).toEqual([true]);
   });
 
+  it('mirrors the shell columns in the header only when a start region is given', () => {
+    const plain = mount(TAppShell, {
+      props: { mobile: false },
+      slots: { header: '<span>title</span>' },
+    });
+    expect(plain.find('.t-app-shell__header').classes()).not.toContain('has-start');
+    expect(plain.find('.t-app-shell__header-start').exists()).toBe(false);
+
+    const split = mount(TAppShell, {
+      props: { mobile: false },
+      slots: { 'header-start': '<span class="rail">title</span>', header: '<span>tools</span>' },
+    });
+    expect(split.find('.t-app-shell__header').classes()).toContain('has-start');
+    expect(split.find('.t-app-shell__header-start .rail').exists()).toBe(true);
+  });
+
   it('omits the collapse toggle when collapsing is off or opted out', () => {
     const notCollapsible = mount(TAppShell, {
       props: { mobile: false, collapsible: false },

@@ -8,7 +8,6 @@ const cardClass = tv({
     variant: {
       outline: 't-card--outline',
       soft: 't-card--soft',
-      solid: 't-card--solid',
       inset: 't-card--inset',
     },
     size: {

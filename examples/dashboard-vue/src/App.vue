@@ -30,6 +30,7 @@ import {
   IconMoon,
   IconOrders,
   IconSearch,
+  IconSidebar,
   IconSun,
   IconUsers,
 } from './icons';
@@ -44,6 +45,9 @@ const toast = useToast();
 const view = ref('overview');
 const settingsOpen = ref(false);
 const search = ref('');
+// Tracked so the collapse control can live next to the user row while expanded,
+// and fall back to the shell's built-in (centred) toggle once collapsed.
+const sidebarCollapsed = ref(false);
 
 function onNotifications() {
   toast.add({
@@ -103,38 +107,40 @@ function selectView(value: string, closeSidebar: () => void) {
 <template>
   <TToastProvider position="bottom-right">
     <TAppShell
+      v-model:collapsed="sidebarCollapsed"
       collapsible
+      :show-collapse-button="sidebarCollapsed"
       sidebar-label="Dashboard navigation"
       menu-label="Open navigation"
     >
+      <template #header-start>
+        <TStack
+          direction="horizontal"
+          align="center"
+          gap="var(--tree-space-3)"
+        >
+          <TText
+            as="h1"
+            size="lg"
+            weight="semibold"
+          >
+            {{ viewTitles[view] }}
+          </TText>
+          <TBadge
+            tone="info"
+            size="sm"
+          >
+            Demo
+          </TBadge>
+        </TStack>
+      </template>
+
       <template #header="{ mobile }">
         <TStack
           direction="horizontal"
           align="center"
           gap="var(--tree-space-4)"
         >
-          <TStack
-            direction="horizontal"
-            align="center"
-            gap="var(--tree-space-3)"
-          >
-            <TText
-              as="h1"
-              size="lg"
-              weight="semibold"
-            >
-              {{ viewTitles[view] }}
-            </TText>
-            <TBadge
-              tone="info"
-              size="sm"
-            >
-              Demo
-            </TBadge>
-          </TStack>
-
-          <TSpacer />
-
           <TInput
             v-if="!mobile"
             v-model="search"
@@ -237,7 +243,7 @@ function selectView(value: string, closeSidebar: () => void) {
         />
       </template>
 
-      <template #sidebar-footer="{ mobile, collapsed, closeSidebar }">
+      <template #sidebar-footer="{ mobile, collapsed, closeSidebar, toggleCollapsed }">
         <!-- Header actions that don't fit the mobile top bar live here. -->
         <template v-if="mobile">
           <TStack gap="var(--tree-space-1)">
@@ -315,14 +321,26 @@ function selectView(value: string, closeSidebar: () => void) {
             size="sm"
             alt="Jef Almeida"
           />
-          <TText
-            v-if="!collapsed"
-            as="small"
-            tone="muted"
-            truncate
-          >
-            Jef Almeida
-          </TText>
+          <template v-if="!collapsed">
+            <TText
+              as="small"
+              tone="muted"
+              truncate
+            >
+              Jef Almeida
+            </TText>
+            <TSpacer />
+            <TTooltip content="Collapse sidebar">
+              <TButton
+                variant="ghost"
+                size="sm"
+                aria-label="Collapse sidebar"
+                @click="toggleCollapsed"
+              >
+                <IconSidebar />
+              </TButton>
+            </TTooltip>
+          </template>
         </TStack>
       </template>
 

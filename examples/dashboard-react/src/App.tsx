@@ -20,6 +20,10 @@ const themeOptions: Array<{ label: string; value: ThemeMode }> = [
   { label: 'Dark', value: 'dark' },
 ];
 
+/**
+ * "Density" is this app's label for TreeUI's `size` prop — TreeUI has no
+ * density axis of its own (see docs/ai/DECISIONS.md → "Density").
+ */
 const densityOptions: Array<{ label: string; value: TSize }> = [
   { label: 'Compact', value: 'sm' },
   { label: 'Comfortable', value: 'md' },

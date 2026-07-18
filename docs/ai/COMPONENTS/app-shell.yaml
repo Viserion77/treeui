@@ -76,7 +76,8 @@ events:
   - sidebar-open-change
 
 slots:
-  - header
+  - header           # aligns with the content panel when `header-start` is used
+  - header-start     # header region over the sidebar rail
   - sidebar-header   # pinned above the sidebar body
   - sidebar
   - sidebar-footer   # pinned to the bottom of the sidebar
@@ -112,6 +113,7 @@ behavior:
   exposes_slot_props_with_mobile_collapsed_and_toggles: true
   sidebar_footer_pinned_to_bottom: true
   sidebar_header_and_footer_inset_to_align_with_nav_icons: true
+  header_mirrors_shell_columns_when_header_start_is_used: true
 
 usage:
   vue_pattern: "Supports v-model:collapsed (desktop rail) and v-model:sidebarOpen (mobile drawer). Header and sidebar slots receive { mobile, collapsed, sidebarOpen, toggleSidebar, closeSidebar, toggleCollapsed }. Place a TNavMenu in the sidebar slot; it inherits collapsed state automatically. Set collapsible to enable the desktop rail. The shell fills 100dvh and 100% width, so mount it at the app root and do not wrap its content in a max-width TContainer unless a specific region needs constrained reading width."

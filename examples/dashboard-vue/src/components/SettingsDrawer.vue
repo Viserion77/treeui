@@ -38,16 +38,22 @@ const themeOptions: Array<{ label: string; value: TThemeMode }> = [
   { label: 'Dark', value: 'dark' },
 ];
 
+/**
+ * "Density" is this app's label for TreeUI's `size` prop — TreeUI has no
+ * density axis of its own (see docs/ai/DECISIONS.md → "Density"). End users
+ * recognize density in a preferences panel; the dashboard maps it onto the
+ * `size` every sized component already accepts.
+ */
 const densityOptions: Array<{ label: string; value: TSize }> = [
   { label: 'Compact', value: 'sm' },
   { label: 'Comfortable', value: 'md' },
   { label: 'Spacious', value: 'lg' },
 ];
 
+/** Card variants are a surface scale: plain → tinted → recessed. */
 const cardVariantOptions: Array<{ label: string; value: TCardVariant }> = [
   { label: 'Outline', value: 'outline' },
   { label: 'Soft', value: 'soft' },
-  { label: 'Solid', value: 'solid' },
   { label: 'Inset', value: 'inset' },
 ];
 
@@ -114,7 +120,7 @@ function restoreDefaults() {
 
       <TFormField
         label="Density"
-        hint="Controls the size of tables, inputs, and buttons."
+        hint="Sets the size prop on tables, inputs, and buttons."
       >
         <TToggleGroup
           v-model="config.density"
@@ -124,7 +130,10 @@ function restoreDefaults() {
         />
       </TFormField>
 
-      <TFormField label="Card style">
+      <TFormField
+        label="Card style"
+        hint="How much the card surface stands out from the page."
+      >
         <TSelect
           v-model="config.cardVariant"
           aria-label="Card style"

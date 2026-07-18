@@ -80,7 +80,8 @@ consumer-app wiring changes, update `docs/ai/SETUP.yaml`.
 
 - **Sizes**: `sm | md | lg` — shared across most components.
 - **Action variants**: `solid | outline | ghost | soft | danger`.
-- **Card variants**: `outline | soft | solid | inset`.
+- **Card variants**: `outline | soft | inset` — a surface scale, not action variants. `solid` is
+  deliberately absent from cards; see `docs/ai/DECISIONS.md` → "Variant Vocabulary".
 - **Form components**: use the `modelValue` prop + `update:modelValue` emit for `v-model`.
 - **Overlay components**: use `open`/`defaultOpen` props + `update:open`/`open-change` emits; use the
   `useControllableOpen` composable from `packages/vue/src/composables/`.

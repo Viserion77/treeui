@@ -222,12 +222,6 @@
   background: var(--tree-color-bg-subtle);
 }
 
-.t-card--solid {
-  background: var(--tree-color-text-primary);
-  color: var(--tree-color-bg-surface);
-  border-color: transparent;
-}
-
 .t-card--inset {
   background: var(--tree-color-bg-subtle);
   border-color: var(--tree-color-border-default);

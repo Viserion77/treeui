@@ -183,7 +183,7 @@ components:
   cards:
     reference-structure: [image, title, description, action-button]
     treeui-structure: [header-slot, body-slot, footer-slot]
-    treeui-variants: [outline, soft, solid]
+    treeui-variants: [outline, soft, inset]
     treeui-sizes: [sm, md, lg]
 
   badges:

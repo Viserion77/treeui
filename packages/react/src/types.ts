@@ -3,5 +3,5 @@
 // shared package in a future release.
 export type TSize = 'sm' | 'md' | 'lg';
 export type TVariant = 'solid' | 'outline' | 'ghost' | 'soft' | 'danger';
-export type TCardVariant = 'outline' | 'soft' | 'solid' | 'inset';
+export type TCardVariant = 'outline' | 'soft' | 'inset';
 export type TBadgeTone = 'neutral' | 'success' | 'warning' | 'danger' | 'info';

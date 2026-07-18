@@ -68,7 +68,11 @@ shared_sizes:
 
 shared_variants:
   action_values: [solid, outline, ghost, soft, danger]
-  card_values: [outline, soft, solid, inset]
+  card_values: [outline, soft, inset]
+  card_values_note: >
+    Card variants are a surface scale (plain → tinted → recessed), a different
+    axis from the action variants above. `solid` is deliberately absent: it is
+    an action variant only. See DECISIONS.md → "Variant Vocabulary".
   button_extra_values:
     values: [brand]
     note: "TButton adds a high-emphasis `brand` gradient variant (via `--tree-gradient-brand`) on top of the shared action values. It is button-only, not a shared action variant."

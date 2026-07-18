@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { TBadge, TButton, TCard } from '@treeui/react';
+import type { TCardVariant } from '@treeui/react';
 
 const meta = {
   title: 'Components/Card',
@@ -8,7 +9,9 @@ const meta = {
   argTypes: {
     variant: {
       control: 'select',
-      options: ['outline', 'soft', 'solid', 'inset'],
+      // `satisfies` ties the control to the contract, so a retired variant
+      // left behind here fails typecheck instead of shipping to autodocs.
+      options: ['outline', 'soft', 'inset'] satisfies TCardVariant[],
     },
     size: { control: 'select', options: ['sm', 'md', 'lg'] },
   },

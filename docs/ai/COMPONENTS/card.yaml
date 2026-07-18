@@ -12,7 +12,7 @@ props:
   variant:
     type: TCardVariant
     default: outline
-    values: [outline, soft, solid, inset]
+    values: [outline, soft, inset]
   size:
     type: TSize
     default: md
@@ -32,6 +32,13 @@ slots:
 
 behavior:
   body_wrapper_class: t-card__body
-  solid_variant_rescopes_color_tokens_for_nested_content: true
+  variant_effects:
+    outline: "Base surface with a default border. The styling baseline — the `t-card--outline` class is emitted but carries no CSS rule of its own."
+    soft: "Subtle tinted surface (bg-subtle), same border and shadow as outline."
+    inset: "Same tinted surface as soft, but with no shadow, so it reads as recessed inside another surface."
+  note: >
+    No card variant inverts its surface, so nested content inherits the normal
+    color tokens. For a high-emphasis card, use a brand-colored border rather
+    than an inverted background.
 
 example: '<TCard><p>Quiet elegance for product UI.</p></TCard>'

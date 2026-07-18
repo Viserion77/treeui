@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite';
-import { TBadge, TButton, TCard } from '@treeui/vue';
+import { TBadge, TButton, TCard, treeCardVariants } from '@treeui/vue';
 
 const meta = {
   title: 'Components/Data Display/Card',
@@ -12,7 +12,8 @@ const meta = {
   argTypes: {
     variant: {
       control: 'select',
-      options: ['outline', 'soft', 'solid', 'inset'],
+      // Sourced from the contract so the control cannot drift from the type.
+      options: [...treeCardVariants],
     },
   },
 } satisfies Meta<typeof TCard>;

@@ -1,0 +1,27 @@
+name: TSpacer
+source_file: packages/vue/src/components/TSpacer.vue
+package: "@treeui/vue"
+kind: layout
+status: available
+purpose: "Flexible spacer that absorbs free space between siblings in a flex layout (e.g. TStack), replacing hand-written margin:auto / flex:1."
+
+props:
+  as:
+    type: string
+    default: div
+
+slots: []
+
+behavior:
+  grows_to_fill_free_space: true
+  pushes_siblings_apart_or_to_ends: true
+
+a11y:
+  - "Rendered with aria-hidden='true'; it is a layout-only element with no content."
+
+example: |
+  <TStack direction="horizontal" align="center">
+    <strong>Title</strong>
+    <TSpacer />
+    <TButton>Action</TButton>
+  </TStack>

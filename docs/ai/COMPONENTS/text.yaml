@@ -1,0 +1,44 @@
+name: TText
+source_file: packages/vue/src/components/TText.vue
+package: "@treeui/vue"
+kind: primitive
+status: available
+purpose: "Typography primitive for body text, labels and headings — size, tone, weight and truncation from tokens, with no hand-written CSS."
+
+props:
+  as:
+    type: string
+    default: span
+    note: "Render element. Use `p`, `h1`–`h6`, `label`, `small`, `strong`, … for correct semantics."
+  size:
+    type: TTextSize
+    default: undefined
+    values: [xs, sm, md, lg, xl, 2xl, 3xl]
+    note: "Maps to --tree-font-size-*. Omitted = inherit."
+  tone:
+    type: TTextTone
+    default: default
+    values: [default, muted, inverse, brand]
+    note: "`default` inherits the current colour; others map to --tree-color-text-* / brand."
+  weight:
+    type: TTextWeight
+    default: undefined
+    values: [regular, medium, semibold, bold]
+  truncate:
+    type: boolean
+    default: false
+    note: "Clip to a single line with an ellipsis."
+
+slots:
+  - default
+
+behavior:
+  semantic_element_controlled_by_as: true
+  token_driven_size_tone_weight: true
+
+a11y:
+  - "Choose `as` to convey the correct semantics (e.g. headings via h1–h6); TText adds only visual styling."
+
+example: |
+  <TText as="h1" size="lg" weight="semibold">Overview</TText>
+  <TText tone="muted" size="sm">6.4 GB of 10 GB used</TText>

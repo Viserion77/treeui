@@ -41,6 +41,10 @@ import TTabPanel from './TTabPanel.vue';
 import TToastProvider from './TToastProvider.vue';
 import TAvatar from './TAvatar.vue';
 import TDivider from './TDivider.vue';
+import TStack from './TStack.vue';
+import TSpacer from './TSpacer.vue';
+import TKbd from './TKbd.vue';
+import TText from './TText.vue';
 import TEmptyState from './TEmptyState.vue';
 import TTable from './TTable.vue';
 import TTag from './TTag.vue';
@@ -3953,5 +3957,57 @@ describe('TDonutChart', () => {
     const wrapper = mount(TDonutChart, { props: { segments: [] } });
     expect(wrapper.find('.t-donut-chart__empty').exists()).toBe(true);
     expect(wrapper.find('.t-donut-chart__svg').exists()).toBe(false);
+  });
+
+  it('stretches a full-width button and aligns its content', () => {
+    const wrapper = mount(TButton, {
+      props: { block: true, align: 'start' },
+      slots: { default: 'Menu item' },
+    });
+
+    expect(wrapper.classes()).toContain('t-button--block');
+    expect(wrapper.classes()).toContain('t-button--align-start');
+    expect(wrapper.classes()).not.toContain('t-button--align-end');
+  });
+
+  it('grows a stack to fill its parent', () => {
+    const filling = mount(TStack, { props: { grow: true } });
+    expect(filling.classes()).toContain('is-grow');
+
+    const idle = mount(TStack);
+    expect(idle.classes()).not.toContain('is-grow');
+  });
+
+  it('renders a flexible spacer', () => {
+    const wrapper = mount(TSpacer);
+    expect(wrapper.classes()).toContain('t-spacer');
+    expect(wrapper.attributes('aria-hidden')).toBe('true');
+  });
+
+  it('renders a keyboard hint from its slot', () => {
+    const wrapper = mount(TKbd, { slots: { default: '⌘K' } });
+    expect(wrapper.element.tagName).toBe('KBD');
+    expect(wrapper.classes()).toContain('t-kbd');
+    expect(wrapper.text()).toBe('⌘K');
+  });
+
+  it('applies text size, tone, weight, truncation and polymorphic tag', () => {
+    const wrapper = mount(TText, {
+      props: { as: 'p', size: 'lg', tone: 'muted', weight: 'semibold', truncate: true },
+      slots: { default: 'Hello' },
+    });
+
+    expect(wrapper.element.tagName).toBe('P');
+    expect(wrapper.classes()).toContain('t-text--size-lg');
+    expect(wrapper.classes()).toContain('t-text--muted');
+    expect(wrapper.classes()).toContain('t-text--weight-semibold');
+    expect(wrapper.classes()).toContain('is-truncated');
+  });
+
+  it('omits text modifier classes at their defaults', () => {
+    const wrapper = mount(TText, { slots: { default: 'Plain' } });
+    expect(wrapper.element.tagName).toBe('SPAN');
+    expect(wrapper.classes()).toContain('t-text');
+    expect(wrapper.classes().some((c) => c.startsWith('t-text--'))).toBe(false);
   });
 });

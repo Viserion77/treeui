@@ -1,0 +1,22 @@
+name: TKbd
+source_file: packages/vue/src/components/TKbd.vue
+package: "@treeui/vue"
+kind: primitive
+status: available
+purpose: "Keyboard-key hint (e.g. ⌘K, Esc, Ctrl) rendered as a native <kbd> with the library's chip styling."
+
+props: {}
+
+slots:
+  - default
+
+behavior:
+  renders_native_kbd_element: true
+
+a11y:
+  - "Uses the native <kbd> element so assistive tech announces it as keyboard input."
+
+example: |
+  <TInput placeholder="Search…">
+    <template #suffix><TKbd>⌘K</TKbd></template>
+  </TInput>

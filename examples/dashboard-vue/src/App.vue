@@ -5,10 +5,17 @@ import {
   TAvatar,
   TBadge,
   TButton,
+  TCard,
+  TDivider,
   TDropdown,
   TInput,
+  TKbd,
   TNavMenu,
+  TPage,
   TProgress,
+  TSpacer,
+  TStack,
+  TText,
   TToastProvider,
   TTooltip,
   useToast,
@@ -99,48 +106,63 @@ function selectView(value: string, closeSidebar: () => void) {
       collapsible
       sidebar-label="Dashboard navigation"
       menu-label="Open navigation"
-      class="app"
     >
       <template #header="{ mobile, collapsed, toggleCollapsed }">
-        <div class="topbar">
-          <div class="page-title">
-            <h1>{{ viewTitles[view] }}</h1>
+        <TStack
+          direction="horizontal"
+          align="center"
+          gap="var(--tree-space-4)"
+        >
+          <TStack
+            direction="horizontal"
+            align="center"
+            gap="var(--tree-space-3)"
+          >
+            <TText
+              as="h1"
+              size="lg"
+              weight="semibold"
+            >
+              {{ viewTitles[view] }}
+            </TText>
             <TBadge
               tone="info"
               size="sm"
             >
               Demo
             </TBadge>
-          </div>
+          </TStack>
 
-          <div class="topbar__search">
-            <TInput
-              v-model="search"
-              type="search"
-              size="sm"
-              class="navbar-search"
-              placeholder="Search orders, customers…"
-              aria-label="Search"
-            >
-              <template #prefix>
-                <IconSearch
-                  width="16"
-                  height="16"
-                />
-              </template>
-              <template #suffix>
-                <kbd class="navbar-search__kbd">⌘K</kbd>
-              </template>
-            </TInput>
-          </div>
+          <TSpacer />
 
-          <!--
-            On mobile the header has no room for these; they move into the
-            navigation drawer (see the #sidebar slot) so nothing overflows.
-          -->
-          <div
+          <TInput
             v-if="!mobile"
-            class="navbar-actions"
+            v-model="search"
+            type="search"
+            size="sm"
+            style="width: min(22rem, 100%)"
+            placeholder="Search orders, customers…"
+            aria-label="Search"
+          >
+            <template #prefix>
+              <IconSearch
+                width="16"
+                height="16"
+              />
+            </template>
+            <template #suffix>
+              <TKbd>⌘K</TKbd>
+            </template>
+          </TInput>
+
+          <TSpacer v-if="!mobile" />
+
+          <!-- On mobile these move into the drawer (see #sidebar) — no room here. -->
+          <TStack
+            v-if="!mobile"
+            direction="horizontal"
+            align="center"
+            gap="var(--tree-space-2)"
           >
             <TTooltip :content="collapsed ? 'Expand sidebar' : 'Collapse sidebar'">
               <TButton
@@ -189,26 +211,34 @@ function selectView(value: string, closeSidebar: () => void) {
               aria-label="User menu"
               @select="onUserMenu"
             />
-          </div>
-        </div>
+          </TStack>
+        </TStack>
       </template>
 
       <template #sidebar="{ mobile, collapsed, closeSidebar }">
-        <div
-          class="sidebar"
-          :class="{ 'sidebar--collapsed': collapsed }"
+        <TStack
+          grow
+          gap="var(--tree-space-4)"
         >
-          <div class="brand">
+          <TStack
+            direction="horizontal"
+            align="center"
+            :justify="collapsed ? 'center' : 'flex-start'"
+            gap="var(--tree-space-2)"
+          >
             <img
               :src="logoUrl"
               alt=""
-              class="brand__logo"
+              width="28"
+              height="28"
             >
-            <span
+            <TText
               v-if="!collapsed"
-              class="brand__name"
-            >Orchard</span>
-          </div>
+              weight="semibold"
+            >
+              Orchard
+            </TText>
+          </TStack>
 
           <TNavMenu
             :model-value="view"
@@ -218,237 +248,109 @@ function selectView(value: string, closeSidebar: () => void) {
             @update:model-value="(value) => selectView(value, closeSidebar)"
           />
 
-          <div class="sidebar__footer">
-            <!-- Header actions that don't fit the mobile top bar live here. -->
-            <div
-              v-if="mobile"
-              class="drawer-actions"
-            >
-              <TButton
-                variant="ghost"
-                :size="config.density"
-                @click="() => { onNotifications(); closeSidebar(); }"
-              >
-                <template #icon>
-                  <IconBell />
-                </template>
-                Notifications
-              </TButton>
-              <TButton
-                variant="ghost"
-                :size="config.density"
-                @click="toggleTheme"
-              >
-                <template #icon>
-                  <component :is="isDark ? IconSun : IconMoon" />
-                </template>
-                {{ isDark ? 'Light theme' : 'Dark theme' }}
-              </TButton>
-              <TButton
-                variant="ghost"
-                :size="config.density"
-                @click="() => { settingsOpen = true; closeSidebar(); }"
-              >
-                <template #icon>
-                  <IconGear />
-                </template>
-                Settings
-              </TButton>
-            </div>
+          <TSpacer />
 
-            <div
+          <TStack gap="var(--tree-space-3)">
+            <!-- Header actions that don't fit the mobile top bar live here. -->
+            <template v-if="mobile">
+              <TStack gap="var(--tree-space-1)">
+                <TButton
+                  block
+                  align="start"
+                  variant="ghost"
+                  :size="config.density"
+                  @click="() => { onNotifications(); closeSidebar(); }"
+                >
+                  <template #icon>
+                    <IconBell />
+                  </template>
+                  Notifications
+                </TButton>
+                <TButton
+                  block
+                  align="start"
+                  variant="ghost"
+                  :size="config.density"
+                  @click="toggleTheme"
+                >
+                  <template #icon>
+                    <component :is="isDark ? IconSun : IconMoon" />
+                  </template>
+                  {{ isDark ? 'Light theme' : 'Dark theme' }}
+                </TButton>
+                <TButton
+                  block
+                  align="start"
+                  variant="ghost"
+                  :size="config.density"
+                  @click="() => { settingsOpen = true; closeSidebar(); }"
+                >
+                  <template #icon>
+                    <IconGear />
+                  </template>
+                  Settings
+                </TButton>
+              </TStack>
+              <TDivider />
+            </template>
+
+            <TCard
               v-if="!collapsed"
-              class="storage"
+              variant="outline"
             >
-              <span class="storage__label">Storage</span>
-              <TProgress
-                :value="64"
-                label="Storage used"
-                size="sm"
-              />
-              <span class="storage__meta">6.4 GB of 10 GB used</span>
-            </div>
-            <div class="sidebar-foot">
+              <TStack gap="var(--tree-space-1)">
+                <TText weight="semibold">
+                  Storage
+                </TText>
+                <TProgress
+                  :value="64"
+                  label="Storage used"
+                  size="sm"
+                />
+                <TText
+                  as="small"
+                  tone="muted"
+                >
+                  6.4 GB of 10 GB used
+                </TText>
+              </TStack>
+            </TCard>
+
+            <TStack
+              direction="horizontal"
+              align="center"
+              :justify="collapsed ? 'center' : 'flex-start'"
+              gap="var(--tree-space-2)"
+            >
               <TAvatar
                 initials="JA"
                 status="online"
                 size="sm"
                 alt="Jef Almeida"
               />
-              <span
+              <TText
                 v-if="!collapsed"
-                class="sidebar-foot__name"
-              >Jef Almeida</span>
-            </div>
-          </div>
-        </div>
+                as="small"
+                tone="muted"
+                truncate
+              >
+                Jef Almeida
+              </TText>
+            </TStack>
+          </TStack>
+        </TStack>
       </template>
 
       <template #default>
-        <div class="content">
+        <TPage width="full">
           <component
             :is="currentView"
             @navigate="view = $event"
           />
-        </div>
+        </TPage>
       </template>
     </TAppShell>
 
     <SettingsDrawer v-model:open="settingsOpen" />
   </TToastProvider>
 </template>
-
-<style scoped>
-.app {
-  font-family: var(--tree-font-family-sans);
-}
-
-/* Header (spans the full width of the shell frame) */
-.topbar {
-  display: flex;
-  align-items: center;
-  gap: var(--tree-space-4);
-  width: 100%;
-  min-width: 0;
-}
-
-.page-title {
-  display: flex;
-  align-items: center;
-  gap: var(--tree-space-3);
-  flex-shrink: 0;
-}
-
-.page-title h1 {
-  margin: 0;
-  font-size: var(--tree-font-size-lg);
-  letter-spacing: -0.01em;
-}
-
-.topbar__search {
-  flex: 1 1 auto;
-  display: flex;
-  justify-content: center;
-  min-width: 0;
-}
-
-.navbar-search {
-  width: min(22rem, 100%);
-}
-
-.navbar-search__kbd {
-  font-family: var(--tree-font-family-mono);
-  font-size: var(--tree-font-size-xs);
-  color: var(--tree-color-text-muted);
-  border: var(--tree-border-width-subtle) solid var(--tree-color-border-default);
-  border-radius: var(--tree-radius-sm);
-  padding: 0 var(--tree-space-1);
-}
-
-.navbar-actions {
-  display: flex;
-  align-items: center;
-  gap: var(--tree-space-2);
-  flex-shrink: 0;
-}
-
-/* Sidebar (below the header on the left of the frame) */
-.sidebar {
-  display: flex;
-  flex-direction: column;
-  gap: var(--tree-space-4);
-  flex: 1;
-  min-height: 0;
-}
-
-.brand {
-  display: flex;
-  align-items: center;
-  gap: var(--tree-space-2);
-  min-width: 0;
-  min-height: 2rem;
-}
-
-.brand__logo {
-  width: 28px;
-  height: 28px;
-  flex-shrink: 0;
-}
-
-.brand__name {
-  font-weight: var(--tree-font-weight-semibold, 600);
-  letter-spacing: -0.01em;
-}
-
-.sidebar__footer {
-  margin-top: auto;
-  display: grid;
-  gap: var(--tree-space-3);
-  min-width: 0;
-}
-
-.storage {
-  display: grid;
-  gap: var(--tree-space-1);
-  padding: var(--tree-space-3);
-  border: var(--tree-border-width-subtle) solid var(--tree-color-border-default);
-  border-radius: var(--tree-radius-lg);
-  background: var(--tree-color-bg-surface);
-}
-
-.storage__label {
-  font-size: var(--tree-font-size-sm);
-  font-weight: var(--tree-font-weight-semibold, 600);
-}
-
-.storage__meta {
-  font-size: var(--tree-font-size-xs);
-  color: var(--tree-color-text-muted);
-}
-
-.sidebar-foot {
-  display: flex;
-  align-items: center;
-  gap: var(--tree-space-2);
-  min-width: 0;
-}
-
-.sidebar-foot__name {
-  font-size: var(--tree-font-size-sm);
-  color: var(--tree-color-text-muted);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-/* When collapsed, center the logo and avatar on the same axis as the
-   (now icon-only) nav items, so the whole rail lines up. */
-.sidebar--collapsed .brand,
-.sidebar--collapsed .sidebar-foot {
-  justify-content: center;
-}
-
-/* Header actions relocated into the mobile drawer */
-.drawer-actions {
-  display: grid;
-  gap: var(--tree-space-1);
-  padding-block-end: var(--tree-space-2);
-  border-bottom: var(--tree-border-width-subtle) solid var(--tree-color-border-default);
-}
-
-.drawer-actions :deep(.t-button) {
-  width: 100%;
-  justify-content: flex-start;
-}
-
-/* Content panel (inset area to the right of the frame) */
-.content {
-  padding: var(--tree-space-6);
-}
-
-@media (max-width: 768px) {
-  .topbar__search {
-    display: none;
-  }
-}
-</style>

@@ -106,6 +106,19 @@
   font-size: var(--tree-font-size-lg);
 }
 
+.t-button--block {
+  width: 100%;
+  min-width: 0;
+}
+
+.t-button--align-start {
+  justify-content: flex-start;
+}
+
+.t-button--align-end {
+  justify-content: flex-end;
+}
+
 .t-button--solid {
   --tree-button-bg: var(--tree-color-brand-primary);
   --tree-button-text: var(--tree-color-brand-contrast);
@@ -5659,6 +5672,95 @@
 
 .t-stack.is-wrapping {
   flex-wrap: wrap;
+}
+
+.t-stack.is-grow {
+  flex: 1 1 0;
+  min-inline-size: 0;
+  min-block-size: 0;
+}
+
+/* ── Spacer ───────────────────────────────────────────── */
+
+.t-spacer {
+  flex: 1 1 auto;
+  align-self: stretch;
+}
+
+/* ── Kbd ──────────────────────────────────────────────── */
+
+.t-kbd {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-inline-size: 1.35rem;
+  padding: 0 var(--tree-space-1);
+  border: var(--tree-border-width-subtle) solid var(--tree-color-border-default);
+  border-radius: var(--tree-radius-sm);
+  background: var(--tree-color-bg-surface);
+  color: var(--tree-color-text-muted);
+  font-family: var(--tree-font-family-mono);
+  font-size: var(--tree-font-size-xs);
+  line-height: var(--tree-font-lineHeight-tight);
+}
+
+/* ── Text ─────────────────────────────────────────────── */
+
+.t-text {
+  margin: 0;
+}
+
+.t-text--size-xs {
+  font-size: var(--tree-font-size-xs);
+}
+.t-text--size-sm {
+  font-size: var(--tree-font-size-sm);
+}
+.t-text--size-md {
+  font-size: var(--tree-font-size-md);
+}
+.t-text--size-lg {
+  font-size: var(--tree-font-size-lg);
+}
+.t-text--size-xl {
+  font-size: var(--tree-font-size-xl);
+}
+.t-text--size-2xl {
+  font-size: var(--tree-font-size-2xl);
+}
+.t-text--size-3xl {
+  font-size: var(--tree-font-size-3xl);
+}
+
+.t-text--muted {
+  color: var(--tree-color-text-muted);
+}
+.t-text--inverse {
+  color: var(--tree-color-text-inverse);
+}
+.t-text--brand {
+  color: var(--tree-color-brand-primary);
+}
+
+.t-text--weight-regular {
+  font-weight: var(--tree-font-weight-regular);
+}
+.t-text--weight-medium {
+  font-weight: var(--tree-font-weight-medium);
+}
+.t-text--weight-semibold {
+  font-weight: var(--tree-font-weight-semibold);
+}
+.t-text--weight-bold {
+  font-weight: var(--tree-font-weight-bold);
+}
+
+.t-text.is-truncated {
+  display: inline-block;
+  max-inline-size: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 /* ── Navbar ───────────────────────────────────────────── */

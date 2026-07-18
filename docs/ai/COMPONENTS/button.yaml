@@ -28,6 +28,14 @@ props:
   type:
     type: "button | submit | reset"
     default: button
+  block:
+    type: boolean
+    default: false
+    note: "Stretches the button to the full width of its container. Useful for menu rows and mobile CTAs."
+  align:
+    type: "start | center | end"
+    default: center
+    note: "Content alignment; only meaningful together with `block`. Use `start` for left-aligned icon+label menu rows."
 
 events:
   - click

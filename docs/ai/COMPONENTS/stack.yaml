@@ -28,6 +28,10 @@ props:
   reverse:
     type: boolean
     default: false
+  grow:
+    type: boolean
+    default: false
+    note: "Expands the stack to fill available space along its parent's main axis (flex: 1 with min-size 0). Use it to make a sidebar column fill its container height."
 
 slots:
   - default

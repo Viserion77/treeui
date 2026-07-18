@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-18T12:52:07.547Z",
+  "generatedAt": "2026-07-18T14:11:52.393Z",
   "packageName": "@treeui/vue",
   "packageVersion": "0.14.0",
   "decisionGuides": [
@@ -1323,6 +1323,18 @@
           "name": "type",
           "type": "button | submit | reset",
           "default": "button"
+        },
+        {
+          "name": "block",
+          "type": "boolean",
+          "default": "false",
+          "note": "Stretches the button to the full width of its container. Useful for menu rows and mobile CTAs."
+        },
+        {
+          "name": "align",
+          "type": "start | center | end",
+          "default": "center",
+          "note": "Content alignment; only meaningful together with `block`. Use `start` for left-aligned icon+label menu rows."
         }
       ],
       "events": [
@@ -3824,6 +3836,43 @@
       ]
     },
     {
+      "name": "TKbd",
+      "aliases": [],
+      "package": "@treeui/vue",
+      "kind": "primitive",
+      "category": "Data Display",
+      "status": "available",
+      "purpose": "Keyboard-key hint (e.g. ⌘K, Esc, Ctrl) rendered as a native <kbd> with the library's chip styling.",
+      "sourceFile": "packages/vue/src/components/TKbd.vue",
+      "storyFile": "apps/docs/src/stories/Kbd.stories.ts",
+      "storyTitle": "Components/Data Display/Kbd",
+      "manifestFile": "docs/ai/COMPONENTS/kbd.yaml",
+      "props": [],
+      "events": [],
+      "slots": [
+        {
+          "name": "default"
+        }
+      ],
+      "a11y": [
+        "Uses the native <kbd> element so assistive tech announces it as keyboard input."
+      ],
+      "behavior": [
+        "renders_native_kbd_element: true"
+      ],
+      "selection": {
+        "keywords": [],
+        "useWhen": [],
+        "avoidWhen": [],
+        "alternatives": []
+      },
+      "setup": {
+        "required": [],
+        "notes": []
+      },
+      "recipes": []
+    },
+    {
       "name": "TLink",
       "aliases": [],
       "package": "@treeui/vue",
@@ -5888,6 +5937,46 @@
       "recipes": []
     },
     {
+      "name": "TSpacer",
+      "aliases": [],
+      "package": "@treeui/vue",
+      "kind": "layout",
+      "category": "Layout",
+      "status": "available",
+      "purpose": "Flexible spacer that absorbs free space between siblings in a flex layout (e.g. TStack), replacing hand-written margin:auto / flex:1.",
+      "sourceFile": "packages/vue/src/components/TSpacer.vue",
+      "storyFile": "apps/docs/src/stories/Spacer.stories.ts",
+      "storyTitle": "Components/Layout/Spacer",
+      "manifestFile": "docs/ai/COMPONENTS/spacer.yaml",
+      "props": [
+        {
+          "name": "as",
+          "type": "string",
+          "default": "div"
+        }
+      ],
+      "events": [],
+      "slots": [],
+      "a11y": [
+        "Rendered with aria-hidden='true'; it is a layout-only element with no content."
+      ],
+      "behavior": [
+        "grows_to_fill_free_space: true",
+        "pushes_siblings_apart_or_to_ends: true"
+      ],
+      "selection": {
+        "keywords": [],
+        "useWhen": [],
+        "avoidWhen": [],
+        "alternatives": []
+      },
+      "setup": {
+        "required": [],
+        "notes": []
+      },
+      "recipes": []
+    },
+    {
       "name": "TSparkline",
       "aliases": [],
       "package": "@treeui/vue",
@@ -6110,6 +6199,12 @@
           "name": "reverse",
           "type": "boolean",
           "default": "false"
+        },
+        {
+          "name": "grow",
+          "type": "boolean",
+          "default": "false",
+          "note": "Expands the stack to fill available space along its parent's main axis (flex: 1 with min-size 0). Use it to make a sidebar column fill its container height."
         }
       ],
       "events": [],
@@ -6758,6 +6853,95 @@
       "recipes": [
         "tag-input"
       ]
+    },
+    {
+      "name": "TText",
+      "aliases": [],
+      "package": "@treeui/vue",
+      "kind": "primitive",
+      "category": "Data Display",
+      "status": "available",
+      "purpose": "Typography primitive for body text, labels and headings — size, tone, weight and truncation from tokens, with no hand-written CSS.",
+      "sourceFile": "packages/vue/src/components/TText.vue",
+      "storyFile": "apps/docs/src/stories/Text.stories.ts",
+      "storyTitle": "Components/Data Display/Text",
+      "manifestFile": "docs/ai/COMPONENTS/text.yaml",
+      "props": [
+        {
+          "name": "as",
+          "type": "string",
+          "default": "span",
+          "note": "Render element. Use `p`, `h1`–`h6`, `label`, `small`, `strong`, … for correct semantics."
+        },
+        {
+          "name": "size",
+          "type": "TTextSize",
+          "default": "undefined",
+          "values": [
+            "xs",
+            "sm",
+            "md",
+            "lg",
+            "xl",
+            "2xl",
+            "3xl"
+          ],
+          "note": "Maps to --tree-font-size-*. Omitted = inherit."
+        },
+        {
+          "name": "tone",
+          "type": "TTextTone",
+          "default": "default",
+          "values": [
+            "default",
+            "muted",
+            "inverse",
+            "brand"
+          ],
+          "note": "`default` inherits the current colour; others map to --tree-color-text-* / brand."
+        },
+        {
+          "name": "weight",
+          "type": "TTextWeight",
+          "default": "undefined",
+          "values": [
+            "regular",
+            "medium",
+            "semibold",
+            "bold"
+          ]
+        },
+        {
+          "name": "truncate",
+          "type": "boolean",
+          "default": "false",
+          "note": "Clip to a single line with an ellipsis."
+        }
+      ],
+      "events": [],
+      "slots": [
+        {
+          "name": "default"
+        }
+      ],
+      "a11y": [
+        "Choose `as` to convey the correct semantics (e.g. headings via h1–h6); TText adds only visual styling."
+      ],
+      "behavior": [
+        "semantic_element_controlled_by_as: true",
+        "token_driven_size_tone_weight: true"
+      ],
+      "selection": {
+        "keywords": [],
+        "useWhen": [],
+        "avoidWhen": [],
+        "alternatives": []
+      },
+      "setup": {
+        "required": [],
+        "notes": []
+      },
+      "recipes": []
     },
     {
       "name": "TTextarea",

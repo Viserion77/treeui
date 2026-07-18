@@ -18,6 +18,8 @@ const props = withDefaults(
     justify?: string;
     wrap?: boolean;
     reverse?: boolean;
+    /** Expand to fill available space along the parent's main axis. */
+    grow?: boolean;
   }>(),
   {
     as: 'div',
@@ -27,6 +29,7 @@ const props = withDefaults(
     justify: 'flex-start',
     wrap: false,
     reverse: false,
+    grow: false,
   },
 );
 
@@ -38,6 +41,7 @@ const rootClasses = computed(() => [
   {
     'is-wrapping': props.wrap,
     'is-reversed': props.reverse,
+    'is-grow': props.grow,
   },
   attrs.class,
 ]);

@@ -12,6 +12,10 @@ const props = withDefaults(
     disabled?: boolean;
     loading?: boolean;
     type?: 'button' | 'submit' | 'reset';
+    /** Stretch to the full width of the container. */
+    block?: boolean;
+    /** Content alignment — only meaningful together with `block`. */
+    align?: 'start' | 'center' | 'end';
   }>(),
   {
     as: 'button',
@@ -20,6 +24,8 @@ const props = withDefaults(
     disabled: false,
     loading: false,
     type: 'button',
+    block: false,
+    align: 'center',
   },
 );
 
@@ -55,6 +61,9 @@ const classes = computed(() =>
     class: {
       'is-loading': props.loading,
       'is-disabled': isDisabled.value,
+      't-button--block': props.block,
+      't-button--align-start': props.align === 'start',
+      't-button--align-end': props.align === 'end',
     },
   }),
 );

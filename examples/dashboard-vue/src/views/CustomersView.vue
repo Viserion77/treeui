@@ -9,8 +9,10 @@ import {
   TGrid,
   TIcon,
   TInput,
+  TSpacer,
   TStack,
   TTag,
+  TText,
   useToast,
 } from '@treeui/vue';
 import { currency, customers } from '../data';
@@ -56,7 +58,7 @@ function message(name: string) {
       placeholder="Search customers…"
       aria-label="Search customers"
       :size="config.density"
-      class="search"
+      style="max-width: 24rem"
     >
       <template #prefix>
         <TIcon name="search" />
@@ -88,102 +90,77 @@ function message(name: string) {
         :size="config.density"
       >
         <TStack gap="var(--tree-space-4)">
-          <div class="person">
+          <TStack
+            direction="horizontal"
+            align="center"
+            gap="var(--tree-space-3)"
+          >
             <TAvatar
               :initials="initialsOf(customer.name)"
               :status="customer.status"
               :size="config.density"
               :alt="customer.name"
             />
-            <div class="person__id">
-              <span class="person__name">{{ customer.name }}</span>
-              <span class="person__email">{{ customer.email }}</span>
-            </div>
-            <TTag
-              size="sm"
-              class="person__plan"
+            <TStack
+              grow
+              gap="0"
             >
+              <TText weight="medium">
+                {{ customer.name }}
+              </TText>
+              <TText
+                tone="muted"
+                size="sm"
+                truncate
+              >
+                {{ customer.email }}
+              </TText>
+            </TStack>
+            <TTag size="sm">
               {{ customer.plan }}
             </TTag>
-          </div>
+          </TStack>
 
           <TDivider />
 
-          <div class="numbers">
-            <div class="numbers__item">
-              <span class="numbers__value">{{ customer.orders }}</span>
-              <span class="numbers__label">orders</span>
-            </div>
-            <div class="numbers__item">
-              <span class="numbers__value">{{ currency.format(customer.lifetimeValue) }}</span>
-              <span class="numbers__label">lifetime value</span>
-            </div>
+          <TStack
+            direction="horizontal"
+            align="center"
+            gap="var(--tree-space-5)"
+          >
+            <TStack gap="0">
+              <TText weight="semibold">
+                {{ customer.orders }}
+              </TText>
+              <TText
+                tone="muted"
+                size="sm"
+              >
+                orders
+              </TText>
+            </TStack>
+            <TStack gap="0">
+              <TText weight="semibold">
+                {{ currency.format(customer.lifetimeValue) }}
+              </TText>
+              <TText
+                tone="muted"
+                size="sm"
+              >
+                lifetime value
+              </TText>
+            </TStack>
+            <TSpacer />
             <TButton
               variant="ghost"
               size="sm"
-              class="numbers__action"
               @click="message(customer.name)"
             >
               Message
             </TButton>
-          </div>
+          </TStack>
         </TStack>
       </TCard>
     </TGrid>
   </TStack>
 </template>
-
-<style scoped>
-.search {
-  max-width: 24rem;
-}
-
-.person {
-  display: flex;
-  align-items: center;
-  gap: var(--tree-space-3);
-}
-
-.person__id {
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-  flex: 1;
-}
-
-.person__name {
-  font-weight: var(--tree-font-weight-medium);
-}
-
-.person__email {
-  font-size: var(--tree-font-size-sm);
-  color: var(--tree-color-text-muted);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.numbers {
-  display: flex;
-  align-items: center;
-  gap: var(--tree-space-5);
-}
-
-.numbers__item {
-  display: flex;
-  flex-direction: column;
-}
-
-.numbers__value {
-  font-weight: var(--tree-font-weight-semibold, 600);
-}
-
-.numbers__label {
-  font-size: var(--tree-font-size-sm);
-  color: var(--tree-color-text-muted);
-}
-
-.numbers__action {
-  margin-left: auto;
-}
-</style>

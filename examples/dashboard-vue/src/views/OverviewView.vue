@@ -13,12 +13,15 @@ import {
   TFormField,
   TGrid,
   TInput,
+  TPageHeader,
   TRadio,
   TRadioGroup,
   TSelect,
+  TSpacer,
   TStack,
   TStat,
   TSwitch,
+  TText,
   TTab,
   TTabList,
   TTabPanel,
@@ -157,8 +160,8 @@ function dismissAlert() {
 
 <template>
   <TStack gap="var(--tree-space-5)">
-    <div class="page-head">
-      <div class="page-head__intro">
+    <TPageHeader subtitle="Track sales, orders, and customers of your store.">
+      <template #breadcrumb>
         <TBreadcrumb>
           <TBreadcrumbItem href="#">
             Orchard
@@ -167,11 +170,8 @@ function dismissAlert() {
             Overview
           </TBreadcrumbItem>
         </TBreadcrumb>
-        <p class="page-head__sub">
-          Track sales, orders, and customers of your store.
-        </p>
-      </div>
-      <div class="page-head__actions">
+      </template>
+      <template #actions>
         <TButton
           variant="ghost"
           :size="config.density"
@@ -195,8 +195,8 @@ function dismissAlert() {
           />
           New order
         </TButton>
-      </div>
-    </div>
+      </template>
+    </TPageHeader>
 
     <TTabs
       default-value="summary"
@@ -273,17 +273,33 @@ function dismissAlert() {
               :size="config.density"
             >
               <template #header>
-                <div class="card-head">
-                  <h2 class="card-title">
-                    Sessions by channel <span class="card-title__unit">· k/month</span>
-                  </h2>
+                <TStack
+                  direction="horizontal"
+                  align="center"
+                  gap="var(--tree-space-3)"
+                >
+                  <TText
+                    as="h2"
+                    size="md"
+                    weight="semibold"
+                  >
+                    Sessions by channel
+                    <TText
+                      as="span"
+                      tone="muted"
+                      weight="regular"
+                    >
+                      · k/month
+                    </TText>
+                  </TText>
+                  <TSpacer />
                   <TBadge
                     variant="outline"
                     size="sm"
                   >
                     last 7 months
                   </TBadge>
-                </div>
+                </TStack>
               </template>
               <div
                 class="channels"
@@ -345,10 +361,19 @@ function dismissAlert() {
               :size="config.density"
             >
               <template #header>
-                <div class="card-head">
-                  <h2 class="card-title">
+                <TStack
+                  direction="horizontal"
+                  align="center"
+                  gap="var(--tree-space-3)"
+                >
+                  <TText
+                    as="h2"
+                    size="md"
+                    weight="semibold"
+                  >
                     Latest orders
-                  </h2>
+                  </TText>
+                  <TSpacer />
                   <TButton
                     variant="soft"
                     size="sm"
@@ -356,7 +381,7 @@ function dismissAlert() {
                   >
                     View all
                   </TButton>
-                </div>
+                </TStack>
               </template>
               <TTable
                 :columns="orderColumns"
@@ -451,7 +476,11 @@ function dismissAlert() {
               </TStack>
 
               <template #footer>
-                <div class="form-foot">
+                <TStack
+                  direction="horizontal"
+                  justify="flex-end"
+                  gap="var(--tree-space-2)"
+                >
                   <TButton
                     variant="soft"
                     size="sm"
@@ -465,7 +494,7 @@ function dismissAlert() {
                   >
                     Create customer
                   </TButton>
-                </div>
+                </TStack>
               </template>
             </TCard>
 
@@ -511,9 +540,13 @@ function dismissAlert() {
               title="Danger zone"
             >
               <TStack gap="var(--tree-space-3)">
-                <p class="danger-copy">
+                <TText
+                  as="p"
+                  tone="muted"
+                  size="sm"
+                >
                   Deleting the quarterly report removes it for every teammate.
-                </p>
+                </TText>
                 <TConfirmDialog
                   title="Delete report?"
                   description="This action cannot be undone."
@@ -597,56 +630,14 @@ function dismissAlert() {
 </style>
 
 <style scoped>
-.page-head {
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: var(--tree-space-4);
-  flex-wrap: wrap;
-}
-
-.page-head__intro {
-  display: grid;
-  gap: var(--tree-space-1);
-}
-
-.page-head__sub {
-  margin: 0;
-  color: var(--tree-color-text-muted);
-  font-size: var(--tree-font-size-sm);
-}
-
-.page-head__actions {
-  display: flex;
-  align-items: center;
-  gap: var(--tree-space-2);
-}
-
+/* Asymmetric main + aside dashboard layout that collapses to one column.
+   GAP: no `TSplit`/two-column-with-aside layout primitive in the library yet. */
 .columns {
   display: grid;
   grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
   gap: var(--tree-space-5);
   align-items: start;
   margin-top: var(--tree-space-5);
-}
-
-.card-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--tree-space-3);
-}
-
-.card-title {
-  margin: 0;
-  font-size: var(--tree-font-size-md);
-  font-weight: var(--tree-font-weight-semibold, 600);
-}
-
-.card-title__unit {
-  color: var(--tree-color-text-muted);
-  font-size: var(--tree-font-size-sm);
-  font-weight: var(--tree-font-weight-regular, 400);
 }
 
 .kpi-meta {
@@ -778,19 +769,6 @@ function dismissAlert() {
   width: 9px;
   height: 9px;
   border-radius: 3px;
-}
-
-.form-foot {
-  display: flex;
-  justify-content: flex-end;
-  gap: var(--tree-space-2);
-  width: 100%;
-}
-
-.danger-copy {
-  margin: 0;
-  font-size: var(--tree-font-size-sm);
-  color: var(--tree-color-text-muted);
 }
 
 @media (max-width: 960px) {

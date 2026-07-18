@@ -15,6 +15,7 @@ import {
   TSelect,
   TStack,
   TTable,
+  TText,
   useToast,
 } from '@treeui/vue';
 import { currency, orders as seedOrders, type Order, type OrderStatus } from '../data';
@@ -180,7 +181,12 @@ function createOrder() {
     :size="config.density"
   >
     <template #header>
-      <div class="toolbar">
+      <TStack
+        direction="horizontal"
+        align="center"
+        wrap
+        gap="var(--tree-space-3)"
+      >
         <TInput
           v-model="search"
           type="search"
@@ -233,7 +239,11 @@ function createOrder() {
             </TFormField>
           </TStack>
           <template #footer>
-            <div class="modal-footer">
+            <TStack
+              direction="horizontal"
+              justify="flex-end"
+              gap="var(--tree-space-3)"
+            >
               <TButton
                 variant="ghost"
                 :size="config.density"
@@ -248,10 +258,10 @@ function createOrder() {
               >
                 Create order
               </TButton>
-            </div>
+            </TStack>
           </template>
         </TModal>
-      </div>
+      </TStack>
     </template>
 
     <TEmptyState
@@ -305,16 +315,26 @@ function createOrder() {
         </template>
       </TTable>
 
-      <div class="table-foot">
-        <span class="table-foot__count">
+      <TStack
+        direction="horizontal"
+        align="center"
+        justify="space-between"
+        wrap
+        gap="var(--tree-space-3)"
+        style="margin-top: var(--tree-space-4)"
+      >
+        <TText
+          tone="muted"
+          size="sm"
+        >
           {{ filtered.length }} orders
-        </span>
+        </TText>
         <TPagination
           v-model="page"
           :total-pages="totalPages"
           :size="config.density"
         />
-      </div>
+      </TStack>
     </template>
   </TCard>
 
@@ -328,36 +348,11 @@ function createOrder() {
 </template>
 
 <style scoped>
-.toolbar {
-  display: flex;
-  align-items: center;
-  gap: var(--tree-space-3);
-  flex-wrap: wrap;
-}
-
+/* Let the search grow to fill the toolbar row.
+   GAP: TStack grows the container, not an individual child — there is no
+   `grow` on a stack *item* (or a <TStackItem grow>) yet. */
 .toolbar__search {
   flex: 1;
   min-width: 14rem;
-}
-
-.modal-footer {
-  display: flex;
-  justify-content: flex-end;
-  gap: var(--tree-space-3);
-  width: 100%;
-}
-
-.table-foot {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--tree-space-3);
-  flex-wrap: wrap;
-  margin-top: var(--tree-space-4);
-}
-
-.table-foot__count {
-  font-size: var(--tree-font-size-sm);
-  color: var(--tree-color-text-muted);
 }
 </style>

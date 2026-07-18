@@ -129,6 +129,7 @@ async function runStep(page, spec) {
   const rest = idx === -1 ? '' : spec.slice(idx + 1);
   switch (kind) {
     case 'click': await page.locator(rest).first().click(); break;
+    case 'clicktext': await page.getByText(rest, { exact: false }).first().click(); break;
     case 'hover': await page.locator(rest).first().hover(); break;
     case 'press': await page.keyboard.press(rest); break;
     case 'waitfor': await page.waitForSelector(rest, { timeout: 8000 }); break;

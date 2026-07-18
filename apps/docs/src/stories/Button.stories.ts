@@ -15,7 +15,7 @@ const meta = {
   argTypes: {
     variant: {
       control: 'select',
-      options: ['solid', 'outline', 'ghost', 'soft', 'danger'],
+      options: ['solid', 'outline', 'ghost', 'soft', 'danger', 'brand'],
     },
     size: {
       control: 'select',
@@ -60,6 +60,7 @@ export const Variants: Story = {
         <TButton variant="ghost">Ghost</TButton>
         <TButton variant="soft">Soft</TButton>
         <TButton variant="danger">Danger</TButton>
+        <TButton variant="brand">Brand</TButton>
       </div>
     `,
   }),

@@ -1,4 +1,4 @@
-import { nextTick } from 'vue';
+import { nextTick, reactive } from 'vue';
 import { mount } from '@vue/test-utils';
 import TBadge from './TBadge.vue';
 import TButton from './TButton.vue';
@@ -21,6 +21,8 @@ import TFormField from './TFormField.vue';
 import TSwitch from './TSwitch.vue';
 import TSkeleton from './TSkeleton.vue';
 import TProgress from './TProgress.vue';
+import TPage from './TPage.vue';
+import TPageHeader from './TPageHeader.vue';
 import TPagination from './TPagination.vue';
 import TAccordion from './TAccordion.vue';
 import TAccordionItem from './TAccordionItem.vue';
@@ -30,6 +32,7 @@ import TDropdown from './TDropdown.vue';
 import TDrawer from './TDrawer.vue';
 import TContextMenu from './TContextMenu.vue';
 import TFileUpload from './TFileUpload.vue';
+import type { TFileUploadState } from './TFileUpload.vue';
 import TPopover from './TPopover.vue';
 import TTabs from './TTabs.vue';
 import TTabList from './TTabList.vue';
@@ -70,6 +73,20 @@ describe('@treeui/vue', () => {
     await wrapper.trigger('click');
 
     expect(wrapper.emitted('click')).toBeUndefined();
+  });
+
+  it('renders the brand button variant', () => {
+    const wrapper = mount(TButton, {
+      props: {
+        variant: 'brand',
+      },
+      slots: {
+        default: 'Upgrade',
+      },
+    });
+
+    expect(wrapper.classes()).toContain('t-button--brand');
+    expect(wrapper.classes()).not.toContain('t-button--solid');
   });
 
   it('renders polymorphic button with correct a11y when disabled', async () => {
@@ -261,6 +278,267 @@ describe('@treeui/vue', () => {
     expect(wrapper.emitted('update:modelValue')?.[1]).toEqual([[]]);
   });
 
+  it('swaps the dropzone label while a drag is active and reverts afterwards', async () => {
+    const wrapper = mount(TFileUpload, {
+      props: {
+        label: 'Drop files here',
+      },
+    });
+
+    const dropzone = wrapper.get('.t-file-upload__dropzone');
+    const file = new File(['brief'], 'brief.txt', { type: 'text/plain' });
+    const dataTransfer = {
+      files: [file],
+      types: ['Files'],
+      dropEffect: '',
+    } as unknown as DataTransfer;
+
+    expect(wrapper.get('.t-file-upload__label').text()).toBe('Drop files here');
+
+    await dropzone.trigger('dragenter', { dataTransfer });
+
+    expect(wrapper.get('.t-file-upload__label').text()).toBe('Release to upload');
+
+    await dropzone.trigger('dragleave', { dataTransfer });
+
+    expect(wrapper.get('.t-file-upload__label').text()).toBe('Drop files here');
+
+    await dropzone.trigger('dragenter', { dataTransfer });
+    await dropzone.trigger('drop', { dataTransfer });
+
+    expect(wrapper.get('.t-file-upload__label').text()).toBe('Drop files here');
+  });
+
+  it('renders upload percentage and remaining time for an uploading file', async () => {
+    const file = new File(['hero'], 'hero.png', { type: 'image/png' });
+    const uploadState = new Map([
+      [file, { status: 'uploading' as const, progress: 62, remainingMs: 12000 }],
+    ]);
+
+    const wrapper = mount(TFileUpload, {
+      props: {
+        modelValue: [file],
+        uploadState,
+      },
+    });
+
+    expect(wrapper.get('.t-file-upload__file-status').text()).toBe(
+      'Uploading · 62% · About 12s left',
+    );
+
+    const progressbars = wrapper.findAll('[role="progressbar"]');
+
+    expect(progressbars).toHaveLength(1);
+    expect(progressbars[0].attributes('aria-valuenow')).toBe('62');
+    expect(wrapper.get('.t-file-upload__file').attributes('aria-busy')).toBe('true');
+  });
+
+  it('offers a resume affordance for a resumable errored file and emits retry', async () => {
+    const file = new File(['x'], 'video.mp4', { type: 'video/mp4' });
+    const state = {
+      status: 'error' as const,
+      progress: 90,
+      error: 'Connection lost at 90%.',
+      resumable: true,
+    };
+    const uploadState = new Map([[file, state]]);
+
+    const wrapper = mount(TFileUpload, {
+      props: {
+        modelValue: [file],
+        uploadState,
+      },
+    });
+
+    const retry = wrapper.get('.t-file-upload__retry');
+
+    expect(retry.text()).toBe('Resume from 90%');
+    expect(wrapper.text()).toContain('Connection lost at 90%.');
+
+    await retry.trigger('click');
+
+    expect(wrapper.emitted('retry')?.[0]).toEqual([
+      {
+        file,
+        index: 0,
+        fileKey: expect.any(String),
+        mode: 'resume',
+        state,
+      },
+    ]);
+  });
+
+  it('keeps every row independent when one file fails or is uploading', async () => {
+    const first = new File(['a'], 'alpha.txt', { type: 'text/plain' });
+    const second = new File(['b'], 'beta.txt', { type: 'text/plain' });
+    const third = new File(['c'], 'gamma.txt', { type: 'text/plain' });
+
+    const uploadState = new Map([
+      [first, { status: 'error' as const, progress: 90, error: 'Connection lost.', resumable: true }],
+      [second, { status: 'uploading' as const, progress: 40 }],
+      [third, { status: 'paused' as const, progress: 10 }],
+    ]);
+
+    const wrapper = mount(TFileUpload, {
+      props: {
+        modelValue: [first, second, third],
+        uploadState,
+        loading: true,
+      },
+    });
+
+    const removeButtons = wrapper.findAll('.t-file-upload__remove');
+    const retryButtons = wrapper.findAll('.t-file-upload__retry');
+
+    expect(removeButtons).toHaveLength(3);
+    expect(retryButtons).toHaveLength(2);
+
+    for (const button of [...removeButtons, ...retryButtons]) {
+      expect((button.element as HTMLButtonElement).disabled).toBe(false);
+    }
+
+    expect(wrapper.classes()).not.toContain('is-disabled');
+
+    await removeButtons[1].trigger('click');
+
+    expect(wrapper.emitted('update:modelValue')?.[0]).toEqual([[first, third]]);
+  });
+
+  it('renders thumbnails for image files only and revokes object urls on unmount', async () => {
+    const globalUrl = URL as unknown as Record<string, unknown>;
+    const hadCreate = 'createObjectURL' in globalUrl;
+    const hadRevoke = 'revokeObjectURL' in globalUrl;
+    const originalCreate = globalUrl.createObjectURL;
+    const originalRevoke = globalUrl.revokeObjectURL;
+
+    const createObjectURL = vi.fn(() => 'blob:tree-thumb');
+    const revokeObjectURL = vi.fn();
+
+    globalUrl.createObjectURL = createObjectURL;
+    globalUrl.revokeObjectURL = revokeObjectURL;
+
+    try {
+      const image = new File(['image'], 'hero.png', { type: 'image/png' });
+      const document_ = new File(['doc'], 'brief.txt', { type: 'text/plain' });
+
+      const wrapper = mount(TFileUpload, {
+        props: {
+          modelValue: [image, document_],
+        },
+      });
+
+      await nextTick();
+
+      expect(createObjectURL).toHaveBeenCalledTimes(1);
+      expect(createObjectURL).toHaveBeenCalledWith(image);
+
+      const thumbnails = wrapper.findAll('.t-file-upload__thumb-image');
+
+      expect(thumbnails).toHaveLength(1);
+      expect(thumbnails[0].attributes('src')).toBe('blob:tree-thumb');
+
+      const fallbacks = wrapper.findAll('.t-file-upload__thumb-fallback');
+
+      expect(fallbacks).toHaveLength(1);
+      expect(fallbacks[0].text()).toBe('TXT');
+
+      wrapper.unmount();
+
+      expect(revokeObjectURL).toHaveBeenCalledWith('blob:tree-thumb');
+    } finally {
+      if (hadCreate) {
+        globalUrl.createObjectURL = originalCreate;
+      } else {
+        delete globalUrl.createObjectURL;
+      }
+
+      if (hadRevoke) {
+        globalUrl.revokeObjectURL = originalRevoke;
+      } else {
+        delete globalUrl.revokeObjectURL;
+      }
+    }
+  });
+
+  it('announces a repeated identical failure by appending a new status log node', async () => {
+    const file = new File(['v'], 'video.mp4', { type: 'video/mp4' });
+
+    const uploadState = reactive(
+      new Map<File, TFileUploadState>([[file, { status: 'uploading', progress: 90 }]]),
+    );
+
+    const wrapper = mount(TFileUpload, {
+      props: { modelValue: [file], uploadState },
+      attachTo: document.body,
+    });
+
+    await nextTick();
+
+    const log = wrapper.get('.t-file-upload__status-log').element;
+
+    let addedNodes = 0;
+    const observer = new MutationObserver((records) => {
+      for (const record of records) {
+        addedNodes += record.addedNodes.length;
+      }
+    });
+
+    observer.observe(log, { childList: true, characterData: true, subtree: true });
+
+    // A flaky connection failing twice with the identical error is the common
+    // case: each failure must mutate the live region, or assistive tech stays
+    // silent on the second one.
+    for (let cycle = 0; cycle < 2; cycle += 1) {
+      uploadState.set(file, { status: 'error', progress: 90, error: 'Connection lost.' });
+      await nextTick();
+      await nextTick();
+
+      uploadState.set(file, { status: 'uploading', progress: 90 });
+      await nextTick();
+      await nextTick();
+    }
+
+    observer.disconnect();
+
+    expect(addedNodes).toBe(2);
+
+    const entries = wrapper.findAll('.t-file-upload__status-log-entry');
+
+    expect(entries).toHaveLength(2);
+    expect(entries[1].text()).toBe('video.mp4 failed. Connection lost.');
+
+    wrapper.unmount();
+  });
+
+  it('bounds the status log history while still announcing every failure', async () => {
+    const file = new File(['v'], 'video.mp4', { type: 'video/mp4' });
+
+    const uploadState = reactive(
+      new Map<File, TFileUploadState>([[file, { status: 'uploading' }]]),
+    );
+
+    const wrapper = mount(TFileUpload, {
+      props: { modelValue: [file], uploadState },
+      attachTo: document.body,
+    });
+
+    await nextTick();
+
+    for (let cycle = 0; cycle < 8; cycle += 1) {
+      uploadState.set(file, { status: 'error', error: 'Connection lost.' });
+      await nextTick();
+      await nextTick();
+
+      uploadState.set(file, { status: 'uploading' });
+      await nextTick();
+      await nextTick();
+    }
+
+    expect(wrapper.findAll('.t-file-upload__status-log-entry')).toHaveLength(5);
+
+    wrapper.unmount();
+  });
+
   it('emits textarea updates and applies size class', async () => {
     const wrapper = mount(TTextarea, {
       props: {
@@ -435,6 +713,95 @@ describe('@treeui/vue', () => {
 
     expect(wrapper.find('.t-nav-menu__icon').exists()).toBe(true);
     expect(wrapper.find('.t-nav-menu__marker').exists()).toBe(false);
+  });
+
+  it('maps nav menu router-link active classes so prefix matches cannot double-activate', () => {
+    const RouterLinkStub = {
+      name: 'RouterLink',
+      props: ['to', 'activeClass', 'exactActiveClass'],
+      template: '<a class="t-router-link"><slot /></a>',
+    };
+
+    const uncontrolled = mount(TNavMenu, {
+      props: {
+        items: [
+          { label: 'Tasks', value: 'tasks', to: '/tasks' },
+          { label: 'Groups', value: 'groups', to: '/tasks/groups', exact: false },
+        ],
+      },
+      global: { components: { RouterLink: RouterLinkStub } },
+      attrs: { 'aria-label': 'Nav' },
+    });
+
+    const links = uncontrolled.findAllComponents(RouterLinkStub);
+    expect(links).toHaveLength(2);
+    // Exact by default: only an exact route match adds the selected class.
+    expect(links[0].props('activeClass')).toBe('');
+    expect(links[0].props('exactActiveClass')).toBe('is-selected');
+    // Opt-in prefix item: inclusive matches also highlight.
+    expect(links[1].props('activeClass')).toBe('is-selected');
+    expect(links[1].props('exactActiveClass')).toBe('is-selected');
+
+    const controlled = mount(TNavMenu, {
+      props: {
+        items: [{ label: 'Tasks', value: 'tasks', to: '/tasks' }],
+        modelValue: 'tasks',
+      },
+      global: { components: { RouterLink: RouterLinkStub } },
+      attrs: { 'aria-label': 'Nav' },
+    });
+
+    const controlledLink = controlled.findComponent(RouterLinkStub);
+    // Controlled menus own selection; the router adds no class of its own.
+    expect(controlledLink.props('activeClass')).toBe('');
+    expect(controlledLink.props('exactActiveClass')).toBe('');
+    expect(controlledLink.classes()).toContain('is-selected');
+  });
+
+  it('renders page header title, subtitle, actions and heading level', () => {
+    const wrapper = mount(TPageHeader, {
+      props: { title: 'Tasks', subtitle: 'Your work this cycle', level: 2 },
+      slots: { actions: '<button class="hdr-action">New</button>' },
+    });
+
+    expect(wrapper.element.tagName).toBe('HEADER');
+    const title = wrapper.find('.t-page-header__title');
+    expect(title.exists()).toBe(true);
+    expect(title.element.tagName).toBe('H2');
+    expect(title.text()).toBe('Tasks');
+    expect(wrapper.find('.t-page-header__subtitle').text()).toBe('Your work this cycle');
+    expect(wrapper.find('.t-page-header__actions .hdr-action').exists()).toBe(true);
+  });
+
+  it('omits page header heading block when title and subtitle are empty', () => {
+    const wrapper = mount(TPageHeader);
+
+    expect(wrapper.find('.t-page-header__title').exists()).toBe(false);
+    expect(wrapper.find('.t-page-header__subtitle').exists()).toBe(false);
+    expect(wrapper.find('.t-page-header__heading').exists()).toBe(false);
+  });
+
+  it('renders page shell width, gap and padding through a container column', () => {
+    const wrapper = mount(TPage, {
+      props: { width: 'md', gap: 'sm' },
+      slots: { default: '<p class="page-child">Hi</p>' },
+    });
+
+    expect(wrapper.classes()).toContain('t-page');
+    expect(wrapper.classes()).toContain('is-padded');
+
+    const inner = wrapper.find('.t-page__inner');
+    expect(inner.exists()).toBe(true);
+    expect(inner.classes()).toContain('t-page__inner--gap-sm');
+    expect(inner.classes()).toContain('t-container--md');
+    expect(inner.classes()).toContain('is-centered');
+    expect(wrapper.find('.page-child').exists()).toBe(true);
+  });
+
+  it('drops page padding when padded is false', () => {
+    const wrapper = mount(TPage, { props: { padded: false } });
+
+    expect(wrapper.classes()).not.toContain('is-padded');
   });
 
   it('renders badge variants', () => {

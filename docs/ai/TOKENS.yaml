@@ -75,6 +75,13 @@ shadow:
   sm: "0 6px 18px rgba(15, 23, 42, 0.08)"
   md: "0 14px 34px rgba(15, 23, 42, 0.12)"
 
+gradient:
+  brand: "linear-gradient(135deg, var(--tree-color-brand-primary), var(--tree-color-brand-hover))"
+  note: >-
+    High-emphasis brand gradient (var --tree-gradient-brand), used by the TButton `brand` variant.
+    Foundation token that references the theme brand vars, so it follows light/dark automatically.
+    Override --tree-gradient-brand to match a product's marketing gradient (e.g. a two-hue blend).
+
 border:
   width:
     subtle: "1px"

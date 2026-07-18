@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { createId, isActivationKey } from '@treeui/utils';
-import { computed, onBeforeUnmount, onMounted, ref, useAttrs } from 'vue';
+import { computed, onBeforeUnmount, onMounted, ref, useAttrs, watch } from 'vue';
 import type { TSize } from '../types/contracts';
+import TProgress from './TProgress.vue';
 import TSpinner from './TSpinner.vue';
 
 defineOptions({
@@ -19,19 +20,118 @@ export interface TFileUploadRejection {
   message: string;
 }
 
+export type TFileUploadStatus =
+  | 'pending'
+  | 'uploading'
+  | 'paused'
+  | 'error'
+  | 'success';
+
+export interface TFileUploadState {
+  status: TFileUploadStatus;
+  progress?: number;
+  uploadedBytes?: number;
+  remainingMs?: number;
+  remainingLabel?: string;
+  error?: string;
+  resumable?: boolean;
+  retryable?: boolean;
+  thumbnailUrl?: string;
+  meta?: string;
+}
+
+export type TFileUploadStateSource =
+  | ReadonlyMap<File, TFileUploadState>
+  | ((file: File, index: number) => TFileUploadState | undefined);
+
+export interface TFileUploadRetryPayload {
+  file: File;
+  index: number;
+  fileKey: string;
+  mode: 'resume' | 'restart';
+  state: TFileUploadState;
+}
+
+export interface TFileUploadCancelPayload {
+  file: File;
+  index: number;
+  fileKey: string;
+  state: TFileUploadState;
+  reason: 'remove' | 'clear';
+}
+
+export interface TFileUploadFileSlotProps {
+  file: File;
+  index: number;
+  fileKey: string;
+  state: TFileUploadState | undefined;
+  thumbnailUrl: string | undefined;
+  sizeLabel: string;
+  typeLabel: string;
+  dimensionsLabel: string | undefined;
+  progressLabel: string | undefined;
+  remainingLabel: string | undefined;
+  uploadedLabel: string | undefined;
+  statusLabel: string | undefined;
+  actionLabel: string | undefined;
+  canRetry: boolean;
+  retryMode: 'resume' | 'restart';
+  isDragActive: boolean;
+  isDragReject: boolean;
+  removeFile: () => void;
+  retryFile: () => void;
+}
+
+interface ThumbEntry {
+  url: string;
+  width: number | null;
+  height: number | null;
+}
+
+interface FileRow {
+  slotProps: TFileUploadFileSlotProps;
+  rowClass: string | undefined;
+  metaText: string;
+  statusText: string;
+  errorText: string | undefined;
+  errorId: string | undefined;
+  showProgress: boolean;
+  progressValue: number | undefined;
+  progressAriaLabel: string;
+  isBusy: boolean;
+  isSuccess: boolean;
+}
+
+const DEFAULT_STATUS_LABELS: Record<TFileUploadStatus, string> = {
+  pending: 'Waiting',
+  uploading: 'Uploading',
+  paused: 'Paused',
+  error: 'Upload failed',
+  success: 'Uploaded',
+};
+
+// The status log keeps a bounded history of announcements. Old entries are
+// trimmed rather than replaced in place so that each terminal transition
+// inserts a brand new node: `aria-relevant` defaults to "additions text", so
+// assistive tech announces the insertion and ignores the trim.
+const STATUS_LOG_LIMIT = 5;
+
+type StatusLogEntry = {
+  id: number;
+  text: string;
+};
+
 const slots = defineSlots<{
   icon?: () => unknown;
   default?: (props: {
     files: File[];
     isDragActive: boolean;
+    isDragReject: boolean;
     openFileDialog: () => void;
     clearFiles: () => void;
   }) => unknown;
-  file?: (props: {
-    file: File;
-    index: number;
-    removeFile: () => void;
-  }) => unknown;
+  file?: (props: TFileUploadFileSlotProps) => unknown;
+  'file-status'?: (props: TFileUploadFileSlotProps) => unknown;
   actions?: (props: {
     files: File[];
     openFileDialog: () => void;
@@ -57,6 +157,15 @@ const props = withDefaults(
     paste?: boolean;
     drop?: boolean;
     showFileList?: boolean;
+    uploadState?: TFileUploadStateSource;
+    dragLabel?: string;
+    dragRejectLabel?: string;
+    thumbnails?: boolean;
+    maxThumbnailSize?: number | null;
+    retryLabel?: string;
+    resumeLabel?: (percent: number) => string;
+    remainingTimeFormat?: (remainingMs: number) => string;
+    statusLabels?: Partial<Record<TFileUploadStatus, string>>;
   }>(),
   {
     modelValue: () => [],
@@ -75,6 +184,33 @@ const props = withDefaults(
     paste: true,
     drop: true,
     showFileList: true,
+    uploadState: undefined,
+    dragLabel: 'Release to upload',
+    dragRejectLabel: 'This file type is not accepted',
+    thumbnails: true,
+    maxThumbnailSize: 10 * 1024 * 1024,
+    retryLabel: 'Retry',
+    resumeLabel: (percent: number) => `Resume from ${percent}%`,
+    remainingTimeFormat: (remainingMs: number) => {
+      if (remainingMs < 5000) {
+        return 'Less than 5s left';
+      }
+
+      const seconds = Math.round(remainingMs / 1000);
+
+      if (seconds < 60) {
+        return `About ${seconds}s left`;
+      }
+
+      const minutes = Math.round(seconds / 60);
+
+      if (minutes < 60) {
+        return `About ${minutes} min left`;
+      }
+
+      return `About ${Math.round(minutes / 60)}h left`;
+    },
+    statusLabels: () => ({}),
   },
 );
 
@@ -82,24 +218,36 @@ const emit = defineEmits<{
   'update:modelValue': [files: File[]];
   'files-accepted': [files: File[]];
   'files-rejected': [rejections: TFileUploadRejection[]];
+  retry: [payload: TFileUploadRetryPayload];
+  cancel: [payload: TFileUploadCancelPayload];
 }>();
 
 const attrs = useAttrs();
 const rootRef = ref<HTMLElement | null>(null);
 const inputRef = ref<HTMLInputElement | null>(null);
 const isDragActive = ref(false);
+const isDragReject = ref(false);
 const isFocusedWithin = ref(false);
 const dragDepth = ref(0);
 const feedbackMessages = ref<string[]>([]);
+const statusLog = ref<StatusLogEntry[]>([]);
+let statusLogId = 0;
+const retryFocusKey = ref<string | null>(null);
+const thumbs = ref(new Map<File, ThumbEntry>());
 
 const uploadId = createId('t-file-upload');
 const descriptionId = `${uploadId}-description`;
 const feedbackId = `${uploadId}-feedback`;
 const filesId = `${uploadId}-files`;
 
-const isUnavailable = computed(() => props.disabled || props.loading);
+const isDisabled = computed(() => props.disabled);
 const hasFiles = computed(() => props.modelValue.length > 0);
 const hasCustomBody = computed(() => Boolean(slots.default));
+
+const resolvedStatusLabels = computed(() => ({
+  ...DEFAULT_STATUS_LABELS,
+  ...props.statusLabels,
+}));
 
 const effectiveMaxFiles = computed(() => {
   if (!props.multiple) {
@@ -117,10 +265,11 @@ const rootClasses = computed(() => [
   't-file-upload',
   `t-file-upload--${props.size}`,
   {
-    'is-disabled': isUnavailable.value,
+    'is-disabled': isDisabled.value,
     'is-invalid': props.invalid,
     'is-loading': props.loading,
     'is-drag-active': isDragActive.value,
+    'is-drag-reject': isDragReject.value,
     'has-files': hasFiles.value,
   },
   attrs.class,
@@ -153,6 +302,14 @@ const describedBy = computed(() => {
 
 const selectedFilesLabel = computed(() => `${props.filesLabel} (${props.modelValue.length})`);
 
+const dropzoneLabel = computed(() => {
+  if (isDragReject.value) {
+    return props.dragRejectLabel;
+  }
+
+  return isDragActive.value ? props.dragLabel : props.label;
+});
+
 const formatFileSize = (size: number) => {
   if (size < 1024) {
     return `${size} B`;
@@ -174,23 +331,52 @@ const formatFileSize = (size: number) => {
   return `${roundedValue} ${units[unitIndex]}`;
 };
 
-const fileKey = (file: File, index: number) =>
-  `${file.name}-${file.size}-${file.lastModified}-${index}`;
+const formatFileType = (file: File) => {
+  const dotIndex = file.name.lastIndexOf('.');
+  const extension = dotIndex > 0 && dotIndex < file.name.length - 1
+    ? file.name.slice(dotIndex + 1).toUpperCase()
+    : '';
 
-const matchesAccept = (file: File) => {
-  if (!props.accept.trim()) {
-    return true;
+  if (extension && extension.length <= 5) {
+    return extension;
   }
 
-  const tokens = props.accept
+  const subtype = file.type.includes('/') ? file.type.split('/')[1] : '';
+
+  return subtype ? subtype.toUpperCase() : 'FILE';
+};
+
+let keySeq = 0;
+const keyCache = new WeakMap<File, string>();
+
+const fileKeyFor = (file: File) => {
+  let key = keyCache.get(file);
+
+  if (!key) {
+    keySeq += 1;
+    key = `${uploadId}-f${keySeq}`;
+    keyCache.set(file, key);
+  }
+
+  return key;
+};
+
+const acceptTokens = computed(() =>
+  props.accept
     .split(',')
     .map((token) => token.trim().toLowerCase())
-    .filter(Boolean);
+    .filter(Boolean),
+);
+
+const matchesAccept = (file: File) => {
+  if (acceptTokens.value.length === 0) {
+    return true;
+  }
 
   const fileName = file.name.toLowerCase();
   const fileType = file.type.toLowerCase();
 
-  return tokens.some((token) => {
+  return acceptTokens.value.some((token) => {
     if (token.startsWith('.')) {
       return fileName.endsWith(token);
     }
@@ -201,6 +387,113 @@ const matchesAccept = (file: File) => {
 
     return fileType === token;
   });
+};
+
+const canDetectDragReject = computed(() =>
+  acceptTokens.value.length > 0 && acceptTokens.value.every((token) => token.includes('/')),
+);
+
+const matchesAcceptType = (type: string) => {
+  const fileType = type.toLowerCase();
+
+  if (!fileType) {
+    return true;
+  }
+
+  return acceptTokens.value.some((token) =>
+    token.endsWith('/*') ? fileType.startsWith(token.slice(0, -1)) : fileType === token,
+  );
+};
+
+const detectDragReject = (dataTransfer?: DataTransfer | null) => {
+  if (!canDetectDragReject.value || !dataTransfer) {
+    return false;
+  }
+
+  const items = dataTransfer.items;
+
+  if (!items || items.length === 0) {
+    return false;
+  }
+
+  const fileItems = Array.from(items).filter((item) => item.kind === 'file');
+
+  if (fileItems.length === 0) {
+    return false;
+  }
+
+  return fileItems.every((item) => !matchesAcceptType(item.type));
+};
+
+const resolveState = (file: File, index: number) => {
+  const source = props.uploadState;
+
+  if (!source) {
+    return undefined;
+  }
+
+  return typeof source === 'function' ? source(file, index) : source.get(file);
+};
+
+const resolvedStates = computed(() => props.modelValue.map(resolveState));
+
+const canUseObjectUrl = () =>
+  typeof window !== 'undefined' &&
+  typeof URL !== 'undefined' &&
+  typeof URL.createObjectURL === 'function' &&
+  typeof URL.revokeObjectURL === 'function';
+
+const isThumbnailable = (file: File) =>
+  file.type.startsWith('image/') &&
+  (props.maxThumbnailSize === null || file.size <= props.maxThumbnailSize);
+
+const releaseAllThumbnails = () => {
+  if (canUseObjectUrl()) {
+    for (const entry of thumbs.value.values()) {
+      URL.revokeObjectURL(entry.url);
+    }
+  }
+
+  thumbs.value.clear();
+};
+
+const syncThumbnails = () => {
+  if (!props.thumbnails || !canUseObjectUrl()) {
+    releaseAllThumbnails();
+    return;
+  }
+
+  const live = new Set(props.modelValue);
+
+  for (const [file, entry] of [...thumbs.value]) {
+    if (!live.has(file)) {
+      URL.revokeObjectURL(entry.url);
+      thumbs.value.delete(file);
+    }
+  }
+
+  for (const file of props.modelValue) {
+    if (thumbs.value.has(file) || !isThumbnailable(file)) {
+      continue;
+    }
+
+    const url = URL.createObjectURL(file);
+    thumbs.value.set(file, { url, width: null, height: null });
+
+    const image = new Image();
+
+    image.onload = () => {
+      const current = thumbs.value.get(file);
+
+      if (!current || current.url !== url) {
+        return;
+      }
+
+      thumbs.value.set(file, { url, width: image.naturalWidth, height: image.naturalHeight });
+    };
+
+    image.src = url;
+  }
 };
 
 const buildRejectionMessage = (
@@ -226,7 +519,7 @@ const resetInputValue = () => {
 };
 
 const openFileDialog = () => {
-  if (isUnavailable.value) {
+  if (isDisabled.value) {
     return;
   }
 
@@ -251,7 +544,7 @@ const emitFiles = (
 };
 
 const processFiles = (incomingFiles: File[]) => {
-  if (isUnavailable.value || incomingFiles.length === 0) {
+  if (isDisabled.value || incomingFiles.length === 0) {
     return;
   }
 
@@ -305,9 +598,25 @@ const processFiles = (incomingFiles: File[]) => {
   emitFiles(nextFiles, acceptedFiles, rejections);
 };
 
-const removeFile = (index: number) => {
-  if (isUnavailable.value) {
+const emitCancel = (file: File, index: number, reason: 'remove' | 'clear') => {
+  const state = resolvedStates.value[index];
+
+  if (!state || (state.status !== 'uploading' && state.status !== 'paused')) {
     return;
+  }
+
+  emit('cancel', { file, index, fileKey: fileKeyFor(file), state, reason });
+};
+
+const removeFile = (index: number) => {
+  if (isDisabled.value) {
+    return;
+  }
+
+  const file = props.modelValue[index];
+
+  if (file) {
+    emitCancel(file, index, 'remove');
   }
 
   feedbackMessages.value = [];
@@ -315,13 +624,126 @@ const removeFile = (index: number) => {
 };
 
 const clearFiles = () => {
-  if (isUnavailable.value || !hasFiles.value) {
+  if (isDisabled.value || !hasFiles.value) {
     return;
   }
+
+  props.modelValue.forEach((file, index) => {
+    emitCancel(file, index, 'clear');
+  });
 
   feedbackMessages.value = [];
   emit('update:modelValue', []);
 };
+
+const rows = computed<FileRow[]>(() =>
+  props.modelValue.map((file, index) => {
+    const state = resolvedStates.value[index];
+    const status = state?.status;
+    const thumb = thumbs.value.get(file);
+    const key = fileKeyFor(file);
+
+    const progress = state?.progress;
+    const percent = typeof progress === 'number' ? Math.round(progress) : undefined;
+    const isResumable = state?.resumable === true;
+
+    const canRetry = Boolean(
+      state && (status === 'error' || status === 'paused') && state.retryable !== false,
+    );
+    const retryMode: 'resume' | 'restart' = isResumable ? 'resume' : 'restart';
+
+    const sizeLabel = formatFileSize(file.size);
+    const typeLabel = formatFileType(file);
+    const dimensionsLabel = thumb && thumb.width !== null && thumb.height !== null
+      ? `${thumb.width} × ${thumb.height}`
+      : undefined;
+
+    const progressLabel = status === 'uploading' && percent !== undefined
+      ? `${percent}%`
+      : undefined;
+
+    let remainingLabel: string | undefined;
+
+    if (status === 'uploading') {
+      if (state?.remainingLabel) {
+        remainingLabel = state.remainingLabel;
+      } else if (
+        typeof state?.remainingMs === 'number' &&
+        Number.isFinite(state.remainingMs) &&
+        state.remainingMs >= 0
+      ) {
+        remainingLabel = props.remainingTimeFormat(state.remainingMs);
+      }
+    }
+
+    const uploadedLabel = (status === 'error' || status === 'paused') &&
+      typeof state?.uploadedBytes === 'number'
+      ? `${formatFileSize(state.uploadedBytes)} of ${sizeLabel} uploaded`
+      : undefined;
+
+    const statusLabel = status ? resolvedStatusLabels.value[status] : undefined;
+
+    let actionLabel: string | undefined;
+
+    if (canRetry) {
+      actionLabel = isResumable && percent !== undefined
+        ? props.resumeLabel(percent)
+        : props.retryLabel;
+    }
+
+    const errorText = status === 'error' ? state?.error : undefined;
+
+    const slotProps: TFileUploadFileSlotProps = {
+      file,
+      index,
+      fileKey: key,
+      state,
+      thumbnailUrl: state?.thumbnailUrl ?? thumb?.url,
+      sizeLabel,
+      typeLabel,
+      dimensionsLabel,
+      progressLabel,
+      remainingLabel,
+      uploadedLabel,
+      statusLabel,
+      actionLabel,
+      canRetry,
+      retryMode,
+      isDragActive: isDragActive.value,
+      isDragReject: isDragReject.value,
+      removeFile: () => removeFile(index),
+      retryFile: () => {
+        if (!canRetry || isDisabled.value || !state) {
+          return;
+        }
+
+        emit('retry', { file, index, fileKey: key, mode: retryMode, state });
+      },
+    };
+
+    return {
+      slotProps,
+      rowClass: status ? `is-${status}` : undefined,
+      metaText: [typeLabel, sizeLabel, dimensionsLabel, state?.meta].filter(Boolean).join(' · '),
+      statusText: [statusLabel, progressLabel, remainingLabel, uploadedLabel]
+        .filter(Boolean)
+        .join(' · '),
+      errorText,
+      errorId: errorText ? `${key}-error` : undefined,
+      showProgress: Boolean(
+        state &&
+        (status === 'uploading' ||
+          status === 'paused' ||
+          status === 'error' ||
+          (status === 'success' && percent !== undefined)),
+      ),
+      progressValue: status === 'uploading' ? progress : (progress ?? 0),
+      progressAriaLabel: `${statusLabel ?? ''} ${file.name}`.trim(),
+      isBusy: status === 'uploading',
+      isSuccess: status === 'success',
+    };
+  }),
+);
 
 const hasTransferFiles = (dataTransfer?: DataTransfer | null) => {
   if (!dataTransfer) {
@@ -350,7 +772,7 @@ const onInputChange = (event: Event) => {
 };
 
 const onDropzoneKeydown = (event: KeyboardEvent) => {
-  if (!isActivationKey(event) || isUnavailable.value) {
+  if (!isActivationKey(event) || isDisabled.value) {
     return;
   }
 
@@ -372,8 +794,18 @@ const onFocusOut = (event: FocusEvent) => {
   isFocusedWithin.value = false;
 };
 
+const onRetryFocus = (key: string) => {
+  retryFocusKey.value = key;
+};
+
+const onRetryBlur = (key: string) => {
+  if (retryFocusKey.value === key) {
+    retryFocusKey.value = null;
+  }
+};
+
 const onPaste = (event: ClipboardEvent) => {
-  if (!props.paste || isUnavailable.value) {
+  if (!props.paste || isDisabled.value) {
     return;
   }
 
@@ -396,17 +828,18 @@ const onDocumentPaste = (event: Event) => {
 };
 
 const onDragEnter = (event: DragEvent) => {
-  if (!props.drop || isUnavailable.value || !hasTransferFiles(event.dataTransfer)) {
+  if (!props.drop || isDisabled.value || !hasTransferFiles(event.dataTransfer)) {
     return;
   }
 
   event.preventDefault();
   dragDepth.value += 1;
   isDragActive.value = true;
+  isDragReject.value = detectDragReject(event.dataTransfer);
 };
 
 const onDragOver = (event: DragEvent) => {
-  if (!props.drop || isUnavailable.value || !hasTransferFiles(event.dataTransfer)) {
+  if (!props.drop || isDisabled.value || !hasTransferFiles(event.dataTransfer)) {
     return;
   }
 
@@ -417,10 +850,11 @@ const onDragOver = (event: DragEvent) => {
   }
 
   isDragActive.value = true;
+  isDragReject.value = detectDragReject(event.dataTransfer);
 };
 
 const onDragLeave = (event: DragEvent) => {
-  if (!props.drop || isUnavailable.value || !hasTransferFiles(event.dataTransfer)) {
+  if (!props.drop || isDisabled.value || !hasTransferFiles(event.dataTransfer)) {
     return;
   }
 
@@ -429,26 +863,118 @@ const onDragLeave = (event: DragEvent) => {
 
   if (dragDepth.value === 0) {
     isDragActive.value = false;
+    isDragReject.value = false;
   }
 };
 
 const onDrop = (event: DragEvent) => {
-  if (!props.drop || isUnavailable.value || !hasTransferFiles(event.dataTransfer)) {
+  if (!props.drop || isDisabled.value || !hasTransferFiles(event.dataTransfer)) {
     return;
   }
 
   event.preventDefault();
   dragDepth.value = 0;
   isDragActive.value = false;
+  isDragReject.value = false;
   processFiles(Array.from(event.dataTransfer?.files ?? []));
 };
 
+const previousStatuses = new Map<File, TFileUploadStatus>();
+
+watch(
+  resolvedStates,
+  (states) => {
+    const messages: string[] = [];
+    const live = new Set<File>();
+
+    props.modelValue.forEach((file, index) => {
+      live.add(file);
+
+      const status = states[index]?.status;
+
+      if (!status) {
+        return;
+      }
+
+      const previous = previousStatuses.get(file);
+
+      if (previous === status) {
+        return;
+      }
+
+      previousStatuses.set(file, status);
+
+      if (previous === undefined) {
+        return;
+      }
+
+      if (status === 'success') {
+        messages.push(`${file.name} uploaded.`);
+      } else if (status === 'error') {
+        messages.push(`${file.name} failed. ${states[index]?.error ?? ''}`.trim());
+      }
+    });
+
+    for (const file of [...previousStatuses.keys()]) {
+      if (!live.has(file)) {
+        previousStatuses.delete(file);
+      }
+    }
+
+    if (messages.length > 0) {
+      // Append instead of overwriting a single string: two identical messages
+      // in a row (a retry that fails with the same error) would otherwise write
+      // a byte-identical value, which `Object.is` suppresses — no DOM mutation,
+      // so `aria-live` never fires and the repeat failure is announced as silence.
+      statusLogId += 1;
+      statusLog.value = [
+        ...statusLog.value,
+        { id: statusLogId, text: messages.join(' ') },
+      ].slice(-STATUS_LOG_LIMIT);
+    }
+  },
+  { flush: 'post', immediate: true },
+);
+
+watch(
+  resolvedStates,
+  () => {
+    const key = retryFocusKey.value;
+    const root = rootRef.value;
+
+    if (!key || !root) {
+      return;
+    }
+
+    if (document.activeElement && document.activeElement !== document.body) {
+      return;
+    }
+
+    if (root.querySelector(`[data-t-retry="${key}"]`)) {
+      return;
+    }
+
+    retryFocusKey.value = null;
+
+    const fallback = root.querySelector<HTMLElement>(`[data-t-remove="${key}"]`) ??
+      root.querySelector<HTMLElement>('.t-file-upload__dropzone');
+
+    fallback?.focus();
+  },
+  { flush: 'post' },
+);
+
+watch(() => props.modelValue, syncThumbnails);
+watch(() => props.thumbnails, syncThumbnails);
+
 onMounted(() => {
   document.addEventListener('paste', onDocumentPaste);
+  syncThumbnails();
 });
 
 onBeforeUnmount(() => {
   document.removeEventListener('paste', onDocumentPaste);
+  releaseAllThumbnails();
 });
 </script>
 
@@ -469,7 +995,7 @@ onBeforeUnmount(() => {
       type="file"
       :accept="accept || undefined"
       :multiple="multiple"
-      :disabled="isUnavailable"
+      :disabled="isDisabled"
       @change="onInputChange"
     >
 
@@ -478,10 +1004,10 @@ onBeforeUnmount(() => {
       :aria-busy="loading || undefined"
       :aria-controls="showFileList && hasFiles ? filesId : undefined"
       :aria-describedby="describedBy"
-      :aria-disabled="isUnavailable || undefined"
+      :aria-disabled="isDisabled || undefined"
       :aria-invalid="invalid || undefined"
       role="button"
-      :tabindex="isUnavailable ? -1 : 0"
+      :tabindex="isDisabled ? -1 : 0"
       @click="openFileDialog"
       @keydown="onDropzoneKeydown"
       @dragenter="onDragEnter"
@@ -503,11 +1029,12 @@ onBeforeUnmount(() => {
         <slot
           :files="modelValue"
           :is-drag-active="isDragActive"
+          :is-drag-reject="isDragReject"
           :open-file-dialog="openFileDialog"
           :clear-files="clearFiles"
         >
           <p class="t-file-upload__label">
-            {{ label }}
+            {{ dropzoneLabel }}
           </p>
           <p
             v-if="description"
@@ -545,6 +1072,20 @@ onBeforeUnmount(() => {
     </ul>
 
     <div
+      class="t-file-upload__status-log t-visually-hidden"
+      role="log"
+      aria-live="polite"
+    >
+      <p
+        v-for="entry in statusLog"
+        :key="entry.id"
+        class="t-file-upload__status-log-entry"
+      >
+        {{ entry.text }}
+      </p>
+    </div>
+
+    <div
       v-if="showFileList && hasFiles"
       class="t-file-upload__files"
     >
@@ -559,7 +1100,7 @@ onBeforeUnmount(() => {
         <button
           class="t-file-upload__clear"
           type="button"
-          :disabled="isUnavailable"
+          :disabled="isDisabled"
           @click="clearFiles"
         >
           Clear all
@@ -568,31 +1109,99 @@ onBeforeUnmount(() => {
 
       <ul class="t-file-upload__list">
         <li
-          v-for="(file, index) in modelValue"
-          :key="fileKey(file, index)"
+          v-for="row in rows"
+          :key="row.slotProps.fileKey"
           class="t-file-upload__file"
+          :class="row.rowClass"
+          :aria-busy="row.isBusy || undefined"
         >
           <slot
             name="file"
-            :file="file"
-            :index="index"
-            :remove-file="() => removeFile(index)"
+            v-bind="row.slotProps"
           >
+            <span
+              class="t-file-upload__thumb"
+              aria-hidden="true"
+            >
+              <img
+                v-if="row.slotProps.thumbnailUrl"
+                class="t-file-upload__thumb-image"
+                :src="row.slotProps.thumbnailUrl"
+                alt=""
+              >
+              <span
+                v-else
+                class="t-file-upload__thumb-fallback"
+              >
+                {{ row.slotProps.typeLabel }}
+              </span>
+            </span>
+
             <div class="t-file-upload__file-copy">
               <p class="t-file-upload__file-name">
-                {{ file.name }}
+                {{ row.slotProps.file.name }}
               </p>
               <p class="t-file-upload__file-meta">
-                {{ formatFileSize(file.size) }}
+                {{ row.metaText }}
               </p>
+
+              <slot
+                name="file-status"
+                v-bind="row.slotProps"
+              >
+                <div
+                  v-if="row.showProgress"
+                  class="t-file-upload__file-progress"
+                >
+                  <TProgress
+                    size="sm"
+                    :value="row.progressValue"
+                    :label="row.progressAriaLabel"
+                  />
+                </div>
+
+                <p
+                  v-if="row.statusText"
+                  class="t-file-upload__file-status"
+                >
+                  <span
+                    v-if="row.isSuccess"
+                    class="t-file-upload__proof"
+                    aria-hidden="true"
+                  >✓</span>{{ row.statusText }}
+                </p>
+
+                <p
+                  v-if="row.errorText"
+                  :id="row.errorId"
+                  class="t-file-upload__file-error"
+                >
+                  {{ row.errorText }}
+                </p>
+              </slot>
             </div>
+
+            <button
+              v-if="row.slotProps.canRetry"
+              class="t-file-upload__retry"
+              type="button"
+              :data-t-retry="row.slotProps.fileKey"
+              :disabled="isDisabled"
+              :aria-describedby="row.errorId"
+              @focus="onRetryFocus(row.slotProps.fileKey)"
+              @blur="onRetryBlur(row.slotProps.fileKey)"
+              @click="row.slotProps.retryFile()"
+            >
+              {{ row.slotProps.actionLabel }}
+            </button>
 
             <button
               class="t-file-upload__remove"
               type="button"
-              :disabled="isUnavailable"
-              :aria-label="`Remove ${file.name}`"
-              @click="removeFile(index)"
+              :data-t-remove="row.slotProps.fileKey"
+              :disabled="isDisabled"
+              :aria-label="`Remove ${row.slotProps.file.name}`"
+              @click="row.slotProps.removeFile()"
             >
               Remove
             </button>

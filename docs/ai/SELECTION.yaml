@@ -231,7 +231,10 @@ component_profiles:
       - "The page shell should stay full-width while content stays readable."
     avoid_when:
       - "You need internal spacing between children."
+      - "You are laying out a whole screen — reach for TPage, which adds page padding and vertical rhythm."
     alternatives:
+      - component: TPage
+        when: "You want a full page region with block padding and vertical spacing between sections, not just a width constraint."
       - component: TStack
         when: "The main need is vertical or horizontal spacing."
       - component: TGrid
@@ -421,6 +424,30 @@ component_profiles:
     alternatives:
       - component: TInput
         when: "The value is not numeric."
+
+  TPage:
+    keywords: [page, page shell, content column, screen layout]
+    use_when:
+      - "You want a standard screen region under the app shell with consistent max width, page padding, and vertical rhythm between sections."
+    avoid_when:
+      - "You only need a bare width constraint with no page padding or child spacing."
+    alternatives:
+      - component: TContainer
+        when: "You just need a centered max-width wrapper without page-level block padding or child spacing."
+      - component: TStack
+        when: "You only need to space a group of children, not lay out a whole page."
+
+  TPageHeader:
+    keywords: [page header, title bar, page title, heading and actions]
+    use_when:
+      - "A screen needs a title (and optional subtitle) with a right-aligned actions area in a consistent hierarchy."
+    avoid_when:
+      - "You need cross-page hierarchy or navigation trails rather than a single page title."
+    alternatives:
+      - component: TBreadcrumb
+        when: "You are showing where the page sits in a hierarchy, not its title."
+      - component: TNavbar
+        when: "You need a top application bar, not a per-page title block."
 
   TPagination:
     keywords: [pagination, pages, list navigation]

@@ -24,8 +24,14 @@ export { default as TMultiSelect } from './TMultiSelect.vue';
 export type { TMultiSelectOption } from './TMultiSelect.vue';
 export { default as TGrid } from './TGrid.vue';
 export type {
+  TFileUploadCancelPayload,
+  TFileUploadFileSlotProps,
   TFileUploadRejection,
   TFileUploadRejectionReason,
+  TFileUploadRetryPayload,
+  TFileUploadState,
+  TFileUploadStateSource,
+  TFileUploadStatus,
 } from './TFileUpload.vue';
 export { default as TNavbar } from './TNavbar.vue';
 export { default as TAppBar } from './TNavbar.vue';
@@ -67,6 +73,9 @@ export type { TStatTone, TStatTrendDirection } from './TStat.vue';
 export { default as TSwitch } from './TSwitch.vue';
 export { default as TTooltip } from './TTooltip.vue';
 export { default as TFormField } from './TFormField.vue';
+export { default as TPage } from './TPage.vue';
+export type { TPageGap } from './TPage.vue';
+export { default as TPageHeader } from './TPageHeader.vue';
 export { default as TPagination } from './TPagination.vue';
 export { default as TPopover } from './TPopover.vue';
 export { default as TProgress } from './TProgress.vue';

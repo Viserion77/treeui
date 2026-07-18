@@ -56,6 +56,12 @@ export const treeTokens = {
     sm: '0 6px 18px rgba(15, 23, 42, 0.08)',
     md: '0 14px 34px rgba(15, 23, 42, 0.12)',
   },
+  // Brand gradient for high-emphasis surfaces (e.g. the primary CTA).
+  // References the theme brand vars so it follows light/dark automatically;
+  // override `--tree-gradient-brand` to match a product's marketing gradient.
+  gradient: {
+    brand: 'linear-gradient(135deg, var(--tree-color-brand-primary), var(--tree-color-brand-hover))',
+  },
   border: {
     width: {
       subtle: '1px',

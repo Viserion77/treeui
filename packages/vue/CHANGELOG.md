@@ -1,5 +1,77 @@
 # @treeui/vue
 
+## 0.16.0
+
+### Minor Changes
+
+- 44f01fc: Fix two slots that were documented but non-functional.
+
+  **`TCard` `#header` no longer swallows `#actions`.** The title and actions
+  markup sat inside the `header` slot's fallback content, so filling `#header`
+  removed the action buttons with no error or warning. `t-card__actions` is now a
+  sibling of the slot, matching `TModal` and `TDrawer`.
+
+  _Upgrade note:_ if you worked around this by duplicating your buttons into
+  `#header`, they will now render twice — remove the duplicate.
+
+  **`TDropdown`'s `trigger` slot now works.** `triggerRef` was bound to the
+  built-in fallback button, which is inside the slot and therefore absent once you
+  fill it. A custom trigger could not open the menu at all, and focus was never
+  restored on close (WCAG 2.4.3). Handlers and the ref now live on the trigger
+  wrapper, so a custom trigger opens on click and Enter/ArrowDown, and focus
+  returns to it on Escape and after selecting an item.
+
+- 44f01fc: Export 11 public types that were defined but unreachable from the package entry
+  point — importing any of them failed with TS2614/TS2724:
+
+  `TTableColumn`, `TTableSortState`, `TTableSortDirection`, `TAlertVariant`,
+  `TAvatarStatus`, `TComboboxOption`, `TContextMenuItem`, `TTagVariant`,
+  `TPricingPlan`, `TAccordionType`, `TTabsActivationMode`.
+
+  The last three were declared without the `T` prefix required by the naming
+  convention. They had never been exported, so they are published under the
+  prefixed name only — no alias is needed.
+
+  Adds a test that fails when a new type is declared without being exported or
+  without the prefix, so the barrel cannot drift again.
+
+- 44f01fc: **Security:** `TMarkdownEditor` no longer renders links or images whose URL uses
+  an unsafe scheme. `[click](javascript:…)` previously reached the DOM as a live
+  `href` and executed on click — the preview escapes HTML, so the URL scheme was
+  the one remaining way to get script into it. Links now allow `http`, `https`,
+  `mailto`, `tel` and relative URLs; images allow `http`, `https` and non-SVG
+  `data:image/*`. A rejected URL renders as inert text marked with
+  `t-md-editor__blocked-link` rather than being silently dropped.
+
+  Adds a `sanitize?: (html: string) => string` prop so an app can apply its own
+  policy (DOMPurify or otherwise) on top. No sanitizer is bundled.
+
+  Also fixes the inline renderer corrupting its own output: the emphasis pass ran
+  over already-generated HTML, so `target="_blank"` lost its underscore whenever a
+  line held two links, and any URL containing `_` had `<em>` injected into its
+  `href`. Links and images are now tokenized before the emphasis passes.
+
+  **If you render user-authored markdown, this is a required upgrade.**
+
+### Patch Changes
+
+- 44f01fc: Fix four layout and token defects in the shipped stylesheets.
+
+  - `.t-nav-menu__icon` referenced `--tree-icon-size-md`, which does not exist —
+    the token is `--tree-size-icon-md`. An icon with intrinsic dimensions was
+    unaffected (the 20px default happens to equal `1.25rem`), but an icon with
+    only a `viewBox` rendered at roughly 1264px.
+  - `.t-card__header` now wraps and `.t-card__title` can shrink, so a long title
+    beside action buttons no longer overflows a narrow card. Wrapped actions
+    align left, matching the existing `.t-page-header__bar` behavior.
+  - The app-shell body reset matched only two nesting depths, so the common
+    `body > #app > .app > .t-app-shell` structure kept the 8px user-agent margin
+    and produced a second scrollbar over a `100dvh` shell. The selector is now
+    depth-agnostic.
+  - `TSelect`, `TDatePicker`, `TDateTimePicker`, `TMultiSelect` and `TInput` now
+    set `min-inline-size: 0`, so they shrink inside a flex row instead of forcing
+    it to overflow. Only their minimum changes; preferred width is untouched.
+
 ## 0.15.0
 
 ### Minor Changes

@@ -5,6 +5,8 @@ import type {
   TreeuiRecipe,
   TreeuiRecipeSearchResult,
   TreeuiSearchResult,
+  TreeuiTokenEntry,
+  TreeuiTokenSearchResult,
 } from './types';
 
 export const catalog = rawCatalog as TreeuiCatalog;
@@ -334,6 +336,67 @@ export const searchRecipes = (query: string, limit = 6): TreeuiRecipeSearchResul
     .sort((left, right) => right.score - left.score || left.recipe.name.localeCompare(right.recipe.name))
     .slice(0, limit);
 
+const tokenValues = (token: TreeuiTokenEntry) => [
+  token.value,
+  ...Object.values(token.themeValues ?? {}),
+];
+
+const REM_ROOT_PX = 16;
+
+/**
+ * `64rem` and `1024px` are the same measurement, and consumers reach for
+ * whichever unit their stylesheet uses. Convert a bare length query so it still
+ * resolves to the token that ships the equivalent value in the other unit.
+ */
+const lengthAliases = (query: string): string[] => {
+  const match = query.trim().match(/^(\d*\.?\d+)(rem|px)$/i);
+
+  if (!match) {
+    return [];
+  }
+
+  const amount = Number(match[1]);
+
+  if (!Number.isFinite(amount)) {
+    return [];
+  }
+
+  const unit = match[2].toLowerCase();
+  const converted = unit === 'rem' ? amount * REM_ROOT_PX : amount / REM_ROOT_PX;
+
+  return [`${Number(converted.toFixed(4))}${unit === 'rem' ? 'px' : 'rem'}`];
+};
+
+const scoreToken = (token: TreeuiTokenEntry, query: string) => {
+  const identity = normalizeText(stringifyFields([token.cssVar, token.path]));
+  const category = normalizeText(token.category);
+  // Value matching is what makes a literal such as 64rem or #0969da resolvable
+  // back to the token that already ships it.
+  const values = normalizeText(stringifyFields(tokenValues(token)));
+  const description = normalizeText(token.description ?? '');
+  const valueScore = Math.max(
+    ...[query, ...lengthAliases(query)].map((candidate) => scoreMatch(candidate, values)),
+  );
+
+  let score = 0;
+  score += scoreMatch(query, identity) * 3;
+  score += scoreMatch(query, category) * 2;
+  score += valueScore * 2;
+  score += scoreMatch(query, description);
+
+  return Math.max(score, 0);
+};
+
+export const searchTokens = (query: string, limit = 12): TreeuiTokenSearchResult[] =>
+  catalog.tokens
+    .map((token) => ({
+      token,
+      score: scoreToken(token, query),
+    }))
+    .filter((result) => result.score > 0)
+    .sort((left, right) => right.score - left.score || left.token.cssVar.localeCompare(right.token.cssVar))
+    .slice(0, limit);
+
 const formatFieldList = (label: string, values: string[]) =>
   values.length > 0 ? `${label}: ${values.join(', ')}` : undefined;
 
@@ -393,6 +456,22 @@ export const formatRecipeResults = (results: TreeuiRecipeSearchResult[]) =>
         })
         .join('\n')
     : 'No matching TreeUI recipes found.';
+
+export const formatTokenResults = (results: TreeuiTokenSearchResult[]) =>
+  results.length > 0
+    ? results
+        .map((result, index) => {
+          const { token } = result;
+          const themeValues = token.themeValues
+            ? Object.entries(token.themeValues)
+                .map(([theme, value]) => `${theme} ${value}`)
+                .join(' | ')
+            : undefined;
+          const description = token.description ? ` ${token.description}` : '';
+          return `${index + 1}. ${token.cssVar}: ${themeValues ?? token.value} (${token.category} | ${token.path}).${description}`;
+        })
+        .join('\n')
+    : 'No matching TreeUI design tokens found.';
 
 export const formatSetupGuide = (componentName?: string) => {
   if (!componentName) {

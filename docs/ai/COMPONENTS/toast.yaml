@@ -69,26 +69,26 @@ behavior:
   newest_toasts_appear_last: true
 
 css_classes:
-  provider: tree-toast-provider
+  provider: t-toast-provider
   provider_positions:
-    - tree-toast-provider--top-right
-    - tree-toast-provider--top-left
-    - tree-toast-provider--top-center
-    - tree-toast-provider--bottom-right
-    - tree-toast-provider--bottom-left
-    - tree-toast-provider--bottom-center
-  toast: tree-toast
+    - t-toast-provider--top-right
+    - t-toast-provider--top-left
+    - t-toast-provider--top-center
+    - t-toast-provider--bottom-right
+    - t-toast-provider--bottom-left
+    - t-toast-provider--bottom-center
+  toast: t-toast
   variants:
-    - tree-toast--info
-    - tree-toast--success
-    - tree-toast--warning
-    - tree-toast--danger
+    - t-toast--info
+    - t-toast--success
+    - t-toast--warning
+    - t-toast--danger
   elements:
-    - tree-toast__icon
-    - tree-toast__content
-    - tree-toast__title
-    - tree-toast__description
-    - tree-toast__close
+    - t-toast__icon
+    - t-toast__content
+    - t-toast__title
+    - t-toast__description
+    - t-toast__close
 
 z_index: var(--tree-z-toast)
 

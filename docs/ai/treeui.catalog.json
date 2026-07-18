@@ -1,7 +1,7 @@
 {
-  "generatedAt": "2026-07-18T18:47:04.076Z",
+  "generatedAt": "2026-07-18T23:03:13.511Z",
   "packageName": "@treeui/vue",
-  "packageVersion": "0.14.0",
+  "packageVersion": "0.15.0",
   "decisionGuides": [
     {
       "id": "single-choice",
@@ -146,6 +146,44 @@
           "use": "TConfirmDialog",
           "when": [
             "The user is confirming or canceling a destructive or high-risk action."
+          ],
+          "notes": []
+        }
+      ]
+    },
+    {
+      "id": "navigate-or-act",
+      "question": "Navigate somewhere vs. perform an action",
+      "options": [
+        {
+          "use": "TLink",
+          "when": [
+            "Activating it changes the URL — an external link, a route, or an in-page anchor.",
+            "It should be openable in a new tab, copyable, and crawlable."
+          ],
+          "notes": []
+        },
+        {
+          "use": "TButton",
+          "when": [
+            "Activating it runs behavior on the current page — submit, open an overlay, delete, toggle.",
+            "It needs sizes, action variants, or a loading state."
+          ],
+          "notes": [
+            "Use `variant=\"ghost\"` when an action needs to look understated like a link."
+          ]
+        },
+        {
+          "use": "TNavMenu",
+          "when": [
+            "The links are app-section navigation inside a shell or sidebar."
+          ],
+          "notes": []
+        },
+        {
+          "use": "TBreadcrumb",
+          "when": [
+            "The links express where the current page sits in a hierarchy."
           ],
           "notes": []
         }
@@ -2235,12 +2273,14 @@
         {
           "name": "padded",
           "type": "boolean",
-          "default": "true"
+          "default": "true",
+          "note": "Adds `.is-padded`, i.e. an inline padding of `clamp(var(--tree-space-4), 3vw, var(--tree-space-6))`.\n"
         },
         {
           "name": "centered",
           "type": "boolean",
-          "default": "true"
+          "default": "true",
+          "note": "Adds `.is-centered`, i.e. `margin-inline: auto`."
         }
       ],
       "events": [],
@@ -3135,6 +3175,7 @@
         "role: menu",
         "trigger_aria_haspopup: menu",
         "trigger_aria_expanded: true",
+        "trigger_aria_controls: menu id, while open",
         "aria_disabled_on_disabled_items: true",
         "focus_visible_on_trigger: true",
         "keyboard_arrow_navigation: true",
@@ -3144,9 +3185,11 @@
       ],
       "behavior": [
         "outside_click_closes_menu: true",
-        "focus_restores_on_close: true",
+        "outside_click_restores_focus: false",
         "chevron_rotates_when_open: true",
-        "menu_grows_to_fit_items_without_wrapping: true"
+        "menu_grows_to_fit_items_without_wrapping: true",
+        "opening_focuses_first_enabled_item: true",
+        "focus_restores_on_close: {\"value\":true,\"detail\":\"Focus returns to the trigger when the menu closes from inside it — selecting an item or pressing Escape. It deliberately does NOT move focus on an outside click, where the pointer has already placed focus elsewhere.\\n\",\"applies_to_custom_trigger\":true}"
       ],
       "selection": {
         "keywords": [
@@ -3542,7 +3585,7 @@
           "name": "htmlFor",
           "type": "string",
           "required": false,
-          "description": "The id of the associated form control, used on the <label> for attribute."
+          "description": "Rendered verbatim as the <label for> attribute. There is no id generation: when omitted, the label carries no `for` and is NOT associated with any control. The consumer must pass this AND set the same value as `id` on the child control.\n"
         },
         {
           "name": "error",
@@ -3600,10 +3643,11 @@
         }
       ],
       "a11y": [
-        "Uses native <label> element with for attribute for input association.",
+        "Renders a native <label> element, but ONLY when `label` or the `label` slot is provided.",
         "Error messages are wrapped in role='alert' for screen reader announcements.",
         "Required indicator (*) is aria-hidden to avoid redundant announcements; use aria-required on the input itself.",
-        "Error takes precedence over hint to avoid conflicting messages."
+        "Error takes precedence over hint to avoid conflicting messages.",
+        "Extra attrs land on the root <div> (inheritAttrs: false), not on the child control."
       ],
       "behavior": [],
       "selection": {
@@ -4064,10 +4108,39 @@
       ],
       "behavior": [],
       "selection": {
-        "keywords": [],
-        "useWhen": [],
-        "avoidWhen": [],
-        "alternatives": []
+        "keywords": [
+          "link",
+          "anchor",
+          "hyperlink",
+          "navigation",
+          "router link",
+          "external link",
+          "href",
+          "to"
+        ],
+        "useWhen": [
+          "The action navigates somewhere — a URL, a route, or an anchor on the page.",
+          "You want consistent link styling with `default`, `muted`, or `danger` emphasis.",
+          "You want a component that renders RouterLink when vue-router is installed and a plain <a> when it is not, without branching in the template."
+        ],
+        "avoidWhen": [
+          "The control performs an action rather than navigating (submit, open a dialog, delete) — that is a button, even if it looks like a link.",
+          "You need a full call-to-action surface with variants, sizes, and a loading state."
+        ],
+        "alternatives": [
+          {
+            "component": "TButton",
+            "when": "The control performs an action. Use `variant=\"ghost\"` for a low-emphasis, link-like button."
+          },
+          {
+            "component": "TBreadcrumb",
+            "when": "The links form a hierarchy trail."
+          },
+          {
+            "component": "TNavMenu",
+            "when": "The links are app-section navigation in a shell or sidebar."
+          }
+        ]
       },
       "setup": {
         "required": [],
@@ -4081,7 +4154,8 @@
       "package": "@treeui/vue",
       "category": "Form",
       "status": "stable",
-      "description": "A rich Markdown editor with live preview, toolbar formatting, keyboard shortcuts, and image paste/drop upload support.\n",
+      "description": "A Markdown editor with an always-visible side-by-side live preview, toolbar formatting, keyboard shortcuts, and image paste/drop upload support.\n",
+      "sourceFile": "packages/vue/src/components/TMarkdownEditor.vue",
       "storyFile": "apps/docs/src/stories/MarkdownEditor.stories.ts",
       "storyTitle": "Components/Form/MarkdownEditor",
       "manifestFile": "docs/ai/COMPONENTS/markdown-editor.yaml",
@@ -4117,6 +4191,12 @@
           "type": "(file: File) => Promise<string>",
           "default": "undefined",
           "description": "Async function that receives a File and returns the uploaded image URL. When not provided, pasting an image inserts an empty markdown image tag.\n"
+        },
+        {
+          "name": "sanitize",
+          "type": "(html: string) => string",
+          "default": "undefined",
+          "description": "Optional extra sanitizer applied to the rendered preview HTML as the final step, after the built-in rendering. It is an ADDITIVE escape hatch, not a toggle: pass DOMPurify or a stricter policy of your own instead of forking the component.\n"
         }
       ],
       "events": [
@@ -4143,12 +4223,12 @@
         }
       ],
       "a11y": [
-        "Toolbar has role=\"toolbar\" with aria-label.",
-        "Tab buttons use role=\"tab\" and aria-selected.",
-        "Preview pane has aria-label=\"Markdown preview\".",
+        "Toolbar has role=\"toolbar\" with aria-label=\"Markdown formatting\".",
+        "Toolbar groups are separated by elements with role=\"separator\".",
+        "Preview pane carries aria-label=\"Markdown preview\".",
         "Upload status bar uses role=\"status\" and aria-live=\"polite\".",
         "All toolbar buttons have title attributes describing the action.",
-        "Textarea has aria-label for screen readers."
+        "Textarea has aria-label (mirrors the placeholder text)."
       ],
       "behavior": [],
       "selection": {
@@ -5224,7 +5304,7 @@
       "props": [
         {
           "name": "plans",
-          "type": "PricingPlan[]",
+          "type": "TPricingPlan[]",
           "required": true,
           "description": "Array of plan objects. Each plan supports the same props as PricingCard (title, description, price, currency, period, features, highlighted, badge, buttonText, disabled).\n"
         },
@@ -5245,14 +5325,14 @@
         {
           "name": "select",
           "description": "Emitted when any plan's CTA is clicked. Provides the plan data and index.",
-          "payload": "[plan: PricingPlan, index: number]"
+          "payload": "[plan: TPricingPlan, index: number]"
         }
       ],
       "slots": [
         {
           "name": "plan",
           "description": "Custom rendering for each plan card.",
-          "note": "{ plan: PricingPlan, index: number }"
+          "note": "{ plan: TPricingPlan, index: number }"
         }
       ],
       "a11y": [
@@ -5411,7 +5491,7 @@
       "package": "@treeui/vue",
       "category": "Feedback",
       "status": "draft",
-      "description": "Determinate and indeterminate progress indicator. Supports linear bar and circular ring variants.\n",
+      "description": "Determinate and indeterminate progress indicator. Renders a linear bar only — there is no circular, ring, or radial variant, and no `variant`/`shape`/`type` prop. Compose one yourself if you need it.\n",
       "storyFile": "apps/docs/src/stories/Progress.stories.ts",
       "storyTitle": "Components/Feedback/Progress",
       "manifestFile": "docs/ai/COMPONENTS/progress.yaml",
@@ -5451,7 +5531,8 @@
         "role: progressbar",
         "attributes: [\"aria-valuenow (omitted when indeterminate)\",\"aria-valuemin (always 0)\",\"aria-valuemax (always 100)\",\"aria-label\"]",
         "keyboard:",
-        "notes: Indeterminate state omits aria-valuenow so assistive tech announces the bar as indeterminate."
+        "notes: Indeterminate state omits aria-valuenow so assistive tech announces the bar as indeterminate.",
+        "value_is_normalized: aria-valuenow is `value / max` expressed as a 0–100 percentage, not the raw `value`. aria-valuemax stays 100 regardless of the `max` prop, so the two always agree. The `label` is also repeated in a visually hidden span."
       ],
       "behavior": [],
       "selection": {
@@ -5821,10 +5902,12 @@
       ],
       "slots": [
         {
-          "name": "item"
+          "name": "item",
+          "description": "Replaces the default row body (indicator, label, description, meta). Renders INSIDE the row's <button role=\"option\">.\n"
         },
         {
-          "name": "empty"
+          "name": "empty",
+          "description": "Replaces `emptyText` when `items` is empty."
         }
       ],
       "a11y": [
@@ -5837,7 +5920,8 @@
       ],
       "behavior": [
         "can_be_controlled_or_uncontrolled: true",
-        "supports_rich_row_rendering_via_slot: true",
+        "supports_presentational_row_slot: true",
+        "supports_interactive_content_in_rows: false",
         "empty_state_text_supported: true"
       ],
       "selection": {
@@ -7018,7 +7102,7 @@
       ],
       "slots": [
         {
-          "name": "unnamed"
+          "name": "default"
         }
       ],
       "a11y": [
@@ -7828,6 +7912,847 @@
       "recipes": [
         "hierarchy-picker"
       ]
+    }
+  ],
+  "tokens": [
+    {
+      "cssVar": "--tree-font-family-sans",
+      "path": "font.family.sans",
+      "value": "'Google Sans Flex', 'Segoe UI', sans-serif",
+      "category": "font",
+      "description": "Typography token: font family, size, weight, or line height."
+    },
+    {
+      "cssVar": "--tree-font-family-mono",
+      "path": "font.family.mono",
+      "value": "'Google Sans Code', 'SFMono-Regular', monospace",
+      "category": "font",
+      "description": "Typography token: font family, size, weight, or line height."
+    },
+    {
+      "cssVar": "--tree-font-size-xs",
+      "path": "font.size.xs",
+      "value": "0.6875rem",
+      "category": "font",
+      "description": "Typography token: font family, size, weight, or line height."
+    },
+    {
+      "cssVar": "--tree-font-size-sm",
+      "path": "font.size.sm",
+      "value": "0.8125rem",
+      "category": "font",
+      "description": "Typography token: font family, size, weight, or line height."
+    },
+    {
+      "cssVar": "--tree-font-size-md",
+      "path": "font.size.md",
+      "value": "0.9375rem",
+      "category": "font",
+      "description": "Typography token: font family, size, weight, or line height."
+    },
+    {
+      "cssVar": "--tree-font-size-base",
+      "path": "font.size.base",
+      "value": "0.9375rem",
+      "category": "font",
+      "description": "Typography token: font family, size, weight, or line height."
+    },
+    {
+      "cssVar": "--tree-font-size-lg",
+      "path": "font.size.lg",
+      "value": "1.125rem",
+      "category": "font",
+      "description": "Typography token: font family, size, weight, or line height."
+    },
+    {
+      "cssVar": "--tree-font-size-xl",
+      "path": "font.size.xl",
+      "value": "1.375rem",
+      "category": "font",
+      "description": "Typography token: font family, size, weight, or line height."
+    },
+    {
+      "cssVar": "--tree-font-size-2xl",
+      "path": "font.size.2xl",
+      "value": "1.375rem",
+      "category": "font",
+      "description": "Typography token: font family, size, weight, or line height."
+    },
+    {
+      "cssVar": "--tree-font-size-3xl",
+      "path": "font.size.3xl",
+      "value": "1.75rem",
+      "category": "font",
+      "description": "Typography token: font family, size, weight, or line height."
+    },
+    {
+      "cssVar": "--tree-font-size-4xl",
+      "path": "font.size.4xl",
+      "value": "2.25rem",
+      "category": "font",
+      "description": "Typography token: font family, size, weight, or line height."
+    },
+    {
+      "cssVar": "--tree-font-size-5xl",
+      "path": "font.size.5xl",
+      "value": "3rem",
+      "category": "font",
+      "description": "Typography token: font family, size, weight, or line height."
+    },
+    {
+      "cssVar": "--tree-font-weight-regular",
+      "path": "font.weight.regular",
+      "value": "400",
+      "category": "font",
+      "description": "Typography token: font family, size, weight, or line height."
+    },
+    {
+      "cssVar": "--tree-font-weight-medium",
+      "path": "font.weight.medium",
+      "value": "500",
+      "category": "font",
+      "description": "Typography token: font family, size, weight, or line height."
+    },
+    {
+      "cssVar": "--tree-font-weight-semibold",
+      "path": "font.weight.semibold",
+      "value": "600",
+      "category": "font",
+      "description": "Typography token: font family, size, weight, or line height."
+    },
+    {
+      "cssVar": "--tree-font-weight-bold",
+      "path": "font.weight.bold",
+      "value": "700",
+      "category": "font",
+      "description": "Typography token: font family, size, weight, or line height."
+    },
+    {
+      "cssVar": "--tree-font-weight-extrabold",
+      "path": "font.weight.extrabold",
+      "value": "800",
+      "category": "font",
+      "description": "Typography token: font family, size, weight, or line height."
+    },
+    {
+      "cssVar": "--tree-font-lineHeight-compact",
+      "path": "font.lineHeight.compact",
+      "value": "1.1",
+      "category": "font",
+      "description": "Typography token: font family, size, weight, or line height."
+    },
+    {
+      "cssVar": "--tree-font-lineHeight-ui",
+      "path": "font.lineHeight.ui",
+      "value": "1.15",
+      "category": "font",
+      "description": "Typography token: font family, size, weight, or line height."
+    },
+    {
+      "cssVar": "--tree-font-lineHeight-tight",
+      "path": "font.lineHeight.tight",
+      "value": "1.25",
+      "category": "font",
+      "description": "Typography token: font family, size, weight, or line height."
+    },
+    {
+      "cssVar": "--tree-font-lineHeight-heading",
+      "path": "font.lineHeight.heading",
+      "value": "1.3",
+      "category": "font",
+      "description": "Typography token: font family, size, weight, or line height."
+    },
+    {
+      "cssVar": "--tree-font-lineHeight-base",
+      "path": "font.lineHeight.base",
+      "value": "1.5",
+      "category": "font",
+      "description": "Typography token: font family, size, weight, or line height."
+    },
+    {
+      "cssVar": "--tree-font-lineHeight-body",
+      "path": "font.lineHeight.body",
+      "value": "1.6",
+      "category": "font",
+      "description": "Typography token: font family, size, weight, or line height."
+    },
+    {
+      "cssVar": "--tree-font-lineHeight-relaxed",
+      "path": "font.lineHeight.relaxed",
+      "value": "1.65",
+      "category": "font",
+      "description": "Typography token: font family, size, weight, or line height."
+    },
+    {
+      "cssVar": "--tree-space-0",
+      "path": "space.0",
+      "value": "0",
+      "category": "space",
+      "description": "Spacing scale step for padding, margin, and gap."
+    },
+    {
+      "cssVar": "--tree-space-1",
+      "path": "space.1",
+      "value": "0.25rem",
+      "category": "space",
+      "description": "Spacing scale step for padding, margin, and gap."
+    },
+    {
+      "cssVar": "--tree-space-2",
+      "path": "space.2",
+      "value": "0.5rem",
+      "category": "space",
+      "description": "Spacing scale step for padding, margin, and gap."
+    },
+    {
+      "cssVar": "--tree-space-3",
+      "path": "space.3",
+      "value": "0.75rem",
+      "category": "space",
+      "description": "Spacing scale step for padding, margin, and gap."
+    },
+    {
+      "cssVar": "--tree-space-4",
+      "path": "space.4",
+      "value": "1rem",
+      "category": "space",
+      "description": "Spacing scale step for padding, margin, and gap."
+    },
+    {
+      "cssVar": "--tree-space-5",
+      "path": "space.5",
+      "value": "1.25rem",
+      "category": "space",
+      "description": "Spacing scale step for padding, margin, and gap."
+    },
+    {
+      "cssVar": "--tree-space-6",
+      "path": "space.6",
+      "value": "1.5rem",
+      "category": "space",
+      "description": "Spacing scale step for padding, margin, and gap."
+    },
+    {
+      "cssVar": "--tree-space-8",
+      "path": "space.8",
+      "value": "2rem",
+      "category": "space",
+      "description": "Spacing scale step for padding, margin, and gap."
+    },
+    {
+      "cssVar": "--tree-space-12",
+      "path": "space.12",
+      "value": "3rem",
+      "category": "space",
+      "description": "Spacing scale step for padding, margin, and gap."
+    },
+    {
+      "cssVar": "--tree-space-16",
+      "path": "space.16",
+      "value": "4rem",
+      "category": "space",
+      "description": "Spacing scale step for padding, margin, and gap."
+    },
+    {
+      "cssVar": "--tree-radius-sm",
+      "path": "radius.sm",
+      "value": "0.375rem",
+      "category": "radius",
+      "description": "Corner radius scale step."
+    },
+    {
+      "cssVar": "--tree-radius-md",
+      "path": "radius.md",
+      "value": "0.625rem",
+      "category": "radius",
+      "description": "Corner radius scale step."
+    },
+    {
+      "cssVar": "--tree-radius-lg",
+      "path": "radius.lg",
+      "value": "0.875rem",
+      "category": "radius",
+      "description": "Corner radius scale step."
+    },
+    {
+      "cssVar": "--tree-radius-pill",
+      "path": "radius.pill",
+      "value": "999px",
+      "category": "radius",
+      "description": "Corner radius scale step."
+    },
+    {
+      "cssVar": "--tree-shadow-xs",
+      "path": "shadow.xs",
+      "value": "0 1px 2px rgba(15, 23, 42, 0.06)",
+      "category": "shadow",
+      "description": "Elevation shadow."
+    },
+    {
+      "cssVar": "--tree-shadow-sm",
+      "path": "shadow.sm",
+      "value": "0 6px 18px rgba(15, 23, 42, 0.08)",
+      "category": "shadow",
+      "description": "Elevation shadow."
+    },
+    {
+      "cssVar": "--tree-shadow-md",
+      "path": "shadow.md",
+      "value": "0 14px 34px rgba(15, 23, 42, 0.12)",
+      "category": "shadow",
+      "description": "Elevation shadow."
+    },
+    {
+      "cssVar": "--tree-gradient-brand",
+      "path": "gradient.brand",
+      "value": "linear-gradient(135deg, var(--tree-color-brand-primary), var(--tree-color-brand-hover))",
+      "category": "gradient",
+      "description": "Gradient composed from the themed brand variables."
+    },
+    {
+      "cssVar": "--tree-border-width-subtle",
+      "path": "border.width.subtle",
+      "value": "1px",
+      "category": "border",
+      "description": "Border width step."
+    },
+    {
+      "cssVar": "--tree-border-width-strong",
+      "path": "border.width.strong",
+      "value": "1.5px",
+      "category": "border",
+      "description": "Border width step."
+    },
+    {
+      "cssVar": "--tree-motion-duration-fast",
+      "path": "motion.duration.fast",
+      "value": "100ms",
+      "category": "motion",
+      "description": "Motion duration or easing curve."
+    },
+    {
+      "cssVar": "--tree-motion-duration-moderate",
+      "path": "motion.duration.moderate",
+      "value": "200ms",
+      "category": "motion",
+      "description": "Motion duration or easing curve."
+    },
+    {
+      "cssVar": "--tree-motion-duration-normal",
+      "path": "motion.duration.normal",
+      "value": "300ms",
+      "category": "motion",
+      "description": "Motion duration or easing curve."
+    },
+    {
+      "cssVar": "--tree-motion-duration-slow",
+      "path": "motion.duration.slow",
+      "value": "400ms",
+      "category": "motion",
+      "description": "Motion duration or easing curve."
+    },
+    {
+      "cssVar": "--tree-motion-duration-slower",
+      "path": "motion.duration.slower",
+      "value": "500ms",
+      "category": "motion",
+      "description": "Motion duration or easing curve."
+    },
+    {
+      "cssVar": "--tree-motion-easing-standard",
+      "path": "motion.easing.standard",
+      "value": "cubic-bezier(0.2, 0, 0, 1)",
+      "category": "motion",
+      "description": "Motion duration or easing curve."
+    },
+    {
+      "cssVar": "--tree-motion-easing-easeOut",
+      "path": "motion.easing.easeOut",
+      "value": "cubic-bezier(0, 0, 0.2, 1)",
+      "category": "motion",
+      "description": "Motion duration or easing curve."
+    },
+    {
+      "cssVar": "--tree-motion-easing-easeInOut",
+      "path": "motion.easing.easeInOut",
+      "value": "cubic-bezier(0.4, 0, 0.2, 1)",
+      "category": "motion",
+      "description": "Motion duration or easing curve."
+    },
+    {
+      "cssVar": "--tree-motion-easing-easeIn",
+      "path": "motion.easing.easeIn",
+      "value": "cubic-bezier(0.4, 0, 1, 1)",
+      "category": "motion",
+      "description": "Motion duration or easing curve."
+    },
+    {
+      "cssVar": "--tree-size-control-sm",
+      "path": "size.control.sm",
+      "value": "2rem",
+      "category": "size",
+      "description": "Control and icon sizing scale step."
+    },
+    {
+      "cssVar": "--tree-size-control-md",
+      "path": "size.control.md",
+      "value": "2.5rem",
+      "category": "size",
+      "description": "Control and icon sizing scale step."
+    },
+    {
+      "cssVar": "--tree-size-control-lg",
+      "path": "size.control.lg",
+      "value": "3rem",
+      "category": "size",
+      "description": "Control and icon sizing scale step."
+    },
+    {
+      "cssVar": "--tree-size-icon-sm",
+      "path": "size.icon.sm",
+      "value": "1rem",
+      "category": "size",
+      "description": "Control and icon sizing scale step."
+    },
+    {
+      "cssVar": "--tree-size-icon-md",
+      "path": "size.icon.md",
+      "value": "1.25rem",
+      "category": "size",
+      "description": "Control and icon sizing scale step."
+    },
+    {
+      "cssVar": "--tree-size-icon-lg",
+      "path": "size.icon.lg",
+      "value": "1.5rem",
+      "category": "size",
+      "description": "Control and icon sizing scale step."
+    },
+    {
+      "cssVar": "--tree-size-icon-xl",
+      "path": "size.icon.xl",
+      "value": "2rem",
+      "category": "size",
+      "description": "Control and icon sizing scale step."
+    },
+    {
+      "cssVar": "--tree-size-icon-2xl",
+      "path": "size.icon.2xl",
+      "value": "3rem",
+      "category": "size",
+      "description": "Control and icon sizing scale step."
+    },
+    {
+      "cssVar": "--tree-layout-grid-columns",
+      "path": "layout.grid.columns",
+      "value": "12",
+      "category": "layout",
+      "description": "Layout grid, gutter, or margin measurement."
+    },
+    {
+      "cssVar": "--tree-layout-grid-base",
+      "path": "layout.grid.base",
+      "value": "8px",
+      "category": "layout",
+      "description": "Layout grid, gutter, or margin measurement."
+    },
+    {
+      "cssVar": "--tree-layout-gutter-sm",
+      "path": "layout.gutter.sm",
+      "value": "1rem",
+      "category": "layout",
+      "description": "Layout grid, gutter, or margin measurement."
+    },
+    {
+      "cssVar": "--tree-layout-gutter-md",
+      "path": "layout.gutter.md",
+      "value": "1.5rem",
+      "category": "layout",
+      "description": "Layout grid, gutter, or margin measurement."
+    },
+    {
+      "cssVar": "--tree-layout-margin-sm",
+      "path": "layout.margin.sm",
+      "value": "1.5rem",
+      "category": "layout",
+      "description": "Layout grid, gutter, or margin measurement."
+    },
+    {
+      "cssVar": "--tree-layout-margin-md",
+      "path": "layout.margin.md",
+      "value": "2rem",
+      "category": "layout",
+      "description": "Layout grid, gutter, or margin measurement."
+    },
+    {
+      "cssVar": "--tree-layout-margin-lg",
+      "path": "layout.margin.lg",
+      "value": "3rem",
+      "category": "layout",
+      "description": "Layout grid, gutter, or margin measurement."
+    },
+    {
+      "cssVar": "--tree-z-base",
+      "path": "z.base",
+      "value": "1",
+      "category": "z",
+      "description": "Stacking layer (z-index)."
+    },
+    {
+      "cssVar": "--tree-z-dropdown",
+      "path": "z.dropdown",
+      "value": "1000",
+      "category": "z",
+      "description": "Stacking layer (z-index)."
+    },
+    {
+      "cssVar": "--tree-z-popover",
+      "path": "z.popover",
+      "value": "1050",
+      "category": "z",
+      "description": "Stacking layer (z-index)."
+    },
+    {
+      "cssVar": "--tree-z-sticky",
+      "path": "z.sticky",
+      "value": "1100",
+      "category": "z",
+      "description": "Stacking layer (z-index)."
+    },
+    {
+      "cssVar": "--tree-z-overlay",
+      "path": "z.overlay",
+      "value": "1200",
+      "category": "z",
+      "description": "Stacking layer (z-index)."
+    },
+    {
+      "cssVar": "--tree-z-modal",
+      "path": "z.modal",
+      "value": "1300",
+      "category": "z",
+      "description": "Stacking layer (z-index)."
+    },
+    {
+      "cssVar": "--tree-z-toast",
+      "path": "z.toast",
+      "value": "1400",
+      "category": "z",
+      "description": "Stacking layer (z-index)."
+    },
+    {
+      "cssVar": "--tree-breakpoint-sm",
+      "path": "breakpoint.sm",
+      "value": "640px",
+      "category": "breakpoint",
+      "description": "Responsive breakpoint width."
+    },
+    {
+      "cssVar": "--tree-breakpoint-md",
+      "path": "breakpoint.md",
+      "value": "768px",
+      "category": "breakpoint",
+      "description": "Responsive breakpoint width."
+    },
+    {
+      "cssVar": "--tree-breakpoint-lg",
+      "path": "breakpoint.lg",
+      "value": "1024px",
+      "category": "breakpoint",
+      "description": "Responsive breakpoint width."
+    },
+    {
+      "cssVar": "--tree-breakpoint-xl",
+      "path": "breakpoint.xl",
+      "value": "1280px",
+      "category": "breakpoint",
+      "description": "Responsive breakpoint width."
+    },
+    {
+      "cssVar": "--tree-color-bg-primary",
+      "path": "color.bg.primary",
+      "value": "#f6f8fa",
+      "category": "color",
+      "description": "Themed semantic color, resolved per [data-tree-theme].",
+      "themeValues": {
+        "light": "#f6f8fa",
+        "dark": "#1c2128"
+      }
+    },
+    {
+      "cssVar": "--tree-color-bg-surface",
+      "path": "color.bg.surface",
+      "value": "#ffffff",
+      "category": "color",
+      "description": "Themed semantic color, resolved per [data-tree-theme].",
+      "themeValues": {
+        "light": "#ffffff",
+        "dark": "#22272e"
+      }
+    },
+    {
+      "cssVar": "--tree-color-bg-subtle",
+      "path": "color.bg.subtle",
+      "value": "#eff2f5",
+      "category": "color",
+      "description": "Themed semantic color, resolved per [data-tree-theme].",
+      "themeValues": {
+        "light": "#eff2f5",
+        "dark": "#2d333b"
+      }
+    },
+    {
+      "cssVar": "--tree-color-border-default",
+      "path": "color.border.default",
+      "value": "#d0d7de",
+      "category": "color",
+      "description": "Themed semantic color, resolved per [data-tree-theme].",
+      "themeValues": {
+        "light": "#d0d7de",
+        "dark": "#444c56"
+      }
+    },
+    {
+      "cssVar": "--tree-color-border-strong",
+      "path": "color.border.strong",
+      "value": "#afb8c1",
+      "category": "color",
+      "description": "Themed semantic color, resolved per [data-tree-theme].",
+      "themeValues": {
+        "light": "#afb8c1",
+        "dark": "#576270"
+      }
+    },
+    {
+      "cssVar": "--tree-color-text-primary",
+      "path": "color.text.primary",
+      "value": "#1f2328",
+      "category": "color",
+      "description": "Themed semantic color, resolved per [data-tree-theme].",
+      "themeValues": {
+        "light": "#1f2328",
+        "dark": "#adbac7"
+      }
+    },
+    {
+      "cssVar": "--tree-color-text-muted",
+      "path": "color.text.muted",
+      "value": "#59636e",
+      "category": "color",
+      "description": "Themed semantic color, resolved per [data-tree-theme].",
+      "themeValues": {
+        "light": "#59636e",
+        "dark": "#95a3b2"
+      }
+    },
+    {
+      "cssVar": "--tree-color-text-inverse",
+      "path": "color.text.inverse",
+      "value": "#ffffff",
+      "category": "color",
+      "description": "Themed semantic color, resolved per [data-tree-theme].",
+      "themeValues": {
+        "light": "#ffffff",
+        "dark": "#1c2128"
+      }
+    },
+    {
+      "cssVar": "--tree-color-brand-primary",
+      "path": "color.brand.primary",
+      "value": "#0969da",
+      "category": "color",
+      "description": "Themed semantic color, resolved per [data-tree-theme].",
+      "themeValues": {
+        "light": "#0969da",
+        "dark": "#539bf5"
+      }
+    },
+    {
+      "cssVar": "--tree-color-brand-hover",
+      "path": "color.brand.hover",
+      "value": "#0550ae",
+      "category": "color",
+      "description": "Themed semantic color, resolved per [data-tree-theme].",
+      "themeValues": {
+        "light": "#0550ae",
+        "dark": "#6cabf7"
+      }
+    },
+    {
+      "cssVar": "--tree-color-brand-soft",
+      "path": "color.brand.soft",
+      "value": "#ddf4ff",
+      "category": "color",
+      "description": "Themed semantic color, resolved per [data-tree-theme].",
+      "themeValues": {
+        "light": "#ddf4ff",
+        "dark": "#1a3453"
+      }
+    },
+    {
+      "cssVar": "--tree-color-brand-contrast",
+      "path": "color.brand.contrast",
+      "value": "#ffffff",
+      "category": "color",
+      "description": "Themed semantic color, resolved per [data-tree-theme].",
+      "themeValues": {
+        "light": "#ffffff",
+        "dark": "#0a1a2f"
+      }
+    },
+    {
+      "cssVar": "--tree-color-status-success",
+      "path": "color.status.success",
+      "value": "#1a7f37",
+      "category": "color",
+      "description": "Themed semantic color, resolved per [data-tree-theme].",
+      "themeValues": {
+        "light": "#1a7f37",
+        "dark": "#57ab5a"
+      }
+    },
+    {
+      "cssVar": "--tree-color-status-warning",
+      "path": "color.status.warning",
+      "value": "#9a6700",
+      "category": "color",
+      "description": "Themed semantic color, resolved per [data-tree-theme].",
+      "themeValues": {
+        "light": "#9a6700",
+        "dark": "#c69026"
+      }
+    },
+    {
+      "cssVar": "--tree-color-status-error",
+      "path": "color.status.error",
+      "value": "#d1242f",
+      "category": "color",
+      "description": "Themed semantic color, resolved per [data-tree-theme].",
+      "themeValues": {
+        "light": "#d1242f",
+        "dark": "#f47067"
+      }
+    },
+    {
+      "cssVar": "--tree-color-status-info",
+      "path": "color.status.info",
+      "value": "#0969da",
+      "category": "color",
+      "description": "Themed semantic color, resolved per [data-tree-theme].",
+      "themeValues": {
+        "light": "#0969da",
+        "dark": "#6cb6ff"
+      }
+    },
+    {
+      "cssVar": "--tree-color-chart-1",
+      "path": "color.chart.1",
+      "value": "#2a78d6",
+      "category": "color",
+      "description": "Themed semantic color, resolved per [data-tree-theme].",
+      "themeValues": {
+        "light": "#2a78d6",
+        "dark": "#3987e5"
+      }
+    },
+    {
+      "cssVar": "--tree-color-chart-2",
+      "path": "color.chart.2",
+      "value": "#1baf7a",
+      "category": "color",
+      "description": "Themed semantic color, resolved per [data-tree-theme].",
+      "themeValues": {
+        "light": "#1baf7a",
+        "dark": "#199e70"
+      }
+    },
+    {
+      "cssVar": "--tree-color-chart-3",
+      "path": "color.chart.3",
+      "value": "#eda100",
+      "category": "color",
+      "description": "Themed semantic color, resolved per [data-tree-theme].",
+      "themeValues": {
+        "light": "#eda100",
+        "dark": "#c98500"
+      }
+    },
+    {
+      "cssVar": "--tree-color-chart-4",
+      "path": "color.chart.4",
+      "value": "#008300",
+      "category": "color",
+      "description": "Themed semantic color, resolved per [data-tree-theme].",
+      "themeValues": {
+        "light": "#008300",
+        "dark": "#008300"
+      }
+    },
+    {
+      "cssVar": "--tree-color-chart-5",
+      "path": "color.chart.5",
+      "value": "#4a3aa7",
+      "category": "color",
+      "description": "Themed semantic color, resolved per [data-tree-theme].",
+      "themeValues": {
+        "light": "#4a3aa7",
+        "dark": "#9085e9"
+      }
+    },
+    {
+      "cssVar": "--tree-color-chart-6",
+      "path": "color.chart.6",
+      "value": "#e34948",
+      "category": "color",
+      "description": "Themed semantic color, resolved per [data-tree-theme].",
+      "themeValues": {
+        "light": "#e34948",
+        "dark": "#e66767"
+      }
+    },
+    {
+      "cssVar": "--tree-color-chart-7",
+      "path": "color.chart.7",
+      "value": "#e87ba4",
+      "category": "color",
+      "description": "Themed semantic color, resolved per [data-tree-theme].",
+      "themeValues": {
+        "light": "#e87ba4",
+        "dark": "#d55181"
+      }
+    },
+    {
+      "cssVar": "--tree-color-chart-8",
+      "path": "color.chart.8",
+      "value": "#eb6834",
+      "category": "color",
+      "description": "Themed semantic color, resolved per [data-tree-theme].",
+      "themeValues": {
+        "light": "#eb6834",
+        "dark": "#d95926"
+      }
+    },
+    {
+      "cssVar": "--tree-color-overlay",
+      "path": "color.overlay",
+      "value": "rgba(31, 35, 40, 0.5)",
+      "category": "color",
+      "description": "Themed semantic color, resolved per [data-tree-theme].",
+      "themeValues": {
+        "light": "rgba(31, 35, 40, 0.5)",
+        "dark": "rgba(13, 17, 23, 0.6)"
+      }
+    },
+    {
+      "cssVar": "--tree-color-focus-ring",
+      "path": "color.focus-ring",
+      "value": "rgba(9, 105, 218, 0.32)",
+      "category": "color",
+      "description": "Themed semantic color, resolved per [data-tree-theme].",
+      "themeValues": {
+        "light": "rgba(9, 105, 218, 0.32)",
+        "dark": "rgba(83, 155, 245, 0.32)"
+      }
     }
   ]
 }

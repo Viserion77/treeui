@@ -76,15 +76,15 @@ behavior:
   - Uses position fixed for viewport-relative placement.
 
 css:
-  block: tree-context-menu
+  block: t-context-menu
   modifiers:
-    - "tree-context-menu--sm"
-    - "tree-context-menu--md"
-    - "tree-context-menu--lg"
+    - "t-context-menu--sm"
+    - "t-context-menu--md"
+    - "t-context-menu--lg"
   states:
     - "is-disabled"
     - "is-open"
     - "is-focused (on items)"
   elements:
-    - "tree-context-menu__menu"
-    - "tree-context-menu__item"
+    - "t-context-menu__menu"
+    - "t-context-menu__item"

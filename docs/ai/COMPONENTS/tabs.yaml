@@ -31,14 +31,14 @@ events:
   - update:modelValue
 
 slots:
-  - default
+  default:
     note: "Contains TTabList and TTabPanels children."
 
 sub_components:
   TTabList:
     purpose: "Container for tab triggers with role=tablist."
     slots:
-      - default
+      default:
         note: "Contains TTab children."
     a11y:
       role: tablist

@@ -40,7 +40,7 @@ types:
     key: string
     label: string
     sortable: boolean (optional)
-    align: "'left' | 'center' | 'right'" (optional)
+    align: "'left' | 'center' | 'right' (optional)"
     width: string (optional)
   TTableSortState:
     key: string

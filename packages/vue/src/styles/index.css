@@ -182,6 +182,7 @@ table.t-visually-hidden {
   align-items: center;
   gap: var(--tree-space-2);
   width: 100%;
+  min-inline-size: 0;
   min-height: var(--tree-size-control-md);
   padding-inline: var(--tree-space-3);
   border: var(--tree-border-width-subtle) solid var(--tree-color-border-default);
@@ -751,6 +752,7 @@ table.t-visually-hidden {
   position: relative;
   display: grid;
   width: 100%;
+  min-inline-size: 0;
 }
 
 .t-date-picker__trigger,
@@ -1129,9 +1131,11 @@ table.t-visually-hidden {
   align-items: center;
   justify-content: space-between;
   gap: var(--tree-space-3);
+  flex-wrap: wrap;
 }
 
 .t-card__title {
+  min-width: 0;
   font-size: var(--tree-font-size-lg);
   font-weight: var(--tree-font-weight-semibold);
   line-height: var(--tree-font-lineHeight-heading);
@@ -2313,6 +2317,7 @@ table.t-visually-hidden {
   position: relative;
   display: inline-flex;
   width: 100%;
+  min-inline-size: 0;
 }
 
 .t-select__trigger {
@@ -4515,6 +4520,16 @@ table.t-visually-hidden {
   font-size: 0.9em;
 }
 
+/* A link or image whose URL scheme was rejected renders as inert text. Marked
+   visually so the author can tell the URL was blocked rather than assume the
+   link simply failed to parse. */
+.t-md-editor__blocked-link {
+  color: var(--tree-color-text-muted);
+  text-decoration: underline dotted;
+  text-underline-offset: 0.2em;
+  cursor: not-allowed;
+}
+
 .t-md-editor__image {
   max-width: 100%;
   height: auto;
@@ -5293,6 +5308,7 @@ table.t-visually-hidden {
   position: relative;
   display: inline-flex;
   width: 100%;
+  min-inline-size: 0;
   font-family: var(--tree-font-family-sans);
 }
 
@@ -6082,8 +6098,8 @@ table.t-visually-hidden {
 }
 
 .t-nav-menu__icon {
-  width: var(--tree-icon-size-md);
-  height: var(--tree-icon-size-md);
+  width: var(--tree-size-icon-md);
+  height: var(--tree-size-icon-md);
   flex-shrink: 0;
   color: var(--tree-color-text-muted);
 }
@@ -6368,9 +6384,11 @@ a.t-nav-menu__item.is-disabled {
 /* The shell is sized to the viewport, which the browser's default 8px body
    margin breaks (it offsets the frame and adds a stray page scrollbar). Scoped
    with :has() so it only applies to pages that actually mount an app shell —
-   the library never restyles a consumer's body otherwise. */
-body:has(> .t-app-shell),
-body:has(> * > .t-app-shell) {
+   the library never restyles a consumer's body otherwise. The match is
+   depth-agnostic on purpose: apps commonly mount through wrappers
+   (`body > #app > .app > .t-app-shell`), and a fixed-depth selector silently
+   misses those and leaves the stray scrollbar behind. */
+body:has(.t-app-shell) {
   margin: 0;
 }
 

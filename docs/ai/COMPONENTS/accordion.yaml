@@ -97,13 +97,13 @@ a11y:
 # ── CSS ─────────────────────────────────────────────────────────────────
 
 css:
-  block: tree-accordion
+  block: t-accordion
   elements:
-    - tree-accordion__item
-    - tree-accordion__trigger
-    - tree-accordion__icon
-    - tree-accordion__content
-    - tree-accordion__panel
+    - t-accordion__item
+    - t-accordion__trigger
+    - t-accordion__icon
+    - t-accordion__content
+    - t-accordion__panel
   states:
     - is-open
     - is-disabled

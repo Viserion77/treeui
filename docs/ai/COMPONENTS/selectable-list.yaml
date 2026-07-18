@@ -31,8 +31,14 @@ events:
   - update:modelValue
 
 slots:
-  - item
-  - empty
+  item:
+    scoped_props: "{ item: TSelectableListItem, selected: boolean, focused: boolean }"
+    content_restriction: presentational_only
+    description: >
+      Replaces the default row body (indicator, label, description, meta).
+      Renders INSIDE the row's <button role="option">.
+  empty:
+    description: "Replaces `emptyText` when `items` is empty."
 
 a11y:
   role: listbox
@@ -42,9 +48,44 @@ a11y:
   arrow_navigation: true
   activation_keys_select_option: true
 
+item_slot_warning:
+  severity: critical
+  rule: "The `item` slot must contain ONLY presentational content — text, spans, icons, badges. Never a button, link, input, or any other interactive or focusable element."
+  why_the_row_is_a_button: >
+    Each row is a native <button role="option"> so the listbox gets real keyboard
+    and activation semantics. That choice is what makes nesting controls unsafe.
+  failure_1_accessibility:
+    name: "Children Presentational"
+    detail: >
+      ARIA defines role=option as a role whose descendants are presentational.
+      Assistive technology flattens everything inside the row to its accessible
+      name, so a nested control is stripped from the a11y tree — screen reader and
+      keyboard users cannot reach it even though it is visible on screen.
+  failure_2_hydration:
+    name: "Parser-forced hydration mismatch"
+    detail: >
+      <button> cannot contain a <button>: the HTML parser closes the outer one at
+      the nested start tag. The nested control is re-parented as a sibling, so the
+      server-rendered DOM never matches the vdom and hydration mismatches on every
+      render. It also becomes a direct child of role=listbox, which is invalid.
+    verified: >
+      Confirmed by re-parsing the component's own serialized output: an item slot
+      containing <span>Alpha</span><button>Delete</button> parses to the Delete
+      button as a SIBLING of the role=option button, zero buttons nested inside it,
+      and a non-option element directly under role=listbox.
+  use_instead:
+    - component: TTable
+      when: "Rows need per-row actions. Put the controls in their own cell, and use TDropdown with align=\"end\" for an actions menu."
+    - component: "TCard / TStack composition"
+      when: "The rows are not tabular but still need buttons or links. Compose the row yourself so the interactive elements are real siblings, and do not wrap the row in role=option."
+    - component: TTreeView
+      when: "The rows are hierarchical."
+  still_fine: "Selection-only rich rows — a label plus description, meta text, an icon, or a TBadge — which is what the component is for."
+
 behavior:
   can_be_controlled_or_uncontrolled: true
-  supports_rich_row_rendering_via_slot: true
+  supports_presentational_row_slot: true
+  supports_interactive_content_in_rows: false
   empty_state_text_supported: true
 
 example: |

@@ -13,15 +13,58 @@ props:
     type: TContainerSize
     default: lg
     values: [sm, md, lg, xl, full]
+    max_widths:
+      note: >
+        The literal max-width each size resolves to, so you can match an existing
+        layout without reading the stylesheet. Defined in
+        packages/vue/src/styles/index.css on `.t-container--<size>`.
+      sm:
+        class: .t-container--sm
+        max_width: 40rem
+      md:
+        class: .t-container--md
+        max_width: 48rem
+      lg:
+        class: .t-container--lg
+        max_width: 64rem
+        note: "Default size."
+      xl:
+        class: .t-container--xl
+        max_width: 80rem
+      full:
+        class: .t-container--full
+        max_width: none
+        note: "No constraint — spans the parent."
+      not_tokens: >
+        These are Vue-component-specific layout values, deliberately NOT
+        `--tree-*` design tokens. Do not add `--tree-container-*` variables; to
+        change a width, override the `.t-container--<size>` rule or wrap your own
+        element. Reuse TContainer rather than reimplementing these numbers.
   padded:
     type: boolean
     default: true
+    note: >
+      Adds `.is-padded`, i.e. an inline padding of
+      `clamp(var(--tree-space-4), 3vw, var(--tree-space-6))`.
   centered:
     type: boolean
     default: true
+    note: "Adds `.is-centered`, i.e. `margin-inline: auto`."
 
 slots:
   - default
+
+css:
+  block: t-container
+  modifiers:
+    - t-container--sm
+    - t-container--md
+    - t-container--lg
+    - t-container--xl
+    - t-container--full
+  states:
+    - is-padded
+    - is-centered
 
 behavior:
   semantic_element_controlled_by_as: true

@@ -42,13 +42,13 @@ const hasHeader = computed(() => !!props.title);
         >
           {{ title }}
         </span>
-        <span
-          v-if="$slots.actions"
-          class="t-card__actions"
-        >
-          <slot name="actions" />
-        </span>
       </slot>
+      <span
+        v-if="$slots.actions"
+        class="t-card__actions"
+      >
+        <slot name="actions" />
+      </span>
     </header>
     <div class="t-card__body">
       <slot />

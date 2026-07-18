@@ -4,14 +4,262 @@ css_variable_prefix: "--tree-"
 theme_selector: '[data-tree-theme="<name>"]'
 themes: [light, dark]
 
+naming_grammar:
+  read_this_first: >
+    Do NOT compose a variable name by gluing the prefix onto a role you found in
+    this file. Theme colors and foundation tokens use DIFFERENT grammars, and
+    guessing produces dead CSS that fails silently. The authoritative list of
+    every real name is `emitted_variables` below — copy from there.
+  how_names_are_generated:
+    source: packages/tokens/src/css.ts
+    rule: "`--tree-` + the nested object path joined with `-`, with no case conversion."
+  forms:
+    theme_color:
+      grammar: "--tree-color-<group>-<role>"
+      mandatory_color_segment: true
+      why: >
+        Every theme lives under a top-level `color` key in `treeThemes`, so the
+        flattener always emits `color` as the first path segment. There is no
+        theme variable without it.
+      correct: "--tree-color-status-error"
+      wrong: "--tree-status-error"
+      wrong_note: "Composing prefix + role from `semantic_color_roles` yields this. It does not exist and resolves to nothing."
+      applies_to: [bg, border, text, brand, status, chart]
+    theme_color_ungrouped:
+      grammar: "--tree-color-<name>"
+      why: "`overlay` and `focus-ring` sit directly under `color` with no group, so they take only one segment."
+      members: ["--tree-color-overlay", "--tree-color-focus-ring"]
+      wrong: ["--tree-color-misc-overlay", "--tree-overlay"]
+      wrong_note: "`misc` is a documentation grouping in this file only. It is never part of a variable name."
+    foundation:
+      grammar: "--tree-<group>-<name>"
+      no_color_segment: true
+      why: "Foundation tokens are not colors and have no `color` root key."
+      correct: ["--tree-space-4", "--tree-radius-md", "--tree-shadow-sm", "--tree-z-modal", "--tree-size-control-md"]
+      wrong: ["--tree-color-space-4"]
+      applies_to: [font, space, radius, shadow, gradient, border, motion, size, layout, z, breakpoint]
+    foundation_nested:
+      grammar: "--tree-<group>-<subgroup>-<name>"
+      why: "Groups with a second level of nesting emit all three segments."
+      correct: ["--tree-font-size-lg", "--tree-border-width-subtle", "--tree-motion-duration-fast", "--tree-size-icon-md", "--tree-layout-gutter-md"]
+  casing_traps:
+    rule: "Path segments are emitted verbatim — camelCase keys stay camelCase in kebab-case names."
+    members:
+      - "--tree-font-lineHeight-base (NOT --tree-font-line-height-base)"
+      - "--tree-motion-easing-easeOut (NOT --tree-motion-easing-ease-out)"
+      - "--tree-motion-easing-easeInOut"
+      - "--tree-motion-easing-easeIn"
+    also: "`--tree-color-focus-ring` is genuinely hyphenated, because its source key is the literal string 'focus-ring'."
+
 semantic_color_roles:
-  bg: [primary, surface, subtle]
-  border: [default, strong]
-  text: [primary, muted, inverse]
-  brand: [primary, hover, soft, contrast]
-  status: [success, warning, error, info]
-  chart: [1, 2, 3, 4, 5, 6, 7, 8]
-  misc: [overlay, focus-ring]
+  note: >
+    Roles only. These are NOT variable names — prefix each with `--tree-color-`.
+    See `naming_grammar` and `emitted_variables`.
+  bg:
+    roles: [primary, surface, subtle]
+    semantics:
+      primary:
+        variable: "--tree-color-bg-primary"
+        means: "The page canvas — the backdrop everything else sits on."
+        use_for: "App shell content area, page background."
+      surface:
+        variable: "--tree-color-bg-surface"
+        means: "A raised component surface sitting ON the canvas."
+        use_for: "Cards, modals, popovers, menus, table bodies, inputs. This is the default surface for components."
+      subtle:
+        variable: "--tree-color-bg-subtle"
+        means: "A recessed or tinted surface — a step back from `surface`, not a second brand color."
+        use_for: "Inset/soft card variants, hover states on ghost controls, zebra table rows, code blocks, disabled fills."
+    there_is_no:
+      names: [bg-secondary, bg-tertiary, bg-muted, bg-default, bg-elevated]
+      guidance: >
+        These do not exist. The scale is a three-step depth axis
+        (canvas → surface → recessed), not a semantic emphasis ramp. If you reached
+        for "secondary", you almost certainly want `subtle`. For a raised surface,
+        use `surface` and add `--tree-shadow-sm`.
+  border:
+    roles: [default, strong]
+    semantics:
+      default: "Standard component border."
+      strong: "Higher-contrast border for emphasis or hover."
+  text:
+    roles: [primary, muted, inverse]
+    semantics:
+      primary: "Default body and heading text."
+      muted: "Secondary text — hints, descriptions, metadata, placeholders."
+      inverse: "Text on a filled dark/brand surface."
+  brand:
+    roles: [primary, hover, soft, contrast]
+    semantics:
+      primary: "The accent color itself."
+      hover: "Hover/active step of the accent."
+      soft: "Low-emphasis accent tint used as a background."
+      contrast: "Text color that is legible ON `brand-primary`."
+  status:
+    roles: [success, warning, error, info]
+    note: "`error`, not `danger` — see `variant_to_token_mapping`."
+  chart:
+    roles: [1, 2, 3, 4, 5, 6, 7, 8]
+  ungrouped:
+    note: "No group segment: `--tree-color-overlay`, `--tree-color-focus-ring`."
+    semantics:
+      overlay: "Scrim behind modals and drawers."
+      focus-ring: "Focus indicator ring color."
+
+variant_to_token_mapping:
+  rule: >
+    The component variant vocabulary and the token vocabulary use different words
+    for the same concept. `danger` is a COMPONENT variant name; it has no token.
+    It always resolves to the `status.error` token.
+  danger:
+    component_variant: danger
+    token_role: status.error
+    css_variable: "--tree-color-status-error"
+    there_is_no: ["--tree-color-status-danger", "--tree-color-danger"]
+    used_by: [TButton, TAlert, TToast, TBadge, TStat, TTimeline, TLink, TConfirmDialog]
+    verified_in: packages/vue/src/styles/index.css
+    examples:
+      - ".t-button--danger sets --tree-button-bg: var(--tree-color-status-error)"
+      - ".t-link--danger sets color: var(--tree-color-status-error)"
+      - ".t-alert--danger and .t-stat--danger color-mix from var(--tree-color-status-error)"
+  aligned_names:
+    note: "The other status variants match their token role name directly."
+    success: "--tree-color-status-success"
+    warning: "--tree-color-status-warning"
+    info: "--tree-color-status-info"
+
+emitted_variables:
+  note: >-
+    Every CSS custom property @treeui/tokens actually emits. Generated from
+    packages/tokens/src/tokens.ts via packages/tokens/src/css.ts. If a name is
+    not in this list, it does not exist. Copy names from here verbatim rather
+    than composing them from roles.
+  total: 105
+  foundation:
+    count: 79
+    scope: "Emitted on :root — theme-independent, identical in light and dark."
+    variables:
+      # font
+      --tree-font-family-sans: "'Google Sans Flex', 'Segoe UI', sans-serif"
+      --tree-font-family-mono: "'Google Sans Code', 'SFMono-Regular', monospace"
+      --tree-font-size-xs: "0.6875rem"
+      --tree-font-size-sm: "0.8125rem"
+      --tree-font-size-md: "0.9375rem"
+      --tree-font-size-base: "0.9375rem"
+      --tree-font-size-lg: "1.125rem"
+      --tree-font-size-xl: "1.375rem"
+      --tree-font-size-2xl: "1.375rem"
+      --tree-font-size-3xl: "1.75rem"
+      --tree-font-size-4xl: "2.25rem"
+      --tree-font-size-5xl: "3rem"
+      --tree-font-weight-regular: "400"
+      --tree-font-weight-medium: "500"
+      --tree-font-weight-semibold: "600"
+      --tree-font-weight-bold: "700"
+      --tree-font-weight-extrabold: "800"
+      --tree-font-lineHeight-compact: "1.1"
+      --tree-font-lineHeight-ui: "1.15"
+      --tree-font-lineHeight-tight: "1.25"
+      --tree-font-lineHeight-heading: "1.3"
+      --tree-font-lineHeight-base: "1.5"
+      --tree-font-lineHeight-body: "1.6"
+      --tree-font-lineHeight-relaxed: "1.65"
+      # space
+      --tree-space-0: "0"
+      --tree-space-1: "0.25rem"
+      --tree-space-2: "0.5rem"
+      --tree-space-3: "0.75rem"
+      --tree-space-4: "1rem"
+      --tree-space-5: "1.25rem"
+      --tree-space-6: "1.5rem"
+      --tree-space-8: "2rem"
+      --tree-space-12: "3rem"
+      --tree-space-16: "4rem"
+      # radius
+      --tree-radius-sm: "0.375rem"
+      --tree-radius-md: "0.625rem"
+      --tree-radius-lg: "0.875rem"
+      --tree-radius-pill: "999px"
+      # shadow
+      --tree-shadow-xs: "0 1px 2px rgba(15, 23, 42, 0.06)"
+      --tree-shadow-sm: "0 6px 18px rgba(15, 23, 42, 0.08)"
+      --tree-shadow-md: "0 14px 34px rgba(15, 23, 42, 0.12)"
+      # gradient
+      --tree-gradient-brand: "linear-gradient(135deg, var(--tree-color-brand-primary), var(--tree-color-brand-hover))"
+      # border
+      --tree-border-width-subtle: "1px"
+      --tree-border-width-strong: "1.5px"
+      # motion
+      --tree-motion-duration-fast: "100ms"
+      --tree-motion-duration-moderate: "200ms"
+      --tree-motion-duration-normal: "300ms"
+      --tree-motion-duration-slow: "400ms"
+      --tree-motion-duration-slower: "500ms"
+      --tree-motion-easing-standard: "cubic-bezier(0.2, 0, 0, 1)"
+      --tree-motion-easing-easeOut: "cubic-bezier(0, 0, 0.2, 1)"
+      --tree-motion-easing-easeInOut: "cubic-bezier(0.4, 0, 0.2, 1)"
+      --tree-motion-easing-easeIn: "cubic-bezier(0.4, 0, 1, 1)"
+      # size
+      --tree-size-control-sm: "2rem"
+      --tree-size-control-md: "2.5rem"
+      --tree-size-control-lg: "3rem"
+      --tree-size-icon-sm: "1rem"
+      --tree-size-icon-md: "1.25rem"
+      --tree-size-icon-lg: "1.5rem"
+      --tree-size-icon-xl: "2rem"
+      --tree-size-icon-2xl: "3rem"
+      # layout
+      --tree-layout-grid-columns: "12"
+      --tree-layout-grid-base: "8px"
+      --tree-layout-gutter-sm: "1rem"
+      --tree-layout-gutter-md: "1.5rem"
+      --tree-layout-margin-sm: "1.5rem"
+      --tree-layout-margin-md: "2rem"
+      --tree-layout-margin-lg: "3rem"
+      # z
+      --tree-z-base: "1"
+      --tree-z-dropdown: "1000"
+      --tree-z-popover: "1050"
+      --tree-z-sticky: "1100"
+      --tree-z-overlay: "1200"
+      --tree-z-modal: "1300"
+      --tree-z-toast: "1400"
+      # breakpoint
+      --tree-breakpoint-sm: "640px"
+      --tree-breakpoint-md: "768px"
+      --tree-breakpoint-lg: "1024px"
+      --tree-breakpoint-xl: "1280px"
+  theme_colors:
+    count: 26
+    scope: "Re-emitted per theme under [data-tree-theme]. Values in theme_values below."
+    note: "The name set is identical in light and dark — verified against both."
+    variables:
+      - --tree-color-bg-primary
+      - --tree-color-bg-surface
+      - --tree-color-bg-subtle
+      - --tree-color-border-default
+      - --tree-color-border-strong
+      - --tree-color-text-primary
+      - --tree-color-text-muted
+      - --tree-color-text-inverse
+      - --tree-color-brand-primary
+      - --tree-color-brand-hover
+      - --tree-color-brand-soft
+      - --tree-color-brand-contrast
+      - --tree-color-status-success
+      - --tree-color-status-warning
+      - --tree-color-status-error
+      - --tree-color-status-info
+      - --tree-color-chart-1
+      - --tree-color-chart-2
+      - --tree-color-chart-3
+      - --tree-color-chart-4
+      - --tree-color-chart-5
+      - --tree-color-chart-6
+      - --tree-color-chart-7
+      - --tree-color-chart-8
+      - --tree-color-overlay
+      - --tree-color-focus-ring
 
 data_viz_palette:
   variables: "--tree-color-chart-1 … --tree-color-chart-8"

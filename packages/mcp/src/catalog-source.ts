@@ -1,6 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { parseAllDocuments } from 'yaml';
+import { buildTokenEntries } from './token-source';
 import type {
   TreeuiCatalog,
   TreeuiCatalogField,
@@ -448,6 +449,7 @@ export const buildCatalogFromRepo = (repoRoot: string): TreeuiCatalog => {
     recipes,
     setup,
     components,
+    tokens: buildTokenEntries(),
   };
 };
 

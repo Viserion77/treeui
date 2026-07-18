@@ -142,6 +142,7 @@
   align-items: center;
   gap: var(--tree-space-2);
   width: 100%;
+  min-inline-size: 0;
   min-height: var(--tree-size-control-md);
   padding-inline: var(--tree-space-3);
   border: var(--tree-border-width-subtle) solid var(--tree-color-border-default);
@@ -238,9 +239,11 @@
   align-items: center;
   justify-content: space-between;
   gap: var(--tree-space-3);
+  flex-wrap: wrap;
 }
 
 .t-card__title {
+  min-width: 0;
   font-size: var(--tree-font-size-lg);
   font-weight: var(--tree-font-weight-semibold);
   line-height: var(--tree-font-lineHeight-heading);

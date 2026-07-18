@@ -41,7 +41,7 @@ sub_components:
         default: false
         description: "Marks this item as the current page. Automatically set if it's the last item without a renderable link target."
     slots:
-      - default
+      default:
         note: "Label text for the breadcrumb item."
     a11y:
       renders_anchor_when_link_target_present: true

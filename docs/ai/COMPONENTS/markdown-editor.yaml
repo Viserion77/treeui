@@ -1,12 +1,20 @@
-component: MarkdownEditor
+component: TMarkdownEditor
+source_file: packages/vue/src/components/TMarkdownEditor.vue
 status: stable
 since: 0.x.x
 description: >
-  A rich Markdown editor with live preview, toolbar formatting,
-  keyboard shortcuts, and image paste/drop upload support.
+  A Markdown editor with an always-visible side-by-side live preview, toolbar
+  formatting, keyboard shortcuts, and image paste/drop upload support.
 
 element: div
 role: textbox (textarea within)
+
+layout:
+  mode: "Fixed: the write pane and the preview pane are both always rendered."
+  note: >
+    There is no view-mode prop and no write/preview tab switcher. If you need a
+    single-pane or tabbed layout, compose it yourself — do not pass a `mode`,
+    `view`, `split`, or `tab` prop, none exist.
 
 props:
   modelValue:
@@ -29,6 +37,18 @@ props:
     description: >
       Async function that receives a File and returns the uploaded image URL.
       When not provided, pasting an image inserts an empty markdown image tag.
+  sanitize:
+    type: "(html: string) => string"
+    default: undefined
+    description: >
+      Optional extra sanitizer applied to the rendered preview HTML as the final
+      step, after the built-in rendering. It is an ADDITIVE escape hatch, not a
+      toggle: pass DOMPurify or a stricter policy of your own instead of forking
+      the component.
+    important: >
+      This is NOT a boolean and does NOT switch protection on or off. HTML escaping
+      and URL-scheme allowlisting are unconditional and run whether or not you pass
+      it. Omitting `sanitize` does not leave the preview unsanitized.
 
 events:
   update:modelValue:
@@ -51,34 +71,79 @@ keyboard:
   Ctrl+K: Insert link
   Ctrl+E: Toggle inline code
 
+preview_rendering:
+  renderer: "Built-in line-based markdown renderer; the result is injected with v-html."
+  supported:
+    block: [headings h1-h6, paragraphs, blockquote, unordered list, ordered list, fenced code block, horizontal rule]
+    inline: [bold, italic, strikethrough, inline code, link, image]
+  escapes_html: true
+  escapes_html_detail: >
+    Every piece of author text is passed through an HTML escape (& < > " ') before
+    any markdown replacement runs, so raw HTML in the source is rendered as visible
+    text and never as live markup. Fenced code block contents are escaped too.
+  url_scheme_allowlist:
+    enforced: true
+    unconditional: true
+    links:
+      allowed: [relative URLs, "https:", "http:", "mailto:", "tel:"]
+      rule: "A URL with no scheme is relative and always allowed. With a scheme, it must be on the list."
+    images:
+      allowed: [relative URLs, "https:", "http:", "data:image/* raster only"]
+      raster_data_urls: [png, jpeg, jpg, gif, webp, avif, bmp, x-icon, vnd.microsoft.icon]
+      excluded: "data:image/svg+xml — SVG can carry script and external references, so it is deliberately not allowed."
+    rejected_url_behavior: >
+      The link/image is NOT rendered. The original markdown source is emitted as
+      inert text inside <span class="t-md-editor__blocked-link">, so the author can
+      see what was blocked instead of silently losing content.
+    evasion_hardening: >
+      URLs are normalized before the scheme test — HTML character references are
+      decoded, control characters and whitespace stripped, then lowercased. This
+      defeats `JaVaScRiPt:`, ` javascript:`, `java&#9;script:`, NUL-padded, and
+      `&#106;avascript:` style bypasses.
+    stops: "[click](javascript:alert(1)) never produces an executable href."
+  external_links: 'Allowed links render with target="_blank" rel="noopener noreferrer".'
+  images: 'Allowed images render with loading="lazy".'
+
 a11y:
-  - Toolbar has role="toolbar" with aria-label.
-  - Tab buttons use role="tab" and aria-selected.
-  - Preview pane has aria-label="Markdown preview".
+  - Toolbar has role="toolbar" with aria-label="Markdown formatting".
+  - Toolbar groups are separated by elements with role="separator".
+  - Preview pane carries aria-label="Markdown preview".
   - Upload status bar uses role="status" and aria-live="polite".
   - All toolbar buttons have title attributes describing the action.
-  - Textarea has aria-label for screen readers.
+  - Textarea has aria-label (mirrors the placeholder text).
 
 css:
-  block: tree-md-editor
+  block: t-md-editor
   modifiers:
-    - tree-md-editor--sm
-    - tree-md-editor--md
-    - tree-md-editor--lg
-    - tree-md-editor--split
-    - tree-md-editor--tab
+    - t-md-editor--sm
+    - t-md-editor--md
+    - t-md-editor--lg
   states:
     - is-disabled
     - is-uploading
   elements:
-    - tree-md-editor__toolbar
-    - tree-md-editor__toolbar-group
-    - tree-md-editor__toolbar-btn
-    - tree-md-editor__toolbar-divider
-    - tree-md-editor__tabs
-    - tree-md-editor__tab
-    - tree-md-editor__body
-    - tree-md-editor__pane
-    - tree-md-editor__textarea
-    - tree-md-editor__preview
-    - tree-md-editor__upload-bar
+    - t-md-editor__toolbar
+    - t-md-editor__toolbar-group
+    - t-md-editor__toolbar-btn
+    - t-md-editor__toolbar-divider
+    - t-md-editor__body
+    - t-md-editor__pane
+    - t-md-editor__pane--write
+    - t-md-editor__pane--preview
+    - t-md-editor__textarea
+    - t-md-editor__preview
+    - t-md-editor__upload-bar
+  preview_output_classes:
+    note: "Emitted by the markdown renderer inside __preview, not by the template."
+    values:
+      - t-md-editor__heading
+      - t-md-editor__heading--1 … t-md-editor__heading--6
+      - t-md-editor__paragraph
+      - t-md-editor__blockquote
+      - t-md-editor__list
+      - t-md-editor__list--ordered
+      - t-md-editor__code-block
+      - t-md-editor__inline-code
+      - t-md-editor__image
+      - t-md-editor__hr
+      - t-md-editor__blocked-link

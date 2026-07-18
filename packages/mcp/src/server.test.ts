@@ -65,6 +65,7 @@ describe('@treeui/mcp server', () => {
         'get_component',
         'get_setup_guide',
         'search_recipes',
+        'search_tokens',
       ]),
     );
     expect(resourceUris).toEqual(
@@ -73,6 +74,7 @@ describe('@treeui/mcp server', () => {
         'treeui://selection',
         'treeui://setup',
         'treeui://recipes',
+        'treeui://tokens',
         'treeui://components/TSelect',
       ]),
     );
@@ -131,6 +133,45 @@ describe('@treeui/mcp server', () => {
     expect(catalogJson.components.some((component) => component.name === 'TSelect')).toBe(true);
     expect(componentJson.name).toBe('TSelect');
     expect(componentJson.selection.alternatives.some((alternative) => alternative.component === 'TCombobox')).toBe(true);
+  });
+
+  it('searches design tokens by name and by shipped value', async () => {
+    const { client } = await connectClient();
+
+    const byName = await client.callTool({
+      name: 'search_tokens',
+      arguments: {
+        query: 'status',
+      },
+    });
+    const byValue = await client.callTool({
+      name: 'search_tokens',
+      arguments: {
+        query: '#0969da',
+      },
+    });
+
+    const byNameText = byName.content[0]?.type === 'text' ? byName.content[0].text : '';
+    const byValueText = byValue.content[0]?.type === 'text' ? byValue.content[0].text : '';
+
+    expect(byNameText).toContain('--tree-color-status-success');
+    // A themed token reports both theme values so an agent can pick the right one.
+    expect(byNameText).toContain('light #1a7f37');
+    expect(byNameText).toContain('dark #57ab5a');
+    expect(byValueText).toContain('--tree-color-brand-primary');
+  });
+
+  it('reads the token resource', async () => {
+    const { client } = await connectClient();
+
+    const tokenResource = await client.readResource({
+      uri: 'treeui://tokens',
+    });
+
+    const tokenText = 'text' in tokenResource.contents[0] ? tokenResource.contents[0].text : '';
+    const tokenJson = JSON.parse(tokenText) as Array<{ cssVar: string }>;
+
+    expect(tokenJson.some((token) => token.cssVar === '--tree-space-4')).toBe(true);
   });
 
   it('surfaces errors for invalid tool input', async () => {

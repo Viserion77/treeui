@@ -12,9 +12,11 @@ import {
   formatRecipeResults,
   formatSearchResults,
   formatSetupGuide,
+  formatTokenResults,
   recommendComponents,
   searchComponents,
   searchRecipes,
+  searchTokens,
 } from './catalog';
 
 const resourceList = [
@@ -40,6 +42,12 @@ const resourceList = [
     uri: 'treeui://recipes',
     name: 'TreeUI recipes',
     description: 'Reusable multi-component composition recipes.',
+    mimeType: 'application/json',
+  },
+  {
+    uri: 'treeui://tokens',
+    name: 'TreeUI design tokens',
+    description: 'Flat list of --tree-* design tokens with per-theme values.',
     mimeType: 'application/json',
   },
   ...catalog.components.map((component) => ({
@@ -72,6 +80,10 @@ const readResourcePayload = (uri: string) => {
 
   if (uri === 'treeui://recipes') {
     return catalog.recipes;
+  }
+
+  if (uri === 'treeui://tokens') {
+    return catalog.tokens;
   }
 
   const componentMatch = uri.match(/^treeui:\/\/components\/([^/]+)$/);
@@ -187,6 +199,23 @@ export const createTreeuiMcpServer = () => {
           required: ['query'],
         },
       },
+      {
+        name: 'search_tokens',
+        description:
+          'Search TreeUI design tokens by CSS variable, category, path, or shipped value. Use this before hardcoding any color, spacing, radius, or breakpoint value.',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            query: {
+              type: 'string',
+              description:
+                'A CSS variable such as --tree-gradient-brand, a category or path such as space or color.status, or a literal value such as 64rem or #0969da.',
+            },
+            limit: { type: 'number', description: 'Maximum number of tokens to return.' },
+          },
+          required: ['query'],
+        },
+      },
     ],
   }));
 
@@ -241,6 +270,16 @@ export const createTreeuiMcpServer = () => {
       }
 
       return asTextContent(formatRecipeResults(searchRecipes(query, readNumberArg(args, 'limit', 6))));
+    }
+
+    if (name === 'search_tokens') {
+      const query = readStringArg(args, 'query');
+
+      if (!query) {
+        return asErrorTextContent('The "query" argument is required.');
+      }
+
+      return asTextContent(formatTokenResults(searchTokens(query, readNumberArg(args, 'limit', 12))));
     }
 
     return asErrorTextContent(`Unknown tool: ${name}`);

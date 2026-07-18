@@ -97,6 +97,16 @@ export interface TreeuiSetupEntry {
   };
 }
 
+export interface TreeuiTokenEntry {
+  cssVar: string;
+  path: string;
+  value: string;
+  category: string;
+  description?: string;
+  /** Per-theme values for tokens that change with `[data-tree-theme]`. */
+  themeValues?: Record<string, string>;
+}
+
 export interface TreeuiCatalog {
   generatedAt: string;
   packageName: string;
@@ -105,6 +115,7 @@ export interface TreeuiCatalog {
   recipes: TreeuiRecipe[];
   setup: TreeuiSetupEntry;
   components: TreeuiComponentEntry[];
+  tokens: TreeuiTokenEntry[];
 }
 
 export interface TreeuiSearchResult {
@@ -115,5 +126,10 @@ export interface TreeuiSearchResult {
 
 export interface TreeuiRecipeSearchResult {
   recipe: TreeuiRecipe;
+  score: number;
+}
+
+export interface TreeuiTokenSearchResult {
+  token: TreeuiTokenEntry;
   score: number;
 }

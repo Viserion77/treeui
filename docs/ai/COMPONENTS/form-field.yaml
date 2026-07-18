@@ -14,7 +14,10 @@ props:
   htmlFor:
     type: string
     required: false
-    description: "The id of the associated form control, used on the <label> for attribute."
+    description: >
+      Rendered verbatim as the <label for> attribute. There is no id generation:
+      when omitted, the label carries no `for` and is NOT associated with any control.
+      The consumer must pass this AND set the same value as `id` on the child control.
   error:
     type: string
     required: false
@@ -50,24 +53,63 @@ slots:
 events: []
 
 css:
-  root: tree-form-field
+  root: t-form-field
   elements:
-    - tree-form-field__label
-    - tree-form-field__required
-    - tree-form-field__control
-    - tree-form-field__hint
-    - tree-form-field__error
+    - t-form-field__label
+    - t-form-field__required
+    - t-form-field__control
+    - t-form-field__hint
+    - t-form-field__error
   modifiers:
-    - tree-form-field--sm
-    - tree-form-field--md
-    - tree-form-field--lg
+    - t-form-field--sm
+    - t-form-field--md
+    - t-form-field--lg
   states:
     - is-disabled
     - is-invalid
     - is-required
 
 accessibility:
-  - "Uses native <label> element with for attribute for input association."
+  - "Renders a native <label> element, but ONLY when `label` or the `label` slot is provided."
   - "Error messages are wrapped in role='alert' for screen reader announcements."
   - "Required indicator (*) is aria-hidden to avoid redundant announcements; use aria-required on the input itself."
   - "Error takes precedence over hint to avoid conflicting messages."
+  - "Extra attrs land on the root <div> (inheritAttrs: false), not on the child control."
+
+accessibility_gaps:
+  summary: >
+    TFormField is a layout and messaging wrapper. It wires up NO accessibility
+    relationships on its own — the consumer owns every association below.
+  label_association:
+    automatic: false
+    detail: >
+      The label renders `:for="htmlFor"`. The component generates no id, so when
+      `htmlFor` is omitted Vue drops the attribute entirely and the label points at
+      nothing. Pass `htmlFor` and set the matching `id` on the control yourself.
+  describedby:
+    automatic: false
+    detail: >
+      The hint and error paragraphs are rendered without ids, and the component
+      never emits `aria-describedby`. To have the hint/error announced with the
+      control, put your own ids on them via the `hint`/`error` slots and set
+      `aria-describedby` on the control.
+  invalid_state:
+    automatic: false
+    detail: >
+      `error` only adds the `is-invalid` class for styling. It does not set
+      `aria-invalid` on the control — set it yourself.
+  required_state:
+    automatic: false
+    detail: >
+      `required` renders an aria-hidden `*` for sighted users only. Set `required`
+      or `aria-required` on the control as well.
+  consumer_pattern: |
+    <TFormField label="Email" html-for="email" :error="emailError" hint="Work address">
+      <TInput
+        id="email"
+        v-model="email"
+        :aria-invalid="emailError ? 'true' : undefined"
+        aria-describedby="email-help"
+      />
+      <template #hint><span id="email-help">Work address</span></template>
+    </TFormField>

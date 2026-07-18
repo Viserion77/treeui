@@ -13,6 +13,7 @@ const props = withDefaults(
     disabled?: boolean;
     placeholder?: string;
     uploadImage?: (file: File) => Promise<string>;
+    sanitize?: (html: string) => string;
   }>(),
   {
     modelValue: '',
@@ -20,6 +21,7 @@ const props = withDefaults(
     disabled: false,
     placeholder: 'Write your markdown here...',
     uploadImage: undefined,
+    sanitize: undefined,
   },
 );
 
@@ -123,7 +125,11 @@ const insertHr = () => insertAtCursor('\n---\n');
 /* ──────── Markdown → HTML rendering ──────── */
 
 const renderedHtml = computed(() => {
-  return markdownToHtml(stringValue.value);
+  const html = markdownToHtml(stringValue.value);
+  // Escape hatch: the built-in rendering escapes HTML and allowlists URL
+  // schemes, but consumers with a stricter policy can pass their own
+  // sanitizer (DOMPurify or similar) instead of forking the component.
+  return props.sanitize ? props.sanitize(html) : html;
 });
 
 function escapeHtml(text: string): string {
@@ -237,11 +243,91 @@ function markdownToHtml(md: string): string {
   return html.join('\n');
 }
 
+/* ──────── URL safety ──────── */
+
+// A URL carries a scheme only when a colon follows a valid scheme name.
+// Anything else (`/path`, `./path`, `#anchor`, `?q=1`) is relative and cannot
+// introduce a new scheme, so it is safe. `//host/path` is protocol-relative:
+// it keeps the page's protocol but points at another host, so it can navigate
+// off-origin. That is allowed — it is a link, not script — and `rel="noopener
+// noreferrer"` on the anchor covers the tab-nabbing side of it.
+const HAS_SCHEME = /^[a-z][a-z0-9+.-]*:/;
+// Navigable schemes. `javascript:`, `vbscript:`, `data:` and friends are
+// rejected — everything reaching inlineMarkdown is already HTML-escaped, so
+// the URL scheme is the only remaining way to get script into the preview.
+const SAFE_LINK_SCHEME = /^(https?|mailto|tel):/;
+const SAFE_IMAGE_SCHEME = /^https?:/;
+// Inline raster images are useful for pasted screenshots. `image/svg+xml` is
+// deliberately excluded: SVG is a document format that can carry script and
+// external references, not just pixels.
+const SAFE_IMAGE_DATA_URL = /^data:image\/(png|jpe?g|gif|webp|avif|bmp|x-icon|vnd\.microsoft\.icon)[;,]/;
+
+const fromCodePoint = (code: number) =>
+  Number.isFinite(code) && code >= 0 && code <= 0x10ffff ? String.fromCodePoint(code) : '';
+
+// Reduce a URL to the form a browser would act on before testing its scheme:
+// decode character references, drop control characters and whitespace, and
+// lowercase. This defeats `JaVaScRiPt:`, ` javascript:`, `java\tscript:`,
+// `java\x00script:` and `&#106;avascript:` style evasion.
+function normalizeUrl(url: string): string {
+  return url
+    .replace(/&quot;/g, '"')
+    .replace(/&#039;/g, "'")
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&amp;/g, '&')
+    .replace(/&#x([0-9a-f]+);?/gi, (_match, hex: string) => fromCodePoint(parseInt(hex, 16)))
+    .replace(/&#(\d+);?/g, (_match, dec: string) => fromCodePoint(parseInt(dec, 10)))
+    // eslint-disable-next-line no-control-regex -- matching control characters is the point
+    .replace(/[\x00-\x20\x7f]/g, '')
+    .toLowerCase();
+}
+
+function isSafeLinkUrl(url: string): boolean {
+  const normalized = normalizeUrl(url);
+  return !HAS_SCHEME.test(normalized) || SAFE_LINK_SCHEME.test(normalized);
+}
+
+function isSafeImageUrl(url: string): boolean {
+  const normalized = normalizeUrl(url);
+  if (!HAS_SCHEME.test(normalized)) return true;
+  return SAFE_IMAGE_SCHEME.test(normalized) || SAFE_IMAGE_DATA_URL.test(normalized);
+}
+
+// Placeholder delimiter for generated markup. NUL is stripped from the input
+// before any token is created, so a placeholder can never collide with user
+// text, and it survives the emphasis passes because none of them treat it as
+// a delimiter.
+const TOKEN = '\x00';
+// eslint-disable-next-line no-control-regex -- matching control characters is the point
+const TOKEN_PATTERN = /\x00(\d+)\x00/g;
+
 function inlineMarkdown(text: string): string {
-  // Images: ![alt](url)
-  text = text.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '<img src="$2" alt="$1" class="t-md-editor__image" loading="lazy" />');
-  // Links: [text](url)
-  text = text.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>');
+  const tokens: string[] = [];
+  // Park generated markup outside the emphasis passes below. Without this,
+  // `_(.+?)_` eats the underscore in the generated target="_blank" and any
+  // underscore inside a URL.
+  const token = (html: string) => {
+    tokens.push(html);
+    return `${TOKEN}${tokens.length - 1}${TOKEN}`;
+  };
+  const inert = (source: string) => token(`<span class="t-md-editor__blocked-link">${source}</span>`);
+
+  // eslint-disable-next-line no-control-regex -- matching control characters is the point
+  text = text.replace(/\x00/g, '');
+
+  // Images: ![alt](url) — alt is a plain-text attribute, so the whole tag is parked.
+  text = text.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, (match, alt: string, url: string) =>
+    isSafeImageUrl(url)
+      ? token(`<img src="${url}" alt="${alt}" class="t-md-editor__image" loading="lazy" />`)
+      : inert(match),
+  );
+  // Links: [text](url) — only the tags are parked so the label still formats.
+  text = text.replace(/\[([^\]]+)\]\(([^)]+)\)/g, (match, label: string, url: string) =>
+    isSafeLinkUrl(url)
+      ? `${token(`<a href="${url}" target="_blank" rel="noopener noreferrer">`)}${label}${token('</a>')}`
+      : inert(match),
+  );
   // Bold: **text**
   text = text.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
   // Italic: _text_ or *text*
@@ -251,7 +337,8 @@ function inlineMarkdown(text: string): string {
   text = text.replace(/`(.+?)`/g, '<code class="t-md-editor__inline-code">$1</code>');
   // Strikethrough: ~~text~~
   text = text.replace(/~~(.+?)~~/g, '<del>$1</del>');
-  return text;
+
+  return text.replace(TOKEN_PATTERN, (_match, index: string) => tokens[Number(index)]);
 }
 
 /* ──────── Image paste / drop handling ──────── */

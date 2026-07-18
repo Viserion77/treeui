@@ -64,19 +64,19 @@ behavior:
   no_emit_on_same_page: "Does not emit when clicking the already-active page"
 
 css_classes:
-  block: tree-pagination
+  block: t-pagination
   elements:
-    - tree-pagination__list
-    - tree-pagination__item
-    - tree-pagination__button
-    - tree-pagination__button--prev
-    - tree-pagination__button--next
-    - tree-pagination__ellipsis
-    - tree-pagination__icon
+    - t-pagination__list
+    - t-pagination__item
+    - t-pagination__button
+    - t-pagination__button--prev
+    - t-pagination__button--next
+    - t-pagination__ellipsis
+    - t-pagination__icon
   modifiers:
-    - tree-pagination--sm
-    - tree-pagination--md
-    - tree-pagination--lg
+    - t-pagination--sm
+    - t-pagination--md
+    - t-pagination--lg
   states:
     - is-active
     - is-disabled

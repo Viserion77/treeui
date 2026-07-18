@@ -159,7 +159,14 @@ Use Changesets for any user-facing package change: `pnpm changeset`.
 
 If the local TreeUI MCP server is available, prefer it for searching components,
 retrieving setup guidance, recommending between alternatives, and reading the
-normalized catalog. In this repository, Claude Code loads the server through
+normalized catalog.
+
+**Before hardcoding any value — a color, a spacing, a max-width, a gradient — run
+`search_tokens` first.** It matches on variable name, on category, and on the
+literal value, so `64rem` or `#0969da` finds the token that already ships. The
+most common failure in consumer apps is reimplementing a token that exists.
+
+In this repository, Claude Code loads the server through
 `.mcp.json` after dependencies are installed; other tools can use the published
 `@treeui/mcp` package or run the local package directly.
 

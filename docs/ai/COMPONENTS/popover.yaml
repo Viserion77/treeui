@@ -8,9 +8,9 @@ description: >
   Supports four placement sides with alignment options.
 
 anatomy:
-  - tree-popover              # root wrapper (relative positioning context)
-  - tree-popover__anchor      # trigger wrapper
-  - tree-popover__content     # floating panel (role="dialog")
+  - t-popover              # root wrapper (relative positioning context)
+  - t-popover__anchor      # trigger wrapper
+  - t-popover__content     # floating panel (role="dialog")
 
 props:
   - name: open
@@ -82,18 +82,18 @@ contract: overlay_contract
 composable: useControllableOpen
 
 css_classes:
-  - tree-popover
-  - tree-popover__anchor
-  - tree-popover__content
-  - tree-popover__content--top
-  - tree-popover__content--right
-  - tree-popover__content--bottom
-  - tree-popover__content--left
-  - tree-popover__content--align-start
-  - tree-popover__content--align-center
-  - tree-popover__content--align-end
+  - t-popover
+  - t-popover__anchor
+  - t-popover__content
+  - t-popover__content--top
+  - t-popover__content--right
+  - t-popover__content--bottom
+  - t-popover__content--left
+  - t-popover__content--align-start
+  - t-popover__content--align-center
+  - t-popover__content--align-end
   - is-open
   - is-disabled
 
-transition: tree-popover-fade
+transition: t-popover-fade
 z_index: var(--tree-z-dropdown)

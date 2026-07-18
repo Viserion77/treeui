@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { createId, isActivationKey, isEscapeKey } from '@treeui/utils';
+import { createId, focusFirst, isActivationKey, isEscapeKey } from '@treeui/utils';
 import { computed, nextTick, onBeforeUnmount, ref, toRef, useAttrs, watch } from 'vue';
 import { useControllableOpen } from '../composables/useControllableOpen';
 import type { TSize } from '../types/contracts';
@@ -51,7 +51,7 @@ defineSlots<{
 const attrs = useAttrs();
 const menuId = createId('t-dropdown');
 const rootRef = ref<HTMLElement | null>(null);
-const triggerRef = ref<HTMLButtonElement | null>(null);
+const triggerRef = ref<HTMLElement | null>(null);
 const itemRefs = ref<Map<string, HTMLElement>>(new Map());
 const focusedIndex = ref(-1);
 
@@ -97,11 +97,14 @@ const closeMenu = (restoreFocus = false) => {
   setValue(false);
   focusedIndex.value = -1;
   if (restoreFocus) {
-    nextTick(() => triggerRef.value?.focus());
+    nextTick(() => {
+      if (triggerRef.value) focusFirst(triggerRef.value);
+    });
   }
 };
 
 const toggleMenu = () => {
+  if (props.disabled) return;
   if (isOpen.value) {
     closeMenu();
   } else {
@@ -226,13 +229,17 @@ onBeforeUnmount(() => {
     :style="rootStyle"
     :data-state="isOpen ? 'open' : 'closed'"
   >
-    <span class="t-dropdown__trigger-wrapper">
+    <span
+      ref="triggerRef"
+      class="t-dropdown__trigger-wrapper"
+      @click="toggleMenu"
+      @keydown="onTriggerKeydown"
+    >
       <slot
         name="trigger"
         :is-open="isOpen"
       >
         <button
-          ref="triggerRef"
           v-bind="triggerAttrs"
           type="button"
           class="t-dropdown__trigger"
@@ -240,8 +247,6 @@ onBeforeUnmount(() => {
           :aria-controls="isOpen ? menuId : undefined"
           aria-haspopup="menu"
           :aria-expanded="isOpen"
-          @click="toggleMenu"
-          @keydown="onTriggerKeydown"
         >
           <span class="t-dropdown__label">{{ label }}</span>
           <svg

@@ -3,46 +3,122 @@ package: "@treeui/vue"
 public_component_prefix: "T"
 source_component_filename_prefix: "T"
 
+# Every component value exported from packages/vue/src/components/index.ts.
+# This list is the canonical answer to "does TreeUI already have X?" — check it
+# before proposing a new component or a new prop, because a capability that
+# already ships here is not missing, only undocumented.
+# Maintenance: must stay 1:1 with the `export { default as ... }` lines in
+# packages/vue/src/components/index.ts. Verify with:
+#   grep -oP '^export \{ default as \K\w+' packages/vue/src/components/index.ts | sort
+primary_exports_count: 75
 primary_exports:
+  - TAccordion
+  - TAccordionItem
   - TAlert
+  - TAppBar
+  - TAppShell
+  - TAvatar
   - TBadge
   - TBreadcrumb
   - TBreadcrumbItem
   - TButton
   - TCard
+  - TChart
   - TCheckbox
+  - TColorSwatch
   - TCombobox
   - TConfirmDialog
+  - TContainer
+  - TContextMenu
   - TDatePicker
-  - TDropdown
+  - TDateTimePicker
+  - TDivider
+  - TDonutChart
   - TDrawer
+  - TDropdown
   - TEmptyState
   - TFileUpload
   - TFormField
+  - TGrid
+  - TIcon
   - TInput
+  - TKbd
+  - TLink
+  - TMarkdownEditor
   - TModal
+  - TMultiSelect
+  - TNavMenu
+  - TNavbar
+  - TNumberInput
+  - TPage
+  - TPageHeader
+  - TPagination
+  - TPopover
+  - TPricing
+  - TPricingCard
+  - TProgress
   - TRadio
   - TRadioGroup
   - TSelect
+  - TSelectableList
+  - TSidebar
   - TSkeleton
+  - TSpacer
+  - TSparkline
   - TSpinner
+  - TSplit
+  - TStack
+  - TStackItem
+  - TStat
+  - TStepper
+  - TSteps
   - TSwitch
-  - TTabs
-  - TTabList
   - TTab
+  - TTabList
   - TTabPanel
+  - TTable
+  - TTabs
+  - TTag
+  - TText
+  - TTextarea
+  - TTimeline
   - TToast
   - TToastProvider
+  - TToggleGroup
   - TTooltip
-  - TAvatar
-  - TDivider
-  - TTable
-  - TTag
-  - TTimeline
-  - TLink
-  - TChart
-  - TSparkline
-  - TDonutChart
+  - TTreeView
+
+export_aliases:
+  note: "Two exports are aliases of the same component, not separate components. Counted individually above."
+  pairs:
+    - canonical: TNavbar
+      alias: TAppBar
+    - canonical: TSteps
+      alias: TStepper
+
+layout_capabilities_already_shipping:
+  note: >
+    Layout sizing and flex behavior already exist as dedicated primitives. Reach
+    for these before adding `fill`, `grow`, `flex`, or width props to individual
+    components — that capability is composed, not duplicated per component.
+  TStackItem:
+    props: [grow, shrink, basis, minWidth, align]
+    purpose: >
+      Per-child flex control inside a TStack. `grow` makes one child absorb the
+      free space; `minWidth` is the standard fix for a flex child that refuses to
+      shrink below its content.
+  TStack:
+    purpose: "One-dimensional layout — direction, gap, align, justify, wrap."
+  TSplit:
+    purpose: "Two-region row that pushes the second region to the far edge."
+  TSpacer:
+    purpose: "Flexible gap that absorbs free space between siblings."
+  TGrid:
+    purpose: "Responsive multi-column layout."
+  TContainer:
+    purpose: "Max-width constraint and horizontal page padding."
+  TPage:
+    purpose: "Page region: width constraint plus block padding and vertical rhythm."
 
 shared_sizes:
   values: [sm, md, lg]

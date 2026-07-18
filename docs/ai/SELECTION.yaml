@@ -82,6 +82,27 @@ decision_guides:
         when:
           - "The user is confirming or canceling a destructive or high-risk action."
 
+  - id: navigate-or-act
+    question: "Navigate somewhere vs. perform an action"
+    rule: "Decide by what the control does, not by how it looks. Navigation is a link; everything else is a button."
+    options:
+      - use: TLink
+        when:
+          - "Activating it changes the URL — an external link, a route, or an in-page anchor."
+          - "It should be openable in a new tab, copyable, and crawlable."
+      - use: TButton
+        when:
+          - "Activating it runs behavior on the current page — submit, open an overlay, delete, toggle."
+          - "It needs sizes, action variants, or a loading state."
+        notes:
+          - "Use `variant=\"ghost\"` when an action needs to look understated like a link."
+      - use: TNavMenu
+        when:
+          - "The links are app-section navigation inside a shell or sidebar."
+      - use: TBreadcrumb
+        when:
+          - "The links express where the current page sits in a hierarchy."
+
   - id: feedback-choice
     question: "Communicate status or feedback"
     options:
@@ -353,6 +374,29 @@ component_profiles:
         when: "The value is numeric."
       - component: TMarkdownEditor
         when: "Rich markdown authoring is needed."
+
+  TLink:
+    keywords: [link, anchor, hyperlink, navigation, router link, external link, href, to]
+    use_when:
+      - "The action navigates somewhere — a URL, a route, or an anchor on the page."
+      - "You want consistent link styling with `default`, `muted`, or `danger` emphasis."
+      - "You want a component that renders RouterLink when vue-router is installed and a plain <a> when it is not, without branching in the template."
+    avoid_when:
+      - "The control performs an action rather than navigating (submit, open a dialog, delete) — that is a button, even if it looks like a link."
+      - "You need a full call-to-action surface with variants, sizes, and a loading state."
+    routing:
+      - "Pass `to` for route navigation. It renders RouterLink only if RouterLink is registered in the app; otherwise it falls back to <a href> using `to` when `to` is a string."
+      - "Pass `href` for plain URLs. When both are given and RouterLink is unavailable, `href` wins."
+      - "Set `external` to add target=\"_blank\" and rel=\"noopener noreferrer\"."
+    accessibility:
+      - "`disabled` renders a <span> with aria-disabled and tabindex=-1 instead of an anchor, so there is no dead link in the tab order. Prefer hiding or omitting a link over disabling it."
+    alternatives:
+      - component: TButton
+        when: "The control performs an action. Use `variant=\"ghost\"` for a low-emphasis, link-like button."
+      - component: TBreadcrumb
+        when: "The links form a hierarchy trail."
+      - component: TNavMenu
+        when: "The links are app-section navigation in a shell or sidebar."
 
   TMarkdownEditor:
     keywords: [markdown, rich text, editor, preview]

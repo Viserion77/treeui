@@ -5,7 +5,8 @@ status: draft
 
 description: >
   Determinate and indeterminate progress indicator.
-  Supports linear bar and circular ring variants.
+  Renders a linear bar only — there is no circular, ring, or radial variant,
+  and no `variant`/`shape`/`type` prop. Compose one yourself if you need it.
 
 props:
   value:
@@ -40,14 +41,18 @@ accessibility:
   notes: >
     Indeterminate state omits aria-valuenow so assistive tech
     announces the bar as indeterminate.
+  value_is_normalized: >
+    aria-valuenow is `value / max` expressed as a 0–100 percentage, not the raw
+    `value`. aria-valuemax stays 100 regardless of the `max` prop, so the two
+    always agree. The `label` is also repeated in a visually hidden span.
 
 css:
-  block: tree-progress
+  block: t-progress
   elements:
-    - tree-progress__track
-    - tree-progress__fill
+    - t-progress__track
+    - t-progress__fill
   modifiers:
-    - tree-progress--sm
-    - tree-progress--md
-    - tree-progress--lg
-    - tree-progress--indeterminate
+    - t-progress--sm
+    - t-progress--md
+    - t-progress--lg
+    - t-progress--indeterminate

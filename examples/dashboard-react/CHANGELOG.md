@@ -1,5 +1,14 @@
 # @treeui/example-dashboard-react
 
+## 0.1.4
+
+### Patch Changes
+
+- Updated dependencies [87c7081]
+- Updated dependencies [586e8fc]
+  - @treeui/tokens@0.15.0
+  - @treeui/react@0.2.0
+
 ## 0.1.3
 
 ### Patch Changes

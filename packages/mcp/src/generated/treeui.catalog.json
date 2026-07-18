@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-18T15:05:23.434Z",
+  "generatedAt": "2026-07-18T15:16:48.312Z",
   "packageName": "@treeui/vue",
   "packageVersion": "0.14.0",
   "decisionGuides": [
@@ -3838,6 +3838,20 @@
           ]
         },
         {
+          "name": "width",
+          "type": "TFieldWidth",
+          "default": "full",
+          "values": [
+            "xs",
+            "sm",
+            "md",
+            "lg",
+            "xl",
+            "full"
+          ],
+          "note": "Inline-size cap (max-inline-size). Fluid by default; use instead of an inline width style."
+        },
+        {
           "name": "disabled",
           "type": "boolean",
           "default": "false"
@@ -5609,6 +5623,20 @@
           ]
         },
         {
+          "name": "width",
+          "type": "TFieldWidth",
+          "default": "full",
+          "values": [
+            "xs",
+            "sm",
+            "md",
+            "lg",
+            "xl",
+            "full"
+          ],
+          "note": "Inline-size cap (max-inline-size). Fluid by default; use instead of an inline width style."
+        },
+        {
           "name": "disabled",
           "type": "boolean",
           "default": "false"
@@ -7206,6 +7234,20 @@
             "md",
             "lg"
           ]
+        },
+        {
+          "name": "width",
+          "type": "TFieldWidth",
+          "default": "full",
+          "values": [
+            "xs",
+            "sm",
+            "md",
+            "lg",
+            "xl",
+            "full"
+          ],
+          "note": "Inline-size cap (max-inline-size). Fluid by default; use instead of an inline width style."
         },
         {
           "name": "disabled",

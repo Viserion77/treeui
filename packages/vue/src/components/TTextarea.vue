@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, useAttrs, ref, watch, nextTick } from 'vue';
-import type { TSize } from '../types/contracts';
+import type { TFieldWidth, TSize } from '../types/contracts';
 import TSpinner from './TSpinner.vue';
 
 defineOptions({
@@ -11,6 +11,8 @@ const props = withDefaults(
   defineProps<{
     modelValue?: string;
     size?: TSize;
+    /** Inline-size cap. Fluid (`full`) by default. */
+    width?: TFieldWidth;
     disabled?: boolean;
     loading?: boolean;
     invalid?: boolean;
@@ -21,6 +23,7 @@ const props = withDefaults(
   {
     modelValue: '',
     size: 'md',
+    width: 'full',
     disabled: false,
     loading: false,
     invalid: false,
@@ -40,6 +43,7 @@ const textareaRef = ref<HTMLTextAreaElement | null>(null);
 const rootClasses = computed(() => [
   't-textarea',
   `t-textarea--${props.size}`,
+  props.width !== 'full' ? `t-field-width--${props.width}` : null,
   {
     'is-disabled': props.disabled,
     'is-invalid': props.invalid,

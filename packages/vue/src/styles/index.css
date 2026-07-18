@@ -5707,6 +5707,28 @@
   order: -1;
 }
 
+/* ── Field width ──────────────────────────────────────── */
+
+/* Shared inline-size scale for form controls. Controls are fluid by default;
+   these cap them at a comfortable width while still shrinking when the
+   container is narrower (max-inline-size, not a fixed width). */
+
+.t-field-width--xs {
+  max-inline-size: 8rem;
+}
+.t-field-width--sm {
+  max-inline-size: 12rem;
+}
+.t-field-width--md {
+  max-inline-size: 18rem;
+}
+.t-field-width--lg {
+  max-inline-size: 24rem;
+}
+.t-field-width--xl {
+  max-inline-size: 32rem;
+}
+
 /* ── Color swatch ─────────────────────────────────────── */
 
 .t-color-swatch {

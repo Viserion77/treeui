@@ -58,7 +58,7 @@ function message(name: string) {
       placeholder="Search customers…"
       aria-label="Search customers"
       :size="config.density"
-      style="max-width: 24rem"
+      width="lg"
     >
       <template #prefix>
         <TIcon name="search" />

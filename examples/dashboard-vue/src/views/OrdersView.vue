@@ -199,7 +199,6 @@ function createOrder() {
             placeholder="Search orders…"
             aria-label="Search orders"
             :size="config.density"
-            style="width: 100%"
           >
             <template #prefix>
               <TIcon name="search" />
@@ -294,53 +293,54 @@ function createOrder() {
     </TEmptyState>
 
     <template v-else>
-      <TTable
-        :columns="orderColumns"
-        :rows="pageRows"
-        :size="config.density"
-      >
-        <template #cell-status="{ value }">
-          <TBadge
-            :tone="toneFor(value)"
+      <TStack gap="var(--tree-space-4)">
+        <TTable
+          :columns="orderColumns"
+          :rows="pageRows"
+          :size="config.density"
+        >
+          <template #cell-status="{ value }">
+            <TBadge
+              :tone="toneFor(value)"
+              size="sm"
+            >
+              {{ value }}
+            </TBadge>
+          </template>
+          <template #cell-amount="{ value }">
+            {{ currency.format(Number(value)) }}
+          </template>
+          <template #cell-actions="{ row }">
+            <TDropdown
+              :items="rowActions"
+              size="sm"
+              align="end"
+              label="⋯"
+              :aria-label="`Actions for ${row.id}`"
+              @select="onRowAction(row as Order, $event)"
+            />
+          </template>
+        </TTable>
+
+        <TStack
+          direction="horizontal"
+          align="center"
+          justify="space-between"
+          wrap
+          gap="var(--tree-space-3)"
+        >
+          <TText
+            tone="muted"
             size="sm"
           >
-            {{ value }}
-          </TBadge>
-        </template>
-        <template #cell-amount="{ value }">
-          {{ currency.format(Number(value)) }}
-        </template>
-        <template #cell-actions="{ row }">
-          <TDropdown
-            :items="rowActions"
-            size="sm"
-            align="end"
-            label="⋯"
-            :aria-label="`Actions for ${row.id}`"
-            @select="onRowAction(row as Order, $event)"
+            {{ filtered.length }} orders
+          </TText>
+          <TPagination
+            v-model="page"
+            :total-pages="totalPages"
+            :size="config.density"
           />
-        </template>
-      </TTable>
-
-      <TStack
-        direction="horizontal"
-        align="center"
-        justify="space-between"
-        wrap
-        gap="var(--tree-space-3)"
-        style="margin-top: var(--tree-space-4)"
-      >
-        <TText
-          tone="muted"
-          size="sm"
-        >
-          {{ filtered.length }} orders
-        </TText>
-        <TPagination
-          v-model="page"
-          :total-pages="totalPages"
-          :size="config.density"
-        />
+        </TStack>
       </TStack>
     </template>
   </TCard>

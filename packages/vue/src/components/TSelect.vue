@@ -2,7 +2,7 @@
 import { createId, isActivationKey, isEscapeKey } from '@treeui/utils';
 import { computed, nextTick, onBeforeUnmount, ref, toRef, useAttrs, watch } from 'vue';
 import { useControllableOpen } from '../composables/useControllableOpen';
-import type { TSize } from '../types/contracts';
+import type { TFieldWidth, TSize } from '../types/contracts';
 import TSpinner from './TSpinner.vue';
 
 defineOptions({
@@ -22,6 +22,8 @@ const props = withDefaults(
     open?: boolean;
     defaultOpen?: boolean;
     size?: TSize;
+    /** Inline-size cap. Fluid (`full`) by default. */
+    width?: TFieldWidth;
     disabled?: boolean;
     loading?: boolean;
     invalid?: boolean;
@@ -33,6 +35,7 @@ const props = withDefaults(
     open: undefined,
     defaultOpen: false,
     size: 'md',
+    width: 'full',
     disabled: false,
     loading: false,
     invalid: false,
@@ -72,6 +75,7 @@ const { value: isOpen, setValue } = useControllableOpen(
 const rootClasses = computed(() => [
   't-select',
   `t-select--${props.size}`,
+  props.width !== 'full' ? `t-field-width--${props.width}` : null,
   {
     't-select--drop-up': dropUp.value,
     'is-disabled': props.disabled,

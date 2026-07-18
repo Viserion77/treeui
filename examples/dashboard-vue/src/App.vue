@@ -141,7 +141,7 @@ function selectView(value: string, closeSidebar: () => void) {
             v-model="search"
             type="search"
             size="sm"
-            style="width: min(22rem, 100%)"
+            width="lg"
             placeholder="Search orders, customers…"
             aria-label="Search"
           >

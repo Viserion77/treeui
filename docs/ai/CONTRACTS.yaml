@@ -80,6 +80,15 @@ shared_props:
     used_by: [TBadge, TStat]
   size:
     used_by: [TBadge, TButton, TCard, TCheckbox, TCombobox, TConfirmDialog, TDatePicker, TDropdown, TFileUpload, TInput, TModal, TRadio, TRadioGroup, TSelect, TSpinner, TTextarea, TTimeline]
+  width:
+    used_by: [TInput, TSelect, TTextarea]
+    values: [xs, sm, md, lg, xl, full]
+    default: full
+    note: >-
+      Inline-size scale for form controls (type `TFieldWidth`). Controls are
+      fluid by default; the other steps set a `max-inline-size` cap so they
+      still shrink on narrow containers. Prefer this over inline width styles.
+      Caps: xs 8rem, sm 12rem, md 18rem, lg 24rem, xl 32rem.
   disabled:
     used_by: [TButton, TCheckbox, TCombobox, TConfirmDialog, TDatePicker, TDropdown, TFileUpload, TInput, TModal, TRadio, TRadioGroup, TSelect, TSwitch, TTextarea, TTooltip]
   loading:

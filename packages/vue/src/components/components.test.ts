@@ -4083,6 +4083,17 @@ describe('TDonutChart', () => {
     expect(wrapper.find('.t-color-swatch__custom').attributes('type')).toBe('color');
   });
 
+  it('caps form control width from the shared field scale', () => {
+    expect(mount(TInput, { props: { width: 'lg' } }).classes()).toContain('t-field-width--lg');
+    expect(mount(TSelect, { props: { width: 'sm' } }).classes()).toContain('t-field-width--sm');
+    expect(mount(TTextarea, { props: { width: 'xl' } }).classes()).toContain('t-field-width--xl');
+  });
+
+  it('leaves form controls fluid by default', () => {
+    const classes = mount(TInput).classes();
+    expect(classes.some((name) => name.startsWith('t-field-width--'))).toBe(false);
+  });
+
   it('does not emit from a disabled colour swatch', async () => {
     const wrapper = mount(TColorSwatch, {
       props: { options: [{ label: 'Blue', value: '#0969da' }], disabled: true },

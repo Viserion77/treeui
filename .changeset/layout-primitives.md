@@ -15,6 +15,10 @@ Add layout, typography and theming primitives so app-level chrome no longer need
 - **TButton** — new `block` (full-width) and `align` (`start`/`center`/`end`) props.
 - **TStack** — new `grow` prop to fill the parent's main axis.
 
+**Form control sizing**
+
+- **`width` prop on TInput / TSelect / TTextarea** — a shared `TFieldWidth` scale (`xs` 8rem → `xl` 32rem, `full` default) that caps a control's inline size via `max-inline-size`, so it still shrinks on narrow containers. Replaces inline `width` / `max-width` styles at call sites.
+
 **Theming**
 
 - **`useTheme()` (`@treeui/vue`)** — theme-mode + accent controller: resolves `system` against the OS, writes `data-tree-theme`, persists the choice, and re-derives a custom accent whenever the theme flips.

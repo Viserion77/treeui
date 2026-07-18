@@ -23,6 +23,11 @@ props:
     type: TSize
     default: md
     values: [sm, md, lg]
+  width:
+    type: TFieldWidth
+    default: full
+    values: [xs, sm, md, lg, xl, full]
+    note: "Inline-size cap (max-inline-size). Fluid by default; use instead of an inline width style."
   disabled:
     type: boolean
     default: false

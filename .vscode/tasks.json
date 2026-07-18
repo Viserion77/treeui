@@ -48,6 +48,36 @@
       }
     },
     {
+      "label": "Dev: Exemplo Vue (6008)",
+      "detail": "Builda os packages e sobe o dashboard-vue (@treeui/example-dashboard-vue) em http://localhost:6008",
+      "type": "shell",
+      "command": "pnpm example:vue:dev",
+      "icon": { "id": "dashboard", "color": "terminal.ansiGreen" },
+      "isBackground": true,
+      "problemMatcher": [],
+      "presentation": {
+        "panel": "dedicated",
+        "group": "dev",
+        "reveal": "always",
+        "clear": true
+      }
+    },
+    {
+      "label": "Dev: Exemplo React (6009)",
+      "detail": "Builda os packages e sobe o dashboard-react (@treeui/example-dashboard-react) em http://localhost:6009",
+      "type": "shell",
+      "command": "pnpm example:react:dev",
+      "icon": { "id": "dashboard", "color": "terminal.ansiCyan" },
+      "isBackground": true,
+      "problemMatcher": [],
+      "presentation": {
+        "panel": "dedicated",
+        "group": "dev",
+        "reveal": "always",
+        "clear": true
+      }
+    },
+    {
       "label": "Build: packages",
       "detail": "Builda tokens → utils → icons → vue → react → mcp",
       "type": "shell",

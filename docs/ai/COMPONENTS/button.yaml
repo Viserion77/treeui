@@ -10,9 +10,10 @@ props:
     type: string
     default: button
   variant:
-    type: TVariant
+    type: "TVariant | brand"
     default: solid
-    values: [solid, outline, ghost, soft, danger]
+    values: [solid, outline, ghost, soft, danger, brand]
+    note: "`brand` is a button-only, high-emphasis gradient variant driven by the `--tree-gradient-brand` token. Use it for the single primary CTA of a screen."
   size:
     type: TSize
     default: md

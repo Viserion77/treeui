@@ -7,7 +7,7 @@ import TSpinner from './TSpinner.vue';
 const props = withDefaults(
   defineProps<{
     as?: string;
-    variant?: TVariant;
+    variant?: TVariant | 'brand';
     size?: TSize;
     disabled?: boolean;
     loading?: boolean;
@@ -36,6 +36,7 @@ const buttonClass = tv({
       ghost: 't-button--ghost',
       soft: 't-button--soft',
       danger: 't-button--danger',
+      brand: 't-button--brand',
     },
     size: {
       sm: 't-button--sm',

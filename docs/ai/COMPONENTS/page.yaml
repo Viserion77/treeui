@@ -1,0 +1,49 @@
+name: TPage
+source_file: packages/vue/src/components/TPage.vue
+package: "@treeui/vue"
+kind: layout
+status: available
+purpose: "Semantic page region under the app shell: block padding, a centered max-width content column, and standardized vertical rhythm between sections."
+
+props:
+  as:
+    type: string
+    default: div
+  width:
+    type: TContainerSize
+    default: lg
+    values: [sm, md, lg, xl, full]
+    note: "Max-width of the centered content column. Mirrors TContainer sizes."
+  padded:
+    type: boolean
+    default: true
+    note: "Adds vertical (block) padding on the region and horizontal padding on the inner column."
+  gap:
+    type: TPageGap
+    default: lg
+    values: [sm, md, lg]
+    note: "Vertical spacing between direct children (e.g. a TPageHeader and content sections)."
+
+slots:
+  - default
+
+forwards_attrs_to: root_element
+
+composition:
+  wraps: TContainer
+  note: "TPage renders a centered TContainer for the width column and adds page-level block padding plus vertical rhythm."
+
+behavior:
+  centers_content_column_by_width: true
+  applies_block_padding_when_padded: true
+  spaces_children_vertically_by_gap: true
+
+a11y:
+  - "Structural wrapper only; landmark semantics come from `as` and the surrounding app shell (avoid nesting a second `main`)."
+
+example: |
+  <TPage width="lg" gap="lg">
+    <TPageHeader title="Overview" subtitle="A consistent page shell." />
+    <TCard>Section one</TCard>
+    <TCard>Section two</TCard>
+  </TPage>

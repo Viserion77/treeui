@@ -44,9 +44,13 @@ const props = withDefaults(
     closeOnEscape?: boolean;
     closeOnOverlay?: boolean;
     showMenuButton?: boolean;
+    /** Render the built-in collapse toggle in the sidebar footer (desktop). */
+    showCollapseButton?: boolean;
     menuLabel?: string;
     closeLabel?: string;
     sidebarLabel?: string;
+    collapseLabel?: string;
+    expandLabel?: string;
   }>(),
   {
     as: 'div',
@@ -63,9 +67,12 @@ const props = withDefaults(
     closeOnEscape: true,
     closeOnOverlay: true,
     showMenuButton: true,
+    showCollapseButton: true,
     menuLabel: 'Open menu',
     closeLabel: 'Close menu',
     sidebarLabel: 'Sidebar',
+    collapseLabel: 'Collapse sidebar',
+    expandLabel: 'Expand sidebar',
   },
 );
 
@@ -87,9 +94,14 @@ export interface AppShellSlotProps {
 
 defineSlots<{
   header?: (props: AppShellSlotProps) => unknown;
+  /** Pinned above the sidebar body, inset to line up with nav item icons. */
+  'sidebar-header'?: (props: AppShellSlotProps) => unknown;
   sidebar?: (props: AppShellSlotProps) => unknown;
+  /** Pinned to the bottom of the sidebar, inset to line up with nav item icons. */
+  'sidebar-footer'?: (props: AppShellSlotProps) => unknown;
   default?: (props: Pick<AppShellSlotProps, 'mobile' | 'collapsed'>) => unknown;
   'menu-icon'?: (props: { sidebarOpen: boolean }) => unknown;
+  'collapse-icon'?: (props: { collapsed: boolean }) => unknown;
 }>();
 
 const attrs = useAttrs();
@@ -138,6 +150,11 @@ const teardownMediaQuery = () => {
 };
 
 const isMobile = computed(() => props.mobile ?? autoMobile.value);
+
+// Collapsing is desktop-only, so the built-in toggle follows the same rule.
+const showCollapseToggle = computed(
+  () => !isMobile.value && props.collapsible && props.showCollapseButton,
+);
 
 // Collapse is a desktop-only concept; the mobile drawer always shows the
 // expanded sidebar, so descendants and slots see `collapsed: false` there.
@@ -413,10 +430,69 @@ const slotProps = computed<AppShellSlotProps>(() => ({
       class="t-app-shell__sidebar"
       :aria-label="sidebarLabel"
     >
-      <slot
-        name="sidebar"
-        v-bind="slotProps"
-      />
+      <div
+        v-if="$slots['sidebar-header']"
+        class="t-app-shell__sidebar-header"
+      >
+        <slot
+          name="sidebar-header"
+          v-bind="slotProps"
+        />
+      </div>
+
+      <div class="t-app-shell__sidebar-body">
+        <slot
+          name="sidebar"
+          v-bind="slotProps"
+        />
+      </div>
+
+      <div
+        v-if="$slots['sidebar-footer'] || showCollapseToggle"
+        class="t-app-shell__sidebar-footer"
+      >
+        <slot
+          name="sidebar-footer"
+          v-bind="slotProps"
+        />
+
+        <button
+          v-if="showCollapseToggle"
+          type="button"
+          class="t-app-shell__collapse-button"
+          :aria-label="isCollapsed ? expandLabel : collapseLabel"
+          :aria-expanded="!isCollapsed"
+          :aria-controls="sidebarId"
+          @click="toggleCollapsed"
+        >
+          <slot
+            name="collapse-icon"
+            :collapsed="effectiveCollapsed"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              <rect
+                x="3"
+                y="3"
+                width="18"
+                height="18"
+                rx="2"
+              />
+              <path d="M9 3v18" />
+            </svg>
+          </slot>
+        </button>
+      </div>
     </aside>
 
     <main class="t-app-shell__main">
@@ -457,10 +533,32 @@ const slotProps = computed<AppShellSlotProps>(() => ({
             </button>
           </div>
           <div class="t-app-shell__drawer-body">
-            <slot
-              name="sidebar"
-              v-bind="slotProps"
-            />
+            <div
+              v-if="$slots['sidebar-header']"
+              class="t-app-shell__sidebar-header"
+            >
+              <slot
+                name="sidebar-header"
+                v-bind="slotProps"
+              />
+            </div>
+
+            <div class="t-app-shell__sidebar-body">
+              <slot
+                name="sidebar"
+                v-bind="slotProps"
+              />
+            </div>
+
+            <div
+              v-if="$slots['sidebar-footer']"
+              class="t-app-shell__sidebar-footer"
+            >
+              <slot
+                name="sidebar-footer"
+                v-bind="slotProps"
+              />
+            </div>
           </div>
         </aside>
       </div>

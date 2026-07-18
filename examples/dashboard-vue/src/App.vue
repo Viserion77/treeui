@@ -30,7 +30,6 @@ import {
   IconMoon,
   IconOrders,
   IconSearch,
-  IconSidebar,
   IconSun,
   IconUsers,
 } from './icons';
@@ -108,7 +107,7 @@ function selectView(value: string, closeSidebar: () => void) {
       sidebar-label="Dashboard navigation"
       menu-label="Open navigation"
     >
-      <template #header="{ mobile, collapsed, toggleCollapsed }">
+      <template #header="{ mobile }">
         <TStack
           direction="horizontal"
           align="center"
@@ -165,16 +164,6 @@ function selectView(value: string, closeSidebar: () => void) {
             align="center"
             gap="var(--tree-space-2)"
           >
-            <TTooltip :content="collapsed ? 'Expand sidebar' : 'Collapse sidebar'">
-              <TButton
-                variant="ghost"
-                size="sm"
-                :aria-label="collapsed ? 'Expand sidebar' : 'Collapse sidebar'"
-                @click="toggleCollapsed"
-              >
-                <IconSidebar />
-              </TButton>
-            </TTooltip>
             <TTooltip content="Notifications">
               <TButton
                 variant="ghost"
@@ -216,129 +205,124 @@ function selectView(value: string, closeSidebar: () => void) {
         </TStack>
       </template>
 
-      <template #sidebar="{ mobile, collapsed, closeSidebar }">
+      <template #sidebar-header="{ collapsed }">
         <TStack
-          grow
-          gap="var(--tree-space-4)"
+          direction="horizontal"
+          align="center"
+          :justify="collapsed ? 'center' : 'flex-start'"
+          gap="var(--tree-space-2)"
         >
-          <TStack
-            direction="horizontal"
-            align="center"
-            :justify="collapsed ? 'center' : 'flex-start'"
-            gap="var(--tree-space-2)"
+          <img
+            :src="logoUrl"
+            alt=""
+            width="28"
+            height="28"
           >
-            <img
-              :src="logoUrl"
-              alt=""
-              width="28"
-              height="28"
+          <TText
+            v-if="!collapsed"
+            weight="semibold"
+          >
+            Orchard
+          </TText>
+        </TStack>
+      </template>
+
+      <template #sidebar="{ closeSidebar }">
+        <TNavMenu
+          :model-value="view"
+          aria-label="Dashboard sections"
+          :items="navItems"
+          :size="config.density"
+          @update:model-value="(value) => selectView(value, closeSidebar)"
+        />
+      </template>
+
+      <template #sidebar-footer="{ mobile, collapsed, closeSidebar }">
+        <!-- Header actions that don't fit the mobile top bar live here. -->
+        <template v-if="mobile">
+          <TStack gap="var(--tree-space-1)">
+            <TButton
+              block
+              align="start"
+              variant="ghost"
+              :size="config.density"
+              @click="() => { onNotifications(); closeSidebar(); }"
             >
+              <template #icon>
+                <IconBell />
+              </template>
+              Notifications
+            </TButton>
+            <TButton
+              block
+              align="start"
+              variant="ghost"
+              :size="config.density"
+              @click="toggleTheme"
+            >
+              <template #icon>
+                <component :is="isDark ? IconSun : IconMoon" />
+              </template>
+              {{ isDark ? 'Light theme' : 'Dark theme' }}
+            </TButton>
+            <TButton
+              block
+              align="start"
+              variant="ghost"
+              :size="config.density"
+              @click="() => { settingsOpen = true; closeSidebar(); }"
+            >
+              <template #icon>
+                <IconGear />
+              </template>
+              Settings
+            </TButton>
+          </TStack>
+          <TDivider />
+        </template>
+
+        <TCard
+          v-if="!collapsed"
+          variant="outline"
+        >
+          <TStack gap="var(--tree-space-1)">
+            <TText weight="semibold">
+              Storage
+            </TText>
+            <TProgress
+              :value="64"
+              label="Storage used"
+              size="sm"
+            />
             <TText
-              v-if="!collapsed"
-              weight="semibold"
+              as="small"
+              tone="muted"
             >
-              Orchard
+              6.4 GB of 10 GB used
             </TText>
           </TStack>
+        </TCard>
 
-          <TNavMenu
-            :model-value="view"
-            aria-label="Dashboard sections"
-            :items="navItems"
-            :size="config.density"
-            @update:model-value="(value) => selectView(value, closeSidebar)"
+        <TStack
+          direction="horizontal"
+          align="center"
+          :justify="collapsed ? 'center' : 'flex-start'"
+          gap="var(--tree-space-2)"
+        >
+          <TAvatar
+            initials="JA"
+            status="online"
+            size="sm"
+            alt="Jef Almeida"
           />
-
-          <TSpacer />
-
-          <TStack gap="var(--tree-space-3)">
-            <!-- Header actions that don't fit the mobile top bar live here. -->
-            <template v-if="mobile">
-              <TStack gap="var(--tree-space-1)">
-                <TButton
-                  block
-                  align="start"
-                  variant="ghost"
-                  :size="config.density"
-                  @click="() => { onNotifications(); closeSidebar(); }"
-                >
-                  <template #icon>
-                    <IconBell />
-                  </template>
-                  Notifications
-                </TButton>
-                <TButton
-                  block
-                  align="start"
-                  variant="ghost"
-                  :size="config.density"
-                  @click="toggleTheme"
-                >
-                  <template #icon>
-                    <component :is="isDark ? IconSun : IconMoon" />
-                  </template>
-                  {{ isDark ? 'Light theme' : 'Dark theme' }}
-                </TButton>
-                <TButton
-                  block
-                  align="start"
-                  variant="ghost"
-                  :size="config.density"
-                  @click="() => { settingsOpen = true; closeSidebar(); }"
-                >
-                  <template #icon>
-                    <IconGear />
-                  </template>
-                  Settings
-                </TButton>
-              </TStack>
-              <TDivider />
-            </template>
-
-            <TCard
-              v-if="!collapsed"
-              variant="outline"
-            >
-              <TStack gap="var(--tree-space-1)">
-                <TText weight="semibold">
-                  Storage
-                </TText>
-                <TProgress
-                  :value="64"
-                  label="Storage used"
-                  size="sm"
-                />
-                <TText
-                  as="small"
-                  tone="muted"
-                >
-                  6.4 GB of 10 GB used
-                </TText>
-              </TStack>
-            </TCard>
-
-            <TStack
-              direction="horizontal"
-              align="center"
-              :justify="collapsed ? 'center' : 'flex-start'"
-              gap="var(--tree-space-2)"
-            >
-              <TAvatar
-                initials="JA"
-                status="online"
-                size="sm"
-                alt="Jef Almeida"
-              />
-              <TText
-                v-if="!collapsed"
-                as="small"
-                tone="muted"
-                truncate
-              >
-                Jef Almeida
-              </TText>
-            </TStack>
-          </TStack>
+          <TText
+            v-if="!collapsed"
+            as="small"
+            tone="muted"
+            truncate
+          >
+            Jef Almeida
+          </TText>
         </TStack>
       </template>
 

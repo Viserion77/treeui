@@ -42,6 +42,7 @@ import TTabPanel from './TTabPanel.vue';
 import TToastProvider from './TToastProvider.vue';
 import TAvatar from './TAvatar.vue';
 import TDivider from './TDivider.vue';
+import TAppShell from './TAppShell.vue';
 import TColorSwatch from './TColorSwatch.vue';
 import TStack from './TStack.vue';
 import TStackItem from './TStackItem.vue';
@@ -4081,6 +4082,50 @@ describe('TDonutChart', () => {
 
     await wrapper.setProps({ allowCustom: true });
     expect(wrapper.find('.t-color-swatch__custom').attributes('type')).toBe('color');
+  });
+
+  it('renders sidebar header/footer regions and the built-in collapse toggle', async () => {
+    const wrapper = mount(TAppShell, {
+      props: { mobile: false, collapsible: true },
+      slots: {
+        'sidebar-header': '<p class="brand">Orchard</p>',
+        sidebar: '<nav class="nav">nav</nav>',
+        'sidebar-footer': '<p class="user">Jef</p>',
+      },
+    });
+
+    expect(wrapper.find('.t-app-shell__sidebar-header .brand').exists()).toBe(true);
+    expect(wrapper.find('.t-app-shell__sidebar-body .nav').exists()).toBe(true);
+    expect(wrapper.find('.t-app-shell__sidebar-footer .user').exists()).toBe(true);
+
+    const toggle = wrapper.find('.t-app-shell__collapse-button');
+    expect(toggle.attributes('aria-label')).toBe('Collapse sidebar');
+    expect(toggle.attributes('aria-expanded')).toBe('true');
+
+    await toggle.trigger('click');
+    expect(wrapper.emitted('update:collapsed')?.[0]).toEqual([true]);
+  });
+
+  it('omits the collapse toggle when collapsing is off or opted out', () => {
+    const notCollapsible = mount(TAppShell, {
+      props: { mobile: false, collapsible: false },
+    });
+    expect(notCollapsible.find('.t-app-shell__collapse-button').exists()).toBe(false);
+
+    const optedOut = mount(TAppShell, {
+      props: { mobile: false, collapsible: true, showCollapseButton: false },
+    });
+    expect(optedOut.find('.t-app-shell__collapse-button').exists()).toBe(false);
+  });
+
+  it('keeps the sidebar footer out of the DOM when nothing needs it', () => {
+    const wrapper = mount(TAppShell, {
+      props: { mobile: false, collapsible: false },
+      slots: { sidebar: '<nav>nav</nav>' },
+    });
+
+    expect(wrapper.find('.t-app-shell__sidebar-footer').exists()).toBe(false);
+    expect(wrapper.find('.t-app-shell__sidebar-header').exists()).toBe(false);
   });
 
   it('caps form control width from the shared field scale', () => {

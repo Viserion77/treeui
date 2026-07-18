@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-18T15:16:48.312Z",
+  "generatedAt": "2026-07-18T17:00:45.556Z",
   "packageName": "@treeui/vue",
   "packageVersion": "0.14.0",
   "decisionGuides": [
@@ -946,6 +946,22 @@
           "default": "true"
         },
         {
+          "name": "showCollapseButton",
+          "type": "boolean",
+          "default": "true",
+          "note": "Renders the built-in collapse toggle in the sidebar footer. Desktop only, and only when `collapsible` is set — no need to wire your own."
+        },
+        {
+          "name": "collapseLabel",
+          "type": "string",
+          "default": "Collapse sidebar"
+        },
+        {
+          "name": "expandLabel",
+          "type": "string",
+          "default": "Expand sidebar"
+        },
+        {
           "name": "menuLabel",
           "type": "string",
           "default": "Open menu"
@@ -980,13 +996,22 @@
           "name": "header"
         },
         {
+          "name": "sidebar-header"
+        },
+        {
           "name": "sidebar"
+        },
+        {
+          "name": "sidebar-footer"
         },
         {
           "name": "default"
         },
         {
           "name": "menu-icon"
+        },
+        {
+          "name": "collapse-icon"
         }
       ],
       "a11y": [
@@ -1014,7 +1039,9 @@
         "left_and_right_variants: true",
         "locks_body_scroll_while_drawer_open: true",
         "overlay_click_closes_when_enabled: true",
-        "exposes_slot_props_with_mobile_collapsed_and_toggles: true"
+        "exposes_slot_props_with_mobile_collapsed_and_toggles: true",
+        "sidebar_footer_pinned_to_bottom: true",
+        "sidebar_header_and_footer_inset_to_align_with_nav_icons: true"
       ],
       "selection": {
         "keywords": [

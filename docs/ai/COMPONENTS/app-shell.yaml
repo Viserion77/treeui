@@ -49,6 +49,16 @@ props:
   showMenuButton:
     type: boolean
     default: true
+  showCollapseButton:
+    type: boolean
+    default: true
+    note: "Renders the built-in collapse toggle in the sidebar footer. Desktop only, and only when `collapsible` is set — no need to wire your own."
+  collapseLabel:
+    type: string
+    default: Collapse sidebar
+  expandLabel:
+    type: string
+    default: Expand sidebar
   menuLabel:
     type: string
     default: Open menu
@@ -67,9 +77,12 @@ events:
 
 slots:
   - header
+  - sidebar-header   # pinned above the sidebar body
   - sidebar
+  - sidebar-footer   # pinned to the bottom of the sidebar
   - default
   - menu-icon
+  - collapse-icon
 
 a11y:
   role: dialog
@@ -97,6 +110,8 @@ behavior:
   locks_body_scroll_while_drawer_open: true
   overlay_click_closes_when_enabled: true
   exposes_slot_props_with_mobile_collapsed_and_toggles: true
+  sidebar_footer_pinned_to_bottom: true
+  sidebar_header_and_footer_inset_to_align_with_nav_icons: true
 
 usage:
   vue_pattern: "Supports v-model:collapsed (desktop rail) and v-model:sidebarOpen (mobile drawer). Header and sidebar slots receive { mobile, collapsed, sidebarOpen, toggleSidebar, closeSidebar, toggleCollapsed }. Place a TNavMenu in the sidebar slot; it inherits collapsed state automatically. Set collapsible to enable the desktop rail. The shell fills 100dvh and 100% width, so mount it at the app root and do not wrap its content in a max-width TContainer unless a specific region needs constrained reading width."

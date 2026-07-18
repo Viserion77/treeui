@@ -1672,6 +1672,12 @@
   gap: var(--tree-space-3);
   color: var(--tree-color-text-primary);
   overflow: auto;
+  /* Focus and selection rings are painted outside their element's border box.
+     A scrollport with no padding clips them, so edge-flush controls (a selected
+     colour swatch, a focused field) lose their ring. Pad the scrollport and pull
+     it back by the same amount so content alignment is unchanged. */
+  padding: var(--tree-space-1);
+  margin: calc(var(--tree-space-1) * -1);
 }
 
 .t-drawer__footer {
@@ -6325,6 +6331,7 @@ a.t-nav-menu__item.is-disabled {
   grid-area: sidebar;
   display: flex;
   flex-direction: column;
+  gap: var(--tree-space-4);
   min-block-size: 0;
   overflow-x: hidden;
   overflow-y: auto;
@@ -6333,6 +6340,64 @@ a.t-nav-menu__item.is-disabled {
   background: transparent;
   transition: padding var(--tree-motion-duration-moderate)
     var(--tree-motion-easing-standard);
+}
+
+/* The sidebar body takes the slack so the footer pins to the bottom. */
+.t-app-shell__sidebar-body {
+  flex: 1 1 auto;
+  min-block-size: 0;
+}
+
+/* Nav items carry their own inline padding to draw the selected pill, which
+   pushes their icons inward. Match it here so a brand mark in the header and a
+   user row in the footer line up with those icons instead of the rail edge. */
+.t-app-shell__sidebar-header,
+.t-app-shell__sidebar-footer {
+  --tree-app-shell-rail-inset: var(--tree-space-3);
+
+  padding-inline: var(--tree-app-shell-rail-inset);
+}
+
+.t-app-shell__sidebar-footer {
+  display: grid;
+  gap: var(--tree-space-3);
+  min-inline-size: 0;
+}
+
+.t-app-shell__collapse-button {
+  display: inline-flex;
+  align-items: center;
+  /* Icon flush to the footer inset so it lands on the same axis as nav icons. */
+  justify-content: flex-start;
+  justify-self: start;
+  inline-size: var(--tree-size-control-sm);
+  block-size: var(--tree-size-control-sm);
+  padding: 0;
+  border: 0;
+  border-radius: var(--tree-radius-md);
+  background: transparent;
+  color: var(--tree-color-text-muted);
+  cursor: pointer;
+  transition: background var(--tree-motion-duration-fast) var(--tree-motion-easing-standard);
+}
+
+.t-app-shell__collapse-button:hover {
+  background: var(--tree-color-bg-subtle);
+  color: var(--tree-color-text-primary);
+}
+
+.t-app-shell__collapse-button:focus-visible {
+  outline: 2px solid var(--tree-color-focus-ring);
+  outline-offset: 2px;
+}
+
+.t-app-shell.is-collapsed .t-app-shell__sidebar-footer {
+  justify-items: center;
+}
+
+.t-app-shell.is-collapsed .t-app-shell__collapse-button {
+  justify-content: center;
+  justify-self: center;
 }
 
 .t-app-shell.is-collapsed .t-app-shell__sidebar {

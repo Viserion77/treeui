@@ -1,0 +1,49 @@
+name: TPageHeader
+source_file: packages/vue/src/components/TPageHeader.vue
+package: "@treeui/vue"
+kind: layout
+status: available
+purpose: "Canonical page title block: heading, optional subtitle, and a right-aligned actions area, so title hierarchy and alignment stay consistent across screens."
+
+props:
+  title:
+    type: string
+    default: ""
+    note: "Rendered inside the heading element. Overridden by the `title` slot."
+  subtitle:
+    type: string
+    default: ""
+  level:
+    type: "1 | 2 | 3 | 4 | 5 | 6"
+    default: 1
+    note: "Heading level for the title element. Default `1` treats it as the page title; lower it when the page already has an h1."
+  as:
+    type: string
+    default: header
+
+slots:
+  - breadcrumb
+  - title
+  - subtitle
+  - actions
+  - default
+
+forwards_attrs_to: root_element
+
+behavior:
+  title_and_subtitle_optional: true
+  heading_level_controlled_by_level: true
+  actions_area_right_aligned_and_wraps: true
+  default_slot_renders_below_heading: true
+
+a11y:
+  - "Title renders as a real heading element (`h1`–`h6`) chosen by `level`; keep one h1 per page."
+  - "Actions area holds standard focusable controls (e.g. TButton) — no custom roles added."
+
+example: |
+  <TPageHeader title="Tasks" subtitle="Everything your team is working on this cycle.">
+    <template #actions>
+      <TButton variant="outline" size="sm">Export</TButton>
+      <TButton variant="brand" size="sm">New task</TButton>
+    </template>
+  </TPageHeader>

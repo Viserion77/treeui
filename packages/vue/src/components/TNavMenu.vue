@@ -17,6 +17,13 @@ export interface TNavMenuItem {
   to?: string | Record<string, unknown>;
   badge?: string | number;
   disabled?: boolean;
+  /**
+   * When the item renders as a router link, controls whether an inclusive
+   * (prefix) route match also marks it active. Defaults to the menu-level
+   * `exact` prop. Set to `false` for section roots that should stay active on
+   * nested routes.
+   */
+  exact?: boolean;
 }
 
 const props = withDefaults(
@@ -27,6 +34,7 @@ const props = withDefaults(
     size?: TSize;
     collapsed?: boolean;
     disabled?: boolean;
+    exact?: boolean;
   }>(),
   {
     modelValue: undefined,
@@ -35,6 +43,7 @@ const props = withDefaults(
     size: 'md',
     collapsed: undefined,
     disabled: false,
+    exact: true,
   },
 );
 
@@ -71,6 +80,37 @@ const itemTag = (item: TNavMenuItem) => {
     return routerLinkComponent.value;
   }
   return 'button';
+};
+
+const isRouterLinkItem = (item: TNavMenuItem) =>
+  Boolean(item.to) && routerLinkComponent.value !== null;
+
+// Keep the active highlight deterministic when items render as router links.
+// Vue Router's default `router-link-active` uses inclusive (prefix) matching,
+// so several links can appear active at once. We map the router's active
+// classes onto TreeUI's own `is-selected`:
+// - Controlled menus (explicit `modelValue`) own selection, so the router adds
+//   no class of its own — only the bound `is-selected` shows.
+// - Uncontrolled menus let the current route drive selection, using exact
+//   matching by default (opt out per item, or menu-wide, via `exact`).
+const routerActiveClass = (item: TNavMenuItem) => {
+  if (!isRouterLinkItem(item)) {
+    return undefined;
+  }
+
+  if (props.modelValue !== undefined) {
+    return '';
+  }
+
+  return (item.exact ?? props.exact) ? '' : 'is-selected';
+};
+
+const routerExactActiveClass = (item: TNavMenuItem) => {
+  if (!isRouterLinkItem(item)) {
+    return undefined;
+  }
+
+  return props.modelValue !== undefined ? '' : 'is-selected';
 };
 
 const getInitialFocusedIndex = () => {
@@ -237,6 +277,8 @@ watch(
             'is-selected': isSelected(item.value),
             'is-disabled': disabled || item.disabled,
           }"
+          :active-class="routerActiveClass(item)"
+          :exact-active-class="routerExactActiveClass(item)"
           :disabled="(!item.to && (disabled || item.disabled)) || undefined"
           :aria-disabled="(item.to && (disabled || item.disabled)) || undefined"
           :aria-current="isSelected(item.value) ? 'page' : undefined"

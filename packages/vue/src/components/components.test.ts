@@ -21,6 +21,8 @@ import TFormField from './TFormField.vue';
 import TSwitch from './TSwitch.vue';
 import TSkeleton from './TSkeleton.vue';
 import TProgress from './TProgress.vue';
+import TPage from './TPage.vue';
+import TPageHeader from './TPageHeader.vue';
 import TPagination from './TPagination.vue';
 import TAccordion from './TAccordion.vue';
 import TAccordionItem from './TAccordionItem.vue';
@@ -71,6 +73,20 @@ describe('@treeui/vue', () => {
     await wrapper.trigger('click');
 
     expect(wrapper.emitted('click')).toBeUndefined();
+  });
+
+  it('renders the brand button variant', () => {
+    const wrapper = mount(TButton, {
+      props: {
+        variant: 'brand',
+      },
+      slots: {
+        default: 'Upgrade',
+      },
+    });
+
+    expect(wrapper.classes()).toContain('t-button--brand');
+    expect(wrapper.classes()).not.toContain('t-button--solid');
   });
 
   it('renders polymorphic button with correct a11y when disabled', async () => {
@@ -697,6 +713,95 @@ describe('@treeui/vue', () => {
 
     expect(wrapper.find('.t-nav-menu__icon').exists()).toBe(true);
     expect(wrapper.find('.t-nav-menu__marker').exists()).toBe(false);
+  });
+
+  it('maps nav menu router-link active classes so prefix matches cannot double-activate', () => {
+    const RouterLinkStub = {
+      name: 'RouterLink',
+      props: ['to', 'activeClass', 'exactActiveClass'],
+      template: '<a class="t-router-link"><slot /></a>',
+    };
+
+    const uncontrolled = mount(TNavMenu, {
+      props: {
+        items: [
+          { label: 'Tasks', value: 'tasks', to: '/tasks' },
+          { label: 'Groups', value: 'groups', to: '/tasks/groups', exact: false },
+        ],
+      },
+      global: { components: { RouterLink: RouterLinkStub } },
+      attrs: { 'aria-label': 'Nav' },
+    });
+
+    const links = uncontrolled.findAllComponents(RouterLinkStub);
+    expect(links).toHaveLength(2);
+    // Exact by default: only an exact route match adds the selected class.
+    expect(links[0].props('activeClass')).toBe('');
+    expect(links[0].props('exactActiveClass')).toBe('is-selected');
+    // Opt-in prefix item: inclusive matches also highlight.
+    expect(links[1].props('activeClass')).toBe('is-selected');
+    expect(links[1].props('exactActiveClass')).toBe('is-selected');
+
+    const controlled = mount(TNavMenu, {
+      props: {
+        items: [{ label: 'Tasks', value: 'tasks', to: '/tasks' }],
+        modelValue: 'tasks',
+      },
+      global: { components: { RouterLink: RouterLinkStub } },
+      attrs: { 'aria-label': 'Nav' },
+    });
+
+    const controlledLink = controlled.findComponent(RouterLinkStub);
+    // Controlled menus own selection; the router adds no class of its own.
+    expect(controlledLink.props('activeClass')).toBe('');
+    expect(controlledLink.props('exactActiveClass')).toBe('');
+    expect(controlledLink.classes()).toContain('is-selected');
+  });
+
+  it('renders page header title, subtitle, actions and heading level', () => {
+    const wrapper = mount(TPageHeader, {
+      props: { title: 'Tasks', subtitle: 'Your work this cycle', level: 2 },
+      slots: { actions: '<button class="hdr-action">New</button>' },
+    });
+
+    expect(wrapper.element.tagName).toBe('HEADER');
+    const title = wrapper.find('.t-page-header__title');
+    expect(title.exists()).toBe(true);
+    expect(title.element.tagName).toBe('H2');
+    expect(title.text()).toBe('Tasks');
+    expect(wrapper.find('.t-page-header__subtitle').text()).toBe('Your work this cycle');
+    expect(wrapper.find('.t-page-header__actions .hdr-action').exists()).toBe(true);
+  });
+
+  it('omits page header heading block when title and subtitle are empty', () => {
+    const wrapper = mount(TPageHeader);
+
+    expect(wrapper.find('.t-page-header__title').exists()).toBe(false);
+    expect(wrapper.find('.t-page-header__subtitle').exists()).toBe(false);
+    expect(wrapper.find('.t-page-header__heading').exists()).toBe(false);
+  });
+
+  it('renders page shell width, gap and padding through a container column', () => {
+    const wrapper = mount(TPage, {
+      props: { width: 'md', gap: 'sm' },
+      slots: { default: '<p class="page-child">Hi</p>' },
+    });
+
+    expect(wrapper.classes()).toContain('t-page');
+    expect(wrapper.classes()).toContain('is-padded');
+
+    const inner = wrapper.find('.t-page__inner');
+    expect(inner.exists()).toBe(true);
+    expect(inner.classes()).toContain('t-page__inner--gap-sm');
+    expect(inner.classes()).toContain('t-container--md');
+    expect(inner.classes()).toContain('is-centered');
+    expect(wrapper.find('.page-child').exists()).toBe(true);
+  });
+
+  it('drops page padding when padded is false', () => {
+    const wrapper = mount(TPage, { props: { padded: false } });
+
+    expect(wrapper.classes()).not.toContain('is-padded');
   });
 
   it('renders badge variants', () => {

@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-16T01:21:59.943Z",
+  "generatedAt": "2026-07-18T01:13:45.997Z",
   "packageName": "@treeui/vue",
   "packageVersion": "0.13.0",
   "decisionGuides": [
@@ -1286,15 +1286,17 @@
         },
         {
           "name": "variant",
-          "type": "TVariant",
+          "type": "TVariant | brand",
           "default": "solid",
           "values": [
             "solid",
             "outline",
             "ghost",
             "soft",
-            "danger"
-          ]
+            "danger",
+            "brand"
+          ],
+          "note": "`brand` is a button-only, high-emphasis gradient variant driven by the `--tree-gradient-brand` token. Use it for the single primary CTA of a screen."
         },
         {
           "name": "size",
@@ -2139,9 +2141,14 @@
           "The page shell should stay full-width while content stays readable."
         ],
         "avoidWhen": [
-          "You need internal spacing between children."
+          "You need internal spacing between children.",
+          "You are laying out a whole screen — reach for TPage, which adds page padding and vertical rhythm."
         ],
         "alternatives": [
+          {
+            "component": "TPage",
+            "when": "You want a full page region with block padding and vertical spacing between sections, not just a width constraint."
+          },
           {
             "component": "TStack",
             "when": "The main need is vertical or horizontal spacing."
@@ -4422,7 +4429,7 @@
           "name": "items",
           "type": "TNavMenuItem[]",
           "default": "[]",
-          "note": "Array of `{ label, value, shortLabel?, description?, icon?, to?, badge?, disabled? }`."
+          "note": "Array of `{ label, value, shortLabel?, description?, icon?, to?, badge?, disabled?, exact? }`."
         },
         {
           "name": "size",
@@ -4443,6 +4450,12 @@
           "name": "disabled",
           "type": "boolean",
           "default": "false"
+        },
+        {
+          "name": "exact",
+          "type": "boolean",
+          "default": "true",
+          "note": "Default active-match strategy for router-link items. `true` keeps only the exactly-active route highlighted (prevents prefix matches from lighting up several items at once). Override per item via `TNavMenuItem.exact`."
         }
       ],
       "events": [
@@ -4607,6 +4620,193 @@
           {
             "component": "TInput",
             "when": "The value is not numeric."
+          }
+        ]
+      },
+      "setup": {
+        "required": [],
+        "notes": []
+      },
+      "recipes": []
+    },
+    {
+      "name": "TPage",
+      "aliases": [],
+      "package": "@treeui/vue",
+      "kind": "layout",
+      "category": "Layout",
+      "status": "available",
+      "purpose": "Semantic page region under the app shell: block padding, a centered max-width content column, and standardized vertical rhythm between sections.",
+      "sourceFile": "packages/vue/src/components/TPage.vue",
+      "storyFile": "apps/docs/src/stories/Page.stories.ts",
+      "storyTitle": "Components/Layout/Page",
+      "manifestFile": "docs/ai/COMPONENTS/page.yaml",
+      "props": [
+        {
+          "name": "as",
+          "type": "string",
+          "default": "div"
+        },
+        {
+          "name": "width",
+          "type": "TContainerSize",
+          "default": "lg",
+          "values": [
+            "sm",
+            "md",
+            "lg",
+            "xl",
+            "full"
+          ],
+          "note": "Max-width of the centered content column. Mirrors TContainer sizes."
+        },
+        {
+          "name": "padded",
+          "type": "boolean",
+          "default": "true",
+          "note": "Adds vertical (block) padding on the region and horizontal padding on the inner column."
+        },
+        {
+          "name": "gap",
+          "type": "TPageGap",
+          "default": "lg",
+          "values": [
+            "sm",
+            "md",
+            "lg"
+          ],
+          "note": "Vertical spacing between direct children (e.g. a TPageHeader and content sections)."
+        }
+      ],
+      "events": [],
+      "slots": [
+        {
+          "name": "default"
+        }
+      ],
+      "a11y": [
+        "Structural wrapper only; landmark semantics come from `as` and the surrounding app shell (avoid nesting a second `main`)."
+      ],
+      "behavior": [
+        "centers_content_column_by_width: true",
+        "applies_block_padding_when_padded: true",
+        "spaces_children_vertically_by_gap: true"
+      ],
+      "selection": {
+        "keywords": [
+          "page",
+          "page shell",
+          "content column",
+          "screen layout"
+        ],
+        "useWhen": [
+          "You want a standard screen region under the app shell with consistent max width, page padding, and vertical rhythm between sections."
+        ],
+        "avoidWhen": [
+          "You only need a bare width constraint with no page padding or child spacing."
+        ],
+        "alternatives": [
+          {
+            "component": "TContainer",
+            "when": "You just need a centered max-width wrapper without page-level block padding or child spacing."
+          },
+          {
+            "component": "TStack",
+            "when": "You only need to space a group of children, not lay out a whole page."
+          }
+        ]
+      },
+      "setup": {
+        "required": [],
+        "notes": []
+      },
+      "recipes": []
+    },
+    {
+      "name": "TPageHeader",
+      "aliases": [],
+      "package": "@treeui/vue",
+      "kind": "layout",
+      "category": "Layout",
+      "status": "available",
+      "purpose": "Canonical page title block: heading, optional subtitle, and a right-aligned actions area, so title hierarchy and alignment stay consistent across screens.",
+      "sourceFile": "packages/vue/src/components/TPageHeader.vue",
+      "storyFile": "apps/docs/src/stories/PageHeader.stories.ts",
+      "storyTitle": "Components/Layout/PageHeader",
+      "manifestFile": "docs/ai/COMPONENTS/page-header.yaml",
+      "props": [
+        {
+          "name": "title",
+          "type": "string",
+          "default": "",
+          "note": "Rendered inside the heading element. Overridden by the `title` slot."
+        },
+        {
+          "name": "subtitle",
+          "type": "string",
+          "default": ""
+        },
+        {
+          "name": "level",
+          "type": "1 | 2 | 3 | 4 | 5 | 6",
+          "default": "1",
+          "note": "Heading level for the title element. Default `1` treats it as the page title; lower it when the page already has an h1."
+        },
+        {
+          "name": "as",
+          "type": "string",
+          "default": "header"
+        }
+      ],
+      "events": [],
+      "slots": [
+        {
+          "name": "breadcrumb"
+        },
+        {
+          "name": "title"
+        },
+        {
+          "name": "subtitle"
+        },
+        {
+          "name": "actions"
+        },
+        {
+          "name": "default"
+        }
+      ],
+      "a11y": [
+        "Title renders as a real heading element (`h1`–`h6`) chosen by `level`; keep one h1 per page.",
+        "Actions area holds standard focusable controls (e.g. TButton) — no custom roles added."
+      ],
+      "behavior": [
+        "title_and_subtitle_optional: true",
+        "heading_level_controlled_by_level: true",
+        "actions_area_right_aligned_and_wraps: true",
+        "default_slot_renders_below_heading: true"
+      ],
+      "selection": {
+        "keywords": [
+          "page header",
+          "title bar",
+          "page title",
+          "heading and actions"
+        ],
+        "useWhen": [
+          "A screen needs a title (and optional subtitle) with a right-aligned actions area in a consistent hierarchy."
+        ],
+        "avoidWhen": [
+          "You need cross-page hierarchy or navigation trails rather than a single page title."
+        ],
+        "alternatives": [
+          {
+            "component": "TBreadcrumb",
+            "when": "You are showing where the page sits in a hierarchy, not its title."
+          },
+          {
+            "component": "TNavbar",
+            "when": "You need a top application bar, not a per-page title block."
           }
         ]
       },

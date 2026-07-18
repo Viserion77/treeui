@@ -69,6 +69,9 @@ shared_sizes:
 shared_variants:
   action_values: [solid, outline, ghost, soft, danger]
   card_values: [outline, soft, solid, inset]
+  button_extra_values:
+    values: [brand]
+    note: "TButton adds a high-emphasis `brand` gradient variant (via `--tree-gradient-brand`) on top of the shared action values. It is button-only, not a shared action variant."
 
 shared_props:
   variant:

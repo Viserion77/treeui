@@ -15,7 +15,7 @@ props:
   items:
     type: "TNavMenuItem[]"
     default: "[]"
-    note: "Array of `{ label, value, shortLabel?, description?, icon?, to?, badge?, disabled? }`."
+    note: "Array of `{ label, value, shortLabel?, description?, icon?, to?, badge?, disabled?, exact? }`."
   size:
     type: TSize
     default: md
@@ -26,6 +26,10 @@ props:
   disabled:
     type: boolean
     default: false
+  exact:
+    type: boolean
+    default: true
+    note: "Default active-match strategy for router-link items. `true` keeps only the exactly-active route highlighted (prevents prefix matches from lighting up several items at once). Override per item via `TNavMenuItem.exact`."
 
 item_interface:
   name: TNavMenuItem
@@ -38,6 +42,7 @@ item_interface:
     to: { type: "string | Record<string, unknown>", required: false, description: "Route target. When provided and vue-router is available, renders RouterLink instead of button." }
     badge: { type: "string | number", required: false }
     disabled: { type: boolean, required: false }
+    exact: { type: boolean, required: false, description: "Overrides the menu-level `exact` for this item. Set `false` for a section root that should stay active on nested routes." }
 
 events:
   - update:modelValue
@@ -65,6 +70,12 @@ routing:
   description: "When an item has a `to` prop and vue-router is installed, TNavMenu renders a RouterLink. Otherwise it renders a button."
   peer_dependency: "vue-router (optional)"
   fallback: "button element"
+  active_state: >-
+    TNavMenu owns a single active highlight (`is-selected` + `aria-current="page"`). To keep this
+    deterministic it maps Vue Router's active classes onto its own: controlled menus (explicit
+    `modelValue`) neutralize the router's classes so only the bound selection shows, while uncontrolled
+    menus let the current route drive selection using exact matching by default (see `exact`). This
+    prevents Vue Router's inclusive `router-link-active` from marking several items active at once.
 
 example: |
   <TNavMenu

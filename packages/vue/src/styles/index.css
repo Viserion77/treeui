@@ -33,6 +33,7 @@
 .t-timeline,
 .t-toast,
 .t-pagination,
+.t-page-header,
 .t-tooltip__content {
   font-family: var(--tree-font-family-sans);
 }
@@ -129,6 +130,16 @@
 .t-button--danger {
   --tree-button-bg: var(--tree-color-status-error);
   --tree-button-text: var(--tree-color-brand-contrast);
+}
+
+.t-button--brand {
+  --tree-button-bg: var(--tree-gradient-brand);
+  --tree-button-text: var(--tree-color-brand-contrast);
+  --tree-button-border: transparent;
+}
+
+.t-button--brand:hover:not(.is-disabled) {
+  filter: saturate(1.08) brightness(1.04);
 }
 
 .t-button__icon,
@@ -5531,6 +5542,85 @@
 
 .t-container--full {
   max-width: none;
+}
+
+/* ── Page ─────────────────────────────────────────────── */
+
+.t-page {
+  display: block;
+  width: 100%;
+}
+
+.t-page.is-padded {
+  padding-block: clamp(var(--tree-space-5), 4vw, var(--tree-space-8));
+}
+
+.t-page__inner {
+  display: flex;
+  flex-direction: column;
+}
+
+.t-page__inner--gap-sm {
+  gap: var(--tree-space-4);
+}
+
+.t-page__inner--gap-md {
+  gap: var(--tree-space-5);
+}
+
+.t-page__inner--gap-lg {
+  gap: var(--tree-space-6);
+}
+
+/* ── Page header ──────────────────────────────────────── */
+
+.t-page-header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--tree-space-3);
+}
+
+.t-page-header__breadcrumb,
+.t-page-header__content,
+.t-page-header__heading {
+  min-width: 0;
+}
+
+.t-page-header__bar {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--tree-space-4);
+  flex-wrap: wrap;
+}
+
+.t-page-header__heading {
+  display: flex;
+  flex-direction: column;
+  gap: var(--tree-space-1);
+}
+
+.t-page-header__title {
+  margin: 0;
+  color: var(--tree-color-text-primary);
+  font-size: var(--tree-font-size-3xl);
+  font-weight: var(--tree-font-weight-semibold);
+  line-height: var(--tree-font-lineHeight-tight);
+  letter-spacing: -0.01em;
+}
+
+.t-page-header__subtitle {
+  margin: 0;
+  color: var(--tree-color-text-muted);
+  font-size: var(--tree-font-size-md);
+  line-height: var(--tree-font-lineHeight-base);
+}
+
+.t-page-header__actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--tree-space-2);
 }
 
 /* ── Grid ─────────────────────────────────────────────── */

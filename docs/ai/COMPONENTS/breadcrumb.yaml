@@ -9,16 +9,28 @@ props:
   separator:
     type: string
     default: "/"
-    description: "Character or string used to separate breadcrumb items."
+    description: "Character or string shown between items. Applied as the inline CSS custom property --tree-breadcrumb-separator on the <ol>, wrapped in single quotes, and drawn by the .t-breadcrumb__item:not(:last-child)::after pseudo-element — it never enters the DOM as text. A value containing a single quote or a backslash produces an invalid CSS value and the separator stops rendering."
 
 events: []
 
 slots:
-  - default
+  default:
+    description: "Breadcrumb trail content, rendered inside the <ol class='t-breadcrumb__list'>. Expects TBreadcrumbItem children so each entry becomes an <li>. No scoped props."
+
+forwards_attrs_to: nav_element
+
+css:
+  block: t-breadcrumb
+  elements:
+    - t-breadcrumb__list
+    - t-breadcrumb__item
+    - t-breadcrumb__link
+    - t-breadcrumb__current
 
 a11y:
   element: nav
   aria_label: "Breadcrumb"
+  aria_label_hardcoded_but_overridable_via_fallthrough_attrs: true
   current_page_aria_current: "page"
   uses_ol_for_ordered_list: true
   interactive_by_default: false
@@ -31,32 +43,43 @@ sub_components:
       to:
         type: "string | Record<string, unknown>"
         required: false
-        description: "Route target. When provided and vue-router is available, renders RouterLink."
+        description: "Route target. Renders RouterLink only when RouterLink is registered globally (app.use(router)) — it is resolved from appContext.components, so a locally imported RouterLink is not found. Without RouterLink a string `to` degrades to a native anchor with href set to that string, while an object `to` resolves to no link target at all and the item falls back to the current-page span."
       href:
         type: string
         required: false
-        description: "URL the breadcrumb item links to. Used as the anchor fallback when `to` is not provided."
+        description: "URL used by the native anchor branch. Takes precedence over a string `to` when both are set, but loses to `to` when a RouterLink is resolvable."
       current:
         type: boolean
         default: false
-        description: "Marks this item as the current page. Automatically set if it's the last item without a renderable link target."
+        description: "Forces the current-page rendering. The item also becomes current automatically whenever it resolves no renderable link target. There is no last-child or positional logic — any item without an href, a string `to`, or a resolvable RouterLink renders as the current page."
     slots:
       default:
-        note: "Label text for the breadcrumb item."
+        description: "Label text for the breadcrumb item. Rendered into whichever branch is active, the link or the aria-current span. No scoped props."
+    forwards_attrs_to: li_element
     a11y:
-      renders_anchor_when_link_target_present: true
+      renders_anchor_or_routerlink_when_link_target_present: true
       renders_span_with_aria_current_page_when_current: true
+      aria_current_not_restricted_to_last_item: true
+
+behavior:
+  link_target_precedence: "to + resolvable RouterLink, then href, then string to"
+  string_to_without_router_renders_native_anchor: true
+  object_to_without_router_renders_current_span: true
+  current_state_is_not_positional: true
+  separator_rendered_by_css_pseudo_element: true
+  separator_ignores_pointer_events: true
 
 routing:
-  description: "TBreadcrumbItem accepts `to` for vue-router projects and falls back to native anchors when only `href` or a string `to` is available."
-  peer_dependency: "vue-router (optional)"
-  fallback: "native anchor element"
+  description: "TBreadcrumbItem renders RouterLink when `to` is set and RouterLink is globally registered, falls back to a native anchor for `href` or a string `to`, and renders the current-page span when no link target can be resolved."
+  peer_dependency: "vue-router (optional, must be installed globally with app.use(router) for the RouterLink branch to activate)"
+  fallback: "native anchor element for href or a string `to`; aria-current span for an object `to` with no RouterLink"
 
 notes:
-  - "Renders a <nav> with aria-label='Breadcrumb' wrapping an <ol>."
-  - "Each item is an <li>. The last item uses aria-current='page'."
+  - "Renders a <nav aria-label='Breadcrumb'> wrapping an <ol class='t-breadcrumb__list'>."
+  - "Each item is an <li>. An item renders <span aria-current='page'> whenever `current` is set or no link target resolves; the component applies no last-child logic, so several items can carry aria-current='page' at once if several lack a link target."
   - "Items are passed as default slot children using TBreadcrumbItem."
-  - "Separator is injected via CSS pseudo-elements or provided via prop."
+  - "The separator is always drawn by CSS: the `separator` prop feeds the --tree-breadcrumb-separator custom property consumed by .t-breadcrumb__item:not(:last-child)::after."
+  - "Neither TBreadcrumb nor TBreadcrumbItem emits any event."
 
 example: |
   <TBreadcrumb>

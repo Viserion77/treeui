@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-19T14:12:00.767Z",
+  "generatedAt": "2026-07-19T15:33:49.757Z",
   "packageName": "@treeui/vue",
   "packageVersion": "0.16.0",
   "decisionGuides": [
@@ -819,15 +819,83 @@
       "storyFile": "apps/docs/src/stories/Accordion.stories.ts",
       "storyTitle": "Components/Data Display/Accordion",
       "manifestFile": "docs/ai/COMPONENTS/accordion.yaml",
-      "props": [],
-      "events": [],
-      "slots": [],
-      "a11y": [
-        "roles: {\"trigger\":\"heading > button\",\"panel\":\"region\"}",
-        "attributes: {\"trigger\":[\"aria-expanded (reflects open state)\",\"aria-controls (references panel id)\"],\"panel\":[\"role=\\\"region\\\"\",\"aria-labelledby (references trigger id)\"]}",
-        "keyboard: [{\"key\":\"Enter / Space\",\"action\":\"Toggle the focused item\"},{\"key\":\"ArrowDown\",\"action\":\"Move focus to the next item trigger\"},{\"key\":\"ArrowUp\",\"action\":\"Move focus to the previous item trigger\"},{\"key\":\"Home\",\"action\":\"Move focus to the first item trigger\"},{\"key\":\"End\",\"action\":\"Move focus to the last item trigger\"}]"
+      "props": [
+        {
+          "name": "type",
+          "type": "'single' | 'multiple'",
+          "default": "'single'",
+          "values": [
+            "single",
+            "multiple"
+          ],
+          "description": "single – at most one item open at a time (opening one closes the rest). multiple – any number of items may be open simultaneously.\n"
+        },
+        {
+          "name": "modelValue",
+          "type": "string | string[] | undefined",
+          "default": "undefined",
+          "description": "Controlled open state. For type=\"single\" pass a string (the item value). For type=\"multiple\" pass an array of strings. The accordion treats itself as controlled only while modelValue !== undefined; passing undefined leaves it uncontrolled and it falls back to its internal state.\n"
+        },
+        {
+          "name": "defaultValue",
+          "type": "string | string[] | undefined",
+          "default": "undefined",
+          "description": "Initial open state for uncontrolled usage. Read once when the accordion is created — changing it after mount has no effect. Ignored while modelValue is set. Do not combine it with modelValue: see notes.\n"
+        },
+        {
+          "name": "disabled",
+          "type": "boolean",
+          "default": "false",
+          "description": "Disables all items. OR-ed with each item's own disabled prop, so an item is disabled when either is true. Provided to items as a computed ref, so flipping it after mount updates every item.\n"
+        },
+        {
+          "name": "collapsible",
+          "type": "boolean",
+          "default": "false",
+          "description": "Only applies when type=\"single\". When true, the open item can be collapsed by clicking its trigger again, which emits undefined. When false, clicking the already-open trigger is a no-op and emits nothing. In type=\"multiple\" any item can always be collapsed and this prop is ignored.\n"
+        }
       ],
-      "behavior": [],
+      "events": [
+        {
+          "name": "update:modelValue",
+          "description": "Emitted when the open state changes (v-model support). type=\"single\" emits the open item value as a string, or undefined when it is collapsed. type=\"multiple\" always emits a string[] of the open values.\n",
+          "payload": "string | string[] | undefined"
+        }
+      ],
+      "slots": [
+        {
+          "name": "default",
+          "description": "Accepts TAccordionItem children."
+        }
+      ],
+      "a11y": [
+        "container_is_a_plain_div_with_no_aria_role: true",
+        "trigger_is_a_heading_wrapped_native_button: h3 > button",
+        "aria_expanded_on_trigger_reflects_open_state: true",
+        "aria_controls_on_trigger_references_panel_id: true",
+        "panel_uses_role_region: true",
+        "aria_labelledby_on_panel_references_trigger_id: true",
+        "disabled_items_use_the_native_disabled_attribute: true",
+        "chevron_icon_is_aria_hidden: true",
+        "trigger_hit_area_is_at_least_44px: via the .t-accordion__trigger::after overlay",
+        "enter_space_toggle_the_focused_item: native button activation",
+        "arrow_down_focuses_next_enabled_trigger_wrapping_to_first: true",
+        "arrow_up_focuses_previous_enabled_trigger_wrapping_to_last: true",
+        "home_focuses_first_enabled_trigger: true",
+        "end_focuses_last_enabled_trigger: true"
+      ],
+      "behavior": [
+        "controlled_only_while_model_value_is_not_undefined: true",
+        "default_value_seeds_uncontrolled_state_once: true",
+        "single_mode_opening_an_item_closes_the_previous_one: true",
+        "single_mode_collapsing_requires_collapsible: true",
+        "multiple_mode_ignores_collapsible: true",
+        "container_and_item_disabled_are_combined_with_or: true",
+        "arrow_navigation_skips_disabled_triggers: true",
+        "arrow_navigation_wraps_around: true",
+        "trigger_order_follows_item_mount_order: true",
+        "only_open_panels_are_rendered: true"
+      ],
       "selection": {
         "keywords": [
           "accordion",
@@ -875,14 +943,15 @@
       "props": [
         {
           "name": "variant",
-          "type": "'info' | 'success' | 'warning' | 'danger'",
+          "type": "TAlertVariant",
           "default": "info",
           "values": [
             "info",
             "success",
             "warning",
             "danger"
-          ]
+          ],
+          "description": "Semantic tone. Sets the --tree-alert-* custom properties that colour the surface, border, icon, and dismiss button."
         },
         {
           "name": "size",
@@ -892,42 +961,55 @@
             "sm",
             "md",
             "lg"
-          ]
+          ],
+          "description": "Adjusts padding and font size only. md is the baseline defined on .t-alert itself."
         },
         {
           "name": "dismissible",
           "type": "boolean",
-          "default": "false"
+          "default": "false",
+          "description": "Renders the trailing dismiss button. The button is the only thing gated by this prop; the alert never hides itself."
         }
       ],
       "events": [
         {
           "name": "dismiss",
-          "description": "Emitted when the dismiss button is clicked.",
+          "description": "Emitted when the dismiss button is clicked. TAlert is stateless — it does not hide, unmount, or animate itself out. The consumer owns removal (v-if, a list splice, or a store flag); without a handler the button is inert.\n",
           "payload": "none"
         }
       ],
       "slots": [
         {
           "name": "default",
-          "description": "Alert message content."
+          "description": "Alert message content, rendered inside .t-alert__content."
         },
         {
           "name": "icon",
-          "description": "Optional leading icon; rendered with aria-hidden."
+          "description": "Optional leading icon. The .t-alert__icon wrapper span is rendered only when the slot is provided (v-if=\"$slots.icon\") and is marked aria-hidden, so the icon is decorative — never put meaning there that is not also in the message text. The wrapper inherits the variant colour via --tree-alert-accent.\n"
         },
         {
           "name": "dismiss-icon",
-          "description": "Custom dismiss button content; replaces the default × icon."
+          "description": "Replaces the default 16x16 × SVG inside the dismiss button. Rendered only when dismissible is true, since the slot lives inside the button. Has a working default, so it is optional. The button keeps its aria-label=\"Dismiss\" regardless of content.\n"
         }
       ],
       "a11y": [
         "role: alert",
+        "role_is_on_root_element: true",
         "icon_slot_marked_aria_hidden: true",
+        "default_dismiss_icon_marked_aria_hidden: true",
         "dismiss_button_aria_label: Dismiss",
-        "keyboard: Tab to dismiss button, Enter/Space to activate"
+        "dismiss_button_label_is_hardcoded: true",
+        "dismiss_button_hit_area: 44x44 via a .t-alert__dismiss::after pseudo-element; the visible button is 1.5rem.",
+        "keyboard: Tab to dismiss button, Enter/Space to activate",
+        "live_region_caveat: role=\"alert\" is an assertive live region. An alert that is already in the DOM on first paint is generally not announced — mount it dynamically (v-if / list insert) when you need the message read out."
       ],
-      "behavior": [],
+      "behavior": [
+        "self_removes_on_dismiss: false",
+        "icon_wrapper_rendered_only_when_icon_slot_provided: true",
+        "dismiss_button_rendered_only_when_dismissible: true",
+        "size_md_emits_class_without_css_rule: t-alert--md is always emitted but carries no CSS rule of its own; .t-alert is the md baseline and only --sm and --lg override padding and font size.",
+        "variant_sets_local_custom_properties: [\"--tree-alert-bg\",\"--tree-alert-border\",\"--tree-alert-text\",\"--tree-alert-accent\"]"
+      ],
       "selection": {
         "keywords": [
           "alert",
@@ -976,7 +1058,8 @@
         {
           "name": "as",
           "type": "string",
-          "default": "div"
+          "default": "div",
+          "note": "Tag or component rendered as the shell root. The root is a plain `div` by default and is therefore not a landmark — the header/sidebar/main regions carry the semantics."
         },
         {
           "name": "side",
@@ -990,164 +1073,229 @@
         {
           "name": "sidebarWidth",
           "type": "string",
-          "default": "17.5rem"
+          "default": "17.5rem",
+          "note": "Any CSS length. Sets `--tree-app-shell-sidebar-width` on the root, which drives the desktop rail track and also caps the mobile drawer at `min(100%, sidebarWidth)`."
         },
         {
           "name": "collapsedWidth",
           "type": "string",
-          "default": "4.75rem"
+          "default": "4.75rem",
+          "note": "Any CSS length. Sets `--tree-app-shell-collapsed-width` on the root, but it only takes effect while the root carries `is-collapsed` (desktop + `collapsible` + collapsed)."
         },
         {
           "name": "collapsible",
           "type": "boolean",
-          "default": "false"
+          "default": "false",
+          "note": "Master gate for the desktop rail. While false the root never gets `is-collapsed`, the built-in collapse toggle is not rendered, and `toggleCollapsed` is a no-op."
         },
         {
           "name": "collapsed",
           "type": "boolean",
-          "default": "undefined"
+          "default": "undefined",
+          "note": "Controlled desktop rail state (v-model:collapsed). Leave undefined for uncontrolled. When set, the component only emits — the parent must apply the new value."
         },
         {
           "name": "defaultCollapsed",
           "type": "boolean",
-          "default": "false"
+          "default": "false",
+          "note": "Initial value for uncontrolled use. Read once during setup; later changes to the prop are ignored."
         },
         {
           "name": "mobile",
           "type": "boolean",
-          "default": "undefined"
+          "default": "undefined",
+          "note": "Forces mobile mode when explicitly true or false. Leave undefined to auto-detect from `breakpoint`."
         },
         {
           "name": "breakpoint",
           "type": "string",
-          "default": "768px"
+          "default": "768px",
+          "note": "Any CSS length. Evaluated as `(max-width: <breakpoint>)` via matchMedia, and only consulted while `mobile` is undefined. Changing it tears down and rebuilds the media query listener."
         },
         {
           "name": "sidebarOpen",
           "type": "boolean",
-          "default": "undefined"
+          "default": "undefined",
+          "note": "Controlled off-canvas drawer state (v-model:sidebarOpen). Mobile-only — the flag is tracked in desktop mode but nothing renders from it."
         },
         {
           "name": "defaultSidebarOpen",
           "type": "boolean",
-          "default": "false"
+          "default": "false",
+          "note": "Initial value for uncontrolled use. Read once during setup."
         },
         {
           "name": "closeOnEscape",
           "type": "boolean",
-          "default": "true"
+          "default": "true",
+          "note": "Drawer only. Escape is handled on the drawer surface, so it fires only while focus is inside the drawer."
         },
         {
           "name": "closeOnOverlay",
           "type": "boolean",
-          "default": "true"
+          "default": "true",
+          "note": "Drawer only. Set false to keep the drawer open on backdrop clicks."
         },
         {
           "name": "showMenuButton",
           "type": "boolean",
-          "default": "true"
+          "default": "true",
+          "note": "Renders the built-in hamburger in the header. Mobile only. Set false to supply your own trigger and call the `toggleSidebar` slot prop from the `header` or `header-start` slot."
         },
         {
           "name": "showCollapseButton",
           "type": "boolean",
           "default": "true",
-          "note": "Renders the built-in collapse toggle in the sidebar footer. Desktop only, and only when `collapsible` is set — no need to wire your own."
+          "note": "Renders the built-in collapse toggle in the sidebar footer. Desktop only, and only when `collapsible` is set — no need to wire your own. Never rendered in the mobile drawer."
         },
         {
           "name": "collapseLabel",
           "type": "string",
-          "default": "Collapse sidebar"
+          "default": "Collapse sidebar",
+          "note": "aria-label of the collapse toggle while the rail is expanded."
         },
         {
           "name": "expandLabel",
           "type": "string",
-          "default": "Expand sidebar"
+          "default": "Expand sidebar",
+          "note": "aria-label of the collapse toggle while the rail is collapsed."
         },
         {
           "name": "menuLabel",
           "type": "string",
-          "default": "Open menu"
+          "default": "Open menu",
+          "note": "aria-label of the built-in hamburger. Static — it does not swap to a close label while the drawer is open."
         },
         {
           "name": "closeLabel",
           "type": "string",
-          "default": "Close menu"
+          "default": "Close menu",
+          "note": "aria-label of the drawer's close button."
         },
         {
           "name": "sidebarLabel",
           "type": "string",
-          "default": "Sidebar"
+          "default": "Sidebar",
+          "note": "aria-label applied to both the desktop <aside> and the drawer <aside>."
         }
       ],
       "events": [
         {
-          "name": "update:collapsed"
+          "name": "update:collapsed",
+          "description": "Desktop rail collapsed state changed. Enables v-model:collapsed.",
+          "payload": "[value: boolean]"
         },
         {
-          "name": "collapse-change"
+          "name": "collapse-change",
+          "description": "Same change as update:collapsed, for non-v-model usage. Both always fire together.",
+          "payload": "[value: boolean]"
         },
         {
-          "name": "update:sidebarOpen"
+          "name": "update:sidebarOpen",
+          "description": "Off-canvas drawer open state changed. Enables v-model:sidebarOpen.",
+          "payload": "[value: boolean]"
         },
         {
-          "name": "sidebar-open-change"
+          "name": "sidebar-open-change",
+          "description": "Same change as update:sidebarOpen, for non-v-model usage. Both always fire together.",
+          "payload": "[value: boolean]"
         }
       ],
       "slots": [
         {
-          "name": "header"
+          "name": "header",
+          "description": "Main header region. Spans the full header width by default; once `header-start` is filled it is constrained to the content column so it lines up with the panel underneath. On mobile the header falls back to a single flex row either way.\n",
+          "note": "AppShellSlotProps — { mobile, collapsed, sidebarOpen, toggleSidebar, closeSidebar, toggleCollapsed }"
         },
         {
-          "name": "header-start"
+          "name": "header-start",
+          "description": "Header region sitting over the sidebar rail (typically the brand mark). Filling it adds `has-start` to the header, which switches the header to the shell's own two-column grid and tracks the rail width as it collapses.\n",
+          "note": "AppShellSlotProps"
         },
         {
-          "name": "sidebar-header"
+          "name": "sidebar-header",
+          "description": "Pinned above the sidebar body, inset to line up with nav item icons. Rendered in both the desktop aside and the mobile drawer.\n",
+          "note": "AppShellSlotProps"
         },
         {
-          "name": "sidebar"
+          "name": "sidebar",
+          "description": "Sidebar body — the natural home for a TNavMenu, which picks up the collapsed state through provide/inject. Rendered in both the desktop aside and the mobile drawer, and takes the vertical slack so the footer pins to the bottom.\n",
+          "note": "AppShellSlotProps"
         },
         {
-          "name": "sidebar-footer"
+          "name": "sidebar-footer",
+          "description": "Pinned to the bottom of the sidebar, inset to line up with nav item icons. In the desktop aside it shares one container with the built-in collapse toggle, which is rendered after the slot content; in the mobile drawer the container holds the slot content alone.\n",
+          "note": "AppShellSlotProps"
         },
         {
-          "name": "default"
+          "name": "default",
+          "description": "Main content area. Scrolls independently of the header and sidebar.",
+          "note": "{ mobile: boolean, collapsed: boolean } — a subset of AppShellSlotProps, no toggles"
         },
         {
-          "name": "menu-icon"
+          "name": "menu-icon",
+          "description": "Replaces the default hamburger glyph inside the built-in menu button. Use `sidebarOpen` to swap the icon while the drawer is open. Renders inside the button, so it must be presentational only.\n",
+          "note": "{ sidebarOpen: boolean }"
         },
         {
-          "name": "collapse-icon"
+          "name": "collapse-icon",
+          "description": "Replaces the default glyph inside the built-in collapse toggle. Renders inside the button, so it must be presentational only.\n",
+          "note": "{ collapsed: boolean }"
         }
       ],
       "a11y": [
-        "role: dialog",
+        "semantic_regions: <header>, <aside> and <main>; the shell root itself is a plain div and is not a landmark",
+        "role: dialog — on the mobile drawer only",
         "aria_modal: true",
-        "focus_trap: true",
-        "restores_focus_on_close: true",
+        "focus_trap: Tab and Shift+Tab cycle inside the drawer; with no focusable descendant, focus is pinned to the drawer itself",
+        "restores_focus_on_close: only when the drawer was opened through the built-in menu button or the toggleSidebar slot prop — those capture document.activeElement first",
         "escape_closes_when_enabled: true",
         "menu_button_aria_expanded: true",
-        "menu_button_aria_controls_drawer: true",
-        "sidebar_labelled_by_sidebar_label: true"
+        "menu_button_aria_controls_drawer: aria-controls always points at the sidebar id, and on mobile that element exists only while the drawer is open",
+        "collapse_button_aria_expanded: reflects the expanded rail, i.e. !collapsed",
+        "collapse_button_aria_controls_sidebar: true",
+        "collapse_button_label_swaps_by_state: collapseLabel while expanded, expandLabel while collapsed",
+        "drawer_close_button_labelled_by_close_label: true",
+        "sidebar_labelled_by_sidebar_label: true",
+        "drawer_focusable_via_tabindex_minus_one: true",
+        "backdrop_is_aria_hidden: true",
+        "built_in_icons_are_aria_hidden: true",
+        "menu_and_drawer_close_buttons_are_44px: true"
       ],
       "behavior": [
         "fills_viewport_full_width_and_height: true",
+        "resets_body_margin_while_a_shell_is_mounted: body:has(.t-app-shell) { margin: 0 } — a deliberate global rule, scoped so it only applies to pages that mount a shell",
         "header_spans_full_width_above_sidebar_and_content: true",
         "content_area_scrolls_independently: true",
         "auto_switches_to_mobile_at_breakpoint_when_mobile_undefined: true",
         "mobile_prop_forces_mobile_mode: true",
         "mobile_sidebar_becomes_off_canvas_drawer: true",
+        "desktop_sidebar_is_removed_from_the_dom_on_mobile: crossing the breakpoint unmounts and remounts the sidebar slot, so component state inside it is not preserved",
+        "drawer_is_rendered_only_while_mobile_and_open: true",
         "auto_menu_button_in_header_on_mobile: true",
         "controlled_and_uncontrolled_collapsed_state: true",
         "controlled_and_uncontrolled_sidebar_open_state: true",
+        "controlled_mode_does_not_self_update: when collapsed or sidebarOpen is bound, the component only emits — the parent must apply the value",
+        "no_emit_when_the_value_is_unchanged: true",
+        "toggle_collapsed_is_a_noop_when_collapsible_is_false: true",
+        "collapse_toggle_requires_desktop_and_collapsible_and_show_collapse_button: true",
         "provides_collapsed_state_to_descendants: true",
         "drawer_reports_collapsed_false_to_descendants_and_slots: true",
         "left_and_right_variants: true",
         "locks_body_scroll_while_drawer_open: true",
+        "releases_the_scroll_lock_when_leaving_mobile_while_open: true",
+        "rearms_the_overlay_when_reentering_mobile_while_open: true",
         "overlay_click_closes_when_enabled: true",
         "exposes_slot_props_with_mobile_collapsed_and_toggles: true",
         "sidebar_footer_pinned_to_bottom: true",
         "sidebar_header_and_footer_inset_to_align_with_nav_icons: true",
-        "header_mirrors_shell_columns_when_header_start_is_used: true"
+        "header_mirrors_shell_columns_when_header_start_is_used: true",
+        "header_start_falls_back_to_a_single_flex_row_on_mobile: true",
+        "animates_the_rail_width_via_grid_template_columns: true",
+        "main_panel_has_a_rounded_inner_corner_on_the_sidebar_side_on_desktop: true",
+        "drawer_width_is_capped_at_min_of_100_percent_and_sidebar_width: true",
+        "root_data_attribute: data-mobile=\"true\" | \"false\" on the shell root",
+        "respects_prefers_reduced_motion: true"
       ],
       "selection": {
         "keywords": [
@@ -1201,7 +1349,7 @@
       "aliases": [],
       "package": "@treeui/vue",
       "category": "Data Display",
-      "description": "User image with fallback initials and optional status indicator dot.",
+      "description": "User avatar that renders an image when `src` is set, otherwise initials derived from `alt`, plus an optional status indicator dot.",
       "sourceFile": "packages/vue/src/components/TAvatar.vue",
       "storyFile": "apps/docs/src/stories/Avatar.stories.ts",
       "storyTitle": "Components/Data Display/Avatar",
@@ -1211,19 +1359,19 @@
           "name": "src",
           "type": "string",
           "required": false,
-          "description": "URL of the avatar image."
+          "description": "URL of the avatar image. When set, the `<img>` branch renders and the initials span is NOT in the DOM at all (`v-else`). If the image fails to load, the `<img>` is hidden via inline `display: none` — the component does NOT fall back to initials, leaving an empty circle. Pass no `src` if you want initials.\n"
         },
         {
           "name": "alt",
           "type": "string",
           "default": "\"\"",
-          "description": "Accessible label for the avatar. Also used to derive initials if `initials` is not set."
+          "description": "Accessible label for the avatar and the `alt` attribute of the `<img>`. Also the source for derived initials when `initials` is not set. Defaults to an empty string, in which case no `aria-label` is rendered at all (`alt || undefined`) and derived initials are empty — always pass a meaningful `alt`.\n"
         },
         {
           "name": "initials",
           "type": "string",
           "required": false,
-          "description": "Explicit initials to display when no image is provided. Overrides derived initials from `alt`."
+          "description": "Explicit initials, rendered only when `src` is unset. Takes precedence over initials derived from `alt`. When omitted, initials are derived from `alt` by splitting on spaces, taking the first character of the first two words, and uppercasing (e.g. \"Jane Doe\" -> \"JD\").\n"
         },
         {
           "name": "size",
@@ -1233,7 +1381,8 @@
             "sm",
             "md",
             "lg"
-          ]
+          ],
+          "description": "Fixed square dimensions — sm 2rem, md 2.5rem, lg 3.5rem — with matching font size for initials."
         },
         {
           "name": "status",
@@ -1245,20 +1394,23 @@
             "busy",
             "away"
           ],
-          "description": "Shows a colored status dot on the avatar."
+          "description": "Shows a colored status dot pinned to the bottom-right of the avatar bounding box. Renders alongside either branch (image or initials). The dot sits on the corner outside the circular mask, so `.t-avatar` deliberately has no `overflow: hidden`.\n"
         }
       ],
       "events": [],
       "slots": [
         {
           "name": "default",
-          "description": "Optional overlay content inside the avatar."
+          "description": "Optional overlay content, rendered inside the `.t-avatar` span after the image/initials and before the status dot. The parent is `position: relative`, so children can be absolutely positioned. Note the wrapper carries `role=\"img\"`, which makes its subtree presentational to assistive technology — slot content is visual only and will not be announced.\n"
         }
       ],
       "a11y": [
-        "role: img",
-        "aria-label: Derived from `alt` prop.",
-        "status_dot: Has its own `aria-label` with the status value."
+        "role: img (always set on the root span, including when only initials render)",
+        "aria-label: Set from `alt`. Omitted entirely when `alt` is empty (the default), which leaves the `role=\"img\"` element without an accessible name.",
+        "initials: Marked `aria-hidden=\"true\"` — the name comes from `alt`, not the visible text.",
+        "image: Receives the `alt` prop as its native `alt` attribute.",
+        "status_dot: Carries `aria-label` with the status value, but the element is a bare `<span>` with no role, so the label is not exposed to assistive technology. Convey status in text if it matters.",
+        "slot_content: Not announced — the `role=\"img\"` root makes descendant content presentational."
       ],
       "behavior": [],
       "selection": {
@@ -1296,7 +1448,8 @@
             "ghost",
             "soft",
             "danger"
-          ]
+          ],
+          "description": "Surface treatment. Selects which --tree-badge-<variant>-* colour variables the badge consumes; danger is a surface style, not a semantic guarantee — its red palette is replaced when tone is success, warning, or info."
         },
         {
           "name": "tone",
@@ -1309,7 +1462,7 @@
             "danger",
             "info"
           ],
-          "description": "Optional semantic tone layered on top of the visual variant."
+          "description": "Semantic palette. Re-maps the --tree-badge-* colour variables that the chosen variant consumes, so it recolours the badge without changing its surface treatment. neutral keeps the brand palette."
         },
         {
           "name": "size",
@@ -1319,7 +1472,8 @@
             "sm",
             "md",
             "lg"
-          ]
+          ],
+          "description": "Changes min-height and font-size only; inline padding is constant across sizes."
         }
       ],
       "events": [],
@@ -1332,10 +1486,19 @@
         }
       ],
       "a11y": [
+        "semantic_element: span",
         "interactive_by_default: false",
-        "icon_slot_marked_aria_hidden: true"
+        "icon_slot_marked_aria_hidden: true",
+        "tone_conveys_meaning_by_color_only: No role or aria state is set, so put the status word in the badge text rather than relying on tone alone."
       ],
-      "behavior": [],
+      "behavior": [
+        "always_applies_one_modifier_per_prop: true",
+        "tone_remaps_variant_color_variables: true",
+        "tone_overrides_variant_danger_palette: true",
+        "tone_neutral_has_no_stylesheet_rule: true",
+        "icon_wrapper_rendered_only_when_slot_filled: true",
+        "icon_renders_before_default_slot: true"
+      ],
       "selection": {
         "keywords": [],
         "useWhen": [],
@@ -1367,23 +1530,32 @@
           "name": "separator",
           "type": "string",
           "default": "/",
-          "description": "Character or string used to separate breadcrumb items."
+          "description": "Character or string shown between items. Applied as the inline CSS custom property --tree-breadcrumb-separator on the <ol>, wrapped in single quotes, and drawn by the .t-breadcrumb__item:not(:last-child)::after pseudo-element — it never enters the DOM as text. A value containing a single quote or a backslash produces an invalid CSS value and the separator stops rendering."
         }
       ],
       "events": [],
       "slots": [
         {
-          "name": "default"
+          "name": "default",
+          "description": "Breadcrumb trail content, rendered inside the <ol class='t-breadcrumb__list'>. Expects TBreadcrumbItem children so each entry becomes an <li>. No scoped props."
         }
       ],
       "a11y": [
         "element: nav",
         "aria_label: Breadcrumb",
+        "aria_label_hardcoded_but_overridable_via_fallthrough_attrs: true",
         "current_page_aria_current: page",
         "uses_ol_for_ordered_list: true",
         "interactive_by_default: false"
       ],
-      "behavior": [],
+      "behavior": [
+        "link_target_precedence: to + resolvable RouterLink, then href, then string to",
+        "string_to_without_router_renders_native_anchor: true",
+        "object_to_without_router_renders_current_span: true",
+        "current_state_is_not_positional: true",
+        "separator_rendered_by_css_pseudo_element: true",
+        "separator_ignores_pointer_events: true"
+      ],
       "selection": {
         "keywords": [],
         "useWhen": [],
@@ -1415,7 +1587,8 @@
         {
           "name": "as",
           "type": "string",
-          "default": "button"
+          "default": "button",
+          "note": "Root tag rendered through `<component :is>`. Any value other than `button` switches the component onto the non-native accessibility path (see `a11y`) and stops the `type` attribute from being rendered."
         },
         {
           "name": "variant",
@@ -1439,23 +1612,26 @@
             "sm",
             "md",
             "lg"
-          ]
+          ],
+          "note": "`t-button--md` is emitted but carries no CSS rule of its own — md is the base sizing, and only sm/lg override height, padding, and font size."
         },
         {
           "name": "disabled",
           "type": "boolean",
-          "default": "false"
+          "default": "false",
+          "note": "Applied as the native `disabled` attribute only when `as` is `button`; for any other tag the component falls back to `aria-disabled=\"true\"` plus `tabindex=\"-1\"`. Clicks are blocked in both cases."
         },
         {
           "name": "loading",
           "type": "boolean",
           "default": "false",
-          "note": "loading implies disabled behavior"
+          "note": "loading implies disabled behavior — the effective disabled state is `disabled || loading`, so `loading` on its own disables the button and applies `is-disabled`."
         },
         {
           "name": "type",
           "type": "button | submit | reset",
-          "default": "button"
+          "default": "button",
+          "note": "Only forwarded when `as` is `button`; for any other tag no `type` attribute is rendered. Set `type=\"submit\"` for the submit control of an enclosing form."
         },
         {
           "name": "block",
@@ -1467,12 +1643,14 @@
           "name": "align",
           "type": "start | center | end",
           "default": "center",
-          "note": "Content alignment; only meaningful together with `block`. Use `start` for left-aligned icon+label menu rows."
+          "note": "Content alignment; only meaningful once the button is wider than its content, which in practice means together with `block`, since the base rule is `min-width: max-content`. Use `start` for left-aligned icon+label menu rows. The default `center` emits no modifier class — it is the base rule."
         }
       ],
       "events": [
         {
-          "name": "click"
+          "name": "click",
+          "description": "Emitted on activation. Suppressed while disabled or loading: the internal handler calls preventDefault() and stopPropagation() and returns without emitting.",
+          "payload": "[event: MouseEvent]"
         }
       ],
       "slots": [
@@ -1485,13 +1663,21 @@
       ],
       "a11y": [
         "native_button_by_default: true",
+        "native_disabled_attr_only_when_button: true",
         "aria_busy_when_loading: true",
         "aria_disabled_for_non_button: true",
-        "tabindex_minus_one_when_non_button_disabled: true"
+        "tabindex_minus_one_when_non_button_disabled: true",
+        "icon_slot_marked_aria_hidden: true",
+        "loading_spinner_is_announced: The nested TSpinner carries role=\"status\" and a visually hidden \"Loading\" label, so the button's accessible name gains that text while loading.",
+        "touch_targets: 44×44px minimum via the .t-button::after overlay",
+        "focus_visible: box-shadow focus ring on the root element"
       ],
       "behavior": [
         "blocks_click_when_disabled_or_loading: true",
-        "renders_spinner_when_loading: true"
+        "renders_spinner_when_loading: true",
+        "spinner_does_not_replace_the_icon_slot: The spinner is prepended, so with both `loading` and an `icon` slot the order is spinner, icon, label.",
+        "icon_slot_wrapper_rendered_only_when_filled: true",
+        "default_slot_always_wrapped_in_label_element: true"
       ],
       "selection": {
         "keywords": [],
@@ -1515,7 +1701,7 @@
       "kind": "layout",
       "category": "Data Display",
       "status": "available",
-      "purpose": "Surface container with optional header and footer slots.",
+      "purpose": "Surface container with optional header, actions, and footer slots.",
       "sourceFile": "packages/vue/src/components/TCard.vue",
       "storyFile": "apps/docs/src/stories/Card.stories.ts",
       "storyTitle": "Components/Data Display/Card",
@@ -1524,7 +1710,8 @@
         {
           "name": "as",
           "type": "string",
-          "default": "section"
+          "default": "section",
+          "description": "Tag or component used for the polymorphic root, rendered through `<component :is=\"as\">`. Change it to `article`, `aside`, `li`, or `div` when the default `section` element is wrong for the surrounding document structure. It only swaps the element — classes, slots, and layout are unchanged.\n"
         },
         {
           "name": "variant",
@@ -1540,37 +1727,44 @@
           "name": "size",
           "type": "TSize",
           "default": "md",
-          "values": [
-            "sm",
-            "md",
-            "lg"
-          ]
+          "description": "Padding scale only — it does not change typography, border, or radius. `sm` uses --tree-space-3, `md` --tree-space-4, `lg` --tree-space-5.\n"
         },
         {
           "name": "title",
           "type": "string",
           "default": "undefined",
-          "description": "Optional card heading rendered inside the header area."
+          "description": "Optional card heading. Rendered as the fallback content of the `header` slot inside a `span.t-card__title`, so supplying `#header` replaces it entirely. Setting it also forces the header element to render. Because it is declared as a prop it is consumed by the component and never reaches the root element as the native HTML `title` tooltip attribute.\n"
         }
       ],
       "events": [],
       "slots": [
         {
-          "name": "header"
+          "name": "header",
+          "description": "Replaces the `title` fallback inside `header.t-card__header`. When this slot is supplied the `title` prop renders nothing. Receives no slot props.\n"
         },
         {
-          "name": "actions"
+          "name": "actions",
+          "description": "Trailing controls wrapped in `span.t-card__actions`, rendered as a sibling after the header content inside the same `header.t-card__header`. Supplying it is enough to render the header on its own, with no `title` and no `header` slot. Receives no slot props.\n"
         },
         {
-          "name": "default"
+          "name": "default",
+          "description": "Card body. Always rendered, wrapped in `div.t-card__body`. Receives no slot props.\n"
         },
         {
-          "name": "footer"
+          "name": "footer",
+          "description": "Renders `footer.t-card__footer` only when the slot is supplied; there is no `footer` prop fallback. Receives no slot props.\n"
         }
       ],
-      "a11y": [],
+      "a11y": [
+        "root_role: None applied by the component — semantics come entirely from `as` (default `section`).",
+        "title_is_not_a_heading: `title` renders a `span.t-card__title`, styled at heading size and weight but carrying no heading semantics, so it does not enter the document outline. When the card must be reachable by heading navigation, put a real `<h2>`/`<h3>` in the `header` slot instead of using the prop.",
+        "unnamed_section_root: The default `section` root has no accessible name, so assistive tech exposes it as generic rather than as a region. The component sets no `inheritAttrs: false` and has a single root, so `aria-label` / `aria-labelledby` passed by the consumer fall through to that root when a named region is wanted."
+      ],
       "behavior": [
         "body_wrapper_class: t-card__body",
+        "header_render_condition: The `header.t-card__header` element renders when ANY of the `header` slot, a truthy `title` prop, or the `actions` slot is present. All three branches are independent — actions alone still produces a header.",
+        "footer_render_condition: The `footer.t-card__footer` element renders only when the `footer` slot is supplied.",
+        "slot_props: None. No slot on this component is scoped; all four are plain content slots.",
         "variant_effects: {\"outline\":\"Base surface with a default border. The styling baseline — the `t-card--outline` class is emitted but carries no CSS rule of its own.\",\"soft\":\"Subtle tinted surface (bg-subtle), same border and shadow as outline.\",\"inset\":\"Same tinted surface as soft, but with no shadow, so it reads as recessed inside another surface.\"}",
         "note: No card variant inverts its surface, so nested content inherits the normal color tokens. For a high-emphasis card, use a brand-colored border rather than an inverted background."
       ],
@@ -1634,13 +1828,13 @@
           "name": "series",
           "type": "TChartSeries[]",
           "default": "[]",
-          "note": "Each item is { name: string; data: number[]; color?: string }."
+          "note": "Each item is { name: string; data: number[]; color?: string }. Series with an empty data array are dropped before rendering — they never reach the plot, legend, tooltip, or a11y table."
         },
         {
           "name": "labels",
           "type": "string[]",
           "default": "[]",
-          "note": "X-axis categories, aligned index-for-index to each series' data."
+          "note": "X-axis categories, aligned index-for-index to each series' data. Labels past the longest series are ignored; a missing label falls back to '#<n>' in the tooltip and to an empty header cell in the a11y table."
         },
         {
           "name": "height",
@@ -1652,80 +1846,91 @@
           "name": "smooth",
           "type": "boolean",
           "default": "false",
-          "note": "Curved line/area."
+          "note": "Curved line/area; ignored for bar."
         },
         {
           "name": "stacked",
           "type": "boolean",
           "default": "false",
-          "note": "Stacks bar series; ignored for line/area. Negative values are clamped to 0 in stacked mode (grouped mode renders them)."
+          "note": "Stacks bar series; ignored for line/area. Negative values are clamped to 0 in stacked mode (grouped mode renders them below the baseline). The tooltip always reports the raw per-series values, not the cumulative stack."
         },
         {
           "name": "showGrid",
           "type": "boolean",
-          "default": "true"
+          "default": "true",
+          "note": "Horizontal gridlines at the y ticks. Independent of showYAxis, which controls the tick text."
         },
         {
           "name": "showLegend",
-          "type": "boolean",
-          "default": "auto (true when more than one series)"
+          "type": "boolean | undefined",
+          "default": "auto (true when more than one series)",
+          "note": "The legend is suppressed whenever there is no data, even when set to true."
         },
         {
           "name": "showXAxis",
           "type": "boolean",
-          "default": "true"
+          "default": "true",
+          "note": "When false the category labels are skipped and the bottom margin collapses from 28px to 10px."
         },
         {
           "name": "showYAxis",
           "type": "boolean",
-          "default": "true"
+          "default": "true",
+          "note": "When false the tick text is skipped and the left margin collapses from 44px to 10px. Gridlines are unaffected."
         },
         {
           "name": "showTooltip",
           "type": "boolean",
-          "default": "true"
+          "default": "true",
+          "note": "Gates hover tracking as a whole: the crosshair, the tooltip panel, and the point-click event all stop when false."
         },
         {
           "name": "showPoints",
           "type": "boolean",
           "default": "false",
-          "note": "Always draw markers on line/area points."
+          "note": "Always draw markers on line/area points; ignored for bar."
         },
         {
           "name": "yTicks",
           "type": "number",
-          "default": "5"
+          "default": "5",
+          "note": "Target tick count handed to niceScale — the rendered count may differ once the bounds are rounded."
         },
         {
           "name": "valueFormat",
           "type": "(value: number) => string",
-          "default": "locale integers for |value| >= 1000"
+          "default": "locale integers for |value| >= 1000",
+          "note": "Applies to y-axis ticks, tooltip values, and the a11y table cells."
         },
         {
           "name": "minY",
           "type": "number",
-          "default": "auto"
+          "default": "auto (min(0, data min) for bar/area, data min for line)",
+          "note": "A hint, not a hard bound: niceScale rounds the low end down, so the rendered domain can start below it."
         },
         {
           "name": "maxY",
           "type": "number",
-          "default": "auto"
+          "default": "auto",
+          "note": "A hint, not a hard bound: niceScale rounds the high end up, so the rendered domain can extend above it."
         },
         {
           "name": "animated",
           "type": "boolean",
           "default": "true",
-          "note": "Draw-in animation; disabled under prefers-reduced-motion."
+          "note": "Draw-in animation via the is-animated root class; disabled under prefers-reduced-motion."
         },
         {
           "name": "loading",
           "type": "boolean",
-          "default": "false"
+          "default": "false",
+          "note": "Replaces the plot with five pulsing skeleton bars and adds the is-loading root class. Takes precedence over the empty state; the legend still renders when data is present."
         },
         {
           "name": "ariaLabel",
           "type": "string",
-          "default": "auto-generated summary"
+          "default": "auto-generated summary ('<type> chart with <n> series')",
+          "note": "Rendered as the <caption> of the visually-hidden data table — it is not applied as an aria-label attribute on the root."
         }
       ],
       "events": [
@@ -1747,14 +1952,19 @@
       ],
       "a11y": [
         "SVG is aria-hidden; a visually-hidden <table> mirrors the series data for assistive tech.",
+        "The table's <caption> carries ariaLabel (or the auto-generated summary); the root div itself has no role or accessible name.",
         "Legend defaults on for multiple series so identity is not color-only.",
-        "Provide a meaningful ariaLabel describing what the chart shows."
+        "Provide a meaningful ariaLabel describing what the chart shows.",
+        "point-click has no keyboard equivalent — do not make it the only way to reach a behavior."
       ],
       "behavior": [
-        "colors_auto_assign_from_chart_palette: --tree-color-chart-1..8, cycling; per-series color overrides",
-        "bar_zero_baseline: true",
-        "line_domain_uses_nice_ticks: true",
-        "hover_shows_crosshair_and_tooltip: true"
+        "colors_auto_assign_from_chart_palette: --tree-color-chart-1..8, cycling by series index; per-series color overrides",
+        "zero_baseline_for_bar_and_area: the y domain is extended to include 0 for bar and area; line uses the data extent. minY overrides it.",
+        "y_domain_uses_nice_ticks: every type runs through niceScale, which rounds the min down and the max up to round numbers",
+        "hover_shows_crosshair_and_tooltip: only while showTooltip is true",
+        "width_measured_with_resize_observer: falls back to 640px until the canvas is mounted and measured",
+        "x_labels_decimate_when_crowded: keeps every max(2, floor(innerWidth / 52))-th label and hides the rest; the last category is always kept",
+        "empty_state_when_no_series_has_data: true"
       ],
       "selection": {
         "keywords": [
@@ -1819,7 +2029,8 @@
         {
           "name": "modelValue",
           "type": "boolean",
-          "default": "false"
+          "default": "false",
+          "description": "Checked state. Fully controlled — the component holds no internal state and never mutates this prop; it emits update:modelValue and the parent must write the value back.\n"
         },
         {
           "name": "size",
@@ -1829,44 +2040,59 @@
             "sm",
             "md",
             "lg"
-          ]
+          ],
+          "description": "Control and label scale. Always rendered as a t-checkbox--<size> modifier."
         },
         {
           "name": "disabled",
           "type": "boolean",
-          "default": "false"
+          "default": "false",
+          "description": "Sets the native disabled attribute on the input and adds is-disabled to the root. No aria-disabled is emitted — the native attribute carries the state.\n"
         },
         {
           "name": "indeterminate",
           "type": "boolean",
-          "default": "false"
+          "default": "false",
+          "description": "Mixed state. Renders the dash icon and sets aria-checked=\"mixed\", taking precedence over modelValue for both. Synced to the input's native indeterminate DOM property.\n"
         },
         {
           "name": "invalid",
           "type": "boolean",
-          "default": "false"
+          "default": "false",
+          "description": "Adds is-invalid to the root and aria-invalid=\"true\" to the input. When false the aria-invalid attribute is omitted entirely, not set to \"false\".\n"
         }
       ],
       "events": [
         {
-          "name": "update:modelValue"
+          "name": "update:modelValue",
+          "description": "Emitted on the native input's change event. The payload is always the negation of the current modelValue prop, not the DOM checked state. Enables v-model binding.\n",
+          "payload": "[value: boolean]"
         }
       ],
       "slots": [
         {
-          "name": "default"
+          "name": "default",
+          "description": "Label content, wrapped in <span class=\"t-checkbox__label\">. Rendered only when the slot is supplied (v-if=\"$slots.default\"). The root element is a <label> that wraps the input, so slot text labels the control implicitly — no for/id pairing is needed.\n"
         }
       ],
       "a11y": [
         "role: native_checkbox",
+        "accessible_name: From the default slot; absent when the slot is omitted — supply aria-label or aria-labelledby",
+        "aria_checked_explicitly_bound: 'mixed' when indeterminate, otherwise the modelValue boolean",
         "aria_checked_mixed_when_indeterminate: true",
         "aria_invalid_when_invalid: true",
+        "native_indeterminate_property_synced: true",
+        "disabled_uses_native_attribute: true",
         "focus_visible_on_control: true",
+        "input_is_visually_hidden_but_focusable: clip-rect hidden input keeps native semantics and tab order; the focus ring is drawn on t-checkbox__control",
         "clickable_target_44x44: true"
       ],
       "behavior": [
         "update_payload_type: boolean",
+        "controlled_only: No internal state; the checkbox does not change appearance until the parent updates modelValue",
+        "indeterminate_precedence: indeterminate wins over modelValue for the rendered icon and for aria-checked; is-checked and is-indeterminate can both be present at once",
         "indeterminate_clears_on_user_toggle: false",
+        "indeterminate_is_parent_owned: The component never clears indeterminate — set it to false yourself when handling update:modelValue",
         "label_click_toggles_checkbox: true"
       ],
       "selection": {
@@ -1918,19 +2144,19 @@
           "name": "modelValue",
           "type": "string",
           "default": "undefined",
-          "note": "Selected colour as a hex string. Matching is case-insensitive."
+          "note": "Selected colour as a hex string. Matched against `options[].value` by case-insensitive exact string comparison, so `#0969DA` matches `#0969da` but `#fff` never matches `#ffffff`. A value matching no preset leaves every swatch unselected and is still written to the custom input."
         },
         {
           "name": "options",
           "type": "TColorSwatchOption[]",
           "default": "[]",
-          "note": "Preset swatches, each `{ label, value }`. `label` becomes the button's accessible name."
+          "note": "Preset swatches, each `{ label, value }`. `value` is applied raw as the button `background`, so any CSS colour renders, but keep it `#rrggbb` so matching and the custom input agree. `label` is the button's only accessible name — the button renders no text content. An empty array renders an empty group (only the custom input, when enabled)."
         },
         {
           "name": "allowCustom",
           "type": "boolean",
           "default": "false",
-          "note": "Appends a native `<input type=\"color\">` for values outside the presets."
+          "note": "Appends a native `<input type=\"color\">` after the presets for values outside them. When false the input is not rendered at all and `customLabel` has no effect."
         },
         {
           "name": "size",
@@ -1940,23 +2166,26 @@
             "sm",
             "md",
             "lg"
-          ]
+          ],
+          "note": "Drives `--tree-color-swatch-size` (sm 1.5rem, md 1.75rem, lg 2rem). Swatches are square; the custom input is one `--tree-space-2` wider."
         },
         {
           "name": "label",
           "type": "string",
           "default": "Color",
-          "note": "Accessible label for the swatch group (`role=\"group\"`)."
+          "note": "Accessible label for the swatch group (`role=\"group\"`). Rendered as `aria-label` on the root, so an `aria-label` passed by the consumer falls through to the same element and overrides it."
         },
         {
           "name": "customLabel",
           "type": "string",
-          "default": "Custom color"
+          "default": "Custom color",
+          "note": "Accessible label (`aria-label`) for the native colour input, and its only accessible name. Applies only when `allowCustom` is set."
         },
         {
           "name": "disabled",
           "type": "boolean",
-          "default": "false"
+          "default": "false",
+          "note": "Sets the native `disabled` attribute on every preset button and on the custom input, so the group stops emitting and drops out of the Tab order. Not reflected on the wrapper, and there is no `is-disabled` class."
         }
       ],
       "events": [
@@ -1966,14 +2195,21 @@
       ],
       "slots": [],
       "a11y": [
-        "Wrapper is `role=\"group\"` labelled by `label`.",
-        "Each swatch is a native button with `aria-pressed` reflecting selection and `aria-label` from the option label.",
-        "Selection is conveyed by an outline (not colour alone), since the swatch's own colour is the content."
+        "Wrapper is `role=\"group\"` labelled by `label` via `aria-label`.",
+        "Each swatch is a native `<button type=\"button\">` with `aria-pressed` reflecting selection and `aria-label` from the option label; it has no text content, so an option without a `label` is unnamed.",
+        "Selection is conveyed by an outline (not colour alone), since the swatch's own colour is the content.",
+        "The custom input is a native `<input type=\"color\">` named only by `customLabel`.",
+        "No roving focus and no arrow-key navigation — every swatch and the custom input is its own Tab stop."
       ],
       "behavior": [
+        "update_payload_type: string",
         "emits_on_preset_click: true",
         "emits_on_custom_input: true",
-        "blocks_interaction_when_disabled: true"
+        "blocks_interaction_when_disabled: true",
+        "selection_match_is_case_insensitive: true",
+        "custom_input_rendered_only_when_allow_custom: true",
+        "custom_input_emits_on_input_not_change: true",
+        "fully_controlled_no_internal_selection_state: true"
       ],
       "selection": {
         "keywords": [],
@@ -2003,7 +2239,8 @@
         {
           "name": "modelValue",
           "type": "string",
-          "default": ""
+          "default": "",
+          "note": "The SELECTED option value, never the text in the input. The input renders an internal `query` string that is re-synced from the selected option's label whenever the listbox is closed. A `modelValue` with no matching entry in `options` resolves to an empty label."
         },
         {
           "name": "options",
@@ -2014,12 +2251,14 @@
         {
           "name": "open",
           "type": "boolean",
-          "default": "undefined"
+          "default": "undefined",
+          "note": "Controlled open state. Once a boolean is passed the component stops tracking open state internally — it only emits update:open / open-change and the consumer MUST write the value back, or the listbox never opens."
         },
         {
           "name": "defaultOpen",
           "type": "boolean",
-          "default": "false"
+          "default": "false",
+          "note": "Uncontrolled initial open state, read once on mount. Later changes to it are ignored."
         },
         {
           "name": "size",
@@ -2029,17 +2268,20 @@
             "sm",
             "md",
             "lg"
-          ]
+          ],
+          "note": "Sizes the control only. `md` has no CSS rule of its own — it is the base `.t-combobox__control` styling."
         },
         {
           "name": "disabled",
           "type": "boolean",
-          "default": "false"
+          "default": "false",
+          "note": "Sets the native `disabled` attribute on the input, adds `is-disabled` to the root, and suppresses the listbox entirely (`v-if=\"isOpen && !disabled\"`) — even while `open` is true. Also short-circuits opening, typing side effects, and keydown handling."
         },
         {
           "name": "loading",
           "type": "boolean",
-          "default": "false"
+          "default": "false",
+          "note": "Presentational only. Replaces the chevron indicator with `<TSpinner size=\"sm\" label=\"Loading\" />` and sets aria-busy; it never blocks typing, opening, filtering, or selection."
         },
         {
           "name": "invalid",
@@ -2054,56 +2296,102 @@
         {
           "name": "emptyText",
           "type": "string",
-          "default": "No results found."
+          "default": "No results found.",
+          "note": "Fallback content of the `empty` slot — supplying that slot shadows this prop entirely."
         }
       ],
       "events": [
         {
-          "name": "update:modelValue"
+          "name": "update:modelValue",
+          "description": "Emitted with the chosen option's `value` when an option is selected, and with `\"\"` when the listbox closes while the input text is blank and a value was set (the clear-by-erasing path).",
+          "payload": "[\"string\"]"
         },
         {
-          "name": "update:open"
+          "name": "update:open",
+          "description": "Emitted whenever the open state changes. Deduped — no emit when the next value equals the current one.",
+          "payload": "[\"boolean\"]"
         },
         {
-          "name": "open-change"
+          "name": "open-change",
+          "description": "Emitted immediately after `update:open`, with the same payload. Alias for consumers that do not use v-model:open.",
+          "payload": "[\"boolean\"]"
         },
         {
-          "name": "input-change"
+          "name": "input-change",
+          "description": "Emitted on every keystroke with the raw, untrimmed input text — the same string the `empty` slot receives as `query`. This is the only hook for server-side / async filtering; it does not replace or disable the built-in local filtering, so an async consumer must feed results back through `options`.",
+          "payload": "[\"string\"]"
         }
       ],
       "slots": [
         {
-          "name": "prefix"
+          "name": "prefix",
+          "description": "Leading content inside `.t-combobox__control`, before the input. Rendered only when the slot is supplied, wrapped in `<span class=\"t-combobox__slot t-combobox__slot--prefix\">`. No scoped props."
         },
         {
-          "name": "option"
+          "name": "option",
+          "description": "Replaces the default option body (label, description, and the selected check icon). Renders INSIDE the row's `<li role=\"option\">`, which owns the click and mouseenter handlers, so it must contain only presentational content. `selected` is `option.value === modelValue`; `active` is the keyboard-highlighted row, which is NOT DOM focus — focus stays on the input at all times.\n"
         },
         {
-          "name": "empty"
+          "name": "empty",
+          "description": "Replaces `emptyText` inside `<li class=\"t-combobox__empty\">` when the filter matches no option. `query` is the current raw input text, untrimmed and uncased. Passing both this slot and `emptyText` renders only the slot."
         }
       ],
       "a11y": [
         "role: combobox",
+        "combobox_element: input",
+        "accessible_name: None is generated — there is no label element and no default slot. Pass aria-label or aria-labelledby (which also names the listbox), or pass `id` and wrap in TFormField with a matching `html-for`; TFormField does not link the label on its own.",
         "trigger_aria_haspopup: listbox",
         "trigger_aria_expanded: true",
+        "trigger_aria_controls_when_open: true",
         "aria_autocomplete: list",
         "aria_activedescendant_on_active_option: true",
+        "aria_activedescendant_cleared_while_closed: true",
         "aria_invalid_when_invalid: true",
         "aria_busy_when_loading: true",
+        "listbox_role: listbox",
+        "option_role: option",
+        "listbox_mirrors_aria_label_and_aria_labelledby: true",
         "aria_selected_on_options: true",
         "aria_disabled_on_disabled_options: true",
+        "focus_stays_on_the_input_options_are_never_focused: true",
         "keyboard_arrow_navigation: true",
+        "arrow_navigation_does_not_wrap_at_the_ends: true",
+        "arrow_navigation_skips_disabled_options: true",
         "escape_closes_and_restores_previous_selection: true",
+        "escape_is_ignored_while_closed: true",
         "enter_selects_active_option: true",
+        "tab_closes_and_restores_previous_selection: true",
         "home_end_navigation: true"
       ],
       "behavior": [
         "update_payload_type: string",
+        "input_text_is_internal_state_not_model_value: true",
         "local_filtering_by_label_description_and_keywords: true",
+        "filtering_is_case_insensitive_substring_on_a_trimmed_query: true",
+        "empty_query_shows_all_options: true",
+        "input_change_emits_the_raw_query_for_async_filtering: true",
+        "async_results_are_fed_back_through_the_options_prop: true",
         "loading_does_not_disable_by_itself: true",
+        "spinner_replaces_the_chevron_when_loading: true",
+        "chevron_rotates_when_open: true",
+        "check_icon_on_selected_option: true",
+        "focus_opens_the_listbox: true",
+        "click_on_input_opens_the_listbox: true",
+        "typing_opens_the_listbox: true",
+        "arrow_down_opens_the_listbox_with_the_first_enabled_option_active: true",
+        "arrow_up_opens_the_listbox_with_the_last_enabled_option_active: true",
+        "active_option_defaults_to_the_current_selection_when_it_is_in_the_filtered_list: true",
+        "disabled_options_cannot_be_activated_selected_or_hovered: true",
+        "selecting_an_option_sets_the_input_text_to_its_label_and_closes_without_restoring: true",
         "outside_click_closes_dropdown: true",
+        "outside_click_is_detected_on_pointerdown_on_document: true",
         "query_clears_selection_when_closed_empty: true",
-        "selected_value_restores_when_search_is_abandoned: true"
+        "selected_value_restores_when_search_is_abandoned: true",
+        "external_model_value_and_options_changes_resync_the_input_text_only_while_closed: true",
+        "active_option_is_revalidated_when_the_filtered_list_changes: true",
+        "open_state_emits_are_deduped: true",
+        "listbox_is_not_rendered_while_disabled: true",
+        "listbox_renders_in_flow_with_no_portal_and_no_flip_positioning: true"
       ],
       "selection": {
         "keywords": [
@@ -2159,12 +2447,14 @@
         {
           "name": "defaultOpen",
           "type": "boolean",
-          "default": "false"
+          "default": "false",
+          "note": "Uncontrolled initial state. Read once on setup — later changes are ignored. Only meaningful when `open` is left undefined."
         },
         {
           "name": "disabled",
           "type": "boolean",
-          "default": "false"
+          "default": "false",
+          "note": "Only blocks opening from the `trigger` slot (the trigger wrapper gets `aria-disabled` and its click is swallowed). It does NOT block a programmatic open through `open`/`defaultOpen`, and it does not disable the confirm/cancel buttons — use `confirmDisabled`/`cancelDisabled` for those."
         },
         {
           "name": "size",
@@ -2174,47 +2464,63 @@
             "sm",
             "md",
             "lg"
-          ]
+          ],
+          "note": "Forwarded to TModal and applied as `t-modal__surface--<size>` — it sizes the dialog surface, not the confirm-dialog block, and it does not size the default footer buttons (those are always TButton `md`)."
         },
         {
           "name": "title",
           "type": "string",
-          "default": ""
+          "default": "",
+          "note": "Rendered by TModal as `t-modal__title` and referenced by `aria-labelledby`. TConfirmDialog does not expose TModal's `header` slot, so an empty title leaves the dialog without an accessible name."
         },
         {
           "name": "description",
           "type": "string",
-          "default": ""
+          "default": "",
+          "note": "Rendered by TModal as `t-modal__description` and referenced by `aria-describedby`. The default slot body is NOT part of the accessible description."
         },
         {
           "name": "confirmLabel",
           "type": "string",
-          "default": "Confirm"
+          "default": "Confirm",
+          "note": "Ignored when the `actions` slot is supplied."
         },
         {
           "name": "cancelLabel",
           "type": "string",
-          "default": "Cancel"
+          "default": "Cancel",
+          "note": "Ignored when the `actions` slot is supplied."
         },
         {
           "name": "confirmVariant",
           "type": "TVariant",
-          "default": "danger"
+          "default": "danger",
+          "values": [
+            "solid",
+            "outline",
+            "ghost",
+            "soft",
+            "danger"
+          ],
+          "note": "Ignored when the `actions` slot is supplied."
         },
         {
           "name": "confirmDisabled",
           "type": "boolean",
-          "default": "false"
+          "default": "false",
+          "note": "Disables the default confirm button AND short-circuits the confirm handler — no `confirm` emit and no close, including when the handler is invoked from the `actions` slot scope."
         },
         {
           "name": "cancelDisabled",
           "type": "boolean",
-          "default": "false"
+          "default": "false",
+          "note": "Disables the default cancel button AND short-circuits the cancel handler — no `cancel` emit and no close, including when the handler is invoked from the `actions` slot scope."
         },
         {
           "name": "loading",
           "type": "boolean",
-          "default": "false"
+          "default": "false",
+          "note": "Puts the default confirm button into its spinner state (TButton adds `is-loading`, `aria-busy`, and the native `disabled` attribute) and short-circuits the confirm handler exactly like `confirmDisabled`. It does not affect the cancel button. Also passed to the `actions` slot scope so a custom footer can mirror the state."
         },
         {
           "name": "closeOnEscape",
@@ -2224,27 +2530,32 @@
         {
           "name": "closeOnOverlay",
           "type": "boolean",
-          "default": "false"
+          "default": "false",
+          "note": "Deliberately opt-in — TModal defaults this to true, TConfirmDialog flips it to false so a confirmation is not dismissed by a stray backdrop click."
         },
         {
           "name": "showCloseButton",
           "type": "boolean",
-          "default": "false"
+          "default": "false",
+          "note": "Deliberately opt-in — TModal defaults this to true. Enabling it adds a header close button that dismisses without emitting `cancel`."
         },
         {
           "name": "closeLabel",
           "type": "string",
-          "default": "Close dialog"
+          "default": "Close dialog",
+          "note": "Accessible name of the header close button. Only rendered when `showCloseButton` is true."
         },
         {
           "name": "closeOnConfirm",
           "type": "boolean",
-          "default": "true"
+          "default": "true",
+          "note": "Set false for async confirmation: `confirm` fires but the dialog stays open, so the caller can hold it open with `loading` while the request resolves and then close it via `open`."
         },
         {
           "name": "closeOnCancel",
           "type": "boolean",
-          "default": "true"
+          "default": "true",
+          "note": "Set false to keep the dialog open after `cancel` — the caller then owns closing via `open`."
         }
       ],
       "events": [
@@ -2263,16 +2574,20 @@
       ],
       "slots": [
         {
-          "name": "trigger"
+          "name": "trigger",
+          "description": "Element that opens the dialog on click. Omit for imperative use."
         },
         {
-          "name": "icon"
+          "name": "icon",
+          "description": "Decorative leading icon. Presence switches the block to the two-column icon layout."
         },
         {
-          "name": "default"
+          "name": "default",
+          "description": "Extra body content rendered under the description."
         },
         {
-          "name": "actions"
+          "name": "actions",
+          "description": "Replaces the whole footer. Scope gives you confirm(), cancel(), and loading."
         }
       ],
       "a11y": [
@@ -2280,15 +2595,26 @@
         "aria_modal: true",
         "focus_trap: inherited_from_modal",
         "restores_focus_on_close: inherited_from_modal",
+        "restore_focus_caveat: TModal only records the previously focused element when the dialog is opened by clicking its `trigger` slot. A dialog opened programmatically — by setting `open` from a row action, a menu item, or `defaultOpen` — has nothing recorded, so focus is not restored on close. Move focus back yourself in that case.",
+        "accessible_name_source: `title` prop, via aria-labelledby; absent when `title` is empty",
+        "accessible_description_source: `description` prop, via aria-describedby; the default slot body is not included",
+        "initial_focus: First focusable element inside the dialog surface. With the default footer and `showCloseButton: false` that is the cancel button, which is the safe landing spot for a destructive confirmation. Enabling `showCloseButton` moves initial focus to the header close button instead. A `loading` or `confirmDisabled` confirm button carries the native `disabled` attribute and is skipped.",
         "icon_slot_marked_aria_hidden: true"
       ],
       "behavior": [
         "built_on_modal_contract: true",
         "default_confirm_button_variant: danger",
+        "default_cancel_button_variant: ghost",
         "overlay_click_disabled_by_default: true",
         "close_button_hidden_by_default: true",
         "loading_state_applies_to_confirm_button: true",
-        "default_actions_close_dialog_when_enabled: true"
+        "confirm_suppressed_when: confirmDisabled || loading — the handler returns before emitting, so neither `confirm` nor the close runs",
+        "cancel_suppressed_when: cancelDisabled — the handler returns before emitting, so neither `cancel` nor the close runs",
+        "closes_after_confirm_when: closeOnConfirm",
+        "closes_after_cancel_when: closeOnCancel",
+        "guards_and_auto_close_apply_to_actions_slot: true",
+        "close_button_and_escape_do_not_emit_cancel: true",
+        "inherits_teleport_scroll_lock_and_focus_trap_from_modal: true"
       ],
       "selection": {
         "keywords": [],
@@ -2354,7 +2680,9 @@
         }
       ],
       "a11y": [
-        "Acts as a structural wrapper only; semantics come from the `as` prop and child content."
+        "Acts as a structural wrapper only; semantics come from the `as` prop and child content.",
+        "Renders a non-semantic `div` by default. Pass `as` to make it a landmark (e.g. `as=\"main\"`, `as=\"section\"`, `as=\"header\"`) — avoid nesting a second `main` inside an app shell or a TPage that already provides one.\n",
+        "`aria-*` and `role` attributes fall through to the root element (see `forwards_attrs_to`)."
       ],
       "behavior": [
         "semantic_element_controlled_by_as: true",
@@ -2406,6 +2734,8 @@
       "package": "@treeui/vue",
       "category": "Overlay",
       "status": "stable",
+      "description": "Right-click (contextmenu) menu teleported to body and positioned at the cursor. The component renders no chrome of its own — the root wrapper is `display: contents` and only wraps the slotted trigger area.\n",
+      "sourceFile": "packages/vue/src/components/TContextMenu.vue",
       "storyFile": "apps/docs/src/stories/ContextMenu.stories.ts",
       "storyTitle": "Components/Overlay/ContextMenu",
       "manifestFile": "docs/ai/COMPONENTS/context-menu.yaml",
@@ -2414,73 +2744,84 @@
           "name": "items",
           "type": "TContextMenuItem[]",
           "default": "[]",
-          "description": "Menu items to render."
+          "description": "Menu items to render, one `role=\"menuitem\"` <li> each. An empty array is allowed and still opens an empty `role=\"menu\"` list with nothing focused.\n"
         },
         {
           "name": "open",
           "type": "boolean | undefined",
           "default": "undefined",
-          "description": "Controlled open state (v-model:open)."
+          "description": "Controlled open state (v-model:open). When defined it wins over the internal state and `defaultOpen` is ignored; the component still emits and expects the parent to write the new value back. `disabled` overrides this — a disabled component renders no menu even while `open` is true.\n"
         },
         {
           "name": "defaultOpen",
           "type": "boolean",
           "default": "false",
-          "description": "Uncontrolled initial open state."
+          "description": "Uncontrolled initial open state. Read once during setup — later changes to this prop have no effect.\n"
         },
         {
           "name": "disabled",
           "type": "boolean",
           "default": "false",
-          "description": "Prevents the context menu from opening."
+          "description": "Prevents the context menu from opening, and hides it if it is already open. While disabled the component does not call preventDefault on `contextmenu`, so the native browser menu appears instead.\n"
         },
         {
           "name": "size",
           "type": "TSize",
           "default": "md",
-          "description": "Item sizing variant."
+          "values": [
+            "sm",
+            "md",
+            "lg"
+          ],
+          "description": "Item sizing variant. The modifier class is applied to both the root and the teleported menu, but only the copy on the menu is effective (the root is teleport-detached from the menu subtree).\n"
         }
       ],
       "events": [
         {
           "name": "select",
-          "description": "Emitted when a menu item is selected.",
+          "description": "Emitted with `item.value` when an enabled item is activated by click or Enter/Space. Disabled items emit nothing.\n",
           "payload": "[value: string]"
         },
         {
           "name": "update:open",
-          "description": "Emitted when open state changes (v-model support).",
+          "description": "Emitted when open state changes (v-model support). Only fires on an actual transition — setting the same value again is a no-op.\n",
           "payload": "[value: boolean]"
         },
         {
           "name": "open-change",
-          "description": "Emitted when open state changes.",
+          "description": "Emitted when open state changes. Always fires together with `update:open`, including in controlled mode.\n",
           "payload": "[value: boolean]"
         }
       ],
       "slots": [
         {
           "name": "default",
-          "description": "Content that acts as the right-click trigger area."
+          "description": "Content that acts as the right-click trigger area. It is rendered inside the root <div>, which is `display: contents` and therefore contributes no box of its own — the slotted content keeps its own layout, and the `contextmenu` handler still fires through event bubbling.\n"
         },
         {
           "name": "item",
-          "description": "Custom rendering for each menu item."
+          "description": "Custom rendering for each menu item; scoped props `{ item, index }`, falls back to `{{ item.label }}`. Rendered inside the `role=\"menuitem\"` <li>, which already owns click, keydown, tabindex and aria-disabled — keep the content presentational, nested interactive controls are not reachable inside a menuitem.\n"
         }
       ],
       "a11y": [
-        "role: menu (on the floating list)",
+        "role: menu (on the teleported floating list)",
         "items_role: menuitem",
-        "keyboard: [\"Right-click / contextmenu event opens menu at cursor\",\"ArrowDown / ArrowUp navigates items\",\"Home / End jumps to first / last enabled item\",\"Enter / Space selects focused item\",\"Escape closes menu and restores focus\"]",
-        "aria: [\"aria-disabled on disabled items\",\"aria-label on menu element\"]",
-        "focus: [\"First enabled item receives focus on open\",\"Focus restored to trigger area on close\"]"
+        "keyboard: [\"Right-click / contextmenu event opens menu at cursor\",\"ArrowDown / ArrowUp move focus to the next / previous enabled item (clamped, no wrap)\",\"Home / End jumps to first / last enabled item\",\"Enter / Space selects focused item\",\"Escape closes menu and restores focus\",\"All key handling lives on the items — keys are only handled while an item has focus\"]",
+        "aria: [\"aria-disabled on disabled items (omitted, not false, when enabled)\",\"aria-label=\\\"Context menu\\\" on the menu element — hardcoded, not configurable or localizable\",\"Menu id is generated with createId('t-context-menu'); there is no `id` prop\",\"tabindex 0 on enabled items, -1 on disabled items — no roving tabindex, every enabled item is tab-reachable\"]",
+        "focus: [\"First enabled item receives focus on open\",\"When every item is disabled, focus still goes to the first item; with an empty `items` array nothing is focused\",\"Focus restored to trigger area on close from Escape or item selection\",\"An outside click closes without restoring focus, leaving it where the pointer put it\"]"
       ],
       "behavior": [
-        "Opens at cursor position on right-click (contextmenu event).",
-        "Uses Teleport to body to escape stacking contexts.",
-        "Closes on click outside, Escape key, or item selection.",
-        "Prevents native browser context menu on trigger area.",
-        "Uses position fixed for viewport-relative placement."
+        "Opens at cursor position on right-click (contextmenu event), using event.clientX / clientY.",
+        "Uses Teleport to body to escape stacking contexts; the menu is not a DOM descendant of the trigger.",
+        "Uses position fixed at the raw cursor coordinates, stacked at var(--tree-z-dropdown).",
+        "No collision detection or viewport clamping — a menu opened near the right or bottom edge overflows.",
+        "Closes on pointerdown outside the menu (including on the trigger itself), Escape, or item selection.",
+        "Right-clicking again inside the trigger area repositions the menu — the outside pointerdown closes it and the following contextmenu reopens it at the new coordinates.",
+        "A document-level contextmenu listener covers keyboard-invoked menus (Shift+F10 / Menu key) raised outside the trigger.",
+        "Prevents native browser context menu on trigger area, but only while not disabled.",
+        "Exposes data-state=\"open\" | \"closed\" on the root element for external styling.",
+        "Document pointerdown / contextmenu listeners are attached only while open, and removed on close and before unmount.",
+        "Menu enter / leave uses the shared t-fade transition (opacity plus scale 0.95)."
       ],
       "selection": {
         "keywords": [
@@ -2523,17 +2864,20 @@
         {
           "name": "modelValue",
           "type": "string",
-          "default": ""
+          "default": "",
+          "note": "Parsed with `parseDateValue`, which accepts ONLY a strict `YYYY-MM-DD` string that resolves to a real calendar date. Anything else (empty, `2026-13-01`, an ISO datetime, a Date object stringified) resolves to null and the trigger falls back to `placeholder`. The hidden input, when present, still submits the raw prop verbatim — an unparseable value renders as the placeholder but is submitted as-is."
         },
         {
           "name": "open",
           "type": "boolean",
-          "default": "controlled_optional"
+          "default": "undefined",
+          "note": "Controlled open state. Once a boolean is passed the component stops tracking open state internally — it only emits update:open / open-change and the consumer MUST write the value back, or the calendar never opens."
         },
         {
           "name": "defaultOpen",
           "type": "boolean",
-          "default": "false"
+          "default": "false",
+          "note": "Uncontrolled initial open state, read once on mount. Later changes to it are ignored. Opening this way skips `openCalendar`, so no day button receives DOM focus until the user tabs or arrows into the grid."
         },
         {
           "name": "size",
@@ -2543,41 +2887,48 @@
             "sm",
             "md",
             "lg"
-          ]
+          ],
+          "note": "Sizes the trigger only, never the popover. `md` has no CSS rule of its own — it is the base `.t-date-picker__trigger` styling — but the `t-date-picker--md` class is still rendered."
         },
         {
           "name": "disabled",
           "type": "boolean",
-          "default": "false"
+          "default": "false",
+          "note": "Sets the native `disabled` attribute on the trigger, adds `is-disabled` to the root, short-circuits `openCalendar` and trigger keydown, makes `isDateDisabled` return true for every date, and suppresses the popover entirely (`v-if=\"isOpen && !disabled\"`) even while `open` is true."
         },
         {
           "name": "invalid",
           "type": "boolean",
-          "default": "false"
+          "default": "false",
+          "note": "Adds `is-invalid` to the root and `aria-invalid=\"true\"` to the trigger. Purely presentational — it does not block opening or selection."
         },
         {
           "name": "placeholder",
           "type": "string",
-          "default": "Select date"
+          "default": "Select date",
+          "note": "Rendered inside `.t-date-picker__value` with a `data-placeholder` attribute whenever `modelValue` does not parse."
         },
         {
           "name": "locale",
           "type": "string",
-          "default": "en-US"
+          "default": "en-US",
+          "note": "BCP-47 tag passed to three separate `Intl.DateTimeFormat` calls: the trigger text (day numeric / month long / year numeric), the popover month caption (month long / year numeric), and the weekday header (weekday short). It does NOT localize the per-day `aria-label`, which is always the raw `YYYY-MM-DD` key."
         },
         {
           "name": "min",
           "type": "string",
-          "default": ""
+          "default": "",
+          "note": "Inclusive lower bound. Days before it get the native `disabled` attribute and cannot be selected or arrowed onto; the Previous-month nav button is disabled once the view reaches the min month. A value that fails `parseDateValue` is ignored, i.e. treated as no bound."
         },
         {
           "name": "max",
           "type": "string",
-          "default": ""
+          "default": "",
+          "note": "Inclusive upper bound, mirroring `min`: out-of-range days are disabled and the Next-month nav button is disabled once the view reaches the max month."
         },
         {
           "name": "weekStartsOn",
-          "type": "number",
+          "type": "0 | 1 | 2 | 3 | 4 | 5 | 6",
           "default": "0",
           "values": [
             "0",
@@ -2587,46 +2938,90 @@
             "4",
             "5",
             "6"
-          ]
+          ],
+          "note": "0 = Sunday. Drives the weekday header order, the leading offset of the day grid, and the Home/End keys (which jump to the first/last day of the week as defined by this prop)."
         },
         {
           "name": "id",
           "type": "string",
-          "default": "auto"
+          "default": "auto",
+          "note": "Names the CALENDAR POPOVER, not the trigger. It becomes the popover's `id` (referenced by the trigger's `aria-controls` while open) and seeds the month caption id as `${id}-caption`. Read once at setup — later changes are ignored. Because `id` is a declared prop it never falls through to the trigger button, so the trigger has no id and a `<label for>` / `TFormField html-for` cannot target it; name the control with `aria-label` instead."
         }
       ],
       "events": [
         {
-          "name": "update:modelValue"
+          "name": "update:modelValue",
+          "description": "Emitted with the chosen day as `YYYY-MM-DD` from `selectDate` only — a click or Enter/Space on an enabled day button. Nothing else in the component emits it; there is no clear affordance, so the value never becomes `\"\"` on its own.",
+          "payload": "[\"string\"]"
         },
         {
-          "name": "update:open"
+          "name": "update:open",
+          "description": "Emitted whenever the open state changes. Deduped — no emit when the next value equals the current one.",
+          "payload": "[\"boolean\"]"
         },
         {
-          "name": "open-change"
+          "name": "open-change",
+          "description": "Emitted immediately after `update:open`, with the same payload. Alias for consumers that do not use v-model:open.",
+          "payload": "[\"boolean\"]"
         },
         {
-          "name": "select"
+          "name": "select",
+          "description": "Emitted from `selectDate` immediately after `update:modelValue`, with the same `YYYY-MM-DD` payload. It is the user-intent signal: it fires only on an actual day activation and never when `modelValue` changes from outside, which is what distinguishes it from `update:modelValue`.",
+          "payload": "[\"string\"]"
         }
       ],
       "slots": [
         {
-          "name": "prefix"
+          "name": "prefix",
+          "description": "Leading content inside the trigger button, before the value text. Rendered only when the slot is supplied, wrapped in `<span class=\"t-date-picker__slot t-date-picker__slot--prefix\">`. No scoped props. Content is inside a `<button>`, so it must be presentational only."
         },
         {
-          "name": "suffix"
+          "name": "suffix",
+          "description": "Trailing content inside the trigger button, in `<span class=\"t-date-picker__slot t-date-picker__slot--suffix\">`. Unlike `prefix` the wrapper is always rendered; supplying the slot replaces the default calendar icon. No scoped props, and the same presentational-only restriction applies."
         }
       ],
       "a11y": [
+        "role: dialog",
+        "accessible_name: None is generated for the trigger beyond its own text content, which is the formatted date or the placeholder — that changes as the user picks, so it is not a stable label. Pass `aria-label` (see example). The `id` prop cannot be used to link an external <label>.",
         "trigger_has_popup_dialog: true",
+        "trigger_aria_expanded: true",
+        "trigger_aria_controls_when_open: true",
+        "aria_invalid_when_invalid: true",
         "calendar_uses_grid_roles: true",
+        "calendar_aria_modal: false",
+        "calendar_labelled_by_month_caption: true",
+        "weekday_header_is_aria_hidden: true",
+        "aria_selected_rendered_on_every_gridcell: true",
+        "aria_current_date_on_today: true",
+        "day_aria_label_is_the_raw_iso_key: true",
+        "nav_buttons_labelled_previous_month_and_next_month: true",
+        "roving_tabindex_one_focusable_day: true",
         "escape_closes: true",
-        "returns_focus_to_trigger_after_selection: true"
+        "returns_focus_to_trigger_after_selection: true",
+        "returns_focus_to_trigger_on_escape_from_a_day: true",
+        "focus_is_not_trapped_and_tab_leaves_the_open_calendar: true"
       ],
       "behavior": [
+        "value_format: YYYY-MM-DD",
+        "controlled_and_uncontrolled_open: true",
+        "open_state_emits_are_deduped: true",
         "selection_closes_popover: true",
         "hidden_input_created_when_name_attr_present: true",
-        "out_of_range_dates_disabled: true"
+        "hidden_input_submits_the_raw_unparsed_model_value: true",
+        "out_of_range_dates_disabled: true",
+        "min_and_max_also_disable_the_month_nav_buttons: true",
+        "popover_is_not_rendered_while_disabled: true",
+        "outside_click_closes_calendar: true",
+        "outside_click_is_detected_on_pointerdown_on_document: true",
+        "outside_click_and_trigger_toggle_close_without_restoring_focus: true",
+        "grid_is_always_six_weeks_forty_two_days: true",
+        "leading_and_trailing_days_render_muted_and_stay_selectable: true",
+        "opening_syncs_the_view_to_the_selected_date_else_the_last_focused_date_else_today: true",
+        "external_model_value_changes_move_the_view_and_the_focused_day: true",
+        "clearing_the_model_value_resets_the_view_to_today_only_while_closed: true",
+        "month_nav_moves_the_focused_day_to_the_first_of_the_new_month_and_focuses_it: true",
+        "today_is_computed_once_at_setup_not_re_evaluated_across_midnight: true",
+        "popover_renders_in_flow_with_no_portal_and_no_flip_positioning: true"
       ],
       "selection": {
         "keywords": [
@@ -2660,7 +3055,7 @@
       "name": "TDateTimePicker",
       "aliases": [],
       "package": "@treeui/vue",
-      "kind": "form",
+      "kind": "form_overlay",
       "category": "Data Entry",
       "status": "available",
       "purpose": "Date and time picker with a calendar grid, time selection, and overlay trigger.",
@@ -2673,7 +3068,7 @@
           "name": "modelValue",
           "type": "string",
           "default": "",
-          "note": "Uses `YYYY-MM-DDTHH:mm`."
+          "note": "Always emitted as `YYYY-MM-DDTHH:mm`. On input it also parses `YYYY-MM-DD` (midnight) and `YYYY-MM-DDTHH:mm:ss`; anything else parses to null and renders the placeholder."
         },
         {
           "name": "open",
@@ -2693,17 +3088,20 @@
             "sm",
             "md",
             "lg"
-          ]
+          ],
+          "note": "Renders as `t-date-picker--<size>` on the root — there is no `t-date-time-picker--<size>` modifier."
         },
         {
           "name": "disabled",
           "type": "boolean",
-          "default": "false"
+          "default": "false",
+          "note": "Blocks opening via click/keyboard and suppresses the overlay entirely, even when `open` is true."
         },
         {
           "name": "loading",
           "type": "boolean",
-          "default": "false"
+          "default": "false",
+          "note": "Only swaps the default suffix icon for a TSpinner; the trigger stays enabled and interactive."
         },
         {
           "name": "invalid",
@@ -2718,33 +3116,38 @@
         {
           "name": "locale",
           "type": "string",
-          "default": "en-US"
+          "default": "en-US",
+          "note": "Feeds all four Intl.DateTimeFormat calls: trigger text, draft preview, month caption, weekday labels."
         },
         {
           "name": "min",
           "type": "string",
-          "default": ""
+          "default": "",
+          "note": "`YYYY-MM-DD` (resolved to 00:00 of that day) or `YYYY-MM-DDTHH:mm`."
         },
         {
           "name": "max",
           "type": "string",
-          "default": ""
+          "default": "",
+          "note": "`YYYY-MM-DD` (resolved to 23:59:59.999 of that day) or `YYYY-MM-DDTHH:mm`."
         },
         {
           "name": "weekStartsOn",
           "type": "0 | 1 | 2 | 3 | 4 | 5 | 6",
-          "default": "0"
+          "default": "0",
+          "note": "0 = Sunday. Reorders the weekday header labels, the grid start date, and Home/End day navigation."
         },
         {
           "name": "id",
           "type": "string",
-          "default": "auto"
+          "default": "auto",
+          "note": "Id of the overlay dialog only — not of the root or the trigger. Read once at setup, so later changes are ignored. The trigger points at it with aria-controls while open."
         },
         {
           "name": "step",
           "type": "number",
           "default": "60",
-          "note": "Seconds between time options."
+          "note": "Seconds between minute options. Must be a positive multiple of 60 below 3600; any other value falls back to 1-minute options. Hours are always 0-23 regardless of step."
         }
       ],
       "events": [
@@ -2764,12 +3167,28 @@
           "name": "select"
         }
       ],
-      "slots": [],
+      "slots": [
+        {
+          "name": "prefix"
+        },
+        {
+          "name": "suffix"
+        }
+      ],
       "a11y": [
         "role: dialog",
+        "aria_modal: false — the overlay is non-modal and does not trap focus",
         "trigger_aria_haspopup: dialog",
         "trigger_aria_expanded: true",
-        "focus_restores_on_close: true",
+        "trigger_aria_controls_when_open: true",
+        "overlay_labelled_by_month_caption: true",
+        "calendar_uses_grid_roles: true",
+        "day_buttons_use_roving_tabindex: true",
+        "day_buttons_aria_pressed_when_selected: true",
+        "gridcell_aria_selected: true",
+        "weekday_row_aria_hidden: true",
+        "time_selects_have_aria_labels: true",
+        "focus_restores_on_close: Only when closing via Apply, Clear, or Escape from a day button. Closing by clicking the trigger, Escape on the trigger, or an outside pointerdown leaves focus where it is.",
         "keyboard_calendar_navigation: true",
         "escape_closes_overlay: true",
         "aria_invalid_when_invalid: true",
@@ -2779,7 +3198,21 @@
         "controlled_and_uncontrolled_open: true",
         "value_format: YYYY-MM-DDTHH:mm",
         "min_and_max_limit_available_values: true",
-        "time_options_generated_from_step: true"
+        "time_options_generated_from_step: true",
+        "draft_then_commit: Choosing a day and changing the Hour/Minute selects mutate an internal draft only. Nothing is emitted and the overlay does NOT close until Apply — unlike TDatePicker, where selecting a day commits and closes.",
+        "apply_emit_order: update:modelValue, then change, then select — all carrying the same `YYYY-MM-DDTHH:mm` string.",
+        "clear_emits_empty_string: Clear emits update:modelValue, change, and select with `''`, then closes.",
+        "default_draft_when_value_is_empty: Now, rounded UP to the next `step` boundary (minimum 60s) with seconds zeroed, then clamped into min/max.",
+        "draft_resyncs_from_model_value_only_while_closed: true",
+        "draft_is_clamped_into_min_max_on_open_and_on_day_select: true",
+        "minute_options_always_include_the_current_draft_minute: true",
+        "hour_option_disabled_when_no_minute_in_that_hour_is_available: true",
+        "month_nav_buttons_disabled_at_min_max_month: true",
+        "out_of_range_days_disabled: true",
+        "outside_pointerdown_closes: true",
+        "overlay_is_not_rendered_while_disabled: true",
+        "hidden_input_created_when_name_attr_present: true",
+        "open_state_emits_are_deduped: true"
       ],
       "selection": {
         "keywords": [
@@ -2819,7 +3252,7 @@
       "aliases": [],
       "package": "@treeui/vue",
       "category": "Layout",
-      "description": "Horizontal or vertical visual separator.",
+      "description": "Horizontal or vertical visual separator. Renders a single native <hr> and nothing else — there is no default slot, so the \"text in the middle of a rule\" pattern (an \"OR\" divider) is NOT supported; compose that yourself from a flex row plus TText. The `label` prop is an accessible name only, never visible text. There are no size, variant, tone, or spacing props.\n",
       "sourceFile": "packages/vue/src/components/TDivider.vue",
       "storyFile": "apps/docs/src/stories/Divider.stories.ts",
       "storyTitle": "Components/Layout/Divider",
@@ -2827,34 +3260,41 @@
       "props": [
         {
           "name": "orientation",
-          "type": "string",
+          "type": "\"horizontal\" | \"vertical\"",
           "default": "horizontal",
           "values": [
             "horizontal",
             "vertical"
-          ]
+          ],
+          "description": "Selects the `t-divider--{orientation}` modifier — the only class the component varies. `horizontal` spans the full inline width (width 100%, height 0) with `margin-block` spacing. `vertical` is a zero-width rule (width 0, height auto) that takes its height from `align-self: stretch`, so it is only visible inside a flex or grid row — in a plain block container it collapses to zero height and renders nothing.\n"
         },
         {
           "name": "decorative",
           "type": "boolean",
           "default": "true",
-          "description": "When true, renders role='none' (purely visual). When false, renders as role='separator'."
+          "description": "When true (the default) renders `role=\"none\"` and no ARIA attributes at all — purely visual, removed from the accessibility tree, and the `label` prop is dropped. When false renders `role=\"separator\"` plus `aria-orientation`, and `aria-label` when `label` is set.\n"
         },
         {
           "name": "label",
           "type": "string",
           "required": false,
-          "description": "Accessible label for non-decorative dividers."
+          "description": "Accessible name, applied as `aria-label` ONLY when `decorative` is false. Because `decorative` defaults to true, `<TDivider label=\"Section\" />` on its own renders no label at all — pass `:decorative=\"false\"` as well. Never rendered as visible text.\n"
         }
       ],
       "events": [],
       "slots": [],
       "a11y": [
-        "role: none (decorative) or separator (semantic)",
-        "aria-orientation: Set when non-decorative.",
-        "aria-label: Set from `label` prop when non-decorative."
+        "role: \"none\" when decorative (the default), \"separator\" when `decorative` is false.",
+        "aria-orientation: Set to the `orientation` value only when `decorative` is false; omitted otherwise. Note that \"horizontal\" is already the implicit default for `role=\"separator\"`, so it is redundant there but harmless.",
+        "aria-label: Set from the `label` prop only when `decorative` is false. Omitted when `label` is unset, so a non-decorative divider without a label is an unnamed separator (valid — separators need no name).",
+        "notes: The decorative default is the right one for most dividers: a purely visual rule should not be announced. Use `:decorative=\"false\"` only when the rule genuinely separates two sections that assistive technology should perceive as distinct, and pair it with `label` when the sections need naming."
       ],
-      "behavior": [],
+      "behavior": [
+        "Renders a native <hr> element as its single root node.",
+        "Extra attrs and class/style fall through to that <hr> (attribute inheritance is not disabled).",
+        "Applies exactly two classes; no state, size, or variant modifiers exist.",
+        "A vertical divider needs a flex or grid parent to have any height."
+      ],
       "selection": {
         "keywords": [],
         "useWhen": [],
@@ -2884,67 +3324,73 @@
           "name": "segments",
           "type": "TDonutSegment[]",
           "default": "[]",
-          "note": "Each item is { label: string; value: number; color?: string }. Non-positive values are omitted."
+          "note": "Each item is { label: string; value: number; color?: string }. Values <= 0 are filtered out before anything renders — they reach neither the chart, the legend, nor the segment count in the auto aria-label. Because the palette cycles by *visible* index, dropping a non-positive item shifts the colors of every segment after it."
         },
         {
           "name": "size",
           "type": "number",
           "default": "200",
-          "note": "Square canvas in px."
+          "note": "Square canvas in px; applied to both the svg and the figure box. Donut geometry insets the ring by thickness/2 + 3px so the hover growth cannot clip; pie geometry uses a radius of size/2 - 2."
         },
         {
           "name": "thickness",
           "type": "number",
           "default": "26",
-          "note": "Ring thickness; 0 renders a full pie."
+          "note": "Ring thickness in px. `0` switches the whole render mode: segments become filled wedges to the center (a pie) and the center block is not rendered at all. Hovering a donut segment temporarily draws it at thickness + 4."
         },
         {
           "name": "gap",
           "type": "number",
           "default": "2",
-          "note": "Gap between slices, in degrees."
+          "note": "Gap between slices, in degrees. In donut mode it is converted to arc length on the mid-radius circle and then floored — the effective gap is at least 2px, or at least thickness + 2px when rounded — so small values (including 0) still leave a visible seam. Forced to 0 whenever exactly one segment is visible."
         },
         {
           "name": "rounded",
           "type": "boolean",
           "default": "false",
-          "note": "Round the ends of donut segments (widens the gap to make room). Best with a thinner ring."
+          "note": "Round the ends of donut segments (widens the gap to make room). Best with a thinner ring. Donut only — stroke-linecap is not applied to pie wedges, so it is ignored when thickness is 0."
         },
         {
           "name": "showLegend",
           "type": "boolean",
-          "default": "true"
+          "default": "true",
+          "note": "The legend only renders when there is data — it is suppressed in the empty state even when true, but it is NOT suppressed while loading, so real values sit next to the skeleton. The has-legend root class tracks the prop alone, not whether the legend actually rendered."
         },
         {
           "name": "showPercent",
           "type": "boolean",
-          "default": "true"
+          "default": "true",
+          "note": "Legend only. Percentages are rounded to whole numbers, so they may not sum to exactly 100%."
         },
         {
           "name": "centerLabel",
           "type": "string",
-          "default": "Total",
-          "note": "Donut only; ignored for pie."
+          "default": "undefined",
+          "note": "Static label under the center value. Falls back to the literal string 'Total' when unset, and is replaced by the hovered segment's label while a segment is hovered. Donut only; the center block is not rendered for a pie."
         },
         {
           "name": "centerValue",
           "type": "string | number",
-          "default": "auto (sum of values)"
+          "default": "undefined",
+          "note": "Overrides the auto total in the center readout; falls back to the formatted sum of the visible values. Interpolated as-is (no valueFormat). Lower precedence than hover: hovering a segment replaces it with that segment's formatted value. Donut only."
         },
         {
           "name": "valueFormat",
           "type": "(value: number) => string",
-          "default": "locale integers for |value| >= 1000"
+          "default": "locale integers for |value| >= 1000",
+          "note": "Applies to the legend values and to the center value. Not applied to percentages, nor to an explicitly supplied centerValue."
         },
         {
           "name": "loading",
           "type": "boolean",
-          "default": "false"
+          "default": "false",
+          "note": "Replaces the figure with a pulsing skeleton disc and adds the is-loading root class. Takes precedence over the empty state; the legend still renders when data is present."
         },
         {
           "name": "ariaLabel",
           "type": "string",
-          "default": "auto-generated summary"
+          "default": "auto-generated summary ('Donut chart with <n> segments' / 'Pie chart with <n> segments')",
+          "note": "Applied to the inner <svg role=\"img\">, which only exists in the data state — neither the loading nor the empty state carries it."
         }
       ],
       "events": [],
@@ -2957,13 +3403,20 @@
         }
       ],
       "a11y": [
-        "Renders role=img with an aria-label summarizing the chart.",
-        "Legend + percentages give a non-visual reading of each slice."
+        "The inner <svg> carries role=img plus the ariaLabel (or the auto-generated summary); the root div has no role or accessible name.",
+        "Legend + percentages give a non-visual reading of each slice.",
+        "The hover readout is pointer-only — segments are not focusable and there is no keyboard equivalent, so never make it the only way to reach a value. The legend already carries the same numbers.",
+        "Legend swatches are aria-hidden, so color is never the only carrier of identity.",
+        "Provide a meaningful ariaLabel describing what the chart shows."
       ],
       "behavior": [
-        "colors_auto_assign_from_chart_palette: --tree-color-chart-1..8, cycling; per-segment color overrides",
-        "hovering_a_slice_dims_the_rest_and_updates_center: true",
-        "center_shows_total_or_the_hovered_segment: true"
+        "colors_auto_assign_from_chart_palette: --tree-color-chart-1..8, cycling by visible-segment index; per-segment color overrides",
+        "hovering_a_slice_dims_the_rest_and_updates_center: the other segments get is-dimmed, the hovered donut segment grows to thickness + 4, and its legend row gets is-active",
+        "hovering_a_legend_row_drives_the_same_highlight: legend items carry the same pointerenter/pointerleave handlers as the segments",
+        "center_readout_precedence: hovered segment > centerValue > formatted total; the label half is hovered segment label > centerLabel > 'Total'",
+        "single_segment_drops_the_gap: with exactly one visible segment the gap is forced to 0 in both donut and pie mode, so the ring/disc closes",
+        "empty_state_when_no_visible_segment_has_value: total <= 0 renders the empty slot instead of the svg; loading wins over it",
+        "segments_fade_in_staggered: 70ms animation delay per segment index; removed under prefers-reduced-motion"
       ],
       "selection": {
         "keywords": [
@@ -3019,17 +3472,20 @@
         {
           "name": "open",
           "type": "boolean",
-          "default": "controlled_optional"
+          "default": "controlled_optional",
+          "note": "Runtime default is `undefined`. While it holds anything other than `undefined` the drawer is fully controlled — the internal state is ignored and the panel only moves when the parent updates this prop."
         },
         {
           "name": "defaultOpen",
           "type": "boolean",
-          "default": "false"
+          "default": "false",
+          "note": "Uncontrolled initial state. Read once on setup — later changes are ignored. Only meaningful while `open` is undefined. Opening this way skips the on-open side effects; see behavior.initial_open_skips_open_side_effects."
         },
         {
           "name": "disabled",
           "type": "boolean",
-          "default": "false"
+          "default": "false",
+          "note": "Only blocks opening from the `trigger` slot — the trigger wrapper gets `aria-disabled` and its click is swallowed (preventDefault + stopPropagation). It does NOT block a programmatic open through `open`/`defaultOpen`, and it disables nothing inside the drawer."
         },
         {
           "name": "size",
@@ -3039,7 +3495,8 @@
             "sm",
             "md",
             "lg"
-          ]
+          ],
+          "note": "Applied as `t-drawer__surface--<size>`. Sizes the cross axis of the panel: width for `side: left | right`, height for `side: top | bottom`."
         },
         {
           "name": "side",
@@ -3050,42 +3507,50 @@
             "right",
             "bottom",
             "left"
-          ]
+          ],
+          "note": "Applied as `t-drawer__surface--<side>`. Also selects the slide-in translate direction and which corners are rounded."
         },
         {
           "name": "title",
           "type": "string",
-          "default": ""
+          "default": "",
+          "note": "Rendered as `t-drawer__title` inside the fallback content of the `header` slot. An empty title with no `header` slot removes the header block entirely and leaves `aria-labelledby` unset — the dialog then has no accessible name."
         },
         {
           "name": "description",
           "type": "string",
-          "default": ""
+          "default": "",
+          "note": "Rendered as `t-drawer__description` between the topbar and the body, and referenced by `aria-describedby`. Only rendered when non-empty. The `content`/`default` body is NOT part of the accessible description."
         },
         {
           "name": "closeOnEscape",
           "type": "boolean",
-          "default": "true"
+          "default": "true",
+          "note": "Escape is handled on the surface's own keydown, so it only fires while focus is inside the drawer. When enabled the handler also calls preventDefault."
         },
         {
           "name": "closeOnOverlay",
           "type": "boolean",
-          "default": "true"
+          "default": "true",
+          "note": "Applies to clicks on `t-drawer__backdrop` only. The backdrop is a sibling of the surface, not an ancestor, so clicks inside the panel never reach it regardless of this prop."
         },
         {
           "name": "showCloseButton",
           "type": "boolean",
-          "default": "true"
+          "default": "true",
+          "note": "The topbar renders when `title` or the `header` slot is present OR this is true. Setting it false with no title and no `header` slot collapses the topbar entirely."
         },
         {
           "name": "closeLabel",
           "type": "string",
-          "default": "Close drawer"
+          "default": "Close drawer",
+          "note": "Accessible name (aria-label) of the header close button, which is icon-only and has no text. Only rendered when `showCloseButton` is true. The component's only localisation hook."
         },
         {
           "name": "id",
           "type": "string",
-          "default": "auto"
+          "default": "auto",
+          "note": "Id of the dialog surface; seeds `<id>-title` and `<id>-description`. Read once on setup (not reactive). Auto-generated via `createId('t-drawer')` when omitted."
         }
       ],
       "events": [
@@ -3098,34 +3563,53 @@
       ],
       "slots": [
         {
-          "name": "trigger"
+          "name": "trigger",
+          "description": "Element that opens the drawer on click. Omit for controlled or imperative use."
         },
         {
-          "name": "header"
+          "name": "header",
+          "description": "Replaces the default title heading in the topbar."
         },
         {
-          "name": "default"
+          "name": "default",
+          "description": "Drawer body content."
         },
         {
-          "name": "content"
+          "name": "content",
+          "description": "Drawer body content; takes precedence over the default slot."
         },
         {
-          "name": "footer"
+          "name": "footer",
+          "description": "Action row pinned under the body."
         }
       ],
       "a11y": [
         "role: dialog",
         "aria_modal: true",
         "focus_trap: true",
-        "restores_focus_on_close: true",
-        "escape_closes_when_enabled: true"
+        "restores_focus_on_close: {\"value\":\"partial\",\"detail\":\"The previously focused element is recorded only in the trigger-click path. A drawer opened programmatically — by setting `open` from elsewhere, or by `defaultOpen` — records nothing, so focus is not restored on close. Move focus back yourself in that case.\\n\"}",
+        "escape_closes_when_enabled: true",
+        "escape_scope: The keydown listener lives on the surface, so Escape only closes while focus is inside the drawer.",
+        "accessible_name_source: the `t-drawer__header` div, via aria-labelledby; unset when `title` is empty and no `header` slot is supplied",
+        "accessible_description_source: the `description` prop, via aria-describedby; the body slots are not included",
+        "initial_focus: First focusable element inside the surface, else the surface itself (`tabindex=\\\"-1\\\"`, with a visible `:focus-visible` ring). Applied on the closed → open transition only.",
+        "backdrop_marked_aria_hidden: true",
+        "trigger_state_not_announced: The trigger wrapper gets no aria-haspopup, aria-expanded, or aria-controls, and no scoped props are exposed to build them. A trigger that needs to announce the drawer must wire those attributes from consumer state."
       ],
       "behavior": [
         "uses_teleport_to_body: true",
         "locks_body_scroll_while_open: true",
         "overlay_click_closes_when_enabled: true",
         "close_button_optional: true",
-        "slides_in_from_side: true"
+        "slides_in_from_side: true",
+        "root_uses_display_contents_without_trigger: `t-drawer` is `display: inline-flex`, but a root with no `t-drawer__trigger` child switches to `display: contents` so the empty wrapper does not generate a line box and add stray height to the page.",
+        "topbar_rendered_when: title is non-empty OR the `header` slot is supplied OR showCloseButton is true",
+        "body_slot_precedence: content > default",
+        "footer_rendered_when: the `footer` slot is supplied",
+        "data_state_attribute: `data-state=\"open\" | \"closed\"` on both the `t-drawer` root and the `t-drawer__portal`",
+        "focus_trap_detail: Tab and Shift+Tab cycle within the surface. With no focusable descendants, Tab is swallowed and focus is pushed back to the surface itself.",
+        "initial_open_skips_open_side_effects: {\"value\":true,\"detail\":\"The on-open work — body scroll lock and initial focus — runs from a watcher on the open state that is not immediate, so a drawer that starts open via `defaultOpen: true` (or an `open` prop already true on first render) never locks scroll and never moves focus into the surface. Focus trap and Escape therefore stay dormant until the user tabs in. Start closed and open on the next tick if you need the full behavior.\\n\"}",
+        "body_scroll_lock_scope: {\"value\":\"per_component_instance\",\"detail\":\"The overlay counter and the saved `overflow` value are per instance, not shared across overlays. Two overlays open at once each restore what they individually saw, so closing the first-opened one while a second is still open unlocks page scroll early.\\n\"}"
       ],
       "selection": {
         "keywords": [
@@ -3173,22 +3657,25 @@
           "name": "items",
           "type": "TDropdownItem[]",
           "default": "[]",
-          "note": "Array of { label: string; value: string; disabled?: boolean }"
+          "note": "Array of { label: string; value: string; disabled?: boolean }. Each entry renders one `<li role=\"menuitem\">`, keyed by `value` — values must be unique, because the internal element map that drives focus is also keyed by `value` and duplicates collide. With the default `[]` the component still renders an empty `<ul role=\"menu\">` and focus stays on the trigger; there is no empty-state affordance (no `emptyText`, no `empty` slot), so guard on `items.length` yourself."
         },
         {
           "name": "open",
           "type": "boolean",
-          "default": "undefined"
+          "default": "undefined",
+          "note": "Controlled open state. Once a boolean is passed the component stops tracking open state internally — it only emits update:open / open-change and the consumer MUST write the value back, or the menu never opens. Flipping it externally does not run the open routine: no item is focused and the outside-click listener is only attached from the transition, so an initially-`true` value opens the menu with focus untouched."
         },
         {
           "name": "defaultOpen",
           "type": "boolean",
-          "default": "false"
+          "default": "false",
+          "note": "Uncontrolled initial open state, read once on mount. Later changes to it are ignored. It renders the menu already open but does NOT focus the first item (focusedIndex stays -1, so no `is-focused` row) and does NOT arm the outside-click listener until the open state changes at least once — see behavior.outside_click_closes_menu."
         },
         {
           "name": "disabled",
           "type": "boolean",
-          "default": "false"
+          "default": "false",
+          "note": "Sets the native `disabled` attribute on the built-in trigger button, adds `is-disabled` to the root, and suppresses the menu entirely (`v-if=\"isOpen && !disabled\"`) — even while `open` is true. Also short-circuits openMenu, toggleMenu and the trigger keydown handler. It is bound only to the default button, so a custom `trigger` slot must render its own disabled state."
         },
         {
           "name": "size",
@@ -3198,12 +3685,14 @@
             "sm",
             "md",
             "lg"
-          ]
+          ],
+          "note": "Sizes the trigger and the menu rows. `t-dropdown--md` is emitted but has no CSS rule of its own — it is the base `.t-dropdown__trigger` / `.t-dropdown__item` styling."
         },
         {
           "name": "label",
           "type": "string",
-          "default": ""
+          "default": "",
+          "note": "Text of the built-in trigger button AND the menu's accessible name (`:aria-label=\"label || undefined\"` on the `<ul role=\"menu\">`). A custom `trigger` slot does not render `label`, but it still names the menu — keep passing it, or the menu has no accessible name at all."
         },
         {
           "name": "align",
@@ -3213,24 +3702,30 @@
             "start",
             "end"
           ],
-          "note": "Horizontal alignment of the menu relative to the trigger. Use `end` when the trigger sits near the right edge of a clipping container (e.g. a table actions column)."
+          "note": "Horizontal alignment of the menu relative to the trigger — `start` pins `left: 0`, `end` pins `right: 0`. Use `end` when the trigger sits near the right edge of a clipping container (e.g. a table actions column). There is no collision detection: the menu is a plain absolutely-positioned child of the root, so it never flips and is clipped by any ancestor with `overflow: hidden`."
         },
         {
           "name": "id",
           "type": "string",
           "default": "undefined",
-          "note": "Custom id for the menu element. Auto-generated when omitted; also exposed to the `trigger` slot as `menuId` so a custom trigger can wire aria-controls."
+          "note": "Custom id for the menu element. Auto-generated when omitted; also exposed to the `trigger` slot as `menuId` so a custom trigger can wire aria-controls. Resolved once during setup — it is NOT reactive, so changing `id` after mount has no effect."
         }
       ],
       "events": [
         {
-          "name": "select"
+          "name": "select",
+          "description": "Emitted with the chosen item's `value`. Disabled items never emit. Fires before the menu closes; the close that follows restores focus to the trigger.",
+          "payload": "[{\"value\":\"string\"}]"
         },
         {
-          "name": "update:open"
+          "name": "update:open",
+          "description": "Emitted whenever the open state changes. Deduped — no emit when the next value equals the current one.",
+          "payload": "[\"boolean\"]"
         },
         {
-          "name": "open-change"
+          "name": "open-change",
+          "description": "Emitted immediately after `update:open`, with the same payload. Alias for consumers that do not use v-model:open.",
+          "payload": "[\"boolean\"]"
         }
       ],
       "slots": [
@@ -3243,24 +3738,39 @@
       ],
       "a11y": [
         "role: menu",
+        "menu_accessible_name_comes_from_the_label_prop: true",
         "trigger_aria_haspopup: menu",
         "trigger_aria_expanded: true",
         "trigger_aria_controls: menu id, while open",
         "custom_trigger_caveat: The three trigger_aria_* guarantees above describe the BUILT-IN trigger button only. A custom `trigger` slot replaces that button, so the consumer must bind them from the `isOpen` and `menuId` scoped props — see slots.trigger.",
+        "item_role: menuitem",
         "aria_disabled_on_disabled_items: true",
+        "disabled_items_get_tabindex_minus_1_but_stay_programmatically_focusable: true",
         "focus_visible_on_trigger: true",
+        "items_receive_real_dom_focus_no_aria_activedescendant: true",
         "keyboard_arrow_navigation: true",
+        "arrow_navigation_skips_disabled_items: true",
+        "arrow_navigation_does_not_wrap_at_the_ends: true",
+        "arrow_down_or_arrow_up_on_the_trigger_both_open_at_the_first_enabled_item: true",
         "escape_closes_menu: true",
         "enter_space_selects_item: true",
-        "home_end_navigation: true"
+        "home_end_navigation: true",
+        "no_typeahead: true",
+        "tab_does_not_close_the_menu: true"
       ],
       "behavior": [
-        "outside_click_closes_menu: true",
+        "outside_click_closes_menu: {\"value\":true,\"detail\":\"Detected on a document `pointerdown` listener that is attached by a watcher on the open state. The watcher is not immediate, so a menu that is already open on mount — via `defaultOpen` or an initially-`true` `open` — has no listener until the open state changes at least once, and outside clicks do not close it.\\n\"}",
         "outside_click_restores_focus: false",
         "chevron_rotates_when_open: true",
         "menu_grows_to_fit_items_without_wrapping: true",
-        "opening_focuses_first_enabled_item: true",
-        "focus_restores_on_close: {\"value\":true,\"detail\":\"Focus returns to the trigger when the menu closes from inside it — selecting an item or pressing Escape. It deliberately does NOT move focus on an outside click, where the pointer has already placed focus elsewhere.\\n\",\"applies_to_custom_trigger\":true}"
+        "menu_scrolls_vertically_past_15rem: true",
+        "menu_renders_in_flow_with_no_portal_and_no_flip_positioning: true",
+        "menu_is_not_rendered_while_disabled: true",
+        "open_state_emits_are_deduped: true",
+        "controlled_open_requires_writing_the_value_back: true",
+        "opening_focuses_first_enabled_item: {\"value\":true,\"detail\":\"Applies to the open routine only — a click or Enter/Space/ArrowDown/ArrowUp on the trigger. `defaultOpen` and an externally driven `open` skip it, leaving focusedIndex at -1 with no row focused and no `is-focused` class. With an empty `items` array focus stays on the trigger; when every item is disabled, focus lands on the first (disabled) item.\\n\"}",
+        "keyboard_activation_on_the_trigger_never_closes_the_menu: {\"value\":true,\"detail\":\"Clicking the trigger toggles, but Enter/Space/Arrow keys always call the open routine, so pressing them while the menu is open re-focuses the first enabled item instead of closing. Escape is the keyboard close.\\n\"}",
+        "focus_restores_on_close: {\"value\":true,\"detail\":\"Focus returns to the trigger when the menu closes from inside it — selecting an item or pressing Escape on an item. Closing from the trigger itself (clicking it again, or Escape while the trigger holds focus) does not run the restore, because focus is already there. It deliberately does NOT move focus on an outside click, where the pointer has already placed focus elsewhere.\\n\",\"applies_to_custom_trigger\":true}"
       ],
       "selection": {
         "keywords": [
@@ -3415,7 +3925,7 @@
           "name": "disabled",
           "type": "boolean",
           "default": "false",
-          "description": "The ONLY prop that gates interaction. Disables the dropzone, the native input, Clear all, and every per-row Remove/Retry."
+          "description": "The ONLY prop that gates interaction. Disables the dropzone, the native input, Clear all, and every per-row Remove/Retry, and makes the paste and drop handlers early-return."
         },
         {
           "name": "loading",
@@ -3440,13 +3950,15 @@
         },
         {
           "name": "maxFiles",
-          "type": "number",
-          "default": "none"
+          "type": "number | null",
+          "default": "null",
+          "description": "Cap on the TOTAL list size, not on one batch — remaining slots are counted against the files already selected. `multiple: false` overrides it with a hard cap of 1. Values below 0 are clamped to 0, which rejects everything."
         },
         {
           "name": "maxFileSize",
-          "type": "number",
-          "default": "none"
+          "type": "number | null",
+          "default": "null",
+          "description": "Per-file byte cap. Enforced only when it is a number greater than 0 — both `null` and `0` disable the check."
         },
         {
           "name": "label",
@@ -3667,19 +4179,20 @@
             "sm",
             "md",
             "lg"
-          ]
+          ],
+          "description": "Box height, taken from `--tree-size-icon-sm/md/lg` (16px / 20px / 24px); the box width is 3:2 of that height. Also selects which CDN asset pair is requested — see `baseUrl`."
         },
         {
           "name": "label",
           "type": "string",
           "default": "undefined",
-          "description": "Accessible label. When set, the flag becomes role=\"img\" with aria-label; otherwise it is aria-hidden."
+          "description": "Accessible label. When set, the flag becomes role=\"img\" with aria-label; otherwise it is aria-hidden. An empty string counts as unset — the flag stays decorative."
         },
         {
           "name": "fallbackText",
           "type": "string",
           "default": "undefined",
-          "description": "Text shown when the image cannot load. Defaults to the uppercased `code`."
+          "description": "Text shown when the image cannot load. Defaults to the normalized `code` uppercased, so a padded `\" br \"` falls back to `BR`."
         }
       ],
       "events": [],
@@ -3687,6 +4200,9 @@
       "a11y": [
         "decorative_by_default: true",
         "becomes_image_when_labeled: true",
+        "image_alt_is_always_empty: The `<img>` always carries `alt=\"\"`, so the accessible name comes only from `label` on the root span — never from the image itself.",
+        "fallback_text_is_hidden_when_decorative: The fallback text renders inside the root span, so without `label` it inherits `aria-hidden=\"true\"` and is not announced. It is a visual affordance, not an accessible name.",
+        "consumer_aria_label_does_not_replace_label: Fallthrough attributes land on the same root span, so a consumer-supplied `aria-label` overrides the one built from `label` — but it does not set `role=\"img\"` or clear `aria-hidden=\"true\"`, leaving the flag hidden and the label unannounced. Use the `label` prop instead.",
         "rule: Provide `label` only when the flag carries meaning that is not already in adjacent text — inside a language option the label is redundant."
       ],
       "behavior": [
@@ -3698,7 +4214,9 @@
         "retina_asset_is_at_least_twice_the_box_height: Box heights come from `--tree-size-icon-sm/md/lg` (16px / 20px / 24px) and the srcset asset is h40 (sm, md) or h60 (lg), so a 2x screen never upscales.",
         "size_outside_the_union_falls_back_to_md: A JS consumer can pass a size outside `TSize`; the asset lookup falls back to the md pair rather than throwing on an undefined entry.",
         "base_url_trailing_slash_is_normalised: Trailing slashes are stripped from `baseUrl` before the path is appended, so a self-hosted mirror cannot silently produce a double-slashed URL.",
+        "sm_and_md_share_one_asset_pair: sm and md both request h20 (h40 at 2x); only lg differs (h24, h60 at 2x). Four distinct segments exist in total, not one pair per size step, so a mirror needs four directories per flag.",
         "path_template_is_public_contract: Changing `baseUrl` is a config change, not a breaking one, as long as the mirror serves the same fixed-height segments (h20, h24, h40, h60).",
+        "image_element_is_removed_not_hidden_on_failure: The `<img>` is behind `v-if`, so a failed load takes it out of the DOM and swaps in the fallback span — it is not left in place with `display: none`.",
         "no_country_or_locale_dataset_is_shipped: TreeUI never maps a language or locale to a country code — the application owns that decision."
       ],
       "selection": {
@@ -8227,7 +8745,7 @@
       "purpose": "Hierarchical tree view with expansion, keyboard navigation, and single or multiple selection.",
       "sourceFile": "packages/vue/src/components/TTreeView.vue",
       "storyFile": "apps/docs/src/stories/TreeView.stories.ts",
-      "storyTitle": "Components/Navigation & Disclosure/TView",
+      "storyTitle": "Components/Navigation & Disclosure/TreeView",
       "manifestFile": "docs/ai/COMPONENTS/tree-view.yaml",
       "props": [
         {

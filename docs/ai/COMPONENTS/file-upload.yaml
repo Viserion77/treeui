@@ -16,7 +16,7 @@ props:
   disabled:
     type: boolean
     default: false
-    description: "The ONLY prop that gates interaction. Disables the dropzone, the native input, Clear all, and every per-row Remove/Retry."
+    description: "The ONLY prop that gates interaction. Disables the dropzone, the native input, Clear all, and every per-row Remove/Retry, and makes the paste and drop handlers early-return."
   loading:
     type: boolean
     default: false
@@ -31,11 +31,13 @@ props:
     type: boolean
     default: true
   maxFiles:
-    type: number
-    default: none
+    type: number | null
+    default: "null"
+    description: "Cap on the TOTAL list size, not on one batch — remaining slots are counted against the files already selected. `multiple: false` overrides it with a hard cap of 1. Values below 0 are clamped to 0, which rejects everything."
   maxFileSize:
-    type: number
-    default: none
+    type: number | null
+    default: "null"
+    description: "Per-file byte cap. Enforced only when it is a number greater than 0 — both `null` and `0` disable the check."
   label:
     type: string
     default: Drop files here

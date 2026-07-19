@@ -1,7 +1,7 @@
 name: TDateTimePicker
 source_file: packages/vue/src/components/TDateTimePicker.vue
 package: "@treeui/vue"
-kind: form
+kind: form_overlay
 status: available
 purpose: "Date and time picker with a calendar grid, time selection, and overlay trigger."
 
@@ -9,7 +9,9 @@ props:
   modelValue:
     type: string
     default: ""
-    note: "Uses `YYYY-MM-DDTHH:mm`."
+    note: >-
+      Always emitted as `YYYY-MM-DDTHH:mm`. On input it also parses `YYYY-MM-DD` (midnight)
+      and `YYYY-MM-DDTHH:mm:ss`; anything else parses to null and renders the placeholder.
   open:
     type: boolean
     default: undefined
@@ -20,12 +22,15 @@ props:
     type: TSize
     default: md
     values: [sm, md, lg]
+    note: "Renders as `t-date-picker--<size>` on the root — there is no `t-date-time-picker--<size>` modifier."
   disabled:
     type: boolean
     default: false
+    note: "Blocks opening via click/keyboard and suppresses the overlay entirely, even when `open` is true."
   loading:
     type: boolean
     default: false
+    note: "Only swaps the default suffix icon for a TSpinner; the trigger stays enabled and interactive."
   invalid:
     type: boolean
     default: false
@@ -35,22 +40,31 @@ props:
   locale:
     type: string
     default: en-US
+    note: "Feeds all four Intl.DateTimeFormat calls: trigger text, draft preview, month caption, weekday labels."
   min:
     type: string
     default: ""
+    note: "`YYYY-MM-DD` (resolved to 00:00 of that day) or `YYYY-MM-DDTHH:mm`."
   max:
     type: string
     default: ""
+    note: "`YYYY-MM-DD` (resolved to 23:59:59.999 of that day) or `YYYY-MM-DDTHH:mm`."
   weekStartsOn:
     type: "0 | 1 | 2 | 3 | 4 | 5 | 6"
     default: 0
+    note: "0 = Sunday. Reorders the weekday header labels, the grid start date, and Home/End day navigation."
   id:
     type: string
     default: auto
+    note: >-
+      Id of the overlay dialog only — not of the root or the trigger. Read once at setup, so later
+      changes are ignored. The trigger points at it with aria-controls while open.
   step:
     type: number
     default: 60
-    note: "Seconds between time options."
+    note: >-
+      Seconds between minute options. Must be a positive multiple of 60 below 3600; any other
+      value falls back to 1-minute options. Hours are always 0-23 regardless of step.
 
 events:
   - update:modelValue
@@ -59,23 +73,120 @@ events:
   - change
   - select
 
-slots: []
+slots:
+  - prefix
+  - suffix
+
+forwards_attrs_to: trigger_button
 
 a11y:
   role: dialog
+  aria_modal: "false — the overlay is non-modal and does not trap focus"
   trigger_aria_haspopup: dialog
   trigger_aria_expanded: true
-  focus_restores_on_close: true
+  trigger_aria_controls_when_open: true
+  overlay_labelled_by_month_caption: true
+  calendar_uses_grid_roles: true
+  day_buttons_use_roving_tabindex: true
+  day_buttons_aria_pressed_when_selected: true
+  gridcell_aria_selected: true
+  weekday_row_aria_hidden: true
+  time_selects_have_aria_labels: true
+  focus_restores_on_close: >-
+    Only when closing via Apply, Clear, or Escape from a day button. Closing by clicking the
+    trigger, Escape on the trigger, or an outside pointerdown leaves focus where it is.
   keyboard_calendar_navigation: true
   escape_closes_overlay: true
   aria_invalid_when_invalid: true
   aria_busy_when_loading: true
+
+keyboard:
+  trigger_open: [Enter, Space, ArrowDown, ArrowUp]
+  trigger_close: [Escape]
+  day_navigation: [ArrowLeft, ArrowRight, ArrowUp, ArrowDown, Home, End, PageUp, PageDown, Escape]
+  day_select: [Enter, Space]
+  month_jump: "PageUp/PageDown move one month; Shift+PageUp/Shift+PageDown move one year."
+  home_end_follow_week_starts_on: true
 
 behavior:
   controlled_and_uncontrolled_open: true
   value_format: YYYY-MM-DDTHH:mm
   min_and_max_limit_available_values: true
   time_options_generated_from_step: true
+  draft_then_commit: >-
+    Choosing a day and changing the Hour/Minute selects mutate an internal draft only. Nothing is
+    emitted and the overlay does NOT close until Apply — unlike TDatePicker, where selecting a day
+    commits and closes.
+  apply_emit_order: "update:modelValue, then change, then select — all carrying the same `YYYY-MM-DDTHH:mm` string."
+  clear_emits_empty_string: "Clear emits update:modelValue, change, and select with `''`, then closes."
+  default_draft_when_value_is_empty: >-
+    Now, rounded UP to the next `step` boundary (minimum 60s) with seconds zeroed, then clamped
+    into min/max.
+  draft_resyncs_from_model_value_only_while_closed: true
+  draft_is_clamped_into_min_max_on_open_and_on_day_select: true
+  minute_options_always_include_the_current_draft_minute: true
+  hour_option_disabled_when_no_minute_in_that_hour_is_available: true
+  month_nav_buttons_disabled_at_min_max_month: true
+  out_of_range_days_disabled: true
+  outside_pointerdown_closes: true
+  overlay_is_not_rendered_while_disabled: true
+  hidden_input_created_when_name_attr_present: true
+  open_state_emits_are_deduped: true
+
+transition: t-fade
+
+css_classes:
+  block: t-date-time-picker
+  shares_block_with: t-date-picker
+  elements:
+    - t-date-picker__trigger
+    - t-date-time-picker__trigger
+    - t-date-picker__slot
+    - t-date-picker__slot--prefix
+    - t-date-picker__slot--suffix
+    - t-date-picker__value
+    - t-date-picker__content
+    - t-date-time-picker__content
+    - t-date-time-picker__calendar
+    - t-date-picker__header
+    - t-date-picker__nav
+    - t-date-picker__month
+    - t-date-picker__weekdays
+    - t-date-picker__weekday
+    - t-date-picker__grid
+    - t-date-picker__row
+    - t-date-picker__cell
+    - t-date-picker__day
+    - t-date-time-picker__summary
+    - t-date-time-picker__eyebrow
+    - t-date-time-picker__summary-value
+    - t-date-time-picker__time
+    - t-date-time-picker__time-field
+    - t-date-time-picker__time-label
+    - t-date-time-picker__select
+    - t-date-time-picker__footer
+  modifiers:
+    - t-date-picker--sm
+    - t-date-picker--md
+    - t-date-picker--lg
+  states:
+    - is-open
+    - is-disabled
+    - is-invalid
+    - is-loading
+    - is-muted
+    - is-selected
+    - is-today
+
+notes:
+  - "The root carries BOTH `t-date-picker` and `t-date-time-picker`, and reuses the date-picker size modifier (`t-date-picker--md`), so any CSS targeting `.t-date-picker` also hits TDateTimePicker."
+  - "`is-open`, `is-disabled`, `is-invalid` and `is-loading` sit on the root <div>; `is-muted`, `is-selected` and `is-today` sit on each `button.t-date-picker__day`."
+  - "The root also carries `data-state=\"open\" | \"closed\"`; the value span carries `data-placeholder=\"true\"` while no value is selected, and each day button carries `data-date=\"YYYY-MM-DD\"`."
+  - "`prefix` renders only when the slot is supplied (v-if=\"$slots.prefix\"). `suffix` always renders and has fallback content — a TSpinner when `loading`, otherwise the calendar icon — so overriding it removes the loading indicator. Neither slot has scoped props; both render inside the trigger <button>, so they must stay presentational."
+  - "inheritAttrs is false: `class` and `style` land on the root <div>, `name` is consumed to render a hidden input mirroring `modelValue`, and every other fallthrough attr (aria-label, data-*, native listeners) goes to the trigger <button>."
+  - "The Clear/Apply footer buttons reuse `t-button t-button--ghost t-button--sm` and `t-button t-button--solid t-button--sm` directly; they are plain <button> elements, not TButton instances."
+  - "`select` fires on Clear too, with an empty string — treat it as \"the user committed a value\", not \"a date was chosen\"."
+  - "There is no `width` prop; constrain the control from its container or with a class passed through to the root."
 
 example: |
   <TDateTimePicker

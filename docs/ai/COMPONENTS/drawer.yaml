@@ -5,65 +5,151 @@ kind: overlay
 status: available
 purpose: "Side-anchored panel for secondary content, navigation, or forms."
 
+usage:
+  vue_pattern: >
+    Supports `v-model:open` via the `open` prop and `update:open` event. The
+    `trigger` slot is optional — omit it and drive the drawer entirely from
+    `open` (or from `defaultOpen`, subject to the caveat in
+    behavior.initial_open_skips_open_side_effects).
+
 props:
   open:
     type: boolean
     default: controlled_optional
+    note: "Runtime default is `undefined`. While it holds anything other than `undefined` the drawer is fully controlled — the internal state is ignored and the panel only moves when the parent updates this prop."
   defaultOpen:
     type: boolean
     default: false
+    note: "Uncontrolled initial state. Read once on setup — later changes are ignored. Only meaningful while `open` is undefined. Opening this way skips the on-open side effects; see behavior.initial_open_skips_open_side_effects."
   disabled:
     type: boolean
     default: false
+    note: "Only blocks opening from the `trigger` slot — the trigger wrapper gets `aria-disabled` and its click is swallowed (preventDefault + stopPropagation). It does NOT block a programmatic open through `open`/`defaultOpen`, and it disables nothing inside the drawer."
   size:
     type: TSize
     default: md
     values: [sm, md, lg]
+    note: "Applied as `t-drawer__surface--<size>`. Sizes the cross axis of the panel: width for `side: left | right`, height for `side: top | bottom`."
   side:
     type: TDrawerSide
     default: right
     values: [top, right, bottom, left]
+    note: "Applied as `t-drawer__surface--<side>`. Also selects the slide-in translate direction and which corners are rounded."
   title:
     type: string
     default: ""
+    note: "Rendered as `t-drawer__title` inside the fallback content of the `header` slot. An empty title with no `header` slot removes the header block entirely and leaves `aria-labelledby` unset — the dialog then has no accessible name."
   description:
     type: string
     default: ""
+    note: "Rendered as `t-drawer__description` between the topbar and the body, and referenced by `aria-describedby`. Only rendered when non-empty. The `content`/`default` body is NOT part of the accessible description."
   closeOnEscape:
     type: boolean
     default: true
+    note: "Escape is handled on the surface's own keydown, so it only fires while focus is inside the drawer. When enabled the handler also calls preventDefault."
   closeOnOverlay:
     type: boolean
     default: true
+    note: "Applies to clicks on `t-drawer__backdrop` only. The backdrop is a sibling of the surface, not an ancestor, so clicks inside the panel never reach it regardless of this prop."
   showCloseButton:
     type: boolean
     default: true
+    note: "The topbar renders when `title` or the `header` slot is present OR this is true. Setting it false with no title and no `header` slot collapses the topbar entirely."
   closeLabel:
     type: string
     default: Close drawer
+    note: "Accessible name (aria-label) of the header close button, which is icon-only and has no text. Only rendered when `showCloseButton` is true. The component's only localisation hook."
   id:
     type: string
     default: auto
+    note: "Id of the dialog surface; seeds `<id>-title` and `<id>-description`. Read once on setup (not reactive). Auto-generated via `createId('t-drawer')` when omitted."
 
 events:
   - update:open
   - open-change
+events_note: >
+  Both carry the same `[value: boolean]` payload and are always emitted together,
+  in that order, from the same state change. `update:open` exists to power
+  `v-model:open`; `open-change` is the plain listener for callers that are not
+  using v-model. Neither fires for a no-op set — `useControllableOpen` returns
+  early when the next value equals the current one.
 
 slots:
-  - trigger
-  - header
-  - default
-  - content
-  - footer
+  trigger:
+    description: "Element that opens the drawer on click. Omit for controlled or imperative use."
+    scoped_props: none
+    note: >
+      There is no built-in trigger button — without this slot no trigger element
+      is rendered at all and the drawer must be driven by `open`/`defaultOpen`.
+      The slot content is wrapped in a plain `t-drawer__trigger` span that owns
+      the click handler and carries `aria-disabled` when `disabled` is set.
+    you_must_supply:
+      - "A natively focusable, click-activated element as the slot root — a `<button type=\"button\">` is the safe default. The wrapper span has no role, no tabindex, and no keydown handler, so Enter/Space only work if the slot content itself is a button."
+      - "aria-haspopup=\"dialog\", aria-expanded, and aria-controls if you want them — the component never sets them, and it exposes no scoped props for the open state or the surface id, so wire them from your own state plus the `id` prop."
+  header:
+    description: "Replaces the default title heading in the topbar."
+    scoped_props: none
+    note: >
+      Rendered inside the `t-drawer__header` div, which is the element
+      `aria-labelledby` points at. Supplying this slot replaces the default
+      `<h2 class=\"t-drawer__title\">{{ title }}</h2>` — `title` then has no
+      effect on what is displayed, but its presence is still what makes the
+      header block render at all, together with the slot itself. Supplying the
+      slot with no `title` is enough to give the dialog an accessible name.
+      Keep a heading element in here so the name is not empty.
+  default:
+    description: "Drawer body content."
+    scoped_props: none
+    note: >
+      Rendered inside `t-drawer__body` as the fallback of the `content` slot, so
+      it is ignored entirely when `content` is supplied. Prefer this slot; use
+      `content` only when a wrapper component needs to fill the body explicitly.
+  content:
+    description: "Drawer body content; takes precedence over the default slot."
+    scoped_props: none
+    note: >
+      Same `t-drawer__body` position as the default slot. When both are supplied,
+      `content` wins and the default slot is never rendered.
+  footer:
+    description: "Action row pinned under the body."
+    scoped_props: none
+    note: >
+      The `t-drawer__footer` wrapper is only rendered when this slot is supplied.
+      No buttons are provided — the drawer ships no default actions.
 
-forwards_attrs_to: trigger_wrapper
+forwards_attrs_to: split_root_and_trigger_wrapper
+attrs_note: >
+  Sets `inheritAttrs: false` and splits fallthrough attrs by hand: `class` and
+  `style` are merged onto the `t-drawer` root div, and every other attr is bound
+  to the `t-drawer__trigger` wrapper span. Because that span is only rendered
+  when the `trigger` slot is filled, a triggerless drawer silently drops all
+  non-class/style attrs. Nothing is forwarded to the teleported surface — target
+  it through the `id` prop instead.
 
 a11y:
   role: dialog
   aria_modal: true
   focus_trap: true
-  restores_focus_on_close: true
+  restores_focus_on_close:
+    value: partial
+    detail: >
+      The previously focused element is recorded only in the trigger-click path.
+      A drawer opened programmatically — by setting `open` from elsewhere, or by
+      `defaultOpen` — records nothing, so focus is not restored on close. Move
+      focus back yourself in that case.
   escape_closes_when_enabled: true
+  escape_scope: "The keydown listener lives on the surface, so Escape only closes while focus is inside the drawer."
+  accessible_name_source: "the `t-drawer__header` div, via aria-labelledby; unset when `title` is empty and no `header` slot is supplied"
+  accessible_description_source: "the `description` prop, via aria-describedby; the body slots are not included"
+  initial_focus: >
+    First focusable element inside the surface, else the surface itself
+    (`tabindex=\"-1\"`, with a visible `:focus-visible` ring). Applied on the
+    closed → open transition only.
+  backdrop_marked_aria_hidden: true
+  trigger_state_not_announced: >
+    The trigger wrapper gets no aria-haspopup, aria-expanded, or aria-controls,
+    and no scoped props are exposed to build them. A trigger that needs to
+    announce the drawer must wire those attributes from consumer state.
 
 behavior:
   uses_teleport_to_body: true
@@ -71,5 +157,85 @@ behavior:
   overlay_click_closes_when_enabled: true
   close_button_optional: true
   slides_in_from_side: true
+  root_uses_display_contents_without_trigger: >
+    `t-drawer` is `display: inline-flex`, but a root with no `t-drawer__trigger`
+    child switches to `display: contents` so the empty wrapper does not generate
+    a line box and add stray height to the page.
+  topbar_rendered_when: "title is non-empty OR the `header` slot is supplied OR showCloseButton is true"
+  body_slot_precedence: "content > default"
+  footer_rendered_when: "the `footer` slot is supplied"
+  data_state_attribute: "`data-state=\"open\" | \"closed\"` on both the `t-drawer` root and the `t-drawer__portal`"
+  focus_trap_detail: >
+    Tab and Shift+Tab cycle within the surface. With no focusable descendants,
+    Tab is swallowed and focus is pushed back to the surface itself.
+  initial_open_skips_open_side_effects:
+    value: true
+    detail: >
+      The on-open work — body scroll lock and initial focus — runs from a watcher
+      on the open state that is not immediate, so a drawer that starts open via
+      `defaultOpen: true` (or an `open` prop already true on first render) never
+      locks scroll and never moves focus into the surface. Focus trap and Escape
+      therefore stay dormant until the user tabs in. Start closed and open on the
+      next tick if you need the full behavior.
+  body_scroll_lock_scope:
+    value: per_component_instance
+    detail: >
+      The overlay counter and the saved `overflow` value are per instance, not
+      shared across overlays. Two overlays open at once each restore what they
+      individually saw, so closing the first-opened one while a second is still
+      open unlocks page scroll early.
+
+css_classes:
+  block: t-drawer
+  elements:
+    - t-drawer__trigger
+    - t-drawer__portal
+    - t-drawer__backdrop
+    - t-drawer__surface
+    - t-drawer__topbar
+    - t-drawer__header
+    - t-drawer__title
+    - t-drawer__close
+    - t-drawer__description
+    - t-drawer__body
+    - t-drawer__footer
+  modifiers:
+    - "t-drawer__surface--sm | t-drawer__surface--md | t-drawer__surface--lg"
+    - "t-drawer__surface--top | t-drawer__surface--right | t-drawer__surface--bottom | t-drawer__surface--left"
+
+transition: t-drawer-fade
+z_index: var(--tree-z-modal)
 
 example: '<TDrawer title="Settings" side="right"><template #trigger><TButton>Open drawer</TButton></template><p>Drawer content</p></TDrawer>'
+
+example_controlled: |
+  <!-- No trigger slot: the drawer is driven entirely from the parent.
+       Nothing records the previously focused element here, so restore it yourself. -->
+  <TDrawer
+    v-model:open="settingsOpen"
+    side="right"
+    size="lg"
+    title="Customize dashboard"
+    description="Preferences are saved on this device."
+  >
+    <TStack>
+      <TSwitch v-model="compact">Compact rows</TSwitch>
+    </TStack>
+    <template #footer>
+      <TButton variant="ghost" @click="reset">Restore defaults</TButton>
+      <TButton @click="settingsOpen = false">Done</TButton>
+    </template>
+  </TDrawer>
+
+example_custom_header: |
+  <!-- The header slot replaces the default <h2>; it is the element
+       aria-labelledby points at, so keep a heading inside it. -->
+  <TDrawer v-model:open="open" close-label="Fechar painel">
+    <template #header>
+      <TStack direction="horizontal" align="center" gap="var(--tree-space-2)">
+        <h2 class="t-drawer__title">Filters</h2>
+        <TBadge tone="info">{{ activeCount }}</TBadge>
+      </TStack>
+    </template>
+    <FilterForm />
+  </TDrawer>

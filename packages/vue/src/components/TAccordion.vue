@@ -141,9 +141,9 @@ function focusLast() {
 }
 
 provide(accordionInjectionKey, {
-  type: props.type,
-  disabled: props.disabled,
-  collapsible: props.collapsible,
+  type: computed(() => props.type),
+  disabled: computed(() => props.disabled),
+  collapsible: computed(() => props.collapsible),
   isItemOpen,
   toggleItem,
   registerTrigger,

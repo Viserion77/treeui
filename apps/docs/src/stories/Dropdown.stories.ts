@@ -15,6 +15,7 @@ const meta = {
   tags: ['autodocs'],
   args: {
     size: 'md',
+    align: 'start',
     disabled: false,
     label: 'Actions',
     items: menuItems,
@@ -23,6 +24,10 @@ const meta = {
     size: {
       control: 'select',
       options: ['sm', 'md', 'lg'],
+    },
+    align: {
+      control: 'select',
+      options: ['start', 'end'],
     },
   },
 } satisfies Meta<typeof TDropdown>;

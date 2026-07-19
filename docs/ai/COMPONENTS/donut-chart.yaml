@@ -9,61 +9,106 @@ props:
   segments:
     type: "TDonutSegment[]"
     default: "[]"
-    note: "Each item is { label: string; value: number; color?: string }. Non-positive values are omitted."
+    note: "Each item is { label: string; value: number; color?: string }. Values <= 0 are filtered out before anything renders — they reach neither the chart, the legend, nor the segment count in the auto aria-label. Because the palette cycles by *visible* index, dropping a non-positive item shifts the colors of every segment after it."
   size:
     type: number
     default: 200
-    note: "Square canvas in px."
+    note: "Square canvas in px; applied to both the svg and the figure box. Donut geometry insets the ring by thickness/2 + 3px so the hover growth cannot clip; pie geometry uses a radius of size/2 - 2."
   thickness:
     type: number
     default: 26
-    note: "Ring thickness; 0 renders a full pie."
+    note: "Ring thickness in px. `0` switches the whole render mode: segments become filled wedges to the center (a pie) and the center block is not rendered at all. Hovering a donut segment temporarily draws it at thickness + 4."
   gap:
     type: number
     default: 2
-    note: "Gap between slices, in degrees."
+    note: "Gap between slices, in degrees. In donut mode it is converted to arc length on the mid-radius circle and then floored — the effective gap is at least 2px, or at least thickness + 2px when rounded — so small values (including 0) still leave a visible seam. Forced to 0 whenever exactly one segment is visible."
   rounded:
     type: boolean
     default: false
-    note: "Round the ends of donut segments (widens the gap to make room). Best with a thinner ring."
+    note: "Round the ends of donut segments (widens the gap to make room). Best with a thinner ring. Donut only — stroke-linecap is not applied to pie wedges, so it is ignored when thickness is 0."
   showLegend:
     type: boolean
     default: true
+    note: "The legend only renders when there is data — it is suppressed in the empty state even when true, but it is NOT suppressed while loading, so real values sit next to the skeleton. The has-legend root class tracks the prop alone, not whether the legend actually rendered."
   showPercent:
     type: boolean
     default: true
+    note: "Legend only. Percentages are rounded to whole numbers, so they may not sum to exactly 100%."
   centerLabel:
     type: string
-    default: "Total"
-    note: "Donut only; ignored for pie."
+    default: undefined
+    note: "Static label under the center value. Falls back to the literal string 'Total' when unset, and is replaced by the hovered segment's label while a segment is hovered. Donut only; the center block is not rendered for a pie."
   centerValue:
     type: "string | number"
-    default: "auto (sum of values)"
+    default: undefined
+    note: "Overrides the auto total in the center readout; falls back to the formatted sum of the visible values. Interpolated as-is (no valueFormat). Lower precedence than hover: hovering a segment replaces it with that segment's formatted value. Donut only."
   valueFormat:
     type: "(value: number) => string"
     default: "locale integers for |value| >= 1000"
+    note: "Applies to the legend values and to the center value. Not applied to percentages, nor to an explicitly supplied centerValue."
   loading:
     type: boolean
     default: false
+    note: "Replaces the figure with a pulsing skeleton disc and adds the is-loading root class. Takes precedence over the empty state; the legend still renders when data is present."
   ariaLabel:
     type: string
-    default: "auto-generated summary"
+    default: "auto-generated summary ('Donut chart with <n> segments' / 'Pie chart with <n> segments')"
+    note: "Applied to the inner <svg role=\"img\">, which only exists in the data state — neither the loading nor the empty state carries it."
 
 slots:
-  - center   # scope: { total: number; active: TDonutSegment | null }  — donut only
-  - empty
+  - center   # scope: { total: number; active: TDonutSegment | null } — donut only, data state only; falls back to the center value + label readout
+  - empty    # unscoped — falls back to the text "No data"; not reached while loading
 
 types:
   TDonutSegment: "{ label: string; value: number; color?: string }"
 
 behavior:
-  colors_auto_assign_from_chart_palette: "--tree-color-chart-1..8, cycling; per-segment color overrides"
-  hovering_a_slice_dims_the_rest_and_updates_center: true
-  center_shows_total_or_the_hovered_segment: true
+  colors_auto_assign_from_chart_palette: "--tree-color-chart-1..8, cycling by visible-segment index; per-segment color overrides"
+  hovering_a_slice_dims_the_rest_and_updates_center: "the other segments get is-dimmed, the hovered donut segment grows to thickness + 4, and its legend row gets is-active"
+  hovering_a_legend_row_drives_the_same_highlight: "legend items carry the same pointerenter/pointerleave handlers as the segments"
+  center_readout_precedence: "hovered segment > centerValue > formatted total; the label half is hovered segment label > centerLabel > 'Total'"
+  single_segment_drops_the_gap: "with exactly one visible segment the gap is forced to 0 in both donut and pie mode, so the ring/disc closes"
+  empty_state_when_no_visible_segment_has_value: "total <= 0 renders the empty slot instead of the svg; loading wins over it"
+  segments_fade_in_staggered: "70ms animation delay per segment index; removed under prefers-reduced-motion"
+
+css:
+  block: t-donut-chart
+  elements:
+    - t-donut-chart__figure
+    - t-donut-chart__svg
+    - t-donut-chart__segment
+    - t-donut-chart__segment--arc
+    - t-donut-chart__segment--wedge
+    - t-donut-chart__center
+    - t-donut-chart__center-value
+    - t-donut-chart__center-label
+    - t-donut-chart__legend
+    - t-donut-chart__legend-item
+    - t-donut-chart__legend-swatch
+    - t-donut-chart__legend-label
+    - t-donut-chart__legend-value
+    - t-donut-chart__legend-percent
+    - t-donut-chart__empty
+    - t-donut-chart__skeleton
+  states:
+    - is-loading    # on the root; unstyled hook — the skeleton element does the visual work
+    - has-legend    # on the root; unstyled hook, mirrors the showLegend prop rather than the rendered legend
+    - is-dimmed     # on t-donut-chart__segment, for every segment except the hovered one
+    - is-active     # on t-donut-chart__legend-item, for the hovered segment
+
+forwards_attrs_to: root_div
 
 a11y:
-  - "Renders role=img with an aria-label summarizing the chart."
+  - "The inner <svg> carries role=img plus the ariaLabel (or the auto-generated summary); the root div has no role or accessible name."
   - "Legend + percentages give a non-visual reading of each slice."
+  - "The hover readout is pointer-only — segments are not focusable and there is no keyboard equivalent, so never make it the only way to reach a value. The legend already carries the same numbers."
+  - "Legend swatches are aria-hidden, so color is never the only carrier of identity."
+  - "Provide a meaningful ariaLabel describing what the chart shows."
+
+notes:
+  - "t-donut-chart__segment--arc renders no dedicated CSS rule; arc appearance comes from the stroke attributes."
+  - "Both modes start the first segment at the top: donut arcs are rotated -90deg, pie wedges start at 0deg = top by construction."
+  - "The center block is pointer-events: none, so it never blocks hovering the ring underneath it."
 
 example: |
   <TDonutChart

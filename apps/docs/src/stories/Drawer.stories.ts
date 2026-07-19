@@ -15,6 +15,7 @@ const meta = {
     closeOnEscape: true,
     closeOnOverlay: true,
     showCloseButton: true,
+    closeLabel: 'Close drawer',
   },
   argTypes: {
     size: {
@@ -51,6 +52,7 @@ export const Playground: Story = {
         :close-on-escape="args.closeOnEscape"
         :close-on-overlay="args.closeOnOverlay"
         :show-close-button="args.showCloseButton"
+        :close-label="args.closeLabel"
         @update:open="open = $event"
       >
         <template #trigger>

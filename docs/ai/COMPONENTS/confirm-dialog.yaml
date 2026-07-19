@@ -5,6 +5,9 @@ kind: overlay
 status: available
 purpose: "High-level confirmation dialog built on the shared modal contract, with default confirm and cancel actions."
 
+usage:
+  vue_pattern: "Supports `v-model:open` via the `open` prop and `update:open` event. Wraps TModal — it renders into TModal's `content` and `footer` slots and drives TModal's `open` prop, so TModal is always fully controlled from here."
+
 props:
   open:
     type: boolean
@@ -12,55 +15,72 @@ props:
   defaultOpen:
     type: boolean
     default: false
+    note: "Uncontrolled initial state. Read once on setup — later changes are ignored. Only meaningful when `open` is left undefined."
   disabled:
     type: boolean
     default: false
+    note: "Only blocks opening from the `trigger` slot (the trigger wrapper gets `aria-disabled` and its click is swallowed). It does NOT block a programmatic open through `open`/`defaultOpen`, and it does not disable the confirm/cancel buttons — use `confirmDisabled`/`cancelDisabled` for those."
   size:
     type: TSize
     default: sm
     values: [sm, md, lg]
+    note: "Forwarded to TModal and applied as `t-modal__surface--<size>` — it sizes the dialog surface, not the confirm-dialog block, and it does not size the default footer buttons (those are always TButton `md`)."
   title:
     type: string
     default: ""
+    note: "Rendered by TModal as `t-modal__title` and referenced by `aria-labelledby`. TConfirmDialog does not expose TModal's `header` slot, so an empty title leaves the dialog without an accessible name."
   description:
     type: string
     default: ""
+    note: "Rendered by TModal as `t-modal__description` and referenced by `aria-describedby`. The default slot body is NOT part of the accessible description."
   confirmLabel:
     type: string
     default: Confirm
+    note: "Ignored when the `actions` slot is supplied."
   cancelLabel:
     type: string
     default: Cancel
+    note: "Ignored when the `actions` slot is supplied."
   confirmVariant:
     type: TVariant
     default: danger
+    values: [solid, outline, ghost, soft, danger]
+    note: "Ignored when the `actions` slot is supplied."
   confirmDisabled:
     type: boolean
     default: false
+    note: "Disables the default confirm button AND short-circuits the confirm handler — no `confirm` emit and no close, including when the handler is invoked from the `actions` slot scope."
   cancelDisabled:
     type: boolean
     default: false
+    note: "Disables the default cancel button AND short-circuits the cancel handler — no `cancel` emit and no close, including when the handler is invoked from the `actions` slot scope."
   loading:
     type: boolean
     default: false
+    note: "Puts the default confirm button into its spinner state (TButton adds `is-loading`, `aria-busy`, and the native `disabled` attribute) and short-circuits the confirm handler exactly like `confirmDisabled`. It does not affect the cancel button. Also passed to the `actions` slot scope so a custom footer can mirror the state."
   closeOnEscape:
     type: boolean
     default: true
   closeOnOverlay:
     type: boolean
     default: false
+    note: "Deliberately opt-in — TModal defaults this to true, TConfirmDialog flips it to false so a confirmation is not dismissed by a stray backdrop click."
   showCloseButton:
     type: boolean
     default: false
+    note: "Deliberately opt-in — TModal defaults this to true. Enabling it adds a header close button that dismisses without emitting `cancel`."
   closeLabel:
     type: string
     default: Close dialog
+    note: "Accessible name of the header close button. Only rendered when `showCloseButton` is true."
   closeOnConfirm:
     type: boolean
     default: true
+    note: "Set false for async confirmation: `confirm` fires but the dialog stays open, so the caller can hold it open with `loading` while the request resolves and then close it via `open`."
   closeOnCancel:
     type: boolean
     default: true
+    note: "Set false to keep the dialog open after `cancel` — the caller then owns closing via `open`."
 
 events:
   - confirm
@@ -69,25 +89,114 @@ events:
   - open-change
 
 slots:
-  - trigger
-  - icon
-  - default
-  - actions
+  trigger:
+    description: "Element that opens the dialog on click. Omit for imperative use."
+    scoped_props: none
+    note: >
+      Rendered into TModal's `trigger` slot, inside the `t-modal__trigger` wrapper
+      span that owns the click handler. Omit it entirely for imperative use — with
+      no trigger slot no wrapper element is rendered at all, and the dialog must be
+      driven by `open` or `defaultOpen`.
+  icon:
+    description: "Decorative leading icon. Presence switches the block to the two-column icon layout."
+    scoped_props: none
+    note: >
+      Decorative only. Wrapped in `t-confirm-dialog__icon` with `aria-hidden="true"`,
+      so anything conveyed by icon alone is invisible to assistive tech — put it in
+      `title` or `description` instead. Supplying the slot at all also toggles the
+      `t-confirm-dialog--with-icon` modifier on the block, which switches the body
+      to the icon layout.
+  default:
+    description: "Extra body content rendered under the description."
+    scoped_props: none
+    note: >
+      Extra body content, rendered inside `t-confirm-dialog__body`. The wrapper is
+      only rendered when the slot is supplied. It supplements `description` rather
+      than replacing it, and it is not referenced by `aria-describedby`.
+  actions:
+    description: "Replaces the whole footer. Scope gives you confirm(), cancel(), and loading."
+    scoped_props: "{ confirm: () => void, cancel: () => void, loading: boolean }"
+    replaces: "both default footer buttons (cancel + confirm)"
+    note: >
+      Fills TModal's `footer` slot. Because it replaces the whole footer,
+      `confirmLabel`, `cancelLabel`, and `confirmVariant` stop having any effect
+      once this slot is supplied.
+    you_must_supply:
+      - "Your own cancel affordance — nothing is rendered for you, and a confirm-only footer leaves keyboard users with Escape as the only way out (and none at all if `closeOnEscape` is false and `showCloseButton` is false)."
+      - "Calls to the provided `confirm` / `cancel` rather than your own emits — they run the `confirmDisabled`/`cancelDisabled`/`loading` guards, emit `confirm`/`cancel`, and honour `closeOnConfirm`/`closeOnCancel`."
+      - "Your own busy state from the `loading` scope prop — the built-in spinner and the native disabled attribute belong to the default confirm button, which is gone."
+slots_not_forwarded: >
+  TModal's `header`, `content`, and `footer` slots are consumed internally and are
+  NOT re-exposed. Passing `#header`, `#content`, or `#footer` to TConfirmDialog
+  renders nothing.
+
+forwards_attrs_to: modal
+attrs_note: >
+  Sets `inheritAttrs: false` and `v-bind="attrs"` onto the inner TModal, so
+  fallthrough attrs land wherever TModal puts them: `class` and `style` on the
+  `t-modal` root, every other attr on the `t-modal__trigger` wrapper span — which
+  only exists when the `trigger` slot is filled. One consequence worth knowing:
+  TModal declares an `id` prop that TConfirmDialog does not redeclare, so an `id`
+  passed to TConfirmDialog is consumed as the modal surface id instead of landing
+  as a DOM attribute on the wrapper.
 
 behavior:
   built_on_modal_contract: true
   default_confirm_button_variant: danger
+  default_cancel_button_variant: ghost
   overlay_click_disabled_by_default: true
   close_button_hidden_by_default: true
   loading_state_applies_to_confirm_button: true
-  default_actions_close_dialog_when_enabled: true
+  confirm_suppressed_when: "confirmDisabled || loading — the handler returns before emitting, so neither `confirm` nor the close runs"
+  cancel_suppressed_when: "cancelDisabled — the handler returns before emitting, so neither `cancel` nor the close runs"
+  closes_after_confirm_when: closeOnConfirm
+  closes_after_cancel_when: closeOnCancel
+  guards_and_auto_close_apply_to_actions_slot: true
+  close_button_and_escape_do_not_emit_cancel: true
+  inherits_teleport_scroll_lock_and_focus_trap_from_modal: true
 
 a11y:
   role: dialog
   aria_modal: true
   focus_trap: inherited_from_modal
   restores_focus_on_close: inherited_from_modal
+  restore_focus_caveat: >
+    TModal only records the previously focused element when the dialog is opened
+    by clicking its `trigger` slot. A dialog opened programmatically — by setting
+    `open` from a row action, a menu item, or `defaultOpen` — has nothing recorded,
+    so focus is not restored on close. Move focus back yourself in that case.
+  accessible_name_source: "`title` prop, via aria-labelledby; absent when `title` is empty"
+  accessible_description_source: "`description` prop, via aria-describedby; the default slot body is not included"
+  initial_focus: >
+    First focusable element inside the dialog surface. With the default footer and
+    `showCloseButton: false` that is the cancel button, which is the safe landing
+    spot for a destructive confirmation. Enabling `showCloseButton` moves initial
+    focus to the header close button instead. A `loading` or `confirmDisabled`
+    confirm button carries the native `disabled` attribute and is skipped.
   icon_slot_marked_aria_hidden: true
+
+css_classes:
+  block: t-confirm-dialog
+  elements:
+    - t-confirm-dialog__icon
+    - t-confirm-dialog__body
+  modifiers:
+    - t-confirm-dialog--with-icon
+  inherited_from_modal:
+    - t-modal
+    - t-modal__trigger
+    - t-modal__portal
+    - t-modal__backdrop
+    - t-modal__positioner
+    - t-modal__surface
+    - "t-modal__surface--sm | t-modal__surface--md | t-modal__surface--lg"
+    - t-modal__topbar
+    - t-modal__header
+    - t-modal__title
+    - t-modal__close
+    - t-modal__description
+    - t-modal__body
+    - t-modal__footer
 
 example: |
   <TConfirmDialog
@@ -98,5 +207,54 @@ example: |
   >
     <template #trigger>
       <TButton variant="danger">Delete</TButton>
+    </template>
+  </TConfirmDialog>
+
+example_async_confirm: |
+  <!-- Keep the dialog open while the request resolves, then close it by hand. -->
+  <TConfirmDialog
+    v-model:open="open"
+    title="Delete project"
+    description="This permanently removes the project and its history."
+    confirm-label="Delete"
+    :loading="pending"
+    :close-on-confirm="false"
+    :cancel-disabled="pending"
+    @confirm="onConfirm"
+  >
+    <template #trigger>
+      <TButton variant="danger">Delete project</TButton>
+    </template>
+  </TConfirmDialog>
+
+  <!--
+  const onConfirm = async () => {
+    pending.value = true;
+    try {
+      await deleteProject();
+      open.value = false;
+    } finally {
+      pending.value = false;
+    }
+  };
+  -->
+
+example_custom_actions: |
+  <!-- Replacing the footer: call the scoped handlers, and mirror `loading` yourself. -->
+  <TConfirmDialog
+    v-model:open="open"
+    title="Publish changes"
+    description="Reviewers will be notified."
+    :loading="pending"
+    :close-on-confirm="false"
+    @confirm="publish"
+  >
+    <template #actions="{ confirm, cancel, loading }">
+      <TButton variant="ghost" :disabled="loading" @click="cancel">
+        Keep editing
+      </TButton>
+      <TButton variant="solid" :loading="loading" @click="confirm">
+        Publish now
+      </TButton>
     </template>
   </TConfirmDialog>

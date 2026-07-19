@@ -62,3 +62,22 @@ export const Vertical: Story = {
     `,
   }),
 };
+
+/**
+ * A divider is decorative by default (`role="none"`), so assistive tech skips it.
+ * Set `:decorative="false"` when the rule marks a real boundary between groups: the
+ * element then exposes `role="separator"` plus `aria-orientation`, and `label`
+ * names the boundary. `label` is ignored while `decorative` is true.
+ */
+export const Semantic: Story = {
+  render: () => ({
+    components: { TDivider },
+    template: `
+      <div style="max-width: 24rem;">
+        <p>Profile and notification preferences</p>
+        <TDivider :decorative="false" label="Danger zone" />
+        <p>Delete this account permanently</p>
+      </div>
+    `,
+  }),
+};

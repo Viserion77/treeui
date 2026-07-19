@@ -1,36 +1,75 @@
 component: TAvatar
 package: "@treeui/vue"
 source: TAvatar.vue
-description: User image with fallback initials and optional status indicator dot.
+description: User avatar that renders an image when `src` is set, otherwise initials derived from `alt`, plus an optional status indicator dot.
 
 props:
   src:
     type: string
     required: false
-    description: URL of the avatar image.
+    description: >
+      URL of the avatar image. When set, the `<img>` branch renders and the initials span is
+      NOT in the DOM at all (`v-else`). If the image fails to load, the `<img>` is hidden via
+      inline `display: none` — the component does NOT fall back to initials, leaving an empty
+      circle. Pass no `src` if you want initials.
   alt:
     type: string
     default: '""'
-    description: Accessible label for the avatar. Also used to derive initials if `initials` is not set.
+    description: >
+      Accessible label for the avatar and the `alt` attribute of the `<img>`. Also the source
+      for derived initials when `initials` is not set. Defaults to an empty string, in which
+      case no `aria-label` is rendered at all (`alt || undefined`) and derived initials are
+      empty — always pass a meaningful `alt`.
   initials:
     type: string
     required: false
-    description: Explicit initials to display when no image is provided. Overrides derived initials from `alt`.
+    description: >
+      Explicit initials, rendered only when `src` is unset. Takes precedence over initials
+      derived from `alt`. When omitted, initials are derived from `alt` by splitting on spaces,
+      taking the first character of the first two words, and uppercasing (e.g. "Jane Doe" -> "JD").
   size:
     type: TSize
     default: md
     values: [sm, md, lg]
+    description: Fixed square dimensions — sm 2rem, md 2.5rem, lg 3.5rem — with matching font size for initials.
   status:
     type: TAvatarStatus
     required: false
     values: [online, offline, busy, away]
-    description: Shows a colored status dot on the avatar.
+    description: >
+      Shows a colored status dot pinned to the bottom-right of the avatar bounding box. Renders
+      alongside either branch (image or initials). The dot sits on the corner outside the
+      circular mask, so `.t-avatar` deliberately has no `overflow: hidden`.
+
+events: []
 
 slots:
   default:
-    description: Optional overlay content inside the avatar.
+    description: >
+      Optional overlay content, rendered inside the `.t-avatar` span after the image/initials and
+      before the status dot. The parent is `position: relative`, so children can be absolutely
+      positioned. Note the wrapper carries `role="img"`, which makes its subtree presentational
+      to assistive technology — slot content is visual only and will not be announced.
+
+types:
+  TAvatarStatus: "'online' | 'offline' | 'busy' | 'away' — exported from @treeui/vue."
 
 accessibility:
-  role: img
-  aria-label: Derived from `alt` prop.
-  status_dot: Has its own `aria-label` with the status value.
+  role: img (always set on the root span, including when only initials render)
+  aria-label: >
+    Set from `alt`. Omitted entirely when `alt` is empty (the default), which leaves the
+    `role="img"` element without an accessible name.
+  initials: Marked `aria-hidden="true"` — the name comes from `alt`, not the visible text.
+  image: Receives the `alt` prop as its native `alt` attribute.
+  status_dot: >
+    Carries `aria-label` with the status value, but the element is a bare `<span>` with no role,
+    so the label is not exposed to assistive technology. Convey status in text if it matters.
+  slot_content: Not announced — the `role="img"` root makes descendant content presentational.
+
+css:
+  root: t-avatar
+  size_modifier: t-avatar--{sm|md|lg}
+  image: t-avatar__image
+  initials: t-avatar__initials
+  status: t-avatar__status
+  status_modifier: t-avatar__status--{online|offline|busy|away}

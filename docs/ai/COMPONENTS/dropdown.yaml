@@ -1,5 +1,6 @@
 name: TDropdown
 source_file: packages/vue/src/components/TDropdown.vue
+package: "@treeui/vue"
 kind: overlay
 status: available
 purpose: "Trigger + floating menu with keyboard navigation for action lists."
@@ -8,37 +9,84 @@ props:
   items:
     type: "TDropdownItem[]"
     default: "[]"
-    note: "Array of { label: string; value: string; disabled?: boolean }"
+    note: >-
+      Array of { label: string; value: string; disabled?: boolean }. Each entry renders one
+      `<li role="menuitem">`, keyed by `value` — values must be unique, because the internal
+      element map that drives focus is also keyed by `value` and duplicates collide. With the
+      default `[]` the component still renders an empty `<ul role="menu">` and focus stays on
+      the trigger; there is no empty-state affordance (no `emptyText`, no `empty` slot), so
+      guard on `items.length` yourself.
   open:
     type: boolean
     default: undefined
+    note: >-
+      Controlled open state. Once a boolean is passed the component stops tracking open state
+      internally — it only emits update:open / open-change and the consumer MUST write the
+      value back, or the menu never opens. Flipping it externally does not run the open
+      routine: no item is focused and the outside-click listener is only attached from the
+      transition, so an initially-`true` value opens the menu with focus untouched.
   defaultOpen:
     type: boolean
     default: false
+    note: >-
+      Uncontrolled initial open state, read once on mount. Later changes to it are ignored.
+      It renders the menu already open but does NOT focus the first item (focusedIndex stays
+      -1, so no `is-focused` row) and does NOT arm the outside-click listener until the open
+      state changes at least once — see behavior.outside_click_closes_menu.
   disabled:
     type: boolean
     default: false
+    note: >-
+      Sets the native `disabled` attribute on the built-in trigger button, adds `is-disabled`
+      to the root, and suppresses the menu entirely (`v-if="isOpen && !disabled"`) — even while
+      `open` is true. Also short-circuits openMenu, toggleMenu and the trigger keydown handler.
+      It is bound only to the default button, so a custom `trigger` slot must render its own
+      disabled state.
   size:
     type: TSize
     default: md
     values: [sm, md, lg]
+    note: >-
+      Sizes the trigger and the menu rows. `t-dropdown--md` is emitted but has no CSS rule of
+      its own — it is the base `.t-dropdown__trigger` / `.t-dropdown__item` styling.
   label:
     type: string
     default: ""
+    note: >-
+      Text of the built-in trigger button AND the menu's accessible name
+      (`:aria-label="label || undefined"` on the `<ul role="menu">`). A custom `trigger` slot
+      does not render `label`, but it still names the menu — keep passing it, or the menu has
+      no accessible name at all.
   align:
     type: TDropdownAlign
     default: start
     values: [start, end]
-    note: "Horizontal alignment of the menu relative to the trigger. Use `end` when the trigger sits near the right edge of a clipping container (e.g. a table actions column)."
+    note: >-
+      Horizontal alignment of the menu relative to the trigger — `start` pins `left: 0`, `end`
+      pins `right: 0`. Use `end` when the trigger sits near the right edge of a clipping
+      container (e.g. a table actions column). There is no collision detection: the menu is a
+      plain absolutely-positioned child of the root, so it never flips and is clipped by any
+      ancestor with `overflow: hidden`.
   id:
     type: string
     default: undefined
-    note: "Custom id for the menu element. Auto-generated when omitted; also exposed to the `trigger` slot as `menuId` so a custom trigger can wire aria-controls."
+    note: >-
+      Custom id for the menu element. Auto-generated when omitted; also exposed to the
+      `trigger` slot as `menuId` so a custom trigger can wire aria-controls. Resolved once
+      during setup — it is NOT reactive, so changing `id` after mount has no effect.
 
 events:
-  - select
-  - update:open
-  - open-change
+  select:
+    payload: [value: string]
+    description: >-
+      Emitted with the chosen item's `value`. Disabled items never emit. Fires before the menu
+      closes; the close that follows restores focus to the trigger.
+  update:open:
+    payload: [boolean]
+    description: "Emitted whenever the open state changes. Deduped — no emit when the next value equals the current one."
+  open-change:
+    payload: [boolean]
+    description: "Emitted immediately after `update:open`, with the same payload. Alias for consumers that do not use v-model:open."
 
 slots:
   trigger:
@@ -58,20 +106,48 @@ slots:
       custom trigger content; those attributes exist only on the built-in button.
       That is what the `isOpen` and `menuId` scoped props are for — bind them
       yourself or the menu is unannounced.
+    attrs_are_not_forwarded: >
+      Fallthrough attrs are v-bound to the built-in button only. Overriding this slot removes
+      that button from the DOM, so every non-class/style attr passed to TDropdown — id, name,
+      aria-label, data-*, native listeners — is silently dropped. Put them on your own slot
+      root instead. `class` and `style` are unaffected: they always land on the root <div>.
     guidance: >
       Do not add your own @click that also toggles `open`: the wrapper already
       toggles, so a second handler double-toggles and the menu appears not to open.
   item:
     scoped_props: "{ item: TDropdownItem, index: number }"
+    content_restriction: presentational_only
     note: >
       Rendered inside the `role=menuitem` <li>. Keep it presentational: the <li>
       already owns click, keydown, tabindex, and aria-disabled. Nested interactive
-      controls are not reachable inside a menuitem.
+      controls are not reachable inside a menuitem. Replaces the default `{{ item.label }}`
+      body entirely — re-render the label yourself. `index` is the position in `items`,
+      including disabled entries, and matches the value compared against the focused row.
 
-forwards_attrs_to: trigger_button
+forwards_attrs_to:
+  note: >
+    The component sets inheritAttrs: false and splits the fallthrough attrs — class and style
+    are pulled out of the attrs object and applied to the root <div>; everything else is
+    v-bound to the built-in trigger button. There is no single fallthrough target, and with a
+    custom `trigger` slot the button half is lost entirely.
+  trigger_button: >
+    All fallthrough attrs except class and style — id, name, aria-*, data-*, and native
+    listeners land on the built-in <button>. Attrs bound explicitly by the template (type,
+    class, disabled, aria-controls, aria-haspopup, aria-expanded) win over a fallthrough of
+    the same name, because v-bind="triggerAttrs" is applied first. Rendered only while the
+    `trigger` slot is NOT overridden.
+  root_div: >
+    class and style only. A class passed to TDropdown is merged into the root <div> classes,
+    NOT onto the trigger button; a style is applied to the same <div>. These survive a custom
+    `trigger` slot.
+
+types:
+  TDropdownItem: "{ label: string; value: string; disabled?: boolean }"
+  TDropdownAlign: "'start' | 'end'"
 
 a11y:
   role: menu
+  menu_accessible_name_comes_from_the_label_prop: true
   trigger_aria_haspopup: menu
   trigger_aria_expanded: true
   trigger_aria_controls: "menu id, while open"
@@ -79,29 +155,91 @@ a11y:
     The three trigger_aria_* guarantees above describe the BUILT-IN trigger button
     only. A custom `trigger` slot replaces that button, so the consumer must bind
     them from the `isOpen` and `menuId` scoped props — see slots.trigger.
+  item_role: menuitem
   aria_disabled_on_disabled_items: true
+  disabled_items_get_tabindex_minus_1_but_stay_programmatically_focusable: true
   focus_visible_on_trigger: true
+  items_receive_real_dom_focus_no_aria_activedescendant: true
   keyboard_arrow_navigation: true
+  arrow_navigation_skips_disabled_items: true
+  arrow_navigation_does_not_wrap_at_the_ends: true
+  arrow_down_or_arrow_up_on_the_trigger_both_open_at_the_first_enabled_item: true
   escape_closes_menu: true
   enter_space_selects_item: true
   home_end_navigation: true
+  no_typeahead: true
+  tab_does_not_close_the_menu: true
 
 behavior:
-  outside_click_closes_menu: true
+  outside_click_closes_menu:
+    value: true
+    detail: >
+      Detected on a document `pointerdown` listener that is attached by a watcher on the open
+      state. The watcher is not immediate, so a menu that is already open on mount — via
+      `defaultOpen` or an initially-`true` `open` — has no listener until the open state
+      changes at least once, and outside clicks do not close it.
   outside_click_restores_focus: false
   chevron_rotates_when_open: true
   menu_grows_to_fit_items_without_wrapping: true
-  opening_focuses_first_enabled_item: true
+  menu_scrolls_vertically_past_15rem: true
+  menu_renders_in_flow_with_no_portal_and_no_flip_positioning: true
+  menu_is_not_rendered_while_disabled: true
+  open_state_emits_are_deduped: true
+  controlled_open_requires_writing_the_value_back: true
+  opening_focuses_first_enabled_item:
+    value: true
+    detail: >
+      Applies to the open routine only — a click or Enter/Space/ArrowDown/ArrowUp on the
+      trigger. `defaultOpen` and an externally driven `open` skip it, leaving focusedIndex at
+      -1 with no row focused and no `is-focused` class. With an empty `items` array focus stays
+      on the trigger; when every item is disabled, focus lands on the first (disabled) item.
+  keyboard_activation_on_the_trigger_never_closes_the_menu:
+    value: true
+    detail: >
+      Clicking the trigger toggles, but Enter/Space/Arrow keys always call the open routine, so
+      pressing them while the menu is open re-focuses the first enabled item instead of
+      closing. Escape is the keyboard close.
   focus_restores_on_close:
     value: true
     detail: >
       Focus returns to the trigger when the menu closes from inside it — selecting
-      an item or pressing Escape. It deliberately does NOT move focus on an outside
+      an item or pressing Escape on an item. Closing from the trigger itself (clicking it
+      again, or Escape while the trigger holds focus) does not run the restore, because focus
+      is already there. It deliberately does NOT move focus on an outside
       click, where the pointer has already placed focus elsewhere.
     applies_to_custom_trigger: true
 
+transition: t-fade
+z_index: var(--tree-z-dropdown)
+
+css_classes:
+  block: t-dropdown
+  elements:
+    - t-dropdown__trigger-wrapper
+    - t-dropdown__trigger
+    - t-dropdown__label
+    - t-dropdown__chevron
+    - t-dropdown__menu
+    - t-dropdown__item
+  modifiers:
+    - t-dropdown--sm
+    - t-dropdown--md
+    - t-dropdown--lg
+    - t-dropdown--align-end
+  states:
+    - is-open
+    - is-disabled
+    - is-focused
+
+notes:
+  - "`is-open` and `is-disabled` sit on the root <div>; `is-disabled` and `is-focused` also sit on each `li.t-dropdown__item`."
+  - "The root also carries `data-state=\"open\" | \"closed\"`, which is the stable hook for tests and for CSS that must not depend on the `is-open` class."
+  - "There is no `t-dropdown--align-start` class — `start` is the default `left: 0` styling and emits no modifier."
+  - "The menu is a plain child of the root, not a portal — it is clipped by any ancestor with `overflow: hidden` and never flips above the trigger when space below is short. Reach for `align=\"end\"` at a container's right edge; there is no vertical equivalent."
+  - "Items are real focus targets, so Tab and Shift+Tab walk through the menu rather than closing it. Close with Escape, a selection, or an outside click."
+
 example_custom_trigger: |
-  <TDropdown :items="items" @select="handleAction">
+  <TDropdown :items="items" label="Actions" @select="handleAction">
     <template #trigger="{ isOpen, menuId }">
       <TButton
         variant="ghost"

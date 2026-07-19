@@ -1,98 +1,137 @@
 name: TAccordion
 source_file: packages/vue/src/components/TAccordion.vue
+package: "@treeui/vue"
 kind: disclosure
 status: available
 purpose: >
   Organized content sections with expandable/collapsible behavior.
   Supports single-open and multi-open modes.
 
-compound:
-  - TAccordionItem (TAccordionItem)
-
 # ── TAccordion (container) ──────────────────────────────────────────────
 
-container:
-  props:
-    type:
-      type: "'single' | 'multiple'"
-      default: "'single'"
-      description: >
-        single – at most one item open at a time (opening one closes the rest).
-        multiple – any number of items may be open simultaneously.
-    modelValue:
-      type: "string | string[] | undefined"
-      default: undefined
-      description: >
-        Controlled open state. For type="single" pass a string (the item value).
-        For type="multiple" pass an array of strings.
-    defaultValue:
-      type: "string | string[] | undefined"
-      default: undefined
-      description: >
-        Initial open state for uncontrolled usage.
-    disabled:
-      type: boolean
-      default: false
-      description: Disables all items.
-    collapsible:
-      type: boolean
-      default: false
-      description: >
-        Only applies when type="single". When true, the open item can be
-        collapsed by clicking its trigger again.
+props:
+  type:
+    type: "'single' | 'multiple'"
+    default: "'single'"
+    values: [single, multiple]
+    description: >
+      single – at most one item open at a time (opening one closes the rest).
+      multiple – any number of items may be open simultaneously.
+  modelValue:
+    type: "string | string[] | undefined"
+    default: undefined
+    description: >
+      Controlled open state. For type="single" pass a string (the item value).
+      For type="multiple" pass an array of strings. The accordion treats itself
+      as controlled only while modelValue !== undefined; passing undefined
+      leaves it uncontrolled and it falls back to its internal state.
+  defaultValue:
+    type: "string | string[] | undefined"
+    default: undefined
+    description: >
+      Initial open state for uncontrolled usage. Read once when the accordion is
+      created — changing it after mount has no effect. Ignored while modelValue
+      is set. Do not combine it with modelValue: see notes.
+  disabled:
+    type: boolean
+    default: false
+    description: >
+      Disables all items. OR-ed with each item's own disabled prop, so an item is
+      disabled when either is true. Provided to items as a computed ref, so
+      flipping it after mount updates every item.
+  collapsible:
+    type: boolean
+    default: false
+    description: >
+      Only applies when type="single". When true, the open item can be collapsed
+      by clicking its trigger again, which emits undefined. When false, clicking
+      the already-open trigger is a no-op and emits nothing. In type="multiple"
+      any item can always be collapsed and this prop is ignored.
 
-  events:
-    - name: "update:modelValue"
-      payload: "string | string[] | undefined"
-      description: Emitted when the open state changes (v-model support).
+events:
+  - name: "update:modelValue"
+    payload: "string | string[] | undefined"
+    description: >
+      Emitted when the open state changes (v-model support). type="single" emits
+      the open item value as a string, or undefined when it is collapsed.
+      type="multiple" always emits a string[] of the open values.
 
-  slots:
-    - name: default
-      description: Accepts TAccordionItem children.
+slots:
+  - name: default
+    description: Accepts TAccordionItem children.
+
+forwards_attrs_to: root_div
 
 # ── TAccordionItem ──────────────────────────────────────────────────────
 
-item:
-  props:
-    value:
-      type: string
-      required: true
-      description: Unique identifier for this item within the accordion.
-    disabled:
-      type: boolean
-      default: false
-      description: Disables this individual item.
-
-  slots:
-    - name: trigger
-      description: Custom trigger content. Receives { open }.
-    - name: default
-      description: Collapsible panel content.
+sub_components:
+  TAccordionItem:
+    source_file: packages/vue/src/components/TAccordionItem.vue
+    purpose: >
+      One disclosure row: a heading-wrapped trigger button plus the panel it
+      controls. Must be rendered inside a TAccordion — it throws
+      "[TreeUI] TAccordionItem must be used inside a TAccordion." otherwise.
+    props:
+      value:
+        type: string
+        required: true
+        description: Unique identifier for this item within the accordion.
+      disabled:
+        type: boolean
+        default: false
+        description: >
+          Disables this individual item. The item is also disabled when the
+          parent TAccordion sets disabled.
+    slots:
+      - name: trigger
+        bindings: "{ open: boolean }"
+        description: >
+          Custom trigger content, rendered inside the button ahead of the chevron
+          icon. When omitted, the trigger falls back to rendering the item's own
+          value string.
+      - name: default
+        description: >
+          Collapsible panel content. Rendered only while the item is open — the
+          panel is removed from the DOM when closed (v-if, not v-show).
+    a11y:
+      heading: "h3.t-accordion__heading wraps the trigger button (level is fixed)"
+      trigger: "native button[type=button] with aria-expanded, aria-controls and the native disabled attribute"
+      panel: "role=region with aria-labelledby referencing the trigger id"
+      icon: "chevron svg is aria-hidden"
+      ids: "trigger and panel ids are generated with Vue useId()"
+    forwards_attrs_to: root_div
 
 # ── Accessibility ───────────────────────────────────────────────────────
 
 a11y:
-  roles:
-    trigger: heading > button
-    panel: region
-  attributes:
-    trigger:
-      - aria-expanded (reflects open state)
-      - aria-controls (references panel id)
-    panel:
-      - role="region"
-      - aria-labelledby (references trigger id)
-  keyboard:
-    - key: Enter / Space
-      action: Toggle the focused item
-    - key: ArrowDown
-      action: Move focus to the next item trigger
-    - key: ArrowUp
-      action: Move focus to the previous item trigger
-    - key: Home
-      action: Move focus to the first item trigger
-    - key: End
-      action: Move focus to the last item trigger
+  container_is_a_plain_div_with_no_aria_role: true
+  trigger_is_a_heading_wrapped_native_button: "h3 > button"
+  aria_expanded_on_trigger_reflects_open_state: true
+  aria_controls_on_trigger_references_panel_id: true
+  panel_uses_role_region: true
+  aria_labelledby_on_panel_references_trigger_id: true
+  disabled_items_use_the_native_disabled_attribute: true
+  chevron_icon_is_aria_hidden: true
+  trigger_hit_area_is_at_least_44px: "via the .t-accordion__trigger::after overlay"
+  enter_space_toggle_the_focused_item: "native button activation"
+  arrow_down_focuses_next_enabled_trigger_wrapping_to_first: true
+  arrow_up_focuses_previous_enabled_trigger_wrapping_to_last: true
+  home_focuses_first_enabled_trigger: true
+  end_focuses_last_enabled_trigger: true
+
+# ── Behavior ────────────────────────────────────────────────────────────
+
+behavior:
+  controlled_only_while_model_value_is_not_undefined: true
+  default_value_seeds_uncontrolled_state_once: true
+  single_mode_opening_an_item_closes_the_previous_one: true
+  single_mode_collapsing_requires_collapsible: true
+  multiple_mode_ignores_collapsible: true
+  container_and_item_disabled_are_combined_with_or: true
+  arrow_navigation_skips_disabled_triggers: true
+  arrow_navigation_wraps_around: true
+  trigger_order_follows_item_mount_order: true
+  only_open_panels_are_rendered: true
 
 # ── CSS ─────────────────────────────────────────────────────────────────
 
@@ -100,6 +139,7 @@ css:
   block: t-accordion
   elements:
     - t-accordion__item
+    - t-accordion__heading
     - t-accordion__trigger
     - t-accordion__icon
     - t-accordion__content
@@ -107,3 +147,25 @@ css:
   states:
     - is-open
     - is-disabled
+
+notes:
+  - "Uncontrolled: pass default-value. Controlled: pass v-model. Do not pass both — if a controlled modelValue ever becomes undefined the accordion reverts to its internal state and any defaultValue items pop back open."
+  - "For type=\"multiple\" bind v-model to a string[]; the emitted payload is always an array in that mode."
+  - "type=\"single\" without collapsible cannot reach an all-closed state after the first item opens."
+
+example: |
+  <!-- uncontrolled, single, collapsible -->
+  <TAccordion type="single" collapsible default-value="item-1">
+    <TAccordionItem value="item-1">
+      <template #trigger="{ open }">Shipping {{ open ? '−' : '+' }}</template>
+      Ships within two business days.
+    </TAccordionItem>
+    <TAccordionItem value="item-2" disabled>Returns</TAccordionItem>
+  </TAccordion>
+
+  <!-- controlled, multiple -->
+  <TAccordion type="multiple" v-model="openItems">
+    <TAccordionItem value="a">Panel A</TAccordionItem>
+    <TAccordionItem value="b">Panel B</TAccordionItem>
+  </TAccordion>
+  <!-- const openItems = ref<string[]>(['a']) -->

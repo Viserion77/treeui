@@ -7,35 +7,74 @@ purpose: "Inline status banner for info, success, warning, and danger messages."
 
 props:
   variant:
-    type: "'info' | 'success' | 'warning' | 'danger'"
+    type: TAlertVariant
     default: info
     values: [info, success, warning, danger]
+    description: "Semantic tone. Sets the --tree-alert-* custom properties that colour the surface, border, icon, and dismiss button."
   size:
     type: TSize
     default: md
     values: [sm, md, lg]
+    description: "Adjusts padding and font size only. md is the baseline defined on .t-alert itself."
   dismissible:
     type: boolean
     default: false
+    description: "Renders the trailing dismiss button. The button is the only thing gated by this prop; the alert never hides itself."
 
 events:
   - name: dismiss
     payload: none
-    description: "Emitted when the dismiss button is clicked."
+    description: >
+      Emitted when the dismiss button is clicked. TAlert is stateless — it does not
+      hide, unmount, or animate itself out. The consumer owns removal (v-if, a list
+      splice, or a store flag); without a handler the button is inert.
 
 slots:
   - name: default
-    description: "Alert message content."
+    description: "Alert message content, rendered inside .t-alert__content."
   - name: icon
-    description: "Optional leading icon; rendered with aria-hidden."
+    description: >
+      Optional leading icon. The .t-alert__icon wrapper span is rendered only when the
+      slot is provided (v-if="$slots.icon") and is marked aria-hidden, so the icon is
+      decorative — never put meaning there that is not also in the message text.
+      The wrapper inherits the variant colour via --tree-alert-accent.
   - name: dismiss-icon
-    description: "Custom dismiss button content; replaces the default × icon."
+    description: >
+      Replaces the default 16x16 × SVG inside the dismiss button. Rendered only when
+      dismissible is true, since the slot lives inside the button. Has a working default,
+      so it is optional. The button keeps its aria-label="Dismiss" regardless of content.
+
+forwards_attrs_to: root_element
+
+types:
+  TAlertVariant: "'info' | 'success' | 'warning' | 'danger'"
 
 a11y:
   role: alert
+  role_is_on_root_element: true
   icon_slot_marked_aria_hidden: true
+  default_dismiss_icon_marked_aria_hidden: true
   dismiss_button_aria_label: "Dismiss"
+  dismiss_button_label_is_hardcoded: true
+  dismiss_button_hit_area: "44x44 via a .t-alert__dismiss::after pseudo-element; the visible button is 1.5rem."
   keyboard: "Tab to dismiss button, Enter/Space to activate"
+  live_region_caveat: >
+    role="alert" is an assertive live region. An alert that is already in the DOM on
+    first paint is generally not announced — mount it dynamically (v-if / list insert)
+    when you need the message read out.
+
+behavior:
+  self_removes_on_dismiss: false
+  icon_wrapper_rendered_only_when_icon_slot_provided: true
+  dismiss_button_rendered_only_when_dismissible: true
+  size_md_emits_class_without_css_rule: >
+    t-alert--md is always emitted but carries no CSS rule of its own; .t-alert is the md
+    baseline and only --sm and --lg override padding and font size.
+  variant_sets_local_custom_properties:
+    - "--tree-alert-bg"
+    - "--tree-alert-border"
+    - "--tree-alert-text"
+    - "--tree-alert-accent"
 
 css:
   block: t-alert
@@ -53,7 +92,19 @@ css:
     - t-alert__dismiss
 
 example: |
-  <TAlert variant="warning" dismissible @dismiss="handleDismiss">
-    <template #icon><WarningIcon /></template>
-    Please review your input before submitting.
-  </TAlert>
+  <script setup>
+  import { ref } from 'vue';
+  import { TAlert } from '@treeui/vue';
+  const showAlert = ref(true);
+  </script>
+  <template>
+    <TAlert
+      v-if="showAlert"
+      variant="warning"
+      dismissible
+      @dismiss="showAlert = false"
+    >
+      <template #icon><WarningIcon /></template>
+      Please review your input before submitting.
+    </TAlert>
+  </template>

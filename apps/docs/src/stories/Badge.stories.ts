@@ -12,6 +12,14 @@ const meta = {
     tone: 'neutral',
   },
   argTypes: {
+    variant: {
+      control: 'select',
+      options: ['solid', 'outline', 'ghost', 'soft', 'danger'],
+    },
+    size: {
+      control: 'select',
+      options: ['sm', 'md', 'lg'],
+    },
     tone: {
       control: 'select',
       options: ['neutral', 'success', 'warning', 'danger', 'info'],
@@ -69,6 +77,55 @@ export const SemanticTones: Story = {
           <TBadge variant="outline" tone="warning">Needs review</TBadge>
           <TBadge variant="outline" tone="info">Planned</TBadge>
           <TBadge variant="outline" tone="danger">Failed</TBadge>
+        </div>
+      </div>
+    `,
+  }),
+};
+
+export const Sizes: Story = {
+  render: () => ({
+    components: { TBadge },
+    template: `
+      <div style="display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap;">
+        <TBadge size="sm">Small</TBadge>
+        <TBadge size="md">Medium</TBadge>
+        <TBadge size="lg">Large</TBadge>
+      </div>
+    `,
+  }),
+};
+
+export const WithIcon: Story = {
+  render: () => ({
+    components: { InfoIcon, TBadge },
+    setup: () => ({ iconProps }),
+    template: `
+      <div style="display: grid; gap: 1rem;">
+        <div style="display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap;">
+          <TBadge size="sm">
+            <template #icon><InfoIcon v-bind="iconProps" /></template>
+            Small
+          </TBadge>
+          <TBadge size="md">
+            <template #icon><InfoIcon v-bind="iconProps" /></template>
+            Medium
+          </TBadge>
+          <TBadge size="lg">
+            <template #icon><InfoIcon v-bind="iconProps" /></template>
+            Large
+          </TBadge>
+        </div>
+        <div style="display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap;">
+          <TBadge tone="success">
+            <template #icon><InfoIcon v-bind="iconProps" /></template>
+            With icon
+          </TBadge>
+          <TBadge tone="success">Without icon</TBadge>
+          <TBadge variant="outline" tone="danger">
+            <template #icon><InfoIcon v-bind="iconProps" /></template>
+            Outline + icon
+          </TBadge>
         </div>
       </div>
     `,

@@ -9,6 +9,13 @@ const preview: Preview = {
     controls: {
       expanded: true,
     },
+    // Matches the `onXxx` argTypes that docgen derives from each component's
+    // emits, so firing an event logs it in the Actions panel. This only has
+    // anything to match because the barrel resolves to source in `main.ts`;
+    // without docgen there are no emit argTypes and the panel stays empty.
+    actions: {
+      argTypesRegex: '^on[A-Z].*',
+    },
     docs: {
       // addon-docs applies its own typography reset to MDX prose through
       // `:where(p, li, h1, …)` selectors, which outrank a plain `html` or `body`

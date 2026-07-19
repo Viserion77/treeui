@@ -10,69 +10,257 @@ props:
     type: string
     format: YYYY-MM-DD
     default: ""
+    note: >-
+      Parsed with `parseDateValue`, which accepts ONLY a strict `YYYY-MM-DD` string that
+      resolves to a real calendar date. Anything else (empty, `2026-13-01`, an ISO datetime,
+      a Date object stringified) resolves to null and the trigger falls back to `placeholder`.
+      The hidden input, when present, still submits the raw prop verbatim — an unparseable
+      value renders as the placeholder but is submitted as-is.
   open:
     type: boolean
-    default: controlled_optional
+    default: undefined
+    note: >-
+      Controlled open state. Once a boolean is passed the component stops tracking open state
+      internally — it only emits update:open / open-change and the consumer MUST write the
+      value back, or the calendar never opens.
   defaultOpen:
     type: boolean
     default: false
+    note: >-
+      Uncontrolled initial open state, read once on mount. Later changes to it are ignored.
+      Opening this way skips `openCalendar`, so no day button receives DOM focus until the
+      user tabs or arrows into the grid.
   size:
     type: TSize
     default: md
     values: [sm, md, lg]
+    note: >-
+      Sizes the trigger only, never the popover. `md` has no CSS rule of its own — it is the
+      base `.t-date-picker__trigger` styling — but the `t-date-picker--md` class is still rendered.
   disabled:
     type: boolean
     default: false
+    note: >-
+      Sets the native `disabled` attribute on the trigger, adds `is-disabled` to the root,
+      short-circuits `openCalendar` and trigger keydown, makes `isDateDisabled` return true for
+      every date, and suppresses the popover entirely (`v-if="isOpen && !disabled"`) even while
+      `open` is true.
   invalid:
     type: boolean
     default: false
+    note: "Adds `is-invalid` to the root and `aria-invalid=\"true\"` to the trigger. Purely presentational — it does not block opening or selection."
   placeholder:
     type: string
     default: Select date
+    note: "Rendered inside `.t-date-picker__value` with a `data-placeholder` attribute whenever `modelValue` does not parse."
   locale:
     type: string
     default: en-US
+    note: >-
+      BCP-47 tag passed to three separate `Intl.DateTimeFormat` calls: the trigger text
+      (day numeric / month long / year numeric), the popover month caption (month long /
+      year numeric), and the weekday header (weekday short). It does NOT localize the per-day
+      `aria-label`, which is always the raw `YYYY-MM-DD` key.
   min:
     type: string
     format: YYYY-MM-DD
     default: ""
+    note: >-
+      Inclusive lower bound. Days before it get the native `disabled` attribute and cannot be
+      selected or arrowed onto; the Previous-month nav button is disabled once the view reaches
+      the min month. A value that fails `parseDateValue` is ignored, i.e. treated as no bound.
   max:
     type: string
     format: YYYY-MM-DD
     default: ""
+    note: "Inclusive upper bound, mirroring `min`: out-of-range days are disabled and the Next-month nav button is disabled once the view reaches the max month."
   weekStartsOn:
-    type: number
+    type: "0 | 1 | 2 | 3 | 4 | 5 | 6"
     values: [0, 1, 2, 3, 4, 5, 6]
     default: 0
+    note: >-
+      0 = Sunday. Drives the weekday header order, the leading offset of the day grid, and the
+      Home/End keys (which jump to the first/last day of the week as defined by this prop).
   id:
     type: string
     default: auto
+    note: >-
+      Names the CALENDAR POPOVER, not the trigger. It becomes the popover's `id` (referenced by
+      the trigger's `aria-controls` while open) and seeds the month caption id as `${id}-caption`.
+      Read once at setup — later changes are ignored. Because `id` is a declared prop it never
+      falls through to the trigger button, so the trigger has no id and a `<label for>` /
+      `TFormField html-for` cannot target it; name the control with `aria-label` instead.
 
 events:
-  - update:modelValue
-  - update:open
-  - open-change
-  - select
+  update:modelValue:
+    payload: [string]
+    description: >-
+      Emitted with the chosen day as `YYYY-MM-DD` from `selectDate` only — a click or
+      Enter/Space on an enabled day button. Nothing else in the component emits it; there is
+      no clear affordance, so the value never becomes `""` on its own.
+  update:open:
+    payload: [boolean]
+    description: "Emitted whenever the open state changes. Deduped — no emit when the next value equals the current one."
+  open-change:
+    payload: [boolean]
+    description: "Emitted immediately after `update:open`, with the same payload. Alias for consumers that do not use v-model:open."
+  select:
+    payload: [string]
+    description: >-
+      Emitted from `selectDate` immediately after `update:modelValue`, with the same
+      `YYYY-MM-DD` payload. It is the user-intent signal: it fires only on an actual day
+      activation and never when `modelValue` changes from outside, which is what distinguishes
+      it from `update:modelValue`.
 
 slots:
-  - prefix
-  - suffix
+  prefix:
+    description: >-
+      Leading content inside the trigger button, before the value text. Rendered only when the
+      slot is supplied, wrapped in `<span class="t-date-picker__slot t-date-picker__slot--prefix">`.
+      No scoped props. Content is inside a `<button>`, so it must be presentational only.
+  suffix:
+    description: >-
+      Trailing content inside the trigger button, in
+      `<span class="t-date-picker__slot t-date-picker__slot--suffix">`. Unlike `prefix` the
+      wrapper is always rendered; supplying the slot replaces the default calendar icon.
+      No scoped props, and the same presentational-only restriction applies.
 
-forwards_attrs_to: trigger_button
+forwards_attrs_to:
+  note: >
+    The component sets inheritAttrs: false and splits the fallthrough attrs three ways. There is
+    no single fallthrough target, so `forwards_attrs_to: trigger_button` alone is not accurate.
+  trigger_button: >
+    All fallthrough attrs except class, style and name — aria-*, data-*, tabindex, native
+    listeners. Attrs bound explicitly by the template (type, class, disabled, aria-controls,
+    aria-haspopup, aria-expanded, aria-invalid, click, keydown) win over a fallthrough of the
+    same name, because v-bind="triggerAttrs" is applied first.
+  root_div: >
+    class and style only. A class passed to TDatePicker is merged into the root <div> classes,
+    NOT onto the trigger; a style is applied to the same <div>.
+  hidden_input: >
+    `name` is pulled out of the trigger attrs entirely. When it is a string, a
+    `<input type="hidden" :name :value="modelValue">` is rendered as the first child of the root
+    so the picker participates in native form submission. The name never lands on the button.
 
 a11y:
+  role: dialog
+  accessible_name: >-
+    None is generated for the trigger beyond its own text content, which is the formatted date
+    or the placeholder — that changes as the user picks, so it is not a stable label. Pass
+    `aria-label` (see example). The `id` prop cannot be used to link an external <label>.
   trigger_has_popup_dialog: true
+  trigger_aria_expanded: true
+  trigger_aria_controls_when_open: true
+  aria_invalid_when_invalid: true
   calendar_uses_grid_roles: true
+  calendar_aria_modal: "false"
+  calendar_labelled_by_month_caption: true
+  weekday_header_is_aria_hidden: true
+  aria_selected_rendered_on_every_gridcell: true
+  aria_current_date_on_today: true
+  day_aria_label_is_the_raw_iso_key: true
+  nav_buttons_labelled_previous_month_and_next_month: true
+  roving_tabindex_one_focusable_day: true
   escape_closes: true
   returns_focus_to_trigger_after_selection: true
+  returns_focus_to_trigger_on_escape_from_a_day: true
+  focus_is_not_trapped_and_tab_leaves_the_open_calendar: true
 
 keyboard:
   trigger_open: [Enter, Space, ArrowDown, ArrowUp]
+  trigger_close: [Escape]
   day_navigation: [ArrowLeft, ArrowRight, ArrowUp, ArrowDown, Home, End, PageUp, PageDown, Escape]
+  day_select: [Enter, Space]
+  note: >-
+    Home/End move to the first/last day of the week per `weekStartsOn`. PageUp/PageDown move one
+    month; Shift+PageUp / Shift+PageDown move one year. Every day-navigation key is refused when
+    the target date is out of the min/max range, so focus simply does not move. Escape on the
+    trigger closes WITHOUT restoring focus (focus is already there); Escape on a day closes and
+    returns focus to the trigger.
 
 behavior:
+  value_format: YYYY-MM-DD
+  controlled_and_uncontrolled_open: true
+  open_state_emits_are_deduped: true
   selection_closes_popover: true
   hidden_input_created_when_name_attr_present: true
+  hidden_input_submits_the_raw_unparsed_model_value: true
   out_of_range_dates_disabled: true
+  min_and_max_also_disable_the_month_nav_buttons: true
+  popover_is_not_rendered_while_disabled: true
+  outside_click_closes_calendar: true
+  outside_click_is_detected_on_pointerdown_on_document: true
+  outside_click_and_trigger_toggle_close_without_restoring_focus: true
+  grid_is_always_six_weeks_forty_two_days: true
+  leading_and_trailing_days_render_muted_and_stay_selectable: true
+  opening_syncs_the_view_to_the_selected_date_else_the_last_focused_date_else_today: true
+  external_model_value_changes_move_the_view_and_the_focused_day: true
+  clearing_the_model_value_resets_the_view_to_today_only_while_closed: true
+  month_nav_moves_the_focused_day_to_the_first_of_the_new_month_and_focuses_it: true
+  today_is_computed_once_at_setup_not_re_evaluated_across_midnight: true
+  popover_renders_in_flow_with_no_portal_and_no_flip_positioning: true
+
+transition: t-fade
+
+css_classes:
+  block: t-date-picker
+  elements:
+    - t-date-picker__trigger
+    - t-date-picker__slot
+    - t-date-picker__slot--prefix
+    - t-date-picker__slot--suffix
+    - t-date-picker__value
+    - t-date-picker__content
+    - t-date-picker__header
+    - t-date-picker__nav
+    - t-date-picker__month
+    - t-date-picker__weekdays
+    - t-date-picker__weekday
+    - t-date-picker__grid
+    - t-date-picker__row
+    - t-date-picker__cell
+    - t-date-picker__day
+  modifiers:
+    - t-date-picker--sm
+    - t-date-picker--md
+    - t-date-picker--lg
+  states:
+    - is-open
+    - is-disabled
+    - is-invalid
+    - is-muted
+    - is-selected
+    - is-today
+
+notes:
+  - "`is-open`, `is-disabled` and `is-invalid` sit on the root <div>; `is-muted`, `is-selected` and `is-today` sit on each `button.t-date-picker__day`."
+  - "The root also carries `data-state=\"open\" | \"closed\"`, the value span carries `data-placeholder` when nothing is selected, and every day button carries `data-date=\"YYYY-MM-DD\"` — these are the stable hooks for tests and for CSS that must not depend on the `is-*` classes."
+  - "There is no `width` prop. Unlike TInput, TSelect and TTextarea, TDatePicker is not on the `TFieldWidth` scale — the root is `width: 100%`, so constrain it from the container or with a class passed through to the root <div>."
+  - "The popover is a plain absolutely-positioned child of the root, not a portal — it is clipped by any ancestor with `overflow: hidden` and never flips above the trigger when space below is short."
+  - "The calendar is `aria-modal=\"false\"` and focus is not trapped. Tab from the focused day leaves the calendar without closing it; only Escape, a selection, or a pointerdown outside close it."
+  - "There is no clear or reset affordance. To support an empty state the consumer must set `modelValue` back to `\"\"` itself."
+  - "`select` and `update:modelValue` always fire together and carry the same payload — listen to `update:modelValue` for state, to `select` when you need to react to user intent specifically (analytics, closing a parent overlay)."
+  - "For a date plus a time-of-day use TDateTimePicker, whose value format is `YYYY-MM-DDTHH:mm`; TDatePicker has no time surface."
 
 example: '<TDatePicker aria-label="Ship date" model-value="2026-04-02" />'
+
+example_range_bounded: |
+  <!-- min/max disable out-of-range days AND the month nav buttons. -->
+  <TDatePicker
+    aria-label="Ship date"
+    min="2026-04-01"
+    max="2026-04-30"
+    :model-value="shipDate"
+    @update:model-value="shipDate = $event"
+  />
+
+example_form_submission: |
+  <!-- `name` is diverted to a hidden input so the picker posts with a native form. -->
+  <TDatePicker
+    aria-label="Start date"
+    name="start_date"
+    locale="pt-BR"
+    :week-starts-on="1"
+    :model-value="startDate"
+    @update:model-value="startDate = $event"
+  />

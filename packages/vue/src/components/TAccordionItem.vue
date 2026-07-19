@@ -25,7 +25,7 @@ const panelId = useId();
 const triggerRef = ref<HTMLButtonElement | null>(null);
 
 const isOpen = computed(() => ctx.isItemOpen(props.value));
-const isDisabled = computed(() => props.disabled || ctx.disabled);
+const isDisabled = computed(() => props.disabled || ctx.disabled.value);
 
 const itemClasses = computed(() => [
   't-accordion__item',

@@ -9,6 +9,7 @@ props:
   as:
     type: string
     default: button
+    note: "Root tag rendered through `<component :is>`. Any value other than `button` switches the component onto the non-native accessibility path (see `a11y`) and stops the `type` attribute from being rendered."
   variant:
     type: "TVariant | brand"
     default: solid
@@ -18,16 +19,19 @@ props:
     type: TSize
     default: md
     values: [sm, md, lg]
+    note: "`t-button--md` is emitted but carries no CSS rule of its own — md is the base sizing, and only sm/lg override height, padding, and font size."
   disabled:
     type: boolean
     default: false
+    note: "Applied as the native `disabled` attribute only when `as` is `button`; for any other tag the component falls back to `aria-disabled=\"true\"` plus `tabindex=\"-1\"`. Clicks are blocked in both cases."
   loading:
     type: boolean
     default: false
-    note: "loading implies disabled behavior"
+    note: "loading implies disabled behavior — the effective disabled state is `disabled || loading`, so `loading` on its own disables the button and applies `is-disabled`."
   type:
     type: "button | submit | reset"
     default: button
+    note: "Only forwarded when `as` is `button`; for any other tag no `type` attribute is rendered. Set `type=\"submit\"` for the submit control of an enclosing form."
   block:
     type: boolean
     default: false
@@ -35,10 +39,12 @@ props:
   align:
     type: "start | center | end"
     default: center
-    note: "Content alignment; only meaningful together with `block`. Use `start` for left-aligned icon+label menu rows."
+    note: "Content alignment; only meaningful once the button is wider than its content, which in practice means together with `block`, since the base rule is `min-width: max-content`. Use `start` for left-aligned icon+label menu rows. The default `center` emits no modifier class — it is the base rule."
 
 events:
-  - click
+  - name: click
+    payload: "[event: MouseEvent]"
+    description: "Emitted on activation. Suppressed while disabled or loading: the internal handler calls preventDefault() and stopPropagation() and returns without emitting."
 
 slots:
   - icon
@@ -48,12 +54,43 @@ forwards_attrs_to: root_element
 
 a11y:
   native_button_by_default: true
+  native_disabled_attr_only_when_button: true
   aria_busy_when_loading: true
   aria_disabled_for_non_button: true
   tabindex_minus_one_when_non_button_disabled: true
+  icon_slot_marked_aria_hidden: true
+  loading_spinner_is_announced: "The nested TSpinner carries role=\"status\" and a visually hidden \"Loading\" label, so the button's accessible name gains that text while loading."
+  touch_targets: "44×44px minimum via the .t-button::after overlay"
+  focus_visible: "box-shadow focus ring on the root element"
+
+css:
+  block: t-button
+  modifiers:
+    - t-button--solid
+    - t-button--outline
+    - t-button--ghost
+    - t-button--soft
+    - t-button--danger
+    - t-button--brand
+    - t-button--sm
+    - t-button--md
+    - t-button--lg
+    - t-button--block
+    - t-button--align-start
+    - t-button--align-end
+  elements:
+    - t-button__spinner
+    - t-button__icon
+    - t-button__label
+  states:
+    - is-loading
+    - is-disabled
 
 behavior:
   blocks_click_when_disabled_or_loading: true
   renders_spinner_when_loading: true
+  spinner_does_not_replace_the_icon_slot: "The spinner is prepended, so with both `loading` and an `icon` slot the order is spinner, icon, label."
+  icon_slot_wrapper_rendered_only_when_filled: true
+  default_slot_always_wrapped_in_label_element: true
 
 example: '<TButton variant="outline">Invite teammate</TButton>'

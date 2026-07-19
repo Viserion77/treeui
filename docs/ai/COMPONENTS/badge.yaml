@@ -10,15 +10,17 @@ props:
     type: TVariant
     default: soft
     values: [solid, outline, ghost, soft, danger]
+    description: "Surface treatment. Selects which --tree-badge-<variant>-* colour variables the badge consumes; danger is a surface style, not a semantic guarantee — its red palette is replaced when tone is success, warning, or info."
   tone:
     type: TBadgeTone
     default: neutral
     values: [neutral, success, warning, danger, info]
-    description: "Optional semantic tone layered on top of the visual variant."
+    description: "Semantic palette. Re-maps the --tree-badge-* colour variables that the chosen variant consumes, so it recolours the badge without changing its surface treatment. neutral keeps the brand palette."
   size:
     type: TSize
     default: md
     values: [sm, md, lg]
+    description: "Changes min-height and font-size only; inline padding is constant across sizes."
 
 events: []
 
@@ -26,8 +28,39 @@ slots:
   - icon
   - default
 
+forwards_attrs_to: root_element
+
 a11y:
+  semantic_element: span
   interactive_by_default: false
   icon_slot_marked_aria_hidden: true
+  tone_conveys_meaning_by_color_only: "No role or aria state is set, so put the status word in the badge text rather than relying on tone alone."
+
+behavior:
+  always_applies_one_modifier_per_prop: true
+  tone_remaps_variant_color_variables: true
+  tone_overrides_variant_danger_palette: true
+  tone_neutral_has_no_stylesheet_rule: true
+  icon_wrapper_rendered_only_when_slot_filled: true
+  icon_renders_before_default_slot: true
+
+css:
+  block: t-badge
+  modifiers:
+    - t-badge--solid
+    - t-badge--outline
+    - t-badge--ghost
+    - t-badge--soft
+    - t-badge--danger
+    - t-badge--sm
+    - t-badge--md
+    - t-badge--lg
+    - t-badge--tone-neutral
+    - t-badge--tone-success
+    - t-badge--tone-warning
+    - t-badge--tone-danger
+    - t-badge--tone-info
+  elements:
+    - t-badge__icon
 
 example: '<TBadge variant="soft" tone="success">Stable foundation</TBadge>'

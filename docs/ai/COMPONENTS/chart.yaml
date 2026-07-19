@@ -13,11 +13,11 @@ props:
   series:
     type: "TChartSeries[]"
     default: "[]"
-    note: "Each item is { name: string; data: number[]; color?: string }."
+    note: "Each item is { name: string; data: number[]; color?: string }. Series with an empty data array are dropped before rendering — they never reach the plot, legend, tooltip, or a11y table."
   labels:
     type: "string[]"
     default: "[]"
-    note: "X-axis categories, aligned index-for-index to each series' data."
+    note: "X-axis categories, aligned index-for-index to each series' data. Labels past the longest series are ignored; a missing label falls back to '#<n>' in the tooltip and to an empty header cell in the a11y table."
   height:
     type: number
     default: 260
@@ -25,78 +25,145 @@ props:
   smooth:
     type: boolean
     default: false
-    note: "Curved line/area."
+    note: "Curved line/area; ignored for bar."
   stacked:
     type: boolean
     default: false
-    note: "Stacks bar series; ignored for line/area. Negative values are clamped to 0 in stacked mode (grouped mode renders them)."
+    note: "Stacks bar series; ignored for line/area. Negative values are clamped to 0 in stacked mode (grouped mode renders them below the baseline). The tooltip always reports the raw per-series values, not the cumulative stack."
   showGrid:
     type: boolean
     default: true
+    note: "Horizontal gridlines at the y ticks. Independent of showYAxis, which controls the tick text."
   showLegend:
-    type: boolean
+    type: "boolean | undefined"
     default: "auto (true when more than one series)"
+    note: "The legend is suppressed whenever there is no data, even when set to true."
   showXAxis:
     type: boolean
     default: true
+    note: "When false the category labels are skipped and the bottom margin collapses from 28px to 10px."
   showYAxis:
     type: boolean
     default: true
+    note: "When false the tick text is skipped and the left margin collapses from 44px to 10px. Gridlines are unaffected."
   showTooltip:
     type: boolean
     default: true
+    note: "Gates hover tracking as a whole: the crosshair, the tooltip panel, and the point-click event all stop when false."
   showPoints:
     type: boolean
     default: false
-    note: "Always draw markers on line/area points."
+    note: "Always draw markers on line/area points; ignored for bar."
   yTicks:
     type: number
     default: 5
+    note: "Target tick count handed to niceScale — the rendered count may differ once the bounds are rounded."
   valueFormat:
     type: "(value: number) => string"
     default: "locale integers for |value| >= 1000"
+    note: "Applies to y-axis ticks, tooltip values, and the a11y table cells."
   minY:
     type: number
-    default: "auto"
+    default: "auto (min(0, data min) for bar/area, data min for line)"
+    note: "A hint, not a hard bound: niceScale rounds the low end down, so the rendered domain can start below it."
   maxY:
     type: number
     default: "auto"
+    note: "A hint, not a hard bound: niceScale rounds the high end up, so the rendered domain can extend above it."
   animated:
     type: boolean
     default: true
-    note: "Draw-in animation; disabled under prefers-reduced-motion."
+    note: "Draw-in animation via the is-animated root class; disabled under prefers-reduced-motion."
   loading:
     type: boolean
     default: false
+    note: "Replaces the plot with five pulsing skeleton bars and adds the is-loading root class. Takes precedence over the empty state; the legend still renders when data is present."
   ariaLabel:
     type: string
-    default: "auto-generated summary"
+    default: "auto-generated summary ('<type> chart with <n> series')"
+    note: "Rendered as the <caption> of the visually-hidden data table — it is not applied as an aria-label attribute on the root."
 
 events:
   point-click:
     payload: "{ index: number; label: string; values: { name: string; value: number; color: string }[] }"
-    note: "Fires on click at the hovered category."
+    note: "Fires on click anywhere on the plot, for the category currently under the pointer. Requires showTooltip — hover tracking is what resolves the category, so nothing is emitted while it is false. Pointer-only: there is no keyboard path to it."
 
 slots:
-  - legend    # scope: { series: { name: string; color: string }[] }
-  - tooltip   # scope: { index, label, values }
-  - empty
+  - legend    # scope: { series: { name: string; color: string }[] } — falls back to swatch + name chips
+  - tooltip   # scope: { index, label, values } — falls back to the label plus a dot/name/value list
+  - empty     # unscoped — falls back to the text "No data to display"
 
 types:
-  TChartType: "line | bar | area"
+  TChartType: "line | area | bar"
   TChartSeries: "{ name: string; data: number[]; color?: string }"
   TChartActivePayload: "{ index: number; label: string; values: { name: string; value: number; color: string }[] }"
 
 behavior:
-  colors_auto_assign_from_chart_palette: "--tree-color-chart-1..8, cycling; per-series color overrides"
-  bar_zero_baseline: true
-  line_domain_uses_nice_ticks: true
-  hover_shows_crosshair_and_tooltip: true
+  colors_auto_assign_from_chart_palette: "--tree-color-chart-1..8, cycling by series index; per-series color overrides"
+  zero_baseline_for_bar_and_area: "the y domain is extended to include 0 for bar and area; line uses the data extent. minY overrides it."
+  y_domain_uses_nice_ticks: "every type runs through niceScale, which rounds the min down and the max up to round numbers"
+  hover_shows_crosshair_and_tooltip: "only while showTooltip is true"
+  width_measured_with_resize_observer: "falls back to 640px until the canvas is mounted and measured"
+  x_labels_decimate_when_crowded: "keeps every max(2, floor(innerWidth / 52))-th label and hides the rest; the last category is always kept"
+  empty_state_when_no_series_has_data: true
+
+css:
+  block: t-chart
+  modifiers:
+    - t-chart--line
+    - t-chart--area
+    - t-chart--bar
+  elements:
+    - t-chart__canvas
+    - t-chart__svg
+    - t-chart__grid
+    - t-chart__gridline
+    - t-chart__axis-label
+    - t-chart__axis-label--x
+    - t-chart__axis-label--y
+    - t-chart__areas
+    - t-chart__area
+    - t-chart__bars
+    - t-chart__bar
+    - t-chart__lines
+    - t-chart__line
+    - t-chart__point
+    - t-chart__hover
+    - t-chart__crosshair
+    - t-chart__marker
+    - t-chart__x-axis
+    - t-chart__tooltip
+    - t-chart__tooltip-label
+    - t-chart__tooltip-list
+    - t-chart__tooltip-item
+    - t-chart__tooltip-dot
+    - t-chart__tooltip-name
+    - t-chart__tooltip-value
+    - t-chart__legend
+    - t-chart__legend-item
+    - t-chart__legend-swatch
+    - t-chart__empty
+    - t-chart__loading
+    - t-chart__loading-bar
+    - t-chart__a11y
+  states:
+    - is-animated
+    - is-loading
+    - is-active   # on t-chart__bar, for the hovered category
+
+forwards_attrs_to: root_div
 
 a11y:
   - "SVG is aria-hidden; a visually-hidden <table> mirrors the series data for assistive tech."
+  - "The table's <caption> carries ariaLabel (or the auto-generated summary); the root div itself has no role or accessible name."
   - "Legend defaults on for multiple series so identity is not color-only."
   - "Provide a meaningful ariaLabel describing what the chart shows."
+  - "point-click has no keyboard equivalent — do not make it the only way to reach a behavior."
+
+notes:
+  - "The tooltip panel is positioned in px and clamped to 64px from each edge of the measured width."
+  - "The a11y table renders the real data even while loading is true."
+  - "Missing values (a series shorter than the category count) read as 0 in the tooltip but as a blank cell in the a11y table."
 
 example: |
   <TChart

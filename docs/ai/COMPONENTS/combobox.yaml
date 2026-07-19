@@ -9,6 +9,11 @@ props:
   modelValue:
     type: string
     default: ""
+    note: >-
+      The SELECTED option value, never the text in the input. The input renders an
+      internal `query` string that is re-synced from the selected option's label
+      whenever the listbox is closed. A `modelValue` with no matching entry in
+      `options` resolves to an empty label.
   options:
     type: "TComboboxOption[]"
     default: "[]"
@@ -16,19 +21,33 @@ props:
   open:
     type: boolean
     default: undefined
+    note: >-
+      Controlled open state. Once a boolean is passed the component stops tracking
+      open state internally — it only emits update:open / open-change and the
+      consumer MUST write the value back, or the listbox never opens.
   defaultOpen:
     type: boolean
     default: false
+    note: "Uncontrolled initial open state, read once on mount. Later changes to it are ignored."
   size:
     type: TSize
     default: md
     values: [sm, md, lg]
+    note: "Sizes the control only. `md` has no CSS rule of its own — it is the base `.t-combobox__control` styling."
   disabled:
     type: boolean
     default: false
+    note: >-
+      Sets the native `disabled` attribute on the input, adds `is-disabled` to the root,
+      and suppresses the listbox entirely (`v-if="isOpen && !disabled"`) — even while
+      `open` is true. Also short-circuits opening, typing side effects, and keydown handling.
   loading:
     type: boolean
     default: false
+    note: >-
+      Presentational only. Replaces the chevron indicator with
+      `<TSpinner size="sm" label="Loading" />` and sets aria-busy; it never blocks
+      typing, opening, filtering, or selection.
   invalid:
     type: boolean
     default: false
@@ -38,42 +57,171 @@ props:
   emptyText:
     type: string
     default: "No results found."
+    note: "Fallback content of the `empty` slot — supplying that slot shadows this prop entirely."
 
 events:
-  - update:modelValue
-  - update:open
-  - open-change
-  - input-change
+  update:modelValue:
+    payload: [string]
+    description: >-
+      Emitted with the chosen option's `value` when an option is selected, and with
+      `""` when the listbox closes while the input text is blank and a value was set
+      (the clear-by-erasing path).
+  update:open:
+    payload: [boolean]
+    description: "Emitted whenever the open state changes. Deduped — no emit when the next value equals the current one."
+  open-change:
+    payload: [boolean]
+    description: "Emitted immediately after `update:open`, with the same payload. Alias for consumers that do not use v-model:open."
+  input-change:
+    payload: [string]
+    description: >-
+      Emitted on every keystroke with the raw, untrimmed input text — the same string
+      the `empty` slot receives as `query`. This is the only hook for server-side /
+      async filtering; it does not replace or disable the built-in local filtering, so
+      an async consumer must feed results back through `options`.
 
 slots:
-  - prefix
-  - option
-  - empty
+  prefix:
+    description: >-
+      Leading content inside `.t-combobox__control`, before the input. Rendered only when
+      the slot is supplied, wrapped in `<span class="t-combobox__slot t-combobox__slot--prefix">`.
+      No scoped props.
+  option:
+    scoped_props: "{ option: TComboboxOption, selected: boolean, active: boolean }"
+    content_restriction: presentational_only
+    description: >
+      Replaces the default option body (label, description, and the selected check icon).
+      Renders INSIDE the row's `<li role="option">`, which owns the click and mouseenter
+      handlers, so it must contain only presentational content. `selected` is
+      `option.value === modelValue`; `active` is the keyboard-highlighted row, which is
+      NOT DOM focus — focus stays on the input at all times.
+  empty:
+    scoped_props: "{ query: string }"
+    description: >-
+      Replaces `emptyText` inside `<li class="t-combobox__empty">` when the filter matches
+      no option. `query` is the current raw input text, untrimmed and uncased. Passing both
+      this slot and `emptyText` renders only the slot.
 
-forwards_attrs_to: input
+forwards_attrs_to:
+  note: >
+    The component sets inheritAttrs: false and splits the fallthrough attrs — class and style
+    are pulled out of the attrs object and applied to the root <div>; everything else is
+    v-bound to the input. There is no single fallthrough target.
+  input: >
+    All fallthrough attrs except class and style — id, name, required, aria-*, data-*, and
+    native listeners land on the input. `autocomplete` is special-cased: it is forced to
+    "off" unless a string is passed. Attrs bound explicitly by the template (role, type,
+    value, placeholder, disabled, aria-controls, aria-expanded, aria-activedescendant,
+    aria-invalid, aria-busy, aria-autocomplete, aria-haspopup) win over a fallthrough of
+    the same name, because v-bind="attrs" is applied first.
+  root_div: >
+    class and style only. A class passed to TCombobox is merged into the root <div> classes,
+    NOT onto the input; a style is applied to the same <div>.
+  listbox_ul: >
+    aria-label and aria-labelledby are additionally MIRRORED onto the listbox <ul> when they
+    are strings, so the popup carries the same accessible name as the input. They still reach
+    the input as well.
+
+types:
+  TComboboxOption: "{ label: string; value: string; description?: string; keywords?: string[]; disabled?: boolean }"
 
 a11y:
   role: combobox
+  combobox_element: input
+  accessible_name: >-
+    None is generated — there is no label element and no default slot. Pass aria-label or
+    aria-labelledby (which also names the listbox), or pass `id` and wrap in TFormField with
+    a matching `html-for`; TFormField does not link the label on its own.
   trigger_aria_haspopup: listbox
   trigger_aria_expanded: true
+  trigger_aria_controls_when_open: true
   aria_autocomplete: list
   aria_activedescendant_on_active_option: true
+  aria_activedescendant_cleared_while_closed: true
   aria_invalid_when_invalid: true
   aria_busy_when_loading: true
+  listbox_role: listbox
+  option_role: option
+  listbox_mirrors_aria_label_and_aria_labelledby: true
   aria_selected_on_options: true
   aria_disabled_on_disabled_options: true
+  focus_stays_on_the_input_options_are_never_focused: true
   keyboard_arrow_navigation: true
+  arrow_navigation_does_not_wrap_at_the_ends: true
+  arrow_navigation_skips_disabled_options: true
   escape_closes_and_restores_previous_selection: true
+  escape_is_ignored_while_closed: true
   enter_selects_active_option: true
+  tab_closes_and_restores_previous_selection: true
   home_end_navigation: true
 
 behavior:
   update_payload_type: string
+  input_text_is_internal_state_not_model_value: true
   local_filtering_by_label_description_and_keywords: true
+  filtering_is_case_insensitive_substring_on_a_trimmed_query: true
+  empty_query_shows_all_options: true
+  input_change_emits_the_raw_query_for_async_filtering: true
+  async_results_are_fed_back_through_the_options_prop: true
   loading_does_not_disable_by_itself: true
+  spinner_replaces_the_chevron_when_loading: true
+  chevron_rotates_when_open: true
+  check_icon_on_selected_option: true
+  focus_opens_the_listbox: true
+  click_on_input_opens_the_listbox: true
+  typing_opens_the_listbox: true
+  arrow_down_opens_the_listbox_with_the_first_enabled_option_active: true
+  arrow_up_opens_the_listbox_with_the_last_enabled_option_active: true
+  active_option_defaults_to_the_current_selection_when_it_is_in_the_filtered_list: true
+  disabled_options_cannot_be_activated_selected_or_hovered: true
+  selecting_an_option_sets_the_input_text_to_its_label_and_closes_without_restoring: true
   outside_click_closes_dropdown: true
+  outside_click_is_detected_on_pointerdown_on_document: true
   query_clears_selection_when_closed_empty: true
   selected_value_restores_when_search_is_abandoned: true
+  external_model_value_and_options_changes_resync_the_input_text_only_while_closed: true
+  active_option_is_revalidated_when_the_filtered_list_changes: true
+  open_state_emits_are_deduped: true
+  listbox_is_not_rendered_while_disabled: true
+  listbox_renders_in_flow_with_no_portal_and_no_flip_positioning: true
+
+transition: t-fade
+
+css_classes:
+  block: t-combobox
+  elements:
+    - t-combobox__control
+    - t-combobox__slot
+    - t-combobox__slot--prefix
+    - t-combobox__input
+    - t-combobox__indicator
+    - t-combobox__listbox
+    - t-combobox__empty
+    - t-combobox__option
+    - t-combobox__option-copy
+    - t-combobox__option-label
+    - t-combobox__option-description
+    - t-combobox__check
+  modifiers:
+    - t-combobox--sm
+    - t-combobox--md
+    - t-combobox--lg
+  states:
+    - is-open
+    - is-disabled
+    - is-invalid
+    - is-loading
+    - is-active
+    - is-selected
+
+notes:
+  - "`is-open`, `is-invalid`, `is-loading` and `is-disabled` sit on the root <div>; `is-active`, `is-selected` and `is-disabled` sit on each `li.t-combobox__option`."
+  - "The root also carries `data-state=\"open\" | \"closed\"`, which is the stable hook for tests and for CSS that must not depend on the `is-open` class."
+  - "The input is uncontrolled text over a controlled value: it renders the internal `query`, not `modelValue`. If the parent ignores `update:modelValue`, typed text stays on screen while no selection exists — always bind v-model or handle the emit."
+  - "There is no `width` prop. Unlike TInput, TSelect, TTextarea and TLanguageSelect, TCombobox is not on the `TFieldWidth` scale; constrain it from the container or with a class passed through to the root <div>."
+  - "The listbox is a plain child of the root, not a portal — it is clipped by any ancestor with `overflow: hidden` and never flips above the input when space below is short. TSelect and TLanguageSelect do flip; TCombobox does not."
+  - "Focus alone opens the listbox, so a TCombobox inside a modal or drawer that autofocuses its first control will render open on mount."
+  - "`keywords` are matched but never displayed — use them for synonyms and alternate spellings; use `description` for the secondary line that renders under the label."
 
 example: |
   <TCombobox
@@ -86,3 +234,39 @@ example: |
     :model-value="assignee"
     @update:model-value="assignee = $event"
   />
+
+example_async: |
+  <!-- Server-side filtering: `input-change` is the only hook, and results come
+       back through `options`. `loading` is presentational and must not gate typing. -->
+  <TCombobox
+    aria-label="Repository"
+    placeholder="Search repositories"
+    :options="results"
+    :loading="pending"
+    :model-value="repo"
+    empty-text="No repositories match this search."
+    @input-change="search($event)"
+    @update:model-value="repo = $event"
+  />
+
+example_custom_option: |
+  <!-- The `option` slot replaces the whole row body, including the built-in
+       check icon — re-render a selected affordance yourself if you need one. -->
+  <TCombobox
+    aria-label="Team"
+    :options="teams"
+    :model-value="team"
+    @update:model-value="team = $event"
+  >
+    <template #option="{ option, selected, active }">
+      <span class="t-combobox__option-copy">
+        <span class="t-combobox__option-label">{{ option.label }}</span>
+        <span class="t-combobox__option-description">{{ option.description }}</span>
+      </span>
+      <TBadge v-if="selected" tone="success">Current</TBadge>
+      <TKbd v-else-if="active">Enter</TKbd>
+    </template>
+    <template #empty="{ query }">
+      No team called &ldquo;{{ query }}&rdquo;.
+    </template>
+  </TCombobox>

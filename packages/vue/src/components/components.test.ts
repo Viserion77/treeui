@@ -3224,6 +3224,36 @@ describe('@treeui/vue', () => {
     expect(wrapper.findAll('.t-accordion__item')[2].classes()).toContain('is-disabled');
   });
 
+  it('container disabled prop disables every item', () => {
+    const wrapper = mountAccordion({ disabled: true });
+
+    for (const item of wrapper.findAll('.t-accordion__item')) {
+      expect(item.classes()).toContain('is-disabled');
+    }
+  });
+
+  it('container disabled prop stays reactive after mount', async () => {
+    // Regression: the context used to provide `disabled: props.disabled`, which
+    // reads the prop once during setup, so toggling it later never reached items.
+    const wrapper = mountAccordion({ disabled: false });
+
+    const firstItem = () => wrapper.findAll('.t-accordion__item')[0];
+    expect(firstItem().classes()).not.toContain('is-disabled');
+
+    await wrapper.setProps({ disabled: true });
+    expect(firstItem().classes()).toContain('is-disabled');
+
+    const trigger = wrapper.findAll('.t-accordion__trigger')[0];
+    await trigger.trigger('click');
+    expect(trigger.attributes('aria-expanded')).toBe('false');
+
+    await wrapper.setProps({ disabled: false });
+    expect(firstItem().classes()).not.toContain('is-disabled');
+
+    await trigger.trigger('click');
+    expect(trigger.attributes('aria-expanded')).toBe('true');
+  });
+
   it('multiple mode allows several items open at once', async () => {
     const wrapper = mount(TAccordion, {
       attachTo: document.body,

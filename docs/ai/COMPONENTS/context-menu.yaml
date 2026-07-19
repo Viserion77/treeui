@@ -2,49 +2,83 @@
 # Right-click floating menu anchored at cursor position.
 
 component: TContextMenu
+source_file: packages/vue/src/components/TContextMenu.vue
 since: 0.5.0
 status: stable
 category: overlay
+description: >
+  Right-click (contextmenu) menu teleported to body and positioned at the cursor.
+  The component renders no chrome of its own — the root wrapper is
+  `display: contents` and only wraps the slotted trigger area.
 
 props:
   items:
     type: TContextMenuItem[]
     default: "[]"
-    description: Menu items to render.
+    description: >
+      Menu items to render, one `role="menuitem"` <li> each. An empty array is
+      allowed and still opens an empty `role="menu"` list with nothing focused.
   open:
     type: boolean | undefined
     default: undefined
-    description: Controlled open state (v-model:open).
+    description: >
+      Controlled open state (v-model:open). When defined it wins over the
+      internal state and `defaultOpen` is ignored; the component still emits and
+      expects the parent to write the new value back. `disabled` overrides this —
+      a disabled component renders no menu even while `open` is true.
   defaultOpen:
     type: boolean
     default: false
-    description: Uncontrolled initial open state.
+    description: >
+      Uncontrolled initial open state. Read once during setup — later changes to
+      this prop have no effect.
   disabled:
     type: boolean
     default: false
-    description: Prevents the context menu from opening.
+    description: >
+      Prevents the context menu from opening, and hides it if it is already open.
+      While disabled the component does not call preventDefault on `contextmenu`,
+      so the native browser menu appears instead.
   size:
     type: TSize
     default: md
-    description: Item sizing variant.
+    values: [sm, md, lg]
+    description: >
+      Item sizing variant. The modifier class is applied to both the root and the
+      teleported menu, but only the copy on the menu is effective (the root is
+      teleport-detached from the menu subtree).
 
 events:
   select:
     payload: "[value: string]"
-    description: Emitted when a menu item is selected.
+    description: >
+      Emitted with `item.value` when an enabled item is activated by click or
+      Enter/Space. Disabled items emit nothing.
   update:open:
     payload: "[value: boolean]"
-    description: Emitted when open state changes (v-model support).
+    description: >
+      Emitted when open state changes (v-model support). Only fires on an actual
+      transition — setting the same value again is a no-op.
   open-change:
     payload: "[value: boolean]"
-    description: Emitted when open state changes.
+    description: >
+      Emitted when open state changes. Always fires together with `update:open`,
+      including in controlled mode.
 
 slots:
   default:
-    description: Content that acts as the right-click trigger area.
+    description: >
+      Content that acts as the right-click trigger area. It is rendered inside the
+      root <div>, which is `display: contents` and therefore contributes no box of
+      its own — the slotted content keeps its own layout, and the `contextmenu`
+      handler still fires through event bubbling.
   item:
     props: "{ item: TContextMenuItem; index: number }"
-    description: Custom rendering for each menu item.
+    description: >
+      Custom rendering for each menu item; scoped props `{ item, index }`, falls
+      back to `{{ item.label }}`. Rendered inside the `role="menuitem"` <li>, which
+      already owns click, keydown, tabindex and aria-disabled — keep the content
+      presentational, nested interactive controls are not reachable inside a menuitem.
 
 types:
   TContextMenuItem:
@@ -53,38 +87,54 @@ types:
     disabled?: boolean
 
 accessibility:
-  role: menu (on the floating list)
+  role: menu (on the teleported floating list)
   items_role: menuitem
   keyboard:
     - "Right-click / contextmenu event opens menu at cursor"
-    - "ArrowDown / ArrowUp navigates items"
+    - "ArrowDown / ArrowUp move focus to the next / previous enabled item (clamped, no wrap)"
     - "Home / End jumps to first / last enabled item"
     - "Enter / Space selects focused item"
     - "Escape closes menu and restores focus"
+    - "All key handling lives on the items — keys are only handled while an item has focus"
   aria:
-    - "aria-disabled on disabled items"
-    - "aria-label on menu element"
+    - "aria-disabled on disabled items (omitted, not false, when enabled)"
+    - "aria-label=\"Context menu\" on the menu element — hardcoded, not configurable or localizable"
+    - "Menu id is generated with createId('t-context-menu'); there is no `id` prop"
+    - "tabindex 0 on enabled items, -1 on disabled items — no roving tabindex, every enabled item is tab-reachable"
   focus:
     - "First enabled item receives focus on open"
-    - "Focus restored to trigger area on close"
+    - "When every item is disabled, focus still goes to the first item; with an empty `items` array nothing is focused"
+    - "Focus restored to trigger area on close from Escape or item selection"
+    - "An outside click closes without restoring focus, leaving it where the pointer put it"
 
 behavior:
-  - Opens at cursor position on right-click (contextmenu event).
-  - Uses Teleport to body to escape stacking contexts.
-  - Closes on click outside, Escape key, or item selection.
-  - Prevents native browser context menu on trigger area.
-  - Uses position fixed for viewport-relative placement.
+  - Opens at cursor position on right-click (contextmenu event), using event.clientX / clientY.
+  - Uses Teleport to body to escape stacking contexts; the menu is not a DOM descendant of the trigger.
+  - Uses position fixed at the raw cursor coordinates, stacked at var(--tree-z-dropdown).
+  - No collision detection or viewport clamping — a menu opened near the right or bottom edge overflows.
+  - Closes on pointerdown outside the menu (including on the trigger itself), Escape, or item selection.
+  - Right-clicking again inside the trigger area repositions the menu — the outside pointerdown closes it and the following contextmenu reopens it at the new coordinates.
+  - A document-level contextmenu listener covers keyboard-invoked menus (Shift+F10 / Menu key) raised outside the trigger.
+  - Prevents native browser context menu on trigger area, but only while not disabled.
+  - Exposes data-state="open" | "closed" on the root element for external styling.
+  - Document pointerdown / contextmenu listeners are attached only while open, and removed on close and before unmount.
+  - Menu enter / leave uses the shared t-fade transition (opacity plus scale 0.95).
 
 css:
-  block: t-context-menu
+  block: t-context-menu (root wrapper, display contents)
   modifiers:
     - "t-context-menu--sm"
     - "t-context-menu--md"
     - "t-context-menu--lg"
+  modifiers_note: >
+    Size modifiers are applied to both the root and the teleported menu, but the
+    rules are `.t-context-menu--<size> .t-context-menu__item`, so only the copy on
+    the menu is effective. `--md` is the base and ships no rules of its own.
   states:
-    - "is-disabled"
-    - "is-open"
-    - "is-focused (on items)"
+    - "is-disabled (on root: markup hook only, no shipped styles)"
+    - "is-open (on root: markup hook only, no shipped styles)"
+    - "is-disabled (on items: opacity 0.5, cursor not-allowed)"
+    - "is-focused (on items: paints the hover background)"
   elements:
-    - "t-context-menu__menu"
-    - "t-context-menu__item"
+    - "t-context-menu__menu (the teleported ul role=menu)"
+    - "t-context-menu__item (each li role=menuitem)"

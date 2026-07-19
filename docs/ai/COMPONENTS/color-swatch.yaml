@@ -9,47 +9,80 @@ props:
   modelValue:
     type: string
     default: undefined
-    note: "Selected colour as a hex string. Matching is case-insensitive."
+    note: "Selected colour as a hex string. Matched against `options[].value` by case-insensitive exact string comparison, so `#0969DA` matches `#0969da` but `#fff` never matches `#ffffff`. A value matching no preset leaves every swatch unselected and is still written to the custom input."
   options:
     type: "TColorSwatchOption[]"
     default: "[]"
-    note: "Preset swatches, each `{ label, value }`. `label` becomes the button's accessible name."
+    note: "Preset swatches, each `{ label, value }`. `value` is applied raw as the button `background`, so any CSS colour renders, but keep it `#rrggbb` so matching and the custom input agree. `label` is the button's only accessible name — the button renders no text content. An empty array renders an empty group (only the custom input, when enabled)."
   allowCustom:
     type: boolean
     default: false
-    note: "Appends a native `<input type=\"color\">` for values outside the presets."
+    note: "Appends a native `<input type=\"color\">` after the presets for values outside them. When false the input is not rendered at all and `customLabel` has no effect."
   size:
     type: TSize
     default: md
     values: [sm, md, lg]
+    note: "Drives `--tree-color-swatch-size` (sm 1.5rem, md 1.75rem, lg 2rem). Swatches are square; the custom input is one `--tree-space-2` wider."
   label:
     type: string
     default: Color
-    note: "Accessible label for the swatch group (`role=\"group\"`)."
+    note: "Accessible label for the swatch group (`role=\"group\"`). Rendered as `aria-label` on the root, so an `aria-label` passed by the consumer falls through to the same element and overrides it."
   customLabel:
     type: string
     default: Custom color
+    note: "Accessible label (`aria-label`) for the native colour input, and its only accessible name. Applies only when `allowCustom` is set."
   disabled:
     type: boolean
     default: false
+    note: "Sets the native `disabled` attribute on every preset button and on the custom input, so the group stops emitting and drops out of the Tab order. Not reflected on the wrapper, and there is no `is-disabled` class."
 
 events:
   - "update:modelValue"
 
 slots: []
 
+forwards_attrs_to: group_wrapper_div
+
+types:
+  TColorSwatchOption: "{ label: string; value: string }"
+
 a11y:
-  - "Wrapper is `role=\"group\"` labelled by `label`."
-  - "Each swatch is a native button with `aria-pressed` reflecting selection and `aria-label` from the option label."
+  - "Wrapper is `role=\"group\"` labelled by `label` via `aria-label`."
+  - "Each swatch is a native `<button type=\"button\">` with `aria-pressed` reflecting selection and `aria-label` from the option label; it has no text content, so an option without a `label` is unnamed."
   - "Selection is conveyed by an outline (not colour alone), since the swatch's own colour is the content."
+  - "The custom input is a native `<input type=\"color\">` named only by `customLabel`."
+  - "No roving focus and no arrow-key navigation — every swatch and the custom input is its own Tab stop."
 
 behavior:
+  update_payload_type: string
   emits_on_preset_click: true
   emits_on_custom_input: true
   blocks_interaction_when_disabled: true
+  selection_match_is_case_insensitive: true
+  custom_input_rendered_only_when_allow_custom: true
+  custom_input_emits_on_input_not_change: true
+  fully_controlled_no_internal_selection_state: true
+
+css_classes:
+  block: t-color-swatch
+  elements:
+    - t-color-swatch__option
+    - t-color-swatch__custom
+  modifiers:
+    - t-color-swatch--sm
+    - t-color-swatch--md
+    - t-color-swatch--lg
+  states:
+    - is-selected
+
+notes:
+  - "`<input type=\"color\">` accepts only a full 7-character `#rrggbb` value; browsers coerce anything else — shorthand `#fff`, `rgb()`, named colours, `undefined` — to `#000000`. Keep `modelValue` and every `options[].value` in that form so the custom input mirrors the current selection."
+  - "The custom input emits on `input`, which fires continuously while the OS colour picker is dragged. Debounce downstream work (persistence, network calls) rather than expecting one event per pick."
+  - "Renders no hidden input and no `name`, so it is not a native form field — submit the value from application state. Fallthrough attributes land on the wrapper `div`, never on the colour input."
 
 related:
   - "Pair with `useTheme()` to apply the picked colour as the app accent — it re-derives a legible brand ramp per theme."
+  - "Wrap in `TFormField` for a visible label and hint; keep `label` set as well, since `TFormField` does not name the `role=\"group\"` wrapper."
 
 example: |
   <TColorSwatch
@@ -57,4 +90,5 @@ example: |
     :options="[{ label: 'Ocean blue', value: '#0969da' }]"
     allow-custom
     label="Accent color"
+    custom-label="Custom accent color"
   />

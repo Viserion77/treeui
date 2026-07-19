@@ -19,6 +19,7 @@ const meta = {
     allowCustom: true,
     size: 'md',
     label: 'Accent color',
+    customLabel: 'Custom accent color',
     disabled: false,
   },
   argTypes: {
@@ -63,6 +64,21 @@ export const Sizes: Story = {
       <div style="display: grid; gap: 1rem;">
         <TColorSwatch v-for="s in ['sm', 'md', 'lg']" :key="s" :size="s"
           :options="presets" allow-custom v-model="value" :label="'Accent ' + s" />
+      </div>
+    `,
+  }),
+};
+
+/** Disabled — preset buttons and the native colour input are both inert. */
+export const Disabled: Story = {
+  render: () => ({
+    components: { TColorSwatch },
+    setup: () => ({ presets }),
+    template: `
+      <div style="display: grid; gap: 1rem;">
+        <TColorSwatch disabled :options="presets" allow-custom model-value="#0969da"
+          label="Disabled accent color" custom-label="Custom accent color" />
+        <TColorSwatch disabled :options="presets" model-value="#1a7f37" label="Disabled presets" />
       </div>
     `,
   }),

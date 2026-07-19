@@ -9,6 +9,7 @@ props:
   as:
     type: string
     default: div
+    note: "Tag or component rendered as the shell root. The root is a plain `div` by default and is therefore not a landmark — the header/sidebar/main regions carry the semantics."
   side:
     type: TSidebarSide
     default: left
@@ -16,112 +17,253 @@ props:
   sidebarWidth:
     type: string
     default: 17.5rem
+    note: "Any CSS length. Sets `--tree-app-shell-sidebar-width` on the root, which drives the desktop rail track and also caps the mobile drawer at `min(100%, sidebarWidth)`."
   collapsedWidth:
     type: string
     default: 4.75rem
+    note: "Any CSS length. Sets `--tree-app-shell-collapsed-width` on the root, but it only takes effect while the root carries `is-collapsed` (desktop + `collapsible` + collapsed)."
   collapsible:
     type: boolean
     default: false
+    note: "Master gate for the desktop rail. While false the root never gets `is-collapsed`, the built-in collapse toggle is not rendered, and `toggleCollapsed` is a no-op."
   collapsed:
     type: boolean
     default: undefined
+    note: "Controlled desktop rail state (v-model:collapsed). Leave undefined for uncontrolled. When set, the component only emits — the parent must apply the new value."
   defaultCollapsed:
     type: boolean
     default: false
+    note: "Initial value for uncontrolled use. Read once during setup; later changes to the prop are ignored."
   mobile:
     type: boolean
     default: undefined
+    note: "Forces mobile mode when explicitly true or false. Leave undefined to auto-detect from `breakpoint`."
   breakpoint:
     type: string
     default: 768px
+    note: "Any CSS length. Evaluated as `(max-width: <breakpoint>)` via matchMedia, and only consulted while `mobile` is undefined. Changing it tears down and rebuilds the media query listener."
   sidebarOpen:
     type: boolean
     default: undefined
+    note: "Controlled off-canvas drawer state (v-model:sidebarOpen). Mobile-only — the flag is tracked in desktop mode but nothing renders from it."
   defaultSidebarOpen:
     type: boolean
     default: false
+    note: "Initial value for uncontrolled use. Read once during setup."
   closeOnEscape:
     type: boolean
     default: true
+    note: "Drawer only. Escape is handled on the drawer surface, so it fires only while focus is inside the drawer."
   closeOnOverlay:
     type: boolean
     default: true
+    note: "Drawer only. Set false to keep the drawer open on backdrop clicks."
   showMenuButton:
     type: boolean
     default: true
+    note: "Renders the built-in hamburger in the header. Mobile only. Set false to supply your own trigger and call the `toggleSidebar` slot prop from the `header` or `header-start` slot."
   showCollapseButton:
     type: boolean
     default: true
-    note: "Renders the built-in collapse toggle in the sidebar footer. Desktop only, and only when `collapsible` is set — no need to wire your own."
+    note: "Renders the built-in collapse toggle in the sidebar footer. Desktop only, and only when `collapsible` is set — no need to wire your own. Never rendered in the mobile drawer."
   collapseLabel:
     type: string
     default: Collapse sidebar
+    note: "aria-label of the collapse toggle while the rail is expanded."
   expandLabel:
     type: string
     default: Expand sidebar
+    note: "aria-label of the collapse toggle while the rail is collapsed."
   menuLabel:
     type: string
     default: Open menu
+    note: "aria-label of the built-in hamburger. Static — it does not swap to a close label while the drawer is open."
   closeLabel:
     type: string
     default: Close menu
+    note: "aria-label of the drawer's close button."
   sidebarLabel:
     type: string
     default: Sidebar
+    note: "aria-label applied to both the desktop <aside> and the drawer <aside>."
 
 events:
-  - update:collapsed
-  - collapse-change
-  - update:sidebarOpen
-  - sidebar-open-change
+  - name: update:collapsed
+    payload: "[value: boolean]"
+    description: "Desktop rail collapsed state changed. Enables v-model:collapsed."
+  - name: collapse-change
+    payload: "[value: boolean]"
+    description: "Same change as update:collapsed, for non-v-model usage. Both always fire together."
+  - name: update:sidebarOpen
+    payload: "[value: boolean]"
+    description: "Off-canvas drawer open state changed. Enables v-model:sidebarOpen."
+  - name: sidebar-open-change
+    payload: "[value: boolean]"
+    description: "Same change as update:sidebarOpen, for non-v-model usage. Both always fire together."
 
 slots:
-  - header           # aligns with the content panel when `header-start` is used
-  - header-start     # header region over the sidebar rail
-  - sidebar-header   # pinned above the sidebar body
-  - sidebar
-  - sidebar-footer   # pinned to the bottom of the sidebar
-  - default
-  - menu-icon
-  - collapse-icon
+  header:
+    scoped: true
+    bindings: "AppShellSlotProps — { mobile, collapsed, sidebarOpen, toggleSidebar, closeSidebar, toggleCollapsed }"
+    description: >
+      Main header region. Spans the full header width by default; once `header-start`
+      is filled it is constrained to the content column so it lines up with the panel
+      underneath. On mobile the header falls back to a single flex row either way.
+  header-start:
+    scoped: true
+    bindings: "AppShellSlotProps"
+    description: >
+      Header region sitting over the sidebar rail (typically the brand mark). Filling
+      it adds `has-start` to the header, which switches the header to the shell's own
+      two-column grid and tracks the rail width as it collapses.
+  sidebar-header:
+    scoped: true
+    bindings: "AppShellSlotProps"
+    description: >
+      Pinned above the sidebar body, inset to line up with nav item icons. Rendered in
+      both the desktop aside and the mobile drawer.
+  sidebar:
+    scoped: true
+    bindings: "AppShellSlotProps"
+    description: >
+      Sidebar body — the natural home for a TNavMenu, which picks up the collapsed
+      state through provide/inject. Rendered in both the desktop aside and the mobile
+      drawer, and takes the vertical slack so the footer pins to the bottom.
+  sidebar-footer:
+    scoped: true
+    bindings: "AppShellSlotProps"
+    description: >
+      Pinned to the bottom of the sidebar, inset to line up with nav item icons. In the
+      desktop aside it shares one container with the built-in collapse toggle, which is
+      rendered after the slot content; in the mobile drawer the container holds the slot
+      content alone.
+  default:
+    scoped: true
+    bindings: "{ mobile: boolean, collapsed: boolean } — a subset of AppShellSlotProps, no toggles"
+    description: "Main content area. Scrolls independently of the header and sidebar."
+  menu-icon:
+    scoped: true
+    bindings: "{ sidebarOpen: boolean }"
+    description: >
+      Replaces the default hamburger glyph inside the built-in menu button. Use
+      `sidebarOpen` to swap the icon while the drawer is open. Renders inside the
+      button, so it must be presentational only.
+  collapse-icon:
+    scoped: true
+    bindings: "{ collapsed: boolean }"
+    description: >
+      Replaces the default glyph inside the built-in collapse toggle. Renders inside the
+      button, so it must be presentational only.
+
+forwards_attrs_to: root
+
+types:
+  TSidebarSide: "'left' | 'right'"
+  AppShellSlotProps: "{ mobile: boolean; collapsed: boolean; sidebarOpen: boolean; toggleSidebar: () => void; closeSidebar: () => void; toggleCollapsed: () => void }"
 
 a11y:
-  role: dialog
+  semantic_regions: "<header>, <aside> and <main>; the shell root itself is a plain div and is not a landmark"
+  role: "dialog — on the mobile drawer only"
   aria_modal: true
-  focus_trap: true
-  restores_focus_on_close: true
+  focus_trap: "Tab and Shift+Tab cycle inside the drawer; with no focusable descendant, focus is pinned to the drawer itself"
+  restores_focus_on_close: "only when the drawer was opened through the built-in menu button or the toggleSidebar slot prop — those capture document.activeElement first"
   escape_closes_when_enabled: true
   menu_button_aria_expanded: true
-  menu_button_aria_controls_drawer: true
+  menu_button_aria_controls_drawer: "aria-controls always points at the sidebar id, and on mobile that element exists only while the drawer is open"
+  collapse_button_aria_expanded: "reflects the expanded rail, i.e. !collapsed"
+  collapse_button_aria_controls_sidebar: true
+  collapse_button_label_swaps_by_state: "collapseLabel while expanded, expandLabel while collapsed"
+  drawer_close_button_labelled_by_close_label: true
   sidebar_labelled_by_sidebar_label: true
+  drawer_focusable_via_tabindex_minus_one: true
+  backdrop_is_aria_hidden: true
+  built_in_icons_are_aria_hidden: true
+  menu_and_drawer_close_buttons_are_44px: true
 
 behavior:
   fills_viewport_full_width_and_height: true
+  resets_body_margin_while_a_shell_is_mounted: "body:has(.t-app-shell) { margin: 0 } — a deliberate global rule, scoped so it only applies to pages that mount a shell"
   header_spans_full_width_above_sidebar_and_content: true
   content_area_scrolls_independently: true
   auto_switches_to_mobile_at_breakpoint_when_mobile_undefined: true
   mobile_prop_forces_mobile_mode: true
   mobile_sidebar_becomes_off_canvas_drawer: true
+  desktop_sidebar_is_removed_from_the_dom_on_mobile: "crossing the breakpoint unmounts and remounts the sidebar slot, so component state inside it is not preserved"
+  drawer_is_rendered_only_while_mobile_and_open: true
   auto_menu_button_in_header_on_mobile: true
   controlled_and_uncontrolled_collapsed_state: true
   controlled_and_uncontrolled_sidebar_open_state: true
+  controlled_mode_does_not_self_update: "when collapsed or sidebarOpen is bound, the component only emits — the parent must apply the value"
+  no_emit_when_the_value_is_unchanged: true
+  toggle_collapsed_is_a_noop_when_collapsible_is_false: true
+  collapse_toggle_requires_desktop_and_collapsible_and_show_collapse_button: true
   provides_collapsed_state_to_descendants: true
   drawer_reports_collapsed_false_to_descendants_and_slots: true
   left_and_right_variants: true
   locks_body_scroll_while_drawer_open: true
+  releases_the_scroll_lock_when_leaving_mobile_while_open: true
+  rearms_the_overlay_when_reentering_mobile_while_open: true
   overlay_click_closes_when_enabled: true
   exposes_slot_props_with_mobile_collapsed_and_toggles: true
   sidebar_footer_pinned_to_bottom: true
   sidebar_header_and_footer_inset_to_align_with_nav_icons: true
   header_mirrors_shell_columns_when_header_start_is_used: true
+  header_start_falls_back_to_a_single_flex_row_on_mobile: true
+  animates_the_rail_width_via_grid_template_columns: true
+  main_panel_has_a_rounded_inner_corner_on_the_sidebar_side_on_desktop: true
+  drawer_width_is_capped_at_min_of_100_percent_and_sidebar_width: true
+  root_data_attribute: 'data-mobile="true" | "false" on the shell root'
+  respects_prefers_reduced_motion: true
+
+css_classes:
+  block: t-app-shell
+  elements:
+    - t-app-shell__header
+    - t-app-shell__header-start
+    - t-app-shell__header-content
+    - t-app-shell__menu-button
+    - t-app-shell__sidebar
+    - t-app-shell__sidebar-header
+    - t-app-shell__sidebar-body
+    - t-app-shell__sidebar-footer
+    - t-app-shell__collapse-button
+    - t-app-shell__main
+    - t-app-shell__overlay
+    - t-app-shell__backdrop
+    - t-app-shell__drawer
+    - t-app-shell__drawer-topbar
+    - t-app-shell__drawer-close
+    - t-app-shell__drawer-body
+  modifiers:
+    - t-app-shell--left
+    - t-app-shell--right
+  states:
+    - is-mobile
+    - is-collapsed
+    - is-sidebar-open
+    - has-start
+  states_note: "is-mobile, is-collapsed and is-sidebar-open sit on the root; has-start sits on .t-app-shell__header."
+  transition: t-app-shell-fade
+
+css_variables:
+  --tree-app-shell-sidebar-width: "set from the sidebarWidth prop; also caps the drawer width"
+  --tree-app-shell-collapsed-width: "set from the collapsedWidth prop"
+  --tree-app-shell-track: "resolved rail track — sidebar width, or collapsed width while is-collapsed"
+  --tree-app-shell-frame: "shared header + sidebar surface"
+  --tree-app-shell-content: "main content panel surface"
+  --tree-app-shell-header-pad: "header inline padding"
+  --tree-app-shell-rail-inset: "inline padding of the sidebar header and footer, matched to nav item icons"
 
 usage:
-  vue_pattern: "Supports v-model:collapsed (desktop rail) and v-model:sidebarOpen (mobile drawer). Header and sidebar slots receive { mobile, collapsed, sidebarOpen, toggleSidebar, closeSidebar, toggleCollapsed }. Place a TNavMenu in the sidebar slot; it inherits collapsed state automatically. Set collapsible to enable the desktop rail. The shell fills 100dvh and 100% width, so mount it at the app root and do not wrap its content in a max-width TContainer unless a specific region needs constrained reading width."
+  vue_pattern: "Supports v-model:collapsed (desktop rail) and v-model:sidebarOpen (mobile drawer). The header, header-start, sidebar, sidebar-header and sidebar-footer slots receive the full AppShellSlotProps { mobile, collapsed, sidebarOpen, toggleSidebar, closeSidebar, toggleCollapsed }; the default slot receives only { mobile, collapsed }; menu-icon receives { sidebarOpen } and collapse-icon receives { collapsed }. Place a TNavMenu in the sidebar slot; it inherits collapsed state automatically. Set collapsible to enable the desktop rail — without it the built-in toggle is not rendered and toggleCollapsed does nothing. Call closeSidebar after navigation so the mobile drawer does not stay open over the new route. The shell fills 100dvh and 100% width, so mount it at the app root and do not wrap its content in a max-width TContainer unless a specific region needs constrained reading width."
 
 example: |
   <TAppShell collapsible>
-    <template #header="{ mobile, toggleCollapsed }">
-      <strong>TreeUI</strong>
+    <template #header-start="{ collapsed }">
+      <strong>{{ collapsed ? 'T' : 'TreeUI' }}</strong>
+    </template>
+    <template #header="{ mobile }">
+      <TText v-if="!mobile" tone="muted">Workspace</TText>
     </template>
     <template #sidebar="{ closeSidebar }">
       <TNavMenu

@@ -3,12 +3,18 @@ source_file: packages/vue/src/components/TCard.vue
 package: "@treeui/vue"
 kind: layout
 status: available
-purpose: "Surface container with optional header and footer slots."
+purpose: "Surface container with optional header, actions, and footer slots."
 
 props:
   as:
     type: string
     default: section
+    description: >
+      Tag or component used for the polymorphic root, rendered through
+      `<component :is="as">`. Change it to `article`, `aside`, `li`, or `div`
+      when the default `section` element is wrong for the surrounding document
+      structure. It only swaps the element — classes, slots, and layout are
+      unchanged.
   variant:
     type: TCardVariant
     default: outline
@@ -16,22 +22,78 @@ props:
   size:
     type: TSize
     default: md
-    values: [sm, md, lg]
+    description: >
+      Padding scale only — it does not change typography, border, or radius.
+      `sm` uses --tree-space-3, `md` --tree-space-4, `lg` --tree-space-5.
   title:
     type: string
     default: undefined
-    description: "Optional card heading rendered inside the header area."
+    description: >
+      Optional card heading. Rendered as the fallback content of the `header`
+      slot inside a `span.t-card__title`, so supplying `#header` replaces it
+      entirely. Setting it also forces the header element to render. Because it
+      is declared as a prop it is consumed by the component and never reaches
+      the root element as the native HTML `title` tooltip attribute.
 
 events: []
 
 slots:
-  - header
-  - actions
-  - default
-  - footer
+  - name: header
+    description: >
+      Replaces the `title` fallback inside `header.t-card__header`. When this
+      slot is supplied the `title` prop renders nothing. Receives no slot props.
+  - name: actions
+    description: >
+      Trailing controls wrapped in `span.t-card__actions`, rendered as a sibling
+      after the header content inside the same `header.t-card__header`.
+      Supplying it is enough to render the header on its own, with no `title`
+      and no `header` slot. Receives no slot props.
+  - name: default
+    description: >
+      Card body. Always rendered, wrapped in `div.t-card__body`. Receives no
+      slot props.
+  - name: footer
+    description: >
+      Renders `footer.t-card__footer` only when the slot is supplied; there is
+      no `footer` prop fallback. Receives no slot props.
+
+a11y:
+  root_role: "None applied by the component — semantics come entirely from `as` (default `section`)."
+  title_is_not_a_heading: >
+    `title` renders a `span.t-card__title`, styled at heading size and weight but
+    carrying no heading semantics, so it does not enter the document outline. When
+    the card must be reachable by heading navigation, put a real `<h2>`/`<h3>` in
+    the `header` slot instead of using the prop.
+  unnamed_section_root: >
+    The default `section` root has no accessible name, so assistive tech exposes
+    it as generic rather than as a region. The component sets no `inheritAttrs:
+    false` and has a single root, so `aria-label` / `aria-labelledby` passed by
+    the consumer fall through to that root when a named region is wanted.
+
+css:
+  block: t-card
+  modifiers:
+    - t-card--outline
+    - t-card--soft
+    - t-card--inset
+    - t-card--sm
+    - t-card--md
+    - t-card--lg
+  elements:
+    - t-card__header
+    - t-card__title
+    - t-card__actions
+    - t-card__body
+    - t-card__footer
 
 behavior:
   body_wrapper_class: t-card__body
+  header_render_condition: >
+    The `header.t-card__header` element renders when ANY of the `header` slot,
+    a truthy `title` prop, or the `actions` slot is present. All three branches
+    are independent — actions alone still produces a header.
+  footer_render_condition: "The `footer.t-card__footer` element renders only when the `footer` slot is supplied."
+  slot_props: "None. No slot on this component is scoped; all four are plain content slots."
   variant_effects:
     outline: "Base surface with a default border. The styling baseline — the `t-card--outline` class is emitted but carries no CSS rule of its own."
     soft: "Subtle tinted surface (bg-subtle), same border and shadow as outline."

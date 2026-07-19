@@ -18,21 +18,27 @@ props:
     type: TSize
     default: md
     values: [sm, md, lg]
+    description: "Box height, taken from `--tree-size-icon-sm/md/lg` (16px / 20px / 24px); the box width is 3:2 of that height. Also selects which CDN asset pair is requested — see `baseUrl`."
   label:
     type: string
     default: undefined
-    description: "Accessible label. When set, the flag becomes role=\"img\" with aria-label; otherwise it is aria-hidden."
+    description: "Accessible label. When set, the flag becomes role=\"img\" with aria-label; otherwise it is aria-hidden. An empty string counts as unset — the flag stays decorative."
   fallbackText:
     type: string
     default: undefined
-    description: "Text shown when the image cannot load. Defaults to the uppercased `code`."
+    description: "Text shown when the image cannot load. Defaults to the normalized `code` uppercased, so a padded `\" br \"` falls back to `BR`."
 
 events: []
 slots: []
 
+forwards_attrs_to: root_span
+
 a11y:
   decorative_by_default: true
   becomes_image_when_labeled: true
+  image_alt_is_always_empty: "The `<img>` always carries `alt=\"\"`, so the accessible name comes only from `label` on the root span — never from the image itself."
+  fallback_text_is_hidden_when_decorative: "The fallback text renders inside the root span, so without `label` it inherits `aria-hidden=\"true\"` and is not announced. It is a visual affordance, not an accessible name."
+  consumer_aria_label_does_not_replace_label: "Fallthrough attributes land on the same root span, so a consumer-supplied `aria-label` overrides the one built from `label` — but it does not set `role=\"img\"` or clear `aria-hidden=\"true\"`, leaving the flag hidden and the label unannounced. Use the `label` prop instead."
   rule: "Provide `label` only when the flag carries meaning that is not already in adjacent text — inside a language option the label is redundant."
 
 behavior:
@@ -44,8 +50,20 @@ behavior:
   retina_asset_is_at_least_twice_the_box_height: "Box heights come from `--tree-size-icon-sm/md/lg` (16px / 20px / 24px) and the srcset asset is h40 (sm, md) or h60 (lg), so a 2x screen never upscales."
   size_outside_the_union_falls_back_to_md: "A JS consumer can pass a size outside `TSize`; the asset lookup falls back to the md pair rather than throwing on an undefined entry."
   base_url_trailing_slash_is_normalised: "Trailing slashes are stripped from `baseUrl` before the path is appended, so a self-hosted mirror cannot silently produce a double-slashed URL."
+  sm_and_md_share_one_asset_pair: "sm and md both request h20 (h40 at 2x); only lg differs (h24, h60 at 2x). Four distinct segments exist in total, not one pair per size step, so a mirror needs four directories per flag."
   path_template_is_public_contract: "Changing `baseUrl` is a config change, not a breaking one, as long as the mirror serves the same fixed-height segments (h20, h24, h40, h60)."
+  image_element_is_removed_not_hidden_on_failure: "The `<img>` is behind `v-if`, so a failed load takes it out of the DOM and swaps in the fallback span — it is not left in place with `display: none`."
   no_country_or_locale_dataset_is_shipped: "TreeUI never maps a language or locale to a country code — the application owns that decision."
+
+css:
+  block: t-flag
+  modifiers:
+    - t-flag--sm
+    - t-flag--md
+    - t-flag--lg
+  elements:
+    - t-flag__image
+    - t-flag__fallback
 
 example: |
   <!-- Decorative: adjacent text already names the country -->

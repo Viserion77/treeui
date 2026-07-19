@@ -1,23 +1,65 @@
 component: TDivider
 package: "@treeui/vue"
 source: TDivider.vue
-description: Horizontal or vertical visual separator.
+description: >
+  Horizontal or vertical visual separator. Renders a single native <hr> and nothing else —
+  there is no default slot, so the "text in the middle of a rule" pattern (an "OR" divider)
+  is NOT supported; compose that yourself from a flex row plus TText. The `label` prop is an
+  accessible name only, never visible text. There are no size, variant, tone, or spacing props.
 
 props:
   orientation:
-    type: string
+    type: '"horizontal" | "vertical"'
     default: horizontal
     values: [horizontal, vertical]
+    description: >
+      Selects the `t-divider--{orientation}` modifier — the only class the component varies.
+      `horizontal` spans the full inline width (width 100%, height 0) with `margin-block`
+      spacing. `vertical` is a zero-width rule (width 0, height auto) that takes its height from
+      `align-self: stretch`, so it is only visible inside a flex or grid row — in a plain block
+      container it collapses to zero height and renders nothing.
   decorative:
     type: boolean
     default: true
-    description: "When true, renders role='none' (purely visual). When false, renders as role='separator'."
+    description: >
+      When true (the default) renders `role="none"` and no ARIA attributes at all — purely visual,
+      removed from the accessibility tree, and the `label` prop is dropped. When false renders
+      `role="separator"` plus `aria-orientation`, and `aria-label` when `label` is set.
   label:
     type: string
     required: false
-    description: Accessible label for non-decorative dividers.
+    description: >
+      Accessible name, applied as `aria-label` ONLY when `decorative` is false. Because
+      `decorative` defaults to true, `<TDivider label="Section" />` on its own renders no label
+      at all — pass `:decorative="false"` as well. Never rendered as visible text.
+
+events: []
+
+slots: []
 
 accessibility:
-  role: "none (decorative) or separator (semantic)"
-  aria-orientation: Set when non-decorative.
-  aria-label: Set from `label` prop when non-decorative.
+  role: '"none" when decorative (the default), "separator" when `decorative` is false.'
+  aria-orientation: >
+    Set to the `orientation` value only when `decorative` is false; omitted otherwise. Note that
+    "horizontal" is already the implicit default for `role="separator"`, so it is redundant there
+    but harmless.
+  aria-label: >
+    Set from the `label` prop only when `decorative` is false. Omitted when `label` is unset, so a
+    non-decorative divider without a label is an unnamed separator (valid — separators need no name).
+  notes: >
+    The decorative default is the right one for most dividers: a purely visual rule should not be
+    announced. Use `:decorative="false"` only when the rule genuinely separates two sections that
+    assistive technology should perceive as distinct, and pair it with `label` when the sections
+    need naming.
+
+behavior:
+  - Renders a native <hr> element as its single root node.
+  - Extra attrs and class/style fall through to that <hr> (attribute inheritance is not disabled).
+  - Applies exactly two classes; no state, size, or variant modifiers exist.
+  - A vertical divider needs a flex or grid parent to have any height.
+
+css:
+  block: t-divider
+  modifiers:
+    - "t-divider--horizontal"
+    - "t-divider--vertical"

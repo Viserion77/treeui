@@ -9,38 +9,101 @@ props:
   modelValue:
     type: boolean
     default: false
+    description: >
+      Checked state. Fully controlled — the component holds no internal state and never
+      mutates this prop; it emits update:modelValue and the parent must write the value back.
   size:
     type: TSize
     default: md
     values: [sm, md, lg]
+    description: "Control and label scale. Always rendered as a t-checkbox--<size> modifier."
   disabled:
     type: boolean
     default: false
+    description: >
+      Sets the native disabled attribute on the input and adds is-disabled to the root.
+      No aria-disabled is emitted — the native attribute carries the state.
   indeterminate:
     type: boolean
     default: false
+    description: >
+      Mixed state. Renders the dash icon and sets aria-checked="mixed", taking precedence
+      over modelValue for both. Synced to the input's native indeterminate DOM property.
   invalid:
     type: boolean
     default: false
+    description: >
+      Adds is-invalid to the root and aria-invalid="true" to the input.
+      When false the aria-invalid attribute is omitted entirely, not set to "false".
 
 events:
-  - update:modelValue
+  - name: update:modelValue
+    payload: "[value: boolean]"
+    description: >
+      Emitted on the native input's change event. The payload is always the negation of the
+      current modelValue prop, not the DOM checked state. Enables v-model binding.
 
 slots:
-  - default
+  - name: default
+    description: >
+      Label content, wrapped in <span class="t-checkbox__label">. Rendered only when the slot
+      is supplied (v-if="$slots.default"). The root element is a <label> that wraps the input,
+      so slot text labels the control implicitly — no for/id pairing is needed.
+    accessible_name_is_not_automatic: >
+      Omitting this slot renders a control with NO accessible name. Pass aria-label or
+      aria-labelledby on the component (both fall through to the native input), or associate
+      it with a visible label some other way.
 
-forwards_attrs_to: native_input[type=checkbox]
+forwards_attrs_to:
+  note: >
+    The component sets inheritAttrs: false and splits the fallthrough attrs — class and style
+    are pulled out of the attrs object and applied to the root <label>; everything else is
+    v-bound to the native input. There is no single fallthrough target.
+  native_input[type=checkbox]: >
+    All fallthrough attrs except class and style — id, name, value, required, aria-*, data-*,
+    and native listeners land on the input.
+  root_label: >
+    class and style only. A class passed to TCheckbox is merged into the root <label> classes,
+    NOT onto the input; a style is applied to the same <label>.
 
 a11y:
   role: native_checkbox
+  accessible_name: "From the default slot; absent when the slot is omitted — supply aria-label or aria-labelledby"
+  aria_checked_explicitly_bound: "'mixed' when indeterminate, otherwise the modelValue boolean"
   aria_checked_mixed_when_indeterminate: true
   aria_invalid_when_invalid: true
+  native_indeterminate_property_synced: true
+  disabled_uses_native_attribute: true
   focus_visible_on_control: true
+  input_is_visually_hidden_but_focusable: "clip-rect hidden input keeps native semantics and tab order; the focus ring is drawn on t-checkbox__control"
   clickable_target_44x44: true
 
 behavior:
   update_payload_type: boolean
+  controlled_only: "No internal state; the checkbox does not change appearance until the parent updates modelValue"
+  indeterminate_precedence: "indeterminate wins over modelValue for the rendered icon and for aria-checked; is-checked and is-indeterminate can both be present at once"
   indeterminate_clears_on_user_toggle: false
+  indeterminate_is_parent_owned: "The component never clears indeterminate — set it to false yourself when handling update:modelValue"
   label_click_toggles_checkbox: true
 
+css_classes:
+  block: t-checkbox
+  elements:
+    - t-checkbox__input
+    - t-checkbox__control
+    - t-checkbox__icon
+    - t-checkbox__label
+  modifiers:
+    - t-checkbox--sm
+    - t-checkbox--md
+    - t-checkbox--lg
+  states:
+    - is-checked
+    - is-indeterminate
+    - is-disabled
+    - is-invalid
+  note: "t-checkbox--md is always rendered but carries no declarations; md is the base size."
+
 example: '<TCheckbox :model-value="accepted" @update:model-value="accepted = $event">Accept terms</TCheckbox>'
+
+example_without_visible_label: '<TCheckbox aria-label="Select row" :model-value="selected" @update:model-value="selected = $event" />'

@@ -1,7 +1,12 @@
 import { onBeforeUnmount, reactive, ref } from 'vue';
 import type { Meta, StoryObj } from '@storybook/vue3-vite';
 import { TButton, TFileUpload } from '@treeui/vue';
-import type { TFileUploadRetryPayload, TFileUploadState } from '@treeui/vue';
+import type {
+  TFileUploadCancelPayload,
+  TFileUploadRejection,
+  TFileUploadRetryPayload,
+  TFileUploadState,
+} from '@treeui/vue';
 
 const meta = {
   title: 'Components/Form/FileUpload',

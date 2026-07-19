@@ -56,6 +56,48 @@ export const Sizes: Story = {
         <TContainer size="md"><div style="padding: 0.75rem; border-radius: 0.75rem; background: var(--tree-color-brand-soft);">Medium container</div></TContainer>
         <TContainer size="lg"><div style="padding: 0.75rem; border-radius: 0.75rem; background: var(--tree-color-brand-soft);">Large container</div></TContainer>
         <TContainer size="xl"><div style="padding: 0.75rem; border-radius: 0.75rem; background: var(--tree-color-brand-soft);">XL container</div></TContainer>
+        <TContainer size="full"><div style="padding: 0.75rem; border-radius: 0.75rem; background: var(--tree-color-brand-soft);">Full container (no max-width)</div></TContainer>
+      </div>
+    `,
+  }),
+};
+
+export const PaddingAndAlignment: Story = {
+  render: () => ({
+    components: { TContainer },
+    template: `
+      <div style="display: grid; gap: 1.25rem; background: var(--tree-color-bg-primary); padding-block: 1.5rem;">
+        <TContainer size="sm" style="outline: 1px dashed var(--tree-color-border-strong);">
+          <div style="padding: 0.75rem; border-radius: 0.75rem; background: var(--tree-color-brand-soft);">Defaults — padded and centered</div>
+        </TContainer>
+        <TContainer size="sm" :padded="false" style="outline: 1px dashed var(--tree-color-border-strong);">
+          <div style="padding: 0.75rem; border-radius: 0.75rem; background: var(--tree-color-brand-soft);">padded=false — content sits flush against the container edge</div>
+        </TContainer>
+        <TContainer size="sm" :centered="false" style="outline: 1px dashed var(--tree-color-border-strong);">
+          <div style="padding: 0.75rem; border-radius: 0.75rem; background: var(--tree-color-brand-soft);">centered=false — hugs the inline start instead of using auto margins</div>
+        </TContainer>
+      </div>
+    `,
+  }),
+};
+
+export const SemanticElement: Story = {
+  render: () => ({
+    components: { TContainer },
+    template: `
+      <div style="background: var(--tree-color-bg-primary); padding-block: 1.5rem;">
+        <TContainer as="main" size="md">
+          <h2 style="margin: 0 0 0.5rem;">Documentation</h2>
+          <p style="margin: 0 0 1rem;">
+            The <code>as</code> prop swaps the rendered element, so the layout wrapper can double as
+            the page landmark instead of adding another nesting level.
+          </p>
+          <TContainer as="section" size="full" :padded="false" aria-label="Related links">
+            <div style="padding: 0.75rem; border-radius: 0.75rem; background: var(--tree-color-brand-soft);">
+              Nested section container filling its parent
+            </div>
+          </TContainer>
+        </TContainer>
       </div>
     `,
   }),

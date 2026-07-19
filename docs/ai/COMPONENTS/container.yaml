@@ -54,6 +54,25 @@ props:
 slots:
   - default
 
+forwards_attrs_to: root_element
+attrs_note: >
+  Sets `inheritAttrs: false` and re-applies attrs by hand so they land on the
+  dynamic `<component :is="as">` root: `class` is appended AFTER the
+  `t-container` modifier and state classes, `style` is bound directly, and all
+  remaining attrs are v-bound. The result matches Vue's default fallthrough
+  merge — consumer classes win on equal specificity, nothing is dropped or
+  overridden. TPage relies on this to pass its `t-page__inner` classes through.
+
+composition:
+  used_by: [TPage]
+  note: >
+    TPage renders a TContainer for its centered content column, forwarding
+    `width` as `size` and `padded` as `padded`, and always forcing
+    `centered`. Do not wrap a TPage in another TContainer.
+
+types:
+  TContainerSize: "'sm' | 'md' | 'lg' | 'xl' | 'full'"
+
 css:
   block: t-container
   modifiers:
@@ -65,6 +84,11 @@ css:
   states:
     - is-padded
     - is-centered
+  note: >
+    The block rule only sets `width: 100%`; each size modifier adds nothing but
+    `max-width`. Both state rules are compound selectors
+    (`.t-container.is-padded`, `.t-container.is-centered`), so they outrank a
+    plain single-class override — override them at equal-or-higher specificity.
 
 behavior:
   semantic_element_controlled_by_as: true
@@ -74,6 +98,11 @@ behavior:
 
 a11y:
   - "Acts as a structural wrapper only; semantics come from the `as` prop and child content."
+  - >
+    Renders a non-semantic `div` by default. Pass `as` to make it a landmark
+    (e.g. `as="main"`, `as="section"`, `as="header"`) — avoid nesting a second
+    `main` inside an app shell or a TPage that already provides one.
+  - "`aria-*` and `role` attributes fall through to the root element (see `forwards_attrs_to`)."
 
 example: |
   <TContainer size="lg">

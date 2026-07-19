@@ -139,7 +139,9 @@ emitted_variables:
     count: 79
     scope: "Emitted on :root — theme-independent, identical in light and dark."
     variables:
-      # font
+      # font — the token layer emits these custom properties only. It ships no
+      # @font-face rules and no font binaries, so loading the webfont is the
+      # consuming app's responsibility; see SETUP.yaml → fonts.
       --tree-font-family-sans: "'Google Sans Flex', 'Segoe UI', sans-serif"
       --tree-font-family-mono: "'Google Sans Code', 'SFMono-Regular', monospace"
       --tree-font-size-xs: "0.6875rem"

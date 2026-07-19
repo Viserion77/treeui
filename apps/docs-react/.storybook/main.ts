@@ -7,7 +7,9 @@ const reactStylePath = fileURLToPath(
 
 const config: StorybookConfig = {
   stories: ['../src/**/*.mdx', '../src/**/*.stories.tsx'],
-  staticDirs: ['../public'],
+  // The webfonts are self-hosted and shared with apps/docs, so neither Storybook
+  // depends on a runtime fetch to fonts.googleapis.com.
+  staticDirs: ['../public', { from: '../../../assets/fonts', to: '/fonts' }],
   addons: ['@storybook/addon-docs', '@storybook/addon-a11y'],
   framework: {
     name: '@storybook/react-vite',

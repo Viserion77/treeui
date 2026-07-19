@@ -12,6 +12,16 @@
   box-sizing: border-box;
 }
 
+/* Base typography. The per-component rules below guarantee the design font even
+   when a component sits inside a consumer element with its own font-family, but
+   they cannot cover unstyled prose or the overlays teleported to <body>. This
+   sets the floor for both. Specificity is (0,0,1), so consumers override it with
+   any rule of their own — and the webfont itself is still theirs to load, since
+   @treeui/tokens ships the custom properties but no @font-face. */
+html {
+  font-family: var(--tree-font-family-sans);
+}
+
 .t-button,
 .t-input,
 .t-combobox,

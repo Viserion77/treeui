@@ -30,6 +30,27 @@ global_rules:
   - "Date-only values use `YYYY-MM-DD`."
   - "Date-time values use `YYYY-MM-DDTHH:mm`."
 
+fonts:
+  summary: "TreeUI names its typefaces in tokens but does not ship them. Loading the webfont is the consuming application's job."
+  ships:
+    - "`@treeui/tokens` emits `--tree-font-family-sans` and `--tree-font-family-mono` as custom properties."
+    - "`@treeui/vue/style.css` and `@treeui/react/style.css` set `html { font-family: var(--tree-font-family-sans) }` so prose, layout roots, and the overlays teleported to `<body>` all inherit the design font."
+  does_not_ship:
+    - "No `@font-face` rules and no font binaries — the packages contain no `.woff2`."
+  required:
+    - "Load Google Sans Flex and Google Sans Code in the host app, or the stack falls back to `'Segoe UI'` / the platform monospace."
+  notes:
+    - "Google Sans Flex has a `slnt` axis, not `ital`. Requesting `ital` from the Google Fonts API returns HTTP 200 with upright-only faces, so italics silently become synthetic obliques. Request `slnt,wght@-10..0,400..800` for a real slant."
+    - "Both families are SIL OFL 1.1, so self-hosting is permitted; ship the licence alongside the binaries."
+    - "The base `html` rule is specificity (0,0,1) — any app rule overrides it. Setting a font on an app root such as `#app` is not enough on its own, because teleported overlays are children of `<body>`, not of that root."
+  example: |
+    <!-- index.html -->
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Google+Sans+Flex:slnt,wght@-10..0,400..800&family=Google+Sans+Code:ital,wght@0,400..800;1,400..800&display=swap"
+      rel="stylesheet"
+    />
+
 theming:
   useTheme:
     purpose: "Theme-mode + accent controller for the app root. Owns the parts of theming that belong to the design system rather than the app."

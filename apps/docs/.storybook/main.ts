@@ -8,7 +8,9 @@ const packageDistStylePath = fileURLToPath(
 
 const config: StorybookConfig = {
   stories: ['../src/**/*.mdx', '../src/**/*.stories.ts'],
-  staticDirs: ['../public'],
+  // The webfonts are self-hosted and shared with apps/docs-react, so neither
+  // Storybook depends on a runtime fetch to fonts.googleapis.com.
+  staticDirs: ['../public', { from: '../../../assets/fonts', to: '/fonts' }],
   addons: [
     {
       name: '@storybook/addon-docs',

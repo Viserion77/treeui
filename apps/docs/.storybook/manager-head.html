@@ -2,3 +2,8 @@
 <link rel="icon" type="image/png" href="./treeui-logo.png" />
 <link rel="apple-touch-icon" href="./treeui-logo.png" />
 <meta name="theme-color" content="#0969da" />
+<!-- The manager is a separate document from the preview iframe and inherits
+     none of its head, so the sidebar and toolbar need the fonts declared here
+     too, alongside the fontBase set in manager.ts. -->
+<link rel="preload" href="./fonts/google-sans-flex-latin.woff2" as="font" type="font/woff2" crossorigin />
+<link rel="stylesheet" href="./fonts/fonts.css" />

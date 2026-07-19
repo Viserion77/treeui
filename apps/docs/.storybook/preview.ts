@@ -1,4 +1,6 @@
 import type { Preview } from '@storybook/vue3-vite';
+import { treeTokens } from '@treeui/tokens';
+import { create } from 'storybook/theming/create';
 import '@treeui/vue/style.css';
 
 const preview: Preview = {
@@ -6,6 +8,16 @@ const preview: Preview = {
     layout: 'centered',
     controls: {
       expanded: true,
+    },
+    docs: {
+      // addon-docs applies its own typography reset to MDX prose through
+      // `:where(p, li, h1, …)` selectors, which outrank a plain `html` or `body`
+      // rule. Theming it is the only way to reach docs pages.
+      theme: create({
+        base: 'light',
+        fontBase: treeTokens.font.family.sans,
+        fontCode: treeTokens.font.family.mono,
+      }),
     },
     options: {
       storySort: {

@@ -12,5 +12,8 @@
     "@treeui/tokens": "workspace:*",
     "@treeui/vue": "workspace:*",
     "vue": "^3.5.40"
+  },
+  "devDependencies": {
+    "@storybook/addon-vitest": "^10.5.2"
   }
 }

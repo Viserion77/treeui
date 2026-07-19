@@ -32,6 +32,7 @@ const config: StorybookConfig = {
       },
     },
     '@storybook/addon-a11y',
+    '@storybook/addon-vitest',
   ],
   framework: {
     name: '@storybook/vue3-vite',

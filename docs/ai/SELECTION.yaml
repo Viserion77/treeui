@@ -479,11 +479,15 @@ component_profiles:
         when: "The choices are hierarchical."
 
   TNavMenu:
-    keywords: [nav menu, sidebar nav, section nav]
+    keywords: [nav menu, sidebar nav, section nav, nav icons, sidebar rail]
     use_when:
       - "You need app-section navigation inside a shell or sidebar."
+      - "Each section should carry an icon — set `icon` on the item to a registered name (`icon: 'layout-dashboard'`). Items with no icon fall back to a letter marker, which is also what a collapsed rail shows."
     avoid_when:
       - "You need tabs for small panel switching."
+    icons:
+      - "`TNavMenuItem.icon` is `TIconInput`: a registered name or a component. Prefer the name — items usually live in a `ref`/`reactive` array or a route config, and a string is never made reactive, so it needs no `markRaw`."
+      - "Register any icon the app needs but TreeUI does not ship, then keep using names. See recipe `nav-menu-icons` and SETUP.yaml → `icons`."
     alternatives:
       - component: TTabs
         when: "The navigation swaps local panels instead of app sections."
@@ -734,12 +738,29 @@ component_profiles:
         when: "The hierarchy is actually app navigation."
 
   TIcon:
-    keywords: [icon, svg, glyph, pictogram]
+    keywords: [icon, svg, glyph, pictogram, register, register icon, custom icon, icon registry, registerTreeIcons, createTreeIcon]
     use_when:
-      - "You need to render a registered TreeUI icon by name."
-      - "You want consistent sizing and a11y defaults without importing the icon component directly."
+      - "You need to render an interface icon. `TIcon` is the way to render one — it resolves the name through the registry and applies the shared size, stroke, and a11y defaults."
+      - "The icon is one of the built-ins: `<TIcon name=\"cpu\" />`. `listTreeIcons()` returns every registered name at runtime."
+      - "The icon is your own: register it once with `registerTreeIcons`, then use it by name exactly like a built-in. A missing icon is registered, not worked around."
     avoid_when:
-      - "The icon is not in the @treeui/icons registry — import or register it instead."
+      - "The graphic is a country flag — a flag names a country, not an interface concept."
+      - "A slot already renders the icon for you (`#icon` on TAlert, TBadge, TButton, TConfirmDialog, TEmptyState, TFileUpload, TStat, TTag) — put the `TIcon` inside that slot rather than beside it. None of those components has an `icon` PROP; the slot is the whole interface."
+    do_not:
+      - "Do not hand-roll an `<svg>` because a name is missing. `createTreeIcon` sets the stroke-width attribute to `(strokeWidth * 24) / size`, which cancels the viewBox scale and paints a constant 2px at every size. A literal `stroke-width=\"2\"` does the opposite: it paints 1.67px at size 20, 2.67px at 32, and 4px at 48, so the icon is slightly light when small and visibly BOLD when large — double the library weight at 48."
+      - "Do not reach for an `icon` prop on TButton, TBadge, TStat, TAlert, TTag, TEmptyState, TConfirmDialog, or TFileUpload. They do not have one. `TNavMenuItem.icon` is the only icon-valued prop or item field in the library."
+    registering:
+      - "Geometry: `registerTreeIcons({ orbit: [['circle', { cx: 12, cy: 12, r: 10 }], ['path', { d: '...' }]] })` — nodes are drawn on a 24x24 grid."
+      - "Components: `registerTreeIcons({ webhook: WebhookIcon })` also accepts ready app-owned components under a registry name."
+      - "Pick names TreeUI does not already ship — `orbit`, `webhook`, and `radar` are safe; `cpu`, `server`, `workflow`, `boxes`, and `circle-dot` are built-ins. Registering any of the 364 built-in names REPLACES it process-wide with no warning. That is the supported way to swap a built-in for a house version, but it must be the intent, not an accident."
+      - "Call it once near the app root, and augment `TIconRegistry` through `declare module '@treeui/icons'` for autocomplete and typo-checking. Registering later is safe — lookups are reactive. Full wiring is in SETUP.yaml → `icons`."
+      - "In tests, call `resetTreeIcons()` in an `afterEach`. The registry is process-wide mutable state, so a registered (or replaced) icon otherwise leaks into every later test."
+      - "An unknown name resolves to `undefined` and logs a warning — in production builds too, once per name — listing every valid name; `TNavMenu` falls back to its letter marker rather than rendering a hole."
+    sizing:
+      - "`size` is a PIXEL COUNT, not the `sm | md | lg` token scale — `<TIcon size=\"md\" />` silently renders an unsized svg."
+      - "To size from tokens, leave `size` alone and set width/height in CSS from `--tree-size-icon-sm | -md | -lg | -xl | -2xl`."
     alternatives:
-      - component: "named import from @treeui/icons"
-        when: "You need tree-shaken, statically-imported icon components."
+      - component: "a component passed straight to `TNavMenuItem.icon`, or rendered into an `#icon` slot"
+        when: "You want the escape hatch with no registry entry — a one-off icon, an imported SVG component, or the result of `createTreeIcon(...)`. `TNavMenuItem.icon` is `TIconInput` and takes the component directly; everywhere else, render it inside the component's `#icon` slot. `TIcon` itself will not take a component — its `name` is `TIconName`. Prefer registering when the icon is used in more than one place."
+      - component: TFlag
+        when: "The graphic is a country flag rendered from an ISO 3166-1 alpha-2 code."

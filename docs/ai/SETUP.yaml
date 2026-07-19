@@ -10,6 +10,8 @@ install:
   optional_packages:
     - package: "@treeui/tokens"
       use_when: "The app needs direct access to TreeUI tokens or theme CSS outside the Vue component package."
+    - package: "@treeui/icons"
+      use_when: "The app augments `TIconRegistry` with `declare module '@treeui/icons'`. The runtime API is already re-exported from `@treeui/vue`, but the module specifier must resolve from the app for the augmentation to augment rather than shadow — see `icons` below."
 
 vue_setup:
   plugin_install:
@@ -50,6 +52,102 @@ fonts:
       href="https://fonts.googleapis.com/css2?family=Google+Sans+Flex:slnt,wght@-10..0,400..800&family=Google+Sans+Code:ital,wght@0,400..800;1,400..800&display=swap"
       rel="stylesheet"
     />
+
+icons:
+  summary: >-
+    TreeUI renders icons from a name registry rather than from per-icon imports.
+    Built-in icons are used by name; an app adds its own once with
+    `registerTreeIcons` and then uses those by name too, everywhere an icon is
+    accepted.
+  ships:
+    - "364 built-in names, reached by name — `<TIcon name=\"cpu\" />`, `icon: 'cpu'` on a nav item. The catalog covers interface, product, file, status, and action vocabulary using TreeUI's own descriptive kebab-case names."
+    - "`listTreeIcons()` returns every registered name (built-ins plus anything the app registered), sorted — use it instead of hardcoding the list."
+    - "The whole registry API is re-exported from `@treeui/vue`: `registerTreeIcons`, `resetTreeIcons`, `createTreeIcon`, `resolveTreeIcon`, `getTreeIcon`, `hasTreeIcon`, `listTreeIcons`, `treeIcons`, `builtinTreeIconNodes`, `treeIconDefaults`, and the `TIconName` / `TIconInput` / `TIconDefinition` / `TIconNode` / `TIconNodes` / `TIconRegistry` types. Registering icons needs no extra runtime dependency."
+    - "`resetTreeIcons()` restores the registry to the icons TreeUI ships, dropping everything registered since. It exists for tests: the registry is process-wide mutable state, so call it in an `afterEach` or a registration in one case leaks into every case after it."
+    - "`builtinTreeIconNodes` is the built-in GEOMETRY keyed by name (`Record<string, TIconNodes>`), not components — `treeIcons` is the name-to-component map. It was called `builtinTreeIcons` before; the old name read like a component map."
+  does_not_ship:
+    - "Named imports for individual icons. There is no `import { Cpu } from '@treeui/icons'` — an icon is reached by registry name, or passed as a component."
+    - "Application-specific artwork. An app needing a name outside the curated catalog registers its own geometry or component under that name."
+  required:
+    - "Call `registerTreeIcons` once, near the application root, BEFORE anything renders — in `main.ts` beside `app.use(TreeUIPlugin)`, not inside a component's `setup`."
+    - "Register a name before any component references it. A name that is not registered at render time resolves to nothing and warns."
+  notes:
+    - "Registration is per name and idempotent. Registering one of the 364 built-in names REPLACES that built-in for the whole process, silently — that is how a built-in is swapped for a house version, so it must be deliberate. To ADD an icon, pick a name TreeUI does not ship (`orbit`, `webhook`, and `radar` are safe); `listTreeIcons()` or `hasTreeIcon(name)` tells you which names are taken."
+    - "Components are built lazily on first lookup and cached, so an icon nobody renders stays as data instead of becoming a component — registering a large set is cheap. This is not a bundle-size claim: the geometry for all 364 built-ins is held in a module-scope `Map`, so importing the package retains it and `sideEffects: false` does not tree-shake it away."
+    - "Every glyph inherits the surrounding text color through the root `currentColor` stroke and needs no color prop. Company logos are not built-ins; import the official SVG as an app-owned component and register it when needed."
+    - "The catalog includes 12 compatibility aliases with identical geometry: grid → layout-grid, share → share-nodes, chevron-updown → chevrons-up-down, refresh → refresh-cw, comment/chat → message-circle, check-square → square-check, help → circle-help, automations → zap, connections → external-link, persona → user-round, and close → x."
+    - "Prefer a name over a component in application data (menu definitions, route metadata, API payloads). A string is never made reactive, while a component object stored in a `ref`/`reactive` triggers Vue's reactivity warning and needs `markRaw`."
+    - "An unknown name renders nothing and logs a `console.warn` listing every valid name — once per name, and in production builds too, not dev-only. `TNavMenu` degrades to its letter marker rather than leaving a hole."
+    - "Never hand-roll an `<svg>` for a missing icon. `createTreeIcon` applies `absoluteStrokeWidth`: it sets the stroke-width attribute to `(strokeWidth * 24) / size`, which cancels the 24-unit viewBox scale and paints a constant 2px at any size. A fixed `stroke-width=\"2\"` scales with the icon instead — 1.67px at size 20, 2.67px at 32, 4px at 48 — so it reads slightly thin when small and clearly bolder than its neighbours when large. Hand-rolling also loses the `size` / `strokeWidth` / `absoluteStrokeWidth` props and the `aria-hidden` default."
+    - "In tests, call `resetTreeIcons()` in an `afterEach`. The registry is anchored on a `Symbol.for` global (so duplicate copies of the package share one registry), which also means every registration persists for the process."
+    - "`TIcon`'s `size` is a PIXEL COUNT, not the `sm | md | lg` token scale — `<TIcon size=\"md\" />` silently renders an unsized svg. To size from tokens, leave `size` alone and set width/height in CSS from `--tree-size-icon-sm | -md | -lg | -xl | -2xl`."
+    - "The `declare module '@treeui/icons'` augmentation only augments if TypeScript can resolve `@treeui/icons` from the app; otherwise it declares a new ambient module and shadows the real types. Under pnpm's isolated `node_modules` a transitive dependency is not resolvable, so add `@treeui/icons` as a direct dependency when you augment."
+    - "Augmenting the registry is optional: `registerTreeIcons` works without it, and unaugmented names still render. The augmentation buys autocomplete and typo-checking on every `name` / `icon`."
+  example: |
+    // main.ts — once, before mount
+    import { createApp } from 'vue';
+    import TreeUIPlugin, { registerTreeIcons } from '@treeui/vue';
+    import WebhookIcon from './icons/WebhookIcon.vue';
+    import '@treeui/vue/style.css';
+    import App from './App.vue';
+
+    registerTreeIcons({
+      // geometry, on a 24x24 grid — the common case
+      orbit: [
+        ['rect', { x: 3, y: 3, width: 7, height: 7, rx: 1.5 }],
+        ['rect', { x: 14, y: 14, width: 7, height: 7, rx: 1.5 }],
+        ['path', { d: 'M10 6.5h4a2 2 0 0 1 2 2V14' }],
+      ],
+      // or an app-owned component
+      webhook: WebhookIcon,
+    });
+
+    createApp(App).use(TreeUIPlugin).mount('#app');
+  type_safety_example: |
+    // env.d.ts (or any .d.ts in the app's tsconfig `include`) — once.
+    // Widens TIconName, so `<TIcon name="orbit" />` type-checks and
+    // autocompletes, and a typo is a compile error.
+    // List exactly the names passed to registerTreeIcons; built-ins are
+    // already keys and do not need repeating.
+    // The `export {}` is required: it makes this file a module, which is what
+    // makes `declare module` an augmentation. Without it the block declares a
+    // new ambient module that SHADOWS the real one and every export reads as missing.
+    export {};
+
+    declare module '@treeui/icons' {
+      interface TIconRegistry {
+        orbit: true;
+        webhook: true;
+      }
+    }
+  escape_hatch: |
+    <!-- `TNavMenuItem.icon` is `TIconInput`, so a component works there with no
+         registry entry. It is the ONLY icon-valued prop or item field in the
+         library — TButton, TBadge, TStat, TAlert, TTag, TEmptyState,
+         TConfirmDialog and TFileUpload have no `icon` prop at all and take
+         rendered content through their `#icon` slot instead.
+         Use this for one-offs; register anything used more than once. -->
+    <script setup lang="ts">
+    import { createTreeIcon, type TNavMenuItem } from '@treeui/vue';
+    import BrandMark from './BrandMark.vue';
+
+    const spark = createTreeIcon('TSparkIcon', [['path', { d: 'M12 2v20' }]]);
+
+    // markRaw is only needed if this array becomes reactive; a registered NAME
+    // sidesteps the question entirely, which is why names are preferred.
+    const items: TNavMenuItem[] = [
+      { label: 'Brand', value: 'brand', icon: BrandMark },
+      { label: 'Spark', value: 'spark', icon: spark },
+    ];
+    </script>
+
+    <template>
+      <!-- everywhere else: the icon goes in the slot, not in a prop -->
+      <TButton>
+        <template #icon><TIcon name="plus" /></template>
+        Add
+      </TButton>
+    </template>
 
 theming:
   useTheme:
@@ -170,6 +268,17 @@ component_setup:
   TNavMenu:
     notes:
       - "When nested inside `TSidebar` or `TAppShell`, `collapsed` can be inherited from the sidebar provider."
+      - "Pass `items` as `{ label, value, icon?, to?, badge?, description?, shortLabel?, disabled?, exact? }[]`."
+      - "`icon` is `TIconInput` — a registered icon name (`icon: 'layout-dashboard'`) or a component. Use the name: it needs no import, and no `markRaw` when the item list is reactive."
+      - "An item with no icon, or with a name that is not registered, shows a letter marker instead. That marker is also all a collapsed rail can show, so give every item an icon when the sidebar collapses."
+      - "Register any icon the app needs beyond the built-ins first — see `icons` above."
+
+  TIcon:
+    required:
+      - "Use a registered name: one of the built-ins, or one the app added with `registerTreeIcons`. See `icons` above."
+    notes:
+      - "`size` is a pixel count, not `sm | md | lg`. Passing `size=\"md\"` renders an unsized svg."
+      - "The icon is `aria-hidden` by default. Pass `label` only when the icon carries meaning on its own; beside visible text it should stay decorative."
 
   TTreeView:
     notes:

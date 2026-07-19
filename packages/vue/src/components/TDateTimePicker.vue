@@ -47,9 +47,9 @@ interface TimeOption {
   value: number;
 }
 
-const CalendarIcon = getTreeIcon('calendar');
-const ChevronLeftIcon = getTreeIcon('chevron-left');
-const ChevronRightIcon = getTreeIcon('chevron-right');
+const CalendarIcon = computed(() => getTreeIcon('calendar'));
+const ChevronLeftIcon = computed(() => getTreeIcon('chevron-left'));
+const ChevronRightIcon = computed(() => getTreeIcon('chevron-right'));
 
 const dateOnlyPattern = /^(\d{4})-(\d{2})-(\d{2})$/;
 const dateTimePattern = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})(?::(\d{2}))?$/;

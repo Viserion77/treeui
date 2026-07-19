@@ -184,6 +184,77 @@ shared_props:
       presentational only and must never gate interaction.
   as:
     used_by: [TButton, TCard]
+  icon:
+    type: TIconInput
+    type_definition: >-
+      `TIconInput = TIconName | Component` — a registered icon name, or a
+      component supplied by the application. Exported from `@treeui/icons` and
+      re-exported from `@treeui/vue`.
+    used_by: [TNavMenu]
+    used_by_note: >-
+      As the `icon` field of a `TNavMenuItem` — and that is the ONLY prop or item
+      field in the library that takes an icon as a value. Components that show an
+      icon elsewhere (TAlert, TBadge, TButton, TConfirmDialog, TEmptyState,
+      TFileUpload, TStat, TTag) expose an `#icon` SLOT and have no `icon` prop;
+      `TIcon` takes `name: TIconName`, a registry name only, never a component.
+      The shared rule is therefore about typing, not reach: where a value-shaped
+      icon exists it is `TIconInput`, never `Component` alone. A name needs no
+      import, and — being a string — is never made reactive, so it survives a
+      `ref`/`reactive` item list, an API response, or a route definition without
+      `markRaw`.
+    resolution:
+      - >-
+        Names are resolved centrally, never per component: `resolveTreeIcon(icon)`
+        maps a name OR a component to a component. A template must call it before
+        `<component :is>`, because Vue resolves a raw string `is` as a globally
+        registered component name — passing `"cpu"` straight through renders
+        nothing.
+      - >-
+        `TIcon` is the render path for a standalone icon. Its `name` prop is a
+        `TIconName` (registry names only); when the app holds a component rather
+        than a name, pass it to an `icon` prop or render it in a slot.
+      - >-
+        An unknown name resolves to `undefined` and logs a warning listing the
+        valid names — once per name, and in production builds as well as dev.
+        Consumers degrade rather than break — `TNavMenu` falls back to its letter
+        marker.
+      - >-
+        Components are built lazily on first lookup and cached, so an icon nobody
+        renders stays as geometry instead of becoming a component. That is a
+        construction saving, not a bundle one: the built-in geometry is held in a
+        module-scope `Map`, so it is retained by any import of the package.
+    registry:
+      - >-
+        Names come from `TIconRegistry`, an augmentable interface;
+        `TIconName = keyof TIconRegistry & string`. Apps widen it with
+        `declare module '@treeui/icons'` — see SETUP.yaml → `icons`.
+      - >-
+        `registerTreeIcons(icons: Record<string, TIconDefinition>)` adds icons,
+        where `TIconDefinition = TIconNodes | Component`. `hasTreeIcon(name)`
+        tests one, `listTreeIcons()` returns all sorted names, `treeIcons` is a
+        lazy name → component map, and `builtinTreeIconNodes` is the shipped
+        GEOMETRY by name (`Record<string, TIconNodes>` — data, not components).
+      - >-
+        Registering one of the 364 built-in names replaces that built-in for the
+        whole process and does not warn. Additions must use a name TreeUI does
+        not ship; replacement is supported but has to be intentional.
+      - >-
+        `resetTreeIcons()` restores the registry to what TreeUI ships and drops
+        everything registered since. The registry is process-wide mutable state
+        (anchored on a `Symbol.for` global so duplicate package copies share it),
+        so tests that register icons must call it in an `afterEach`.
+      - >-
+        Individual icons are NOT exported as named imports. The registry is the
+        public surface; there is no `import { Cpu } from '@treeui/icons'`.
+      - >-
+        Author custom geometry with `createTreeIcon(name, nodes)`, never a
+        hand-rolled `<svg>`. Icons draw on a 24-unit viewBox at a pixel `size`,
+        so painted stroke = attribute × size / 24. `absoluteStrokeWidth` sets the
+        attribute to `(strokeWidth * 24) / size`, cancelling the scale and
+        painting a constant 2px at every size; a hand-rolled `stroke-width="2"`
+        paints 1.67px at 20, 2.67px at 32 and 4px at 48, so it grows heavier as
+        the icon grows. `createTreeIcon` also supplies the `size` / `strokeWidth`
+        props and the `aria-hidden` default.
   class:
     status: "supported via standard Vue attrs when relevant"
 
@@ -199,7 +270,13 @@ shared_slots:
   default:
     used_by: [TBadge, TButton, TCard, TConfirmDialog, TFileUpload, TInput, TModal, TTooltip]
   icon:
-    used_by: [TBadge, TButton, TFileUpload]
+    used_by: [TAlert, TBadge, TButton, TConfirmDialog, TEmptyState, TFileUpload, TStat, TTag]
+    note: >-
+      A slot named `icon` takes rendered content — put a `TIcon` (or any
+      element) inside it. None of these components has an `icon` PROP; the slot
+      is the entire interface, so `<TButton icon="plus">` is not a thing. The one
+      prop-shaped icon in the library is `TNavMenuItem.icon`, typed `TIconInput`;
+      see shared_props → icon.
   prefix:
     used_by: [TCombobox, TDatePicker, TInput, TLanguageSelect]
   suffix:

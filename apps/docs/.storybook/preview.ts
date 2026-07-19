@@ -30,7 +30,7 @@ const preview: Preview = {
       storySort: {
         order: [
           'Foundation',
-          ['Introduction', 'Philosophy', 'Installation', 'Tokens', 'Theming', 'Accessibility', 'Conventions', 'Components', 'Patterns', 'Roadmap', 'Contribution'],
+          ['Introduction', 'Philosophy', 'Installation', 'Tokens', 'Theming', 'Icons', 'Accessibility', 'Conventions', 'Components', 'Patterns', 'Roadmap', 'Contribution'],
           'Showcase',
           ['All Components'],
           'Patterns',
@@ -69,7 +69,10 @@ const preview: Preview = {
       return {
         components: { story },
         template:
-          '<div style="min-height: 100vh; padding: 1.5rem; background: var(--tree-color-bg); color: var(--tree-color-text);"><story /></div>',
+          // `--tree-color-bg` / `--tree-color-text` are not tokens; the real
+          // names carry the `-primary` suffix. The old values resolved to
+          // nothing, so every canvas fell back to the browser defaults.
+          '<div style="min-height: 100vh; padding: 1.5rem; background: var(--tree-color-bg-primary); color: var(--tree-color-text-primary);"><story /></div>',
       };
     },
   ],

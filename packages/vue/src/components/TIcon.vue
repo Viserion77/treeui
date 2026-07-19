@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { computed, type Component } from 'vue';
-import { getTreeIcon, treeIconDefaults, type TIconName } from '@treeui/icons';
+import { computed } from 'vue';
+import { resolveTreeIcon, treeIconDefaults, type TIconName } from '@treeui/icons';
 
 const props = withDefaults(
   defineProps<{
@@ -18,12 +18,15 @@ const props = withDefaults(
   },
 );
 
-const iconComponent = computed(() => getTreeIcon(props.name) as Component);
+// Resolved per render rather than once at setup, so an icon registered after
+// this component mounted still appears.
+const iconComponent = computed(() => resolveTreeIcon(props.name));
 </script>
 
 <template>
   <component
     :is="iconComponent"
+    v-if="iconComponent"
     class="t-icon"
     :size="size"
     :stroke-width="strokeWidth"

@@ -5,23 +5,408 @@ kind: display
 status: available
 purpose: "Render a registered TreeUI icon by name with consistent sizing and accessibility defaults."
 
+usage:
+  three_ways_to_get_an_icon: >-
+    (1) Use a built-in — 364 names ship in the registry: `<TIcon name="cpu" />`, or `icon: 'cpu'` on a
+    TNavMenuItem. (2) Register your own with `registerTreeIcons`, from original geometry or an app-owned
+    component, then use it by name everywhere a name is accepted — see `extension_api` and `example_register`.
+    (3) Pass a component directly — but there is exactly ONE place that accepts one: the `icon` field of
+    a `TNavMenuItem`, typed `TIconInput` (`TIconName | Component`). Everywhere else an icon is rendered
+    into a SLOT, so you put a `<TIcon>` or your own component inside the slot.
+  ticon_name_takes_only_a_name: >-
+    `TIcon`'s own `name` prop is `TIconName`, not `TIconInput` — it does not accept a component. Option
+    (3) above is about `TNavMenuItem.icon`, which is the only `icon` prop or item field in the whole
+    library typed `TIconInput`. To render a component you hold in a variable, use
+    `<component :is="MyIcon" />` directly, put it in an `#icon` slot, or register it first.
+  no_component_has_an_icon_prop: >-
+    TButton, TBadge, TAlert, TStat, TTag, TEmptyState, TConfirmDialog, and TFileUpload have NO `icon`
+    prop. They take an icon through their `#icon` slot (TFileUpload and TStat included), so the correct
+    form is `<TButton><template #icon><TIcon name="plus" /></template>Add</TButton>`, never
+    `<TButton icon="plus">`. Only `TNavMenuItem.icon` takes a registry name or a component as a value.
+  prefer_a_name_over_a_component: >-
+    Passing a name avoids `markRaw`. A string is never made reactive, whereas a component object stored
+    in a `ref`/`reactive` (a menu item array, a config object) makes Vue walk the component definition
+    and log a reactivity warning. Names also survive JSON: they can come from an API response, a route
+    definition, or a config file.
+  never_hand_roll_an_svg: >-
+    A hand-written `<svg viewBox="0 0 24 24" stroke-width="2">` loses the `absoluteStrokeWidth`
+    correction (see `behavior.absolute_stroke_width_math`), so its painted stroke GROWS with the icon
+    instead of staying constant: 1.67px at size 20, 2.67px at 32, 4px at 48. Beside library icons —
+    which hold a flat 2px — it therefore reads slightly light at small sizes and plainly BOLD at large
+    ones. It also loses the `size` / `strokeWidth` / `absoluteStrokeWidth` props and the `aria-hidden`
+    default. Author icons with `createTreeIcon` (or register their geometry) instead.
+
 props:
   name:
     type: TIconName
     required: true
-    description: "Icon identifier from the @treeui/icons registry."
+    description: "Icon identifier from the @treeui/icons registry. Widens as `TIconRegistry` is augmented, so registered app icons are valid values too."
     values:
+      - account
+      - activity
+      - ai-studio
       - alert-circle
+      - align-left
+      - app-window
+      - apps-grid
+      - archive
+      - archive-restore
+      - arrow-down
+      - arrow-left
+      - arrow-left-right
+      - arrow-right
+      - arrow-up
+      - arrow-up-right
+      - assistant
+      - automation-key
+      - automations
+      - badge
+      - badge-check
+      - badge-star
+      - ban
+      - bell
+      - book-open
+      - bookmark
+      - bot
+      - bot-badge
+      - bot-users
+      - boxes
+      - boxes-model
+      - braces
+      - brackets
+      - brain
+      - brain-circuit
+      - brain-lock
+      - browser
+      - brush
+      - brush-stroke
+      - bug
+      - building-2
+      - calculator
       - calendar
+      - calendar-clock
+      - calendar-day
+      - calendar-days
+      - calendar-dot
+      - calendar-plus
+      - calendar-range
+      - calendar-x
+      - carousel
+      - catalog
+      - chart-column
+      - chart-line
+      - chart-pie
+      - chat
       - check
-      - chevron-left
+      - check-circle
+      - check-square
       - chevron-down
+      - chevron-left
       - chevron-right
+      - chevron-up
+      - chevron-updown
+      - chevrons-up-down
+      - circle-alert
+      - circle-check
+      - circle-dot
+      - circle-help
+      - circle-x
+      - clipboard-list
+      - clock
+      - clock-alert
+      - clock-sparkles
+      - clock-x
+      - close
+      - cloud
+      - cloud-off
+      - code
+      - code-2
+      - code-api
+      - coins
+      - comment
+      - companion
+      - compass
+      - connections
+      - contentpilot
+      - copy
+      - cpu
+      - cpu-chip
+      - credit-card
+      - crosshair
+      - crown
+      - cube
+      - database
+      - developer-settings
+      - device-link
+      - dollar-circle
+      - dollar-limit
+      - download
+      - download-video
+      - draw
+      - droplet
+      - ellipsis
+      - ellipsis-vertical
+      - embed-code
+      - eraser
+      - extension
+      - external-link
+      - eye
+      - eye-off
+      - file
+      - file-archive
+      - file-audio
+      - file-code
+      - file-edit
+      - file-image
+      - file-pdf
+      - file-plus
+      - file-scan
+      - file-text
+      - file-video
+      - file-warning
+      - files
+      - film
+      - filter
+      - filter-capabilities
+      - fingerprint
+      - flag
+      - flask-play
+      - folder
+      - folder-input
+      - folder-kanban
+      - folder-open
+      - folder-plus
+      - folder-shared
+      - folder-tree
+      - folder-x
+      - folders
+      - gauge
+      - gauge-high
+      - gauge-low
+      - gauge-medium
+      - gavel
+      - git-branch
+      - git-fork
+      - globe
+      - globe-check
+      - grid
+      - grip-vertical
+      - hand-check
+      - hard-drive
+      - hard-drive-alert
+      - hard-drive-off
+      - hash
+      - heart
+      - heart-chart-up
+      - heart-pulse
+      - help
+      - hierarchy
+      - history
+      - home
+      - hourglass
+      - house
+      - human-lock
+      - id-badge
+      - image
+      - image-minus
+      - image-plus
+      - image-up
+      - inbox
+      - inbox-empty
       - info
+      - install
+      - journal
+      - key
+      - key-off
+      - key-round
       - languages
+      - laptop
+      - laptop-bridge
+      - layers
+      - layout-dashboard
+      - layout-grid
+      - layout-kanban
+      - leaf
+      - library-books
+      - life-buoy
+      - lightbulb
+      - lightbulb-sparkles
+      - line-width
+      - link
+      - link-2
+      - link-off
+      - list
+      - list-checks
+      - list-ordered
+      - list-rule
+      - list-todo
+      - llm
       - loader-circle
+      - lock
+      - lock-keyhole
+      - log-in
+      - log-out
+      - log-out-all
+      - magic-wand
+      - mail
+      - mail-check
+      - mail-open
+      - mail-plus
+      - mail-warning
+      - mails
+      - market
+      - maximize-2
+      - megaphone
+      - memory-stick
+      - menu
+      - message-circle
+      - message-square
+      - message-square-plus
+      - messages-square
+      - mic
+      - microphone
+      - minimize-2
+      - minus
+      - minus-square
+      - monitor-home
+      - monitor-smartphone
+      - moon
+      - more-horizontal
+      - mouse-pointer-2
+      - move-horizontal
+      - network
+      - network-nodes
+      - newsletter
+      - newspaper
+      - octagon-x
+      - package
+      - package-download
+      - page-snapshot
+      - palette
+      - panel-left
+      - panel-right
+      - panels-top-left
+      - paper-plane
+      - paperclip
+      - pause
+      - pause-circle
+      - pencil
+      - persona
+      - piggy-bank
+      - pipette
+      - play
+      - play-circle
+      - plug
+      - plug-cloud
+      - plug-off
+      - plug-plus
+      - plugin
+      - plus
+      - price-tag
+      - publish
+      - quote
+      - radio
+      - radio-tower
+      - receipt
+      - refresh
+      - refresh-cw
+      - refresh-cw-off
+      - repeat
+      - repeat-2
+      - repeat-fallback
+      - repeat-interval
+      - responses-list
+      - rocket
+      - rotate-ccw
+      - rotate-cw
+      - route
+      - rss
+      - save
+      - scale
+      - scan
       - search
+      - search-x
+      - send
+      - send-check
+      - send-request
+      - server
+      - server-api
+      - server-environment
+      - settings
+      - settings-2
+      - share
+      - share-nodes
+      - shield
+      - shield-check
+      - shield-lock
+      - shield-question
+      - shield-x
+      - shopping-basket
+      - shopping-cart
+      - shuffle
+      - signal
+      - signal-high
+      - signal-low
+      - signal-medium
+      - signal-off
+      - siren
+      - sliders-horizontal
+      - smartphone
+      - sparkles
+      - square
+      - square-check
+      - square-plus
+      - square-terminal
+      - star
+      - sticker
+      - storage
+      - store
+      - story
+      - sun
+      - support
+      - target
+      - target-choice
+      - tasks
+      - terminal
+      - ticket
+      - ticket-plus
+      - tickets
+      - timeline
+      - timer
+      - toggle-left
+      - toggle-right
+      - token-input
+      - token-output
+      - trail
+      - trash-2
+      - trend-up
+      - triangle-alert
+      - type
+      - unlink
+      - unplug
+      - upload
+      - upload-cloud
+      - user
+      - user-check
+      - user-cog
+      - user-minus
+      - user-plus
+      - user-round
+      - user-x
+      - users
+      - users-round
+      - vault
+      - volume-2
+      - wallet
+      - wand-sparkles
+      - warehouse
+      - workflow
+      - workspace
+      - wrench
+      - wrench-zap
       - x
+      - zap
+    note: "Names use TreeUI's descriptive kebab-case vocabulary. The catalog covers common application needs; anything missing is one `registerTreeIcons` call away, and `listTreeIcons()` returns the live list at runtime."
   size:
     type: number | string
     default: 20
@@ -32,8 +417,9 @@ props:
       width="md" / height="md" onto the svg, which the browser discards, so the
       icon becomes unsized and stretches to fill its container. Pass a number
       (20, 32) or a numeric string ("20"). To size an icon from tokens, leave `size`
-      alone and set width/height in CSS from --tree-size-icon-sm | -md | -lg
-      (16px / 20px / 24px) — this is what TLanguageSelect's switcher variant does.
+      alone and set width/height in CSS from the icon scale — --tree-size-icon-sm |
+      -md | -lg | -xl | -2xl (1rem / 1.25rem / 1.5rem / 2rem / 3rem) — which is what
+      TLanguageSelect's switcher variant does.
   strokeWidth:
     type: number | string
     default: 2
@@ -46,13 +432,130 @@ props:
     default: undefined
     description: "Accessible label. When set, the icon becomes role=\"img\" with aria-label; otherwise it is aria-hidden."
 
+types:
+  package: "@treeui/icons — every export is re-exported from @treeui/vue, so an app never needs to depend on @treeui/icons directly."
+  TIconNode: "[tag: string, attrs: Record<string, string | number>] — one child of an icon's `<svg>`. Numeric attribute values are allowed so geometry can be authored without hand-quoting every number."
+  TIconNodes: "TIconNode[] — an icon's geometry: the children of its `<svg>`, drawn on a 24x24 grid."
+  TIconRegistry: "An augmentable `interface` whose keys are the icon names; every built-in name is a key. It is an interface rather than a union precisely so apps can add their own names — see `extension_api.TIconRegistry_augmentation`."
+  TIconName: "keyof TIconRegistry & string — a registered icon name."
+  TIconInput: "TIconName | Component — what an `icon` prop accepts."
+  TIconDefinition: "TIconNodes | Component — what `registerTreeIcons` accepts."
+
+extension_api:
+  description: "The registry behind `TIcon` is open: applications add icons to it, and every `name` / `icon` prop in the library picks them up."
+  createTreeIcon:
+    signature: "createTreeIcon(name: string, nodes: TIconNodes): Component"
+    description: "Builds an icon component from geometry, with the same `size` / `strokeWidth` / `absoluteStrokeWidth` props, `currentColor` stroke, and `aria-hidden` default as a built-in. `name` is the devtools component name, by convention `T<Name>Icon`. Use the result directly on an `icon` prop, or register it."
+  registerTreeIcons:
+    signature: "registerTreeIcons(icons: Record<string, TIconDefinition>): void"
+    description: "Adds icons to the registry by name. Values are raw geometry (the common case) or an app-owned, already-built component. Re-registering one of the 364 built-in names REPLACES that built-in for the whole process, so pick names the library does not ship unless replacement is the intent. Call once near the application root; registering later also works, because lookups are reactive and already-rendered components re-resolve."
+  resetTreeIcons:
+    signature: "resetTreeIcons(): void"
+    description: >-
+      Restores the registry to the icons TreeUI ships, dropping everything registered since. The
+      registry is PROCESS-WIDE MUTABLE STATE (anchored on a `Symbol.for` global so duplicate copies of
+      the package share it), so one test that registers an icon — or replaces a built-in — leaks into
+      every test that runs after it. Call this in an `afterEach`. It is a testing utility; production
+      code has no reason to unregister icons.
+    snippet: |
+      import { afterEach } from 'vitest';
+      import { resetTreeIcons } from '@treeui/vue';
+
+      afterEach(() => {
+        resetTreeIcons();
+      });
+  getTreeIcon:
+    signature: "getTreeIcon(name: TIconName): Component"
+    description: "Looks up a registered icon. The return type is non-optional because a `TIconName` is registered by definition; the one way to get `undefined` is to augment `TIconRegistry` with a name and never call `registerTreeIcons` for it."
+  resolveTreeIcon:
+    signature: "resolveTreeIcon(icon: TIconInput | undefined | null): Component | undefined"
+    description: "Turns a name OR a component into a component; components pass through untouched. Templates MUST call this before `<component :is>`: Vue resolves a raw string `is` as a globally registered component name, so passing `\"cpu\"` straight through looks for a component called `cpu` and renders nothing. Tolerant of names TypeScript never vetted (an API response, a config file)."
+  hasTreeIcon:
+    signature: "hasTreeIcon(name: string): name is TIconName"
+    description: "Whether a name resolves to a registered icon. A type guard, so it narrows an untrusted string into a `TIconName`."
+  listTreeIcons:
+    signature: "listTreeIcons(): TIconName[]"
+    description: "Every registered name, sorted — built-ins plus anything registered."
+  treeIcons:
+    signature: "treeIcons: Record<TIconName, Component>"
+    description: "The icons as a name-to-component map. Entries are lazy getters: reading one builds its component, and icons nobody reads stay as geometry rather than becoming components. Icons added with `registerTreeIcons` appear here too, and `resetTreeIcons` removes them again."
+  treeIconDefaults:
+    signature: "treeIconDefaults: { size: 20, strokeWidth: 2, absoluteStrokeWidth: true }"
+    description: "The prop defaults shared by TIcon and every component built with `createTreeIcon`."
+  builtinTreeIconNodes:
+    signature: "builtinTreeIconNodes: Record<string, TIconNodes>"
+    description: >-
+      The built-in GEOMETRY, keyed by name — the 364 shipped `TIconNodes` arrays, before any
+      registration. It is data, not components; `treeIcons` is the name-to-component map. Renamed from
+      `builtinTreeIcons`, which read like a component map and was not. It is also what
+      `resetTreeIcons()` restores the registry to, and it is the source a non-Vue framework package
+      builds its own `TIcon` from.
+  TIconRegistry_augmentation:
+    description: >-
+      `registerTreeIcons` is a runtime call — it cannot widen `TIconName` on its own. Augment the
+      `TIconRegistry` interface once (e.g. in `env.d.ts`) to get autocomplete and typo-checking on the
+      new names; the value is the literal `true`. Augmentation and registration are independent:
+      augmenting without registering type-checks but warns at runtime, and registering without augmenting
+      renders fine but fails `TIconName` type-checking.
+    snippet: |
+      // `export {}` is required — it makes the file a module, which is what makes this an
+      // augmentation. Without it the block shadows the real module instead of extending it.
+      export {};
+
+      declare module '@treeui/icons' {
+        interface TIconRegistry {
+          orbit: true;
+        }
+      }
+
 events: []
 slots: []
+
+forwards_attrs_to: root_svg
 
 a11y:
   decorative_by_default: true
   becomes_image_when_labeled: true
   rule: "Provide `label` only when the icon conveys meaning that is not already in adjacent text."
+
+behavior:
+  unknown_name_renders_nothing: >-
+    An unregistered name makes `resolveTreeIcon` return `undefined`, and `TIcon`'s `v-if` then renders no
+    element at all — no empty box, no placeholder, no error. A `console.warn` names the missing icon,
+    suggests the `registerTreeIcons` call, and lists every valid name. It warns once per NAME (not per
+    message — the message embeds the valid-name list, which changes on every registration), so a miss
+    inside a render loop cannot flood the console. The warning is NOT gated on
+    `process.env.NODE_ENV`: it fires in production builds too, deliberately, because a missing icon is a
+    misconfiguration worth hearing about once and `process` is undefined in most browser bundles.
+    Components with a marker fallback (TNavMenu) show that instead — see nav-menu.yaml.
+  absolute_stroke_width_math: >-
+    Icons draw on `viewBox="0 0 24 24"` with the svg sized to `size`, so painted pixels =
+    (stroke-width attribute) * size / 24. With `absoluteStrokeWidth` (the default) the attribute is set
+    to `(strokeWidth * 24) / size`, which cancels the scale: at the default `strokeWidth: 2` the
+    attribute is 2.4 at size 20, 1.5 at 32, and 1.0 at 48 — a constant 2px painted at every size. That
+    is the entire point of the correction: a 48px icon sits beside a 20px one at the same optical
+    weight. A `size` of 0 or a non-numeric value keeps the nominal stroke rather than producing
+    NaN/Infinity. Setting `absoluteStrokeWidth: false` pins the attribute at `strokeWidth`, which is the
+    hand-rolled behaviour: the painted stroke then scales WITH the icon (1.67px at 20, 2.67px at 32, 4px
+    at 48 — double the library weight).
+  icons_are_built_lazily_and_cached: >-
+    Geometry lives in a data registry; a component is created on first lookup and reused after that, so
+    an unused icon stays as DATA instead of becoming a `defineComponent`. Note what this does not claim:
+    the geometry for all 364 built-ins is retained by any import of the package (the registry copies
+    `builtinTreeIconNodes` into a `Map` at module scope, so a live reference exists and nothing
+    tree-shakes it away — `sideEffects: false` does not change that). The saving is component
+    construction, not bundle bytes.
+  resolved_per_render: >-
+    TIcon resolves its name in a computed, not once at setup, so an icon registered after the component
+    mounted still appears.
+  migration_aliases: >-
+    Twelve compatibility names resolve to the same geometry as their canonical names: grid →
+    layout-grid, share → share-nodes, chevron-updown → chevrons-up-down, refresh → refresh-cw,
+    comment/chat → message-circle, check-square → square-check, help → circle-help, automations →
+    zap, connections → external-link, persona → user-round, and close → x.
+  company_logos_are_app_owned: >-
+    Company logos are not built-ins. When an application needs one, it imports the official SVG as
+    its own component and passes or registers that component under an application-owned name.
 
 example: |
   <!-- Decorative -->
@@ -61,7 +564,76 @@ example: |
   <!-- Meaningful (no adjacent text) -->
   <TIcon name="alert-circle" label="Warning" size="32" />
 
+example_register: |
+  // main.ts — register geometry, once, near the app root
+  import { registerTreeIcons } from '@treeui/vue';
+
+  // Pick a name the library does not ship — registering an existing name
+  // replaces that built-in everywhere. `orbit` is not a built-in.
+  registerTreeIcons({
+    orbit: [
+      ['circle', { cx: 12, cy: 12, r: 10 }],
+      ['path', { d: 'M8 12a4 4 0 1 0 8 0 4 4 0 1 0-8 0' }],
+    ],
+  });
+
+  // ...or register an app-owned component.
+  // Same rule applies: `webhook` is an ADDITION because TreeUI does not ship
+  // it. Had this said `{ cpu: CpuIcon, server: ServerIcon }`, it would be
+  // overwriting two built-ins, not adding a new name.
+  import WebhookIcon from './icons/WebhookIcon.vue';
+
+  registerTreeIcons({ webhook: WebhookIcon });
+
+  // env.d.ts — teach TypeScript the new names (autocomplete + typo-checking)
+  export {};
+
+  declare module '@treeui/icons' {
+    interface TIconRegistry {
+      orbit: true;
+      webhook: true;
+    }
+  }
+
+  <!-- anywhere, by name -->
+  <TIcon name="orbit" label="Orbit" />
+
+example_replace_a_builtin: |
+  // The deliberate version of the same call: TreeUI DOES ship `cpu` and
+  // `server`, so registering those names swaps the built-in geometry for the
+  // house drawing — everywhere, for every component, for the life of the
+  // process. Do this only when the intent is "our `cpu` icon, not TreeUI's"
+  // (for example, matching application-owned artwork).
+  // It is a REPLACEMENT, not an addition; nothing warns.
+  import CpuIcon from './icons/CpuIcon.vue';
+  import ServerIcon from './icons/ServerIcon.vue';
+
+  registerTreeIcons({ cpu: CpuIcon, server: ServerIcon });
+
+  // No TIconRegistry augmentation is needed here — both names are already keys.
+  // resetTreeIcons() puts TreeUI's originals back (see extension_api).
+
+example_test_isolation: |
+  // The registry is process-wide state, so a test that registers an icon
+  // changes every test after it. Reset between cases.
+  import { afterEach, expect, test } from 'vitest';
+  import { hasTreeIcon, registerTreeIcons, resetTreeIcons } from '@treeui/vue';
+
+  afterEach(() => {
+    resetTreeIcons();
+  });
+
+  test('registers a custom icon', () => {
+    registerTreeIcons({ radar: [['circle', { cx: 12, cy: 12, r: 9 }]] });
+    expect(hasTreeIcon('radar')).toBe(true);
+  });
+
+  test('does not leak into the next case', () => {
+    expect(hasTreeIcon('radar')).toBe(false);
+  });
+
 related:
   - TBadge
   - TButton
   - TAlert
+  - TNavMenu

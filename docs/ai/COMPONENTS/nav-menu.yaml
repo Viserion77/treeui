@@ -38,7 +38,7 @@ item_interface:
     value: { type: string, required: true }
     shortLabel: { type: string, required: false }
     description: { type: string, required: false }
-    icon: { type: Component, required: false, description: "Vue component rendered as icon. Replaces the marker when provided." }
+    icon: { type: TIconInput, required: false, description: "`TIconName | Component`. Either a registered icon name (`icon: 'cpu'`) — built-in or added via `registerTreeIcons`, see icon.yaml — or any Vue component. Resolved through `resolveTreeIcon` and rendered in place of the letter marker. An unknown name resolves to nothing and the item falls back to its marker, with a dev-only console warning. Prefer a name: a string is never made reactive, so it needs no `markRaw`, whereas a component object inside a reactive `items` array triggers Vue's reactivity warning." }
     to: { type: "string | Record<string, unknown>", required: false, description: "Route target. When provided and vue-router is available, renders RouterLink instead of button." }
     badge: { type: "string | number", required: false }
     disabled: { type: boolean, required: false }
@@ -84,3 +84,15 @@ example: |
     :model-value="currentRoute"
     @update:model-value="currentRoute = $event"
   />
+
+example_items: |
+  // Icons by name — no import, no markRaw, safe inside a reactive array.
+  const items = ref<TNavMenuItem[]>([
+    { label: 'Overview', value: 'overview', icon: 'layout-dashboard', to: '/' },
+    { label: 'Compute', value: 'compute', icon: 'cpu', to: '/compute', exact: false },
+    { label: 'Databases', value: 'databases', icon: 'database', to: '/databases', badge: 3 },
+    // A component still works — markRaw it, since this array is reactive.
+    { label: 'Billing', value: 'billing', icon: markRaw(BillingIcon), to: '/billing' },
+    // No icon: the item renders its letter marker ("S" from the label).
+    { label: 'Settings', value: 'settings', to: '/settings' },
+  ]);

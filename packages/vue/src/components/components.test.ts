@@ -65,6 +65,13 @@ import TSparkline from './TSparkline.vue';
 import TDonutChart from './TDonutChart.vue';
 import TLink from './TLink.vue';
 import TNavMenu from './TNavMenu.vue';
+import {
+  builtinTreeIconNodes,
+  listTreeIcons,
+  registerTreeIcons,
+  resetTreeIcons,
+  type TIconName,
+} from '@treeui/icons';
 import { useToast } from '../composables/useToast';
 
 describe('@treeui/vue', () => {
@@ -724,6 +731,24 @@ describe('@treeui/vue', () => {
 
     expect(wrapper.find('.t-nav-menu__icon').exists()).toBe(true);
     expect(wrapper.find('.t-nav-menu__marker').exists()).toBe(false);
+  });
+
+  it('accepts an icon name in a nav menu item', () => {
+    const wrapper = mount(TNavMenu, {
+      props: { items: [{ label: 'Models', value: 'models', icon: 'cpu' }] },
+      attrs: { 'aria-label': 'Nav' },
+    });
+    expect(wrapper.find('.t-nav-menu__icon').exists()).toBe(true);
+    expect(wrapper.find('.t-nav-menu__marker').exists()).toBe(false);
+  });
+
+  it('falls back to the letter marker for an unknown name', () => {
+    const wrapper = mount(TNavMenu, {
+      props: { items: [{ label: 'Models', value: 'models', icon: 'nope-not-real' }] },
+      attrs: { 'aria-label': 'Nav' },
+    });
+    expect(wrapper.find('.t-nav-menu__icon').exists()).toBe(false);
+    expect(wrapper.find('.t-nav-menu__marker').text()).toBe('M');
   });
 
   it('maps nav menu router-link active classes so prefix matches cannot double-activate', () => {
@@ -4421,6 +4446,80 @@ describe('TIcon', () => {
     const svg = wrapper.find('svg');
     expect(svg.attributes('width')).toBe('32');
     expect(svg.attributes('height')).toBe('32');
+  });
+
+  it('ships the expanded registry', () => {
+    const names = listTreeIcons();
+    // At least, not exactly: earlier tests may have registered custom icons,
+    // and the built-in set is free to grow.
+    expect(names.length).toBeGreaterThanOrEqual(Object.keys(builtinTreeIconNodes).length);
+    expect(names).toContain('cpu');
+  });
+
+  it('gives an already-mounted component a replaced built-in', async () => {
+    // The library resolves its own icons lazily, so an app that overrides a
+    // built-in gets the override everywhere — not only where it mounted after.
+    const wrapper = mount(TModal, {
+      props: { open: true, title: 'Replaceable' },
+      attachTo: document.body,
+    });
+    await nextTick();
+    const before = document.querySelector('.t-modal__close')?.innerHTML ?? '';
+
+    registerTreeIcons({ x: [['rect', { x: 2, y: 2, width: 20, height: 20 }]] });
+    await nextTick();
+
+    const after = document.querySelector('.t-modal__close')?.innerHTML ?? '';
+    expect(after).toContain('rect');
+    expect(after).not.toBe(before);
+
+    wrapper.unmount();
+    resetTreeIcons();
+  });
+
+  it('renders a new built-in by name', () => {
+    const wrapper = mount(TIcon, { props: { name: 'cpu' } });
+    expect(wrapper.find('svg').exists()).toBe(true);
+    expect(wrapper.findAll('rect').length).toBe(2);
+  });
+
+  it('scales stroke width with size', () => {
+    const wrapper = mount(TIcon, { props: { name: 'cpu', size: 48 } });
+    expect(wrapper.find('svg').attributes('stroke-width')).toBe('1');
+  });
+
+  it('survives a non-numeric size instead of emitting NaN', () => {
+    const wrapper = mount(TIcon, { props: { name: 'cpu', size: 'auto' } });
+    expect(wrapper.find('svg').attributes('stroke-width')).toBe('2');
+  });
+
+  it('renders nothing for a typed but unregistered name instead of throwing', () => {
+    const wrapper = mount(TIcon, { props: { name: 'not-a-registered-icon' as TIconName } });
+
+    expect(wrapper.find('svg').exists()).toBe(false);
+    // Only the v-if placeholder comment is left behind — no stray element.
+    expect(wrapper.element.nodeType).toBe(Node.COMMENT_NODE);
+    expect(wrapper.html()).toBe('<!--v-if-->');
+  });
+
+  // Registers into the shared registry, so it runs after the registry-size
+  // assertion above rather than in the TNavMenu block earlier in this file.
+  it('exposes an icon registered at runtime to nav menu items by name', () => {
+    registerTreeIcons({
+      'test-runtime-glyph': [['circle', { cx: 12, cy: 12, r: 6 }]],
+    });
+
+    const wrapper = mount(TNavMenu, {
+      props: {
+        items: [{ label: 'Runtime', value: 'runtime', icon: 'test-runtime-glyph' }],
+      },
+      attrs: { 'aria-label': 'Nav' },
+    });
+
+    expect(wrapper.find('.t-nav-menu__icon').exists()).toBe(true);
+    expect(wrapper.find('.t-nav-menu__marker').exists()).toBe(false);
+    expect(wrapper.find('.t-nav-menu__icon circle').exists()).toBe(true);
+    expect(listTreeIcons()).toContain('test-runtime-glyph');
   });
 });
 

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { getNextEnabledIndex, isActivationKey } from '@treeui/utils';
+import { resolveTreeIcon, type TIconInput } from '@treeui/icons';
 import { computed, getCurrentInstance, inject, nextTick, ref, useAttrs, watch, type Component, type ComponentPublicInstance } from 'vue';
 import type { TSize } from '../types/contracts';
 import { treeSidebarInjectionKey } from './sidebar';
@@ -13,7 +14,12 @@ export interface TNavMenuItem {
   value: string;
   shortLabel?: string;
   description?: string;
-  icon?: Component;
+  /**
+   * A registered icon name (`'cpu'`), or any component. A name is the simpler
+   * form: it needs no import and no `markRaw`, since a string is not made
+   * reactive when the item lands in a `ref`.
+   */
+  icon?: TIconInput;
   to?: string | Record<string, unknown>;
   badge?: string | number;
   disabled?: boolean;
@@ -61,6 +67,13 @@ defineSlots<{
   }) => unknown;
   empty?: () => unknown;
 }>();
+
+/**
+ * A registry lookup, so it stays cheap enough to call from the template. An
+ * unresolved name returns `undefined` and the item falls back to its letter
+ * marker rather than rendering a hole.
+ */
+const iconFor = (item: TNavMenuItem) => resolveTreeIcon(item.icon);
 
 const attrs = useAttrs();
 const sidebar = inject(treeSidebarInjectionKey, null);
@@ -296,8 +309,8 @@ watch(
             :collapsed="resolvedCollapsed"
           >
             <component
-              :is="item.icon"
-              v-if="item.icon"
+              :is="iconFor(item)"
+              v-if="iconFor(item)"
               class="t-nav-menu__icon"
               aria-hidden="true"
             />

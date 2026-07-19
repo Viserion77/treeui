@@ -26,7 +26,7 @@ defineOptions({
   inheritAttrs: false,
 });
 
-const CloseIcon = getTreeIcon('x');
+const CloseIcon = computed(() => getTreeIcon('x'));
 
 const props = withDefaults(
   defineProps<{

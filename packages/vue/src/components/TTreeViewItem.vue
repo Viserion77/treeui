@@ -7,8 +7,8 @@ defineOptions({
   name: 'TTreeViewItem',
 });
 
-const ChevronRightIcon = getTreeIcon('chevron-right');
-const CheckIcon = getTreeIcon('check');
+const ChevronRightIcon = computed(() => getTreeIcon('chevron-right'));
+const CheckIcon = computed(() => getTreeIcon('check'));
 
 const props = defineProps<{
   node: TTreeViewNode;

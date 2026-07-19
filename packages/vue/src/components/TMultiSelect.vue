@@ -18,9 +18,9 @@ export interface TMultiSelectOption {
   disabled?: boolean;
 }
 
-const ChevronDownIcon = getTreeIcon('chevron-down');
-const CheckIcon = getTreeIcon('check');
-const XIcon = getTreeIcon('x');
+const ChevronDownIcon = computed(() => getTreeIcon('chevron-down'));
+const CheckIcon = computed(() => getTreeIcon('check'));
+const XIcon = computed(() => getTreeIcon('x'));
 
 const props = withDefaults(
   defineProps<{

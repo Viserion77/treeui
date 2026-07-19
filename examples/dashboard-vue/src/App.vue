@@ -8,6 +8,7 @@ import {
   TCard,
   TDivider,
   TDropdown,
+  TIcon,
   TInput,
   TKbd,
   TNavMenu,
@@ -23,17 +24,6 @@ import {
 import type { TNavMenuItem } from '@treeui/vue';
 import logoUrl from './assets/treeui-logo.svg';
 import { useAppTheme, useDashboardConfig } from './composables/useDashboardConfig';
-import {
-  IconBell,
-  IconGear,
-  IconHome,
-  IconMoon,
-  IconOrders,
-  IconSearch,
-  IconSidebar,
-  IconSun,
-  IconUsers,
-} from './icons';
 import SettingsDrawer from './components/SettingsDrawer.vue';
 import OverviewView from './views/OverviewView.vue';
 import OrdersView from './views/OrdersView.vue';
@@ -58,9 +48,9 @@ function onNotifications() {
 }
 
 const navItems: TNavMenuItem[] = [
-  { label: 'Overview', value: 'overview', icon: IconHome, description: 'Metrics and activity' },
-  { label: 'Orders', value: 'orders', icon: IconOrders, badge: 37 },
-  { label: 'Customers', value: 'customers', icon: IconUsers },
+  { label: 'Overview', value: 'overview', icon: 'house', description: 'Metrics and activity' },
+  { label: 'Orders', value: 'orders', icon: 'shopping-cart', badge: 37 },
+  { label: 'Customers', value: 'customers', icon: 'users' },
 ];
 
 const views = {
@@ -151,9 +141,9 @@ function selectView(value: string, closeSidebar: () => void) {
             aria-label="Search"
           >
             <template #prefix>
-              <IconSearch
-                width="16"
-                height="16"
+              <TIcon
+                name="search"
+                :size="16"
               />
             </template>
             <template #suffix>
@@ -177,7 +167,7 @@ function selectView(value: string, closeSidebar: () => void) {
                 aria-label="Notifications"
                 @click="onNotifications"
               >
-                <IconBell />
+                <TIcon name="bell" />
               </TButton>
             </TTooltip>
             <TTooltip :content="isDark ? 'Switch to light theme' : 'Switch to dark theme'">
@@ -187,7 +177,7 @@ function selectView(value: string, closeSidebar: () => void) {
                 :aria-label="isDark ? 'Switch to light theme' : 'Switch to dark theme'"
                 @click="toggleTheme"
               >
-                <component :is="isDark ? IconSun : IconMoon" />
+                <TIcon :name="isDark ? 'sun' : 'moon'" />
               </TButton>
             </TTooltip>
             <TTooltip content="Customize dashboard">
@@ -197,7 +187,7 @@ function selectView(value: string, closeSidebar: () => void) {
                 aria-label="Customize dashboard"
                 @click="settingsOpen = true"
               >
-                <IconGear />
+                <TIcon name="settings" />
               </TButton>
             </TTooltip>
             <TDropdown
@@ -255,7 +245,7 @@ function selectView(value: string, closeSidebar: () => void) {
               @click="() => { onNotifications(); closeSidebar(); }"
             >
               <template #icon>
-                <IconBell />
+                <TIcon name="bell" />
               </template>
               Notifications
             </TButton>
@@ -267,7 +257,7 @@ function selectView(value: string, closeSidebar: () => void) {
               @click="toggleTheme"
             >
               <template #icon>
-                <component :is="isDark ? IconSun : IconMoon" />
+                <TIcon :name="isDark ? 'sun' : 'moon'" />
               </template>
               {{ isDark ? 'Light theme' : 'Dark theme' }}
             </TButton>
@@ -279,7 +269,7 @@ function selectView(value: string, closeSidebar: () => void) {
               @click="() => { settingsOpen = true; closeSidebar(); }"
             >
               <template #icon>
-                <IconGear />
+                <TIcon name="settings" />
               </template>
               Settings
             </TButton>
@@ -337,7 +327,7 @@ function selectView(value: string, closeSidebar: () => void) {
                 aria-label="Collapse sidebar"
                 @click="toggleCollapsed"
               >
-                <IconSidebar />
+                <TIcon name="panel-left" />
               </TButton>
             </TTooltip>
           </template>

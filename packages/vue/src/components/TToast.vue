@@ -4,13 +4,15 @@ import { getTreeIcon, treeIconDefaults } from '@treeui/icons';
 import { computed } from 'vue';
 import type { ToastItem } from '../composables/useToast';
 
-const XIcon = getTreeIcon('x');
+const XIcon = computed(() => getTreeIcon('x'));
 
-const iconMap = {
-  info: getTreeIcon('info'),
-  success: getTreeIcon('check'),
-  warning: getTreeIcon('alert-circle'),
-  danger: getTreeIcon('alert-circle'),
+// Resolved per render, not once at setup: an application that replaces one of
+// these built-ins gets the replacement in toasts that are already mounted.
+const VARIANT_ICONS = {
+  info: 'info',
+  success: 'check',
+  warning: 'alert-circle',
+  danger: 'alert-circle',
 } as const;
 
 const props = withDefaults(
@@ -33,7 +35,7 @@ const classes = computed(() => [
   `t-toast--${props.toast.variant}`,
 ]);
 
-const StatusIcon = computed(() => iconMap[props.toast.variant]);
+const StatusIcon = computed(() => getTreeIcon(VARIANT_ICONS[props.toast.variant]));
 
 function handleClose() {
   emit('close', props.toast.id);

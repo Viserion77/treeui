@@ -13,8 +13,8 @@ const _treeSidebarSides = ['left', 'right'] as const;
 
 export type TSidebarSide = (typeof _treeSidebarSides)[number];
 
-const ChevronLeftIcon = getTreeIcon('chevron-left');
-const ChevronRightIcon = getTreeIcon('chevron-right');
+const ChevronLeftIcon = computed(() => getTreeIcon('chevron-left'));
+const ChevronRightIcon = computed(() => getTreeIcon('chevron-right'));
 
 const props = withDefaults(
   defineProps<{

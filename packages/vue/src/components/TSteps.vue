@@ -22,7 +22,7 @@ const _treeStepOrientations = ['horizontal', 'vertical'] as const;
 export type TStepStatus = (typeof _treeStepStatuses)[number];
 export type TStepOrientation = (typeof _treeStepOrientations)[number];
 
-const CheckIcon = getTreeIcon('check');
+const CheckIcon = computed(() => getTreeIcon('check'));
 
 const props = withDefaults(
   defineProps<{

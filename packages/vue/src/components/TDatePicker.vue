@@ -41,9 +41,9 @@ interface CalendarCell {
   key: string;
 }
 
-const CalendarIcon = getTreeIcon('calendar');
-const ChevronLeftIcon = getTreeIcon('chevron-left');
-const ChevronRightIcon = getTreeIcon('chevron-right');
+const CalendarIcon = computed(() => getTreeIcon('calendar'));
+const ChevronLeftIcon = computed(() => getTreeIcon('chevron-left'));
+const ChevronRightIcon = computed(() => getTreeIcon('chevron-right'));
 
 const props = withDefaults(
   defineProps<{

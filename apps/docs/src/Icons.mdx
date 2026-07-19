@@ -1,0 +1,270 @@
+import { Meta, Title } from '@storybook/addon-docs/blocks';
+
+<Meta title="Foundation/Icons" />
+
+<Title>Icons</Title>
+
+TreeUI ships its own icon registry so a product gets consistent stroke weight, sizing, and
+accessibility defaults without adopting an icon dependency. The registry is open: anything it does
+not ship, you add.
+
+## Rendering an icon
+
+```vue
+<script setup lang="ts">
+import { TIcon } from '@treeui/vue';
+</script>
+
+<template>
+  <TIcon name="cpu" />
+</template>
+```
+
+That is the whole API for the common case. `name` is typed as `TIconName`, so a typo is a
+compile error rather than an empty box.
+
+## What ships
+
+364 original TreeUI icons covering the vocabulary an application shell actually reaches for. Every
+glyph inherits the surrounding text colour through `currentColor`. Company logos are not built-ins;
+import the official SVG as an app-owned component and register it when needed.
+Browse them, with the exact name to copy, in
+[Components → Data Display → Icon → Gallery](?path=/story/components-data-display-icon--gallery).
+
+Every name is also available at runtime:
+
+```ts
+import { listTreeIcons, hasTreeIcon } from '@treeui/vue';
+
+listTreeIcons(); // ['activity', 'alert-circle', …] — sorted, includes yours
+hasTreeIcon('cpu'); // true
+```
+
+## The icon I need is not there
+
+**Register it. Do not hand-roll an `<svg>`, and do not stand up a second icon system beside this
+one.** Registration takes one call and the new name then works everywhere a built-in does.
+
+`registerTreeIcons` accepts geometry as `[tag, attributes]` pairs, drawn on the same 24×24 grid as
+every built-in icon. Call it once, near the application root:
+
+```ts
+// main.ts
+import { registerTreeIcons } from '@treeui/vue';
+
+registerTreeIcons({
+  orbit: [
+    ['circle', { cx: 12, cy: 12, r: 10 }],
+    ['path', { d: 'M8 12a4 4 0 1 0 8 0 4 4 0 1 0-8 0' }],
+  ],
+});
+```
+
+Then use it exactly like a built-in — `<TIcon name="orbit" />`, or `icon: 'orbit'` on a
+`TNavMenu` item.
+
+Pick a name the library does not already ship: registering an existing name **replaces** that
+built-in everywhere, which is a useful escape hatch but a surprising accident.
+
+The registry is process-wide mutable state, so a registration outlives the code that made it. That
+matters most in tests: one case registering an icon leaks into every case after it. `resetTreeIcons`
+restores the registry to the icons TreeUI ships and drops everything registered since — it is the
+only way to undo a registration:
+
+```ts
+import { resetTreeIcons } from '@treeui/vue';
+
+afterEach(() => {
+  resetTreeIcons();
+});
+```
+
+For autocomplete and typo-checking on your own names, augment the registry interface once. It is an
+`interface` rather than a union precisely so applications can extend it:
+
+```ts
+// env.d.ts
+export {};
+
+declare module '@treeui/icons' {
+  interface TIconRegistry {
+    orbit: true;
+  }
+}
+```
+
+The `export {}` is load-bearing. It makes the file a module, which is what turns `declare module` into
+an *augmentation*. Without it the file is a script, and `declare module '@treeui/icons'` declares a
+brand-new ambient module that **shadows** the real one — every icon export then reads as missing.
+
+`TIconName` is `keyof TIconRegistry`, so `TIcon`'s `name` prop and `TNavMenu`'s item `icon` field now
+accept `'orbit'` and still reject `'oribt'`.
+
+An unregistered name is not a silent failure: `resolveTreeIcon` returns `undefined` and a
+`console.warn` names the icon and lists the valid ones, once per bad name. That warning fires in
+production too — a missing icon is a misconfiguration worth hearing about wherever it happens.
+`TNavMenu` falls back to its letter marker rather than rendering a hole.
+
+## Using an app-owned icon component
+
+`registerTreeIcons` also accepts components, which is how you add artwork owned by the application:
+
+```ts
+import WebhookIcon from './icons/WebhookIcon.vue';
+import { registerTreeIcons } from '@treeui/vue';
+
+registerTreeIcons({ webhook: WebhookIcon });
+```
+
+After this, `<TIcon name="webhook" />` renders the app-owned component. The rest of your application
+keeps using names, so replacing the underlying artwork later is a change to this one call.
+
+Note that `webhook` is a name TreeUI does **not** ship. Mapping a set onto names that already exist —
+`cpu`, `server`, `check` — replaces those built-ins rather than adding to them, which is worth doing
+deliberately and not by accident.
+
+You can also skip registration entirely: `TNavMenu`'s item `icon` accepts a component directly, so an
+imported SVG component or a `createTreeIcon(...)` result works with no setup. `TIcon` is the
+exception — its `name` prop is a registry name only, never a component.
+
+## Passing an icon to a component
+
+`TNavMenu` is the only place in the library with an icon field, and it accepts `TIconInput` — a
+registered name **or** a component:
+
+```ts
+import type { TNavMenuItem } from '@treeui/vue';
+
+const items: TNavMenuItem[] = [
+  { label: 'Overview', value: 'overview', icon: 'layout-dashboard' },
+  { label: 'Servers', value: 'servers', icon: 'server' },
+];
+```
+
+```vue
+<TNavMenu :items="items" />
+```
+
+The `TNavMenuItem[]` annotation is not decoration. Without it, `icon` infers as `string`, and `string`
+is not a `TIconName` — the array stops being assignable to the `items` prop. `value` is the item's
+identifier and is required; there is no `id` field, and a route target goes in `to`.
+
+`TButton` and `TBadge` have no icon prop at all. They take icons through slots, which is why the
+examples below put a `TIcon` in the button's content rather than passing a name to it.
+
+Prefer the name. A string is never made reactive, so it needs no `markRaw`; a component object
+stored in a `ref` or `reactive` triggers Vue's "component was made reactive" warning and has to be
+wrapped:
+
+```ts
+import { markRaw, reactive } from 'vue';
+import WorkflowIcon from './icons/WorkflowIcon.vue';
+import type { TNavMenuItem } from '@treeui/vue';
+
+const items = reactive<TNavMenuItem[]>([
+  { label: 'Workflow', value: 'workflow', icon: markRaw(WorkflowIcon) }, // component: needs markRaw
+  { label: 'Servers', value: 'servers', icon: 'server' },            // name: does not
+]);
+```
+
+## Why not hand-roll an `<svg>`
+
+Because the stroke weight will be wrong at every size except the one you tested.
+
+TreeUI icons render with `absoluteStrokeWidth` on by default, which sets the rendered stroke to
+`strokeWidth × 24 / size`. The 24 is the viewBox: as the box scales up, the stroke is scaled down by
+the same factor, so the line lands at a constant device width.
+
+| Size | Rendered `stroke-width` | Optical line |
+|---|---|---|
+| 20 | 2.4 | 2px |
+| 32 | 1.5 | 2px |
+| 48 | 1.0 | 2px |
+
+A hand-rolled `<svg viewBox="0 0 24 24" stroke-width="2">` skips that correction. At size 20 it
+draws a 1.67px line where the library draws 2px — close enough to miss in review. At 48 it draws
+4px against the library's 2px, and the icon looks bolded next to its neighbours. That mismatch is
+the usual reason a codebase ends up with two icon systems.
+
+Hand-rolling also drops the `size`, `strokeWidth`, and `absoluteStrokeWidth` props, the
+`currentColor` stroke, and the `aria-hidden` default.
+
+If you want the component without the registry, `createTreeIcon` builds one from the same geometry:
+
+```ts
+import { createTreeIcon } from '@treeui/vue';
+
+export const WorkflowIcon = createTreeIcon('TWorkflowIcon', [
+  ['circle', { cx: 6, cy: 6, r: 2.5 }],
+]);
+```
+
+The argument is a **component** name (`T<Name>Icon`, what Vue devtools shows), not a registry key —
+`createTreeIcon` builds a component and registers nothing. Pass the result wherever a component is
+accepted, or hand it to `registerTreeIcons` to give it a name as well.
+
+## Sizing
+
+`TIcon`'s `size` is a **pixel count**, not the `sm | md | lg` token scale used by nearly every other
+TreeUI component. This is the one sharp edge in the API:
+
+```vue
+<TIcon name="cpu" :size="32" />  <!-- 32×32 -->
+<TIcon name="cpu" size="md" />   <!-- ✗ unsized: width="md" is discarded by the browser -->
+```
+
+`size="md"` does not throw. It writes `width="md"` onto the `<svg>`, the browser drops the invalid
+value, and the icon stretches to fill whatever contains it.
+
+To size from tokens instead, leave `size` at its default and drive the box from CSS:
+
+```vue
+<template>
+  <TIcon class="app-icon" name="cpu" />
+</template>
+
+<style scoped>
+.app-icon {
+  width: var(--tree-size-icon-md);
+  height: var(--tree-size-icon-md);
+}
+</style>
+```
+
+| Token | Value |
+|---|---|
+| `--tree-size-icon-sm` | 1rem |
+| `--tree-size-icon-md` | 1.25rem |
+| `--tree-size-icon-lg` | 1.5rem |
+| `--tree-size-icon-xl` | 2rem |
+| `--tree-size-icon-2xl` | 3rem |
+
+This is the route to prefer in application code: it follows the type scale and survives a token
+change, where a hardcoded `:size="20"` does not. The library sizes its own icons this way —
+`.t-nav-menu__icon` sets `width` / `height` from `--tree-size-icon-md`, and `TLanguageSelect` uses
+the logical-property equivalent.
+
+Icons inherit their colour from `currentColor`, so they follow the surrounding text with no colour
+prop at all.
+
+## Accessibility
+
+Icons are **decorative by default**: `TIcon` renders `aria-hidden="true"`, and assistive tech skips
+it. That is the right behaviour next to a visible label, where announcing the icon would just repeat
+the text.
+
+```vue
+<!-- Decorative: the text already says "Delete" -->
+<TButton><TIcon name="trash-2" /> Delete</TButton>
+```
+
+Passing `label` promotes the icon to `role="img"` with that `aria-label`:
+
+```vue
+<!-- Meaningful: nothing else conveys "Warning" -->
+<TIcon name="alert-circle" label="Warning" />
+```
+
+Use `label` only when the icon carries meaning no adjacent text repeats. An icon-only button is the
+usual case — and there, prefer labelling the **button** (`aria-label`) over the icon, so the
+accessible name belongs to the thing being activated.

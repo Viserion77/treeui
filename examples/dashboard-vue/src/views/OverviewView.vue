@@ -13,6 +13,7 @@ import {
   TEmptyState,
   TFormField,
   TGrid,
+  TIcon,
   TInput,
   TPageHeader,
   TRadio,
@@ -44,7 +45,6 @@ import {
   type OrderStatus,
 } from '../data';
 import { useDashboardConfig } from '../composables/useDashboardConfig';
-import { IconPlus } from '../icons';
 
 const emit = defineEmits<{
   navigate: [view: string];
@@ -173,9 +173,9 @@ function dismissAlert() {
           :size="config.density"
           @click="newOrder"
         >
-          <IconPlus
-            width="16"
-            height="16"
+          <TIcon
+            name="plus"
+            :size="16"
           />
           New order
         </TButton>

@@ -1,5 +1,72 @@
 # @treeui/vue
 
+## 0.17.0
+
+### Minor Changes
+
+- 3f094fd: Add `TFlag` and `TLanguageSelect` for language and locale selection, plus a
+  `languages` icon in `@treeui/icons`.
+
+  - `TFlag` renders a country flag from an ISO 3166-1 alpha-2 code. Assets load from
+    `https://flagcdn.com` by default; `baseUrl` repoints the component at a mirror, so
+    self-hosting later is a configuration change rather than a breaking one. The path
+    template is part of the public contract and is documented in `SETUP.yaml`.
+  - Flags use the CDN's fixed-height endpoints, which serve flat artwork at each flag's
+    true proportions. The CDN does offer ratio-normalised endpoints, but it normalises
+    only by switching to waving artwork, which reads as decoration beside flat UI icons.
+    A shared height is what actually aligns a column of flags; the varying widths are
+    absorbed by a fixed 3:2 box in CSS, so Nepal stays a pennant and Switzerland stays
+    square without knocking the labels out of line.
+  - When the image cannot load — an unknown code, a strict `img-src` policy, an offline
+    client — `TFlag` falls back to the uppercased country code instead of an empty box,
+    and retries once the resolved source changes.
+  - `TLanguageSelect` reuses the listbox, keyboard and overlay behaviour of `TSelect`,
+    adding a flag and an optional description per option. Options carry an optional
+    `code`: flags are an imprecise proxy for languages (Spanish is not Spain, English is
+    not the US), so a language with no defensible flag simply renders without one.
+  - Two variants. `field` is a form control and leads with the flag, since a form label
+    already says what it is. `switcher` is a page-level control for a navbar, where
+    nothing nearby explains it: a translate icon opens the row and the current flag
+    closes it, so the control reads as "page language, now set to this" on its own.
+    `iconOnly` drops the language name for a tight bar.
+  - Neither component ships locale data. The application owns its language list and all
+    locale side effects; the control only emits the chosen value.
+
+  Follow-up worth doing separately: `TLanguageSelect` currently forks `TSelect`'s listbox
+  navigation rather than sharing it. Extracting a `useListboxNavigation` composable would
+  remove the duplication, but it rewrites `TSelect`'s internals and is better done as its
+  own change with its own regression run.
+
+### Patch Changes
+
+- 2c046f3: Set a base `html { font-family: var(--tree-font-family-sans) }` in the component
+  stylesheets. The design font was previously applied only through a per-component
+  selector list, so unstyled prose, layout roots, and the overlays teleported to
+  `<body>` (modal, drawer, popover, dropdown) fell back to the browser default
+  serif. The rule is specificity (0,0,1), so any consumer rule still overrides it.
+- 3f094fd: Fix focus restoration in `TPopover` when a custom `trigger` slot is used, and stop
+  the published type declarations from pointing outside the tarball.
+
+  - `TPopover` bound its `triggerRef` to the built-in fallback `<button>`, which does
+    not render once a consumer supplies a `trigger` slot. With a custom trigger the
+    ref was `null`, so closing with Escape restored focus nowhere and focus fell back
+    to `<body>` (WCAG 2.4.3). The ref now lives on the `t-popover__anchor` wrapper and
+    resolves the real trigger via `focusFirst()` — the same approach `TDropdown`
+    already used.
+  - The `trigger` slot of `TPopover` and `TDropdown` now also receives the id of the
+    panel it controls (`contentId` / `menuId`). Custom triggers previously had no way
+    to wire a correct `aria-controls`; on `TDropdown` it was impossible, since the
+    generated menu id was never exposed. `TDropdown` also gains an optional `id` prop,
+    matching `TPopover`.
+  - `vite-plugin-dts` inlined the monorepo `@treeui/*` tsconfig path aliases into the
+    emitted declarations, so `TIconName` was re-exported from `../../../icons/src`, a
+    path absent from the published package. Under `skipLibCheck` that silently degraded
+    the type to `any` and `<TIcon name="does-not-exist" />` type-checked. These are real
+    dependencies and now stay bare specifiers.
+
+- Updated dependencies [3f094fd]
+  - @treeui/icons@0.17.0
+
 ## 0.16.0
 
 ### Minor Changes

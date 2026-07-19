@@ -18,6 +18,7 @@ props:
       - chevron-down
       - chevron-right
       - info
+      - languages
       - loader-circle
       - search
       - x
@@ -25,6 +26,14 @@ props:
     type: number | string
     default: 20
     description: "Pixel size for both width and height of the rendered svg."
+    note: |
+      This is a PIXEL COUNT, not the sm | md | lg token scale used by nearly every
+      other TreeUI component. `<TIcon size="md" />` does not fail loudly: it writes
+      width="md" / height="md" onto the svg, which the browser discards, so the
+      icon becomes unsized and stretches to fill its container. Pass a number
+      (20, 32) or a numeric string ("20"). To size an icon from tokens, leave `size`
+      alone and set width/height in CSS from --tree-size-icon-sm | -md | -lg
+      (16px / 20px / 24px) — this is what TLanguageSelect's switcher variant does.
   strokeWidth:
     type: number | string
     default: 2

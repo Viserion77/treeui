@@ -36,6 +36,28 @@ The example dashboards label their `size` control "Density" because that is the 
 - Tokens, variants, sizes, accessibility expectations, and interaction patterns stay framework-agnostic
 - Vue-specific concerns stay inside `@treeui/vue` so future framework packages do not inherit Vue vocabulary
 
+## Locale Data and Flag Assets
+
+**TreeUI ships no language, locale, or country dataset.** `TLanguageSelect` is options-driven like every other choice control: the application owns its language list and every locale side effect.
+
+- The library has no i18n layer. Every string is a hardcoded English default exposed as an overridable prop, so a bundled language list would be the one piece of data in the package pretending to be localized.
+- Library-owned data would have to be duplicated into `@treeui/react` to keep the two packages honest, and per **Portability Boundary** it could never live in `tokens`, `utils`, or `icons` — there is no correct home for it.
+
+**`TFlag` loads flags from a third-party CDN by default.** Bundling ~250 images would dominate the package size for a component most apps never mount.
+
+- `baseUrl` makes self-hosting a configuration change rather than a breaking change. That promotes the path template to public contract: a mirror must serve the same fixed-height segments per `size`, at 1x and 2x.
+- **Flat artwork over normalized ratios.** The CDN also offers ratio-normalized endpoints, but it normalizes the ratio only by switching to the *waving* artwork, which reads as decoration beside flat UI icons. TreeUI takes the fixed-height flat endpoints and accepts the varying widths.
+- A shared *height* is what actually aligns a column of flags — not a shared ratio. The component keeps each flag's true proportions (Nepal is a pennant, Switzerland is square, Qatar is elongated) and CSS places them in a fixed 3:2 box with `object-fit: contain`, so the outliers centre inside the box instead of being cropped or distorted. 3:2 is the most common national flag ratio, so most flags simply fill it.
+- Each step's retina asset is at least twice its box height (`--tree-size-icon-sm/md/lg`), so 2x screens never upscale.
+- The text fallback is not an error state, it is the degraded rendering. When the request is blocked by CSP or the network is gone, the component still resolves to the uppercased code.
+- Flags are an imprecise proxy for languages: Spanish is not Spain, English is not the US. That is why `code` is optional per option rather than derived from the locale value — the application decides which languages get a flag and which one, and options without a `code` render text only.
+
+**`TLanguageSelect` ships two variants because the control's context decides how much it has to explain itself.**
+
+- `field` is a form control. A label already says what the question is, so the flag leads the trigger, the trigger fills its container, and `width` applies.
+- `switcher` is a page-level control for a navbar or app bar, where nothing nearby says what it changes. It earns its translate icon (`TIcon name="languages"`) and its trailing current flag precisely because there is no external label: icon states the purpose, flag states the present value, so the row reads as "page language, now set to this". The trigger sizes to its content, `width` does not apply, and the listbox aligns to the trigger's right edge where a navbar control usually sits.
+- `iconOnly` is a `switcher` affordance only, and it drops the accessible name with the visible one — the consumer must supply `aria-label`. A variant flag that removes text cannot invent the replacement.
+
 ## Shared Interaction Shape
 
 - Form-like components share one value model so the API feels predictable across inputs

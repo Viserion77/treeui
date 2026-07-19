@@ -12,6 +12,13 @@ export default defineConfig({
     dts({
       tsconfigPath: resolveFromPackage('./tsconfig.json'),
       entryRoot: resolveFromPackage('./src'),
+      // The root tsconfig maps @treeui/* to each package's src/ so typecheck
+      // works without building dependencies first. dts would bake those aliases
+      // into the emitted declarations as relative paths (../../../icons/src),
+      // which point outside the published tarball — consumers then silently get
+      // `any` for types like TIconName under skipLibCheck. These are real
+      // dependencies, so keep them as bare specifiers.
+      aliasesExclude: [/^@treeui\//],
     }),
   ],
   build: {

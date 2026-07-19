@@ -33,6 +33,10 @@ decision_guides:
       - use: TTreeView
         when:
           - "The options are hierarchical."
+      - use: TLanguageSelect
+        when:
+          - "The value is the application language or locale."
+          - "Each language should show a country flag beside its name."
 
   - id: multiple-choice
     question: "Choose multiple values"
@@ -338,6 +342,22 @@ component_profiles:
       - component: TAlert
         when: "The layout already has content and only needs a message."
 
+  TFlag:
+    keywords: [flag, country flag, country, nationality, region, iso 3166, alpha-2]
+    use_when:
+      - "You need a country flag rendered from an ISO 3166-1 alpha-2 code."
+      - "Flags stacked in a list must share one height so rows stay aligned — the flat assets keep each flag's true proportions and centre inside a fixed 3:2 box."
+      - "You want a text fallback when the flag asset cannot load."
+    avoid_when:
+      - "The flag would be the only carrier of meaning — always pair it with adjacent text such as the language or country name."
+      - "You need an interface glyph rather than a country flag."
+      - "You are treating the flag as a language identity — a flag names a country, not a language."
+    alternatives:
+      - component: TIcon
+        when: "The graphic is a registered TreeUI icon, not a country flag."
+      - component: TLanguageSelect
+        when: "The flag belongs to a language or locale picker rather than standing alone."
+
   TFormField:
     keywords: [form field, label, hint, validation, wrapper]
     use_when:
@@ -374,6 +394,27 @@ component_profiles:
         when: "The value is numeric."
       - component: TMarkdownEditor
         when: "Rich markdown authoring is needed."
+
+  TLanguageSelect:
+    keywords: [language select, language picker, locale, locale picker, i18n, internationalization, translation, country flag]
+    use_when:
+      - "The user is picking the interface language or locale."
+      - "The control is a labelled form field for the language value — `variant=\"field\"` (the default), where the flag leads the trigger and `width` applies."
+      - "The control is a page-level language switcher in a navbar or app bar, where nothing nearby says what it changes — `variant=\"switcher\"` leads with a translate icon and trails the current flag, sizes to its content, and ignores `width`."
+      - "A navbar switcher should shrink to icon and flag only — `iconOnly` drops the language name, so pass an `aria-label` to name the control."
+      - "Each language should render with its country flag, and optionally an endonym as a second line."
+      - "The app owns the language list and applies the locale side effects itself."
+    avoid_when:
+      - "The values are not languages or locales."
+      - "The language list is long enough that the user must type to narrow it down."
+      - "You expect TreeUI to supply the locale dataset — it ships none, so pass your own `options`."
+    alternatives:
+      - component: TSelect
+        when: "The values are ordinary application data rather than languages or locales."
+      - component: TCombobox
+        when: "The language list is long enough that typing to narrow it down is required."
+      - component: TFlag
+        when: "You only need to render one country flag, without a picker around it."
 
   TLink:
     keywords: [link, anchor, hyperlink, navigation, router link, external link, href, to]

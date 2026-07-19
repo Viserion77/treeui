@@ -54,8 +54,23 @@ events:
 
 slots:
   - name: trigger
-    props: { isOpen: boolean }
-    description: Custom trigger element. Receives current open state.
+    props: { isOpen: boolean, contentId: string }
+    description: >
+      Custom trigger element. Receives the current open state and the id of the
+      content panel, so aria-expanded and aria-controls can be wired by hand.
+    replaces: "the built-in trigger button"
+    you_must_supply:
+      - "A focusable element as the slot root — a native <button type=\"button\"> is the safe default. Focus restore targets the first focusable descendant; with none, focus is lost on close."
+      - "aria-haspopup=\"dialog\", :aria-expanded=\"isOpen\", and :aria-controls=\"isOpen ? contentId : undefined\" on that element."
+      - "The disabled state, if you need one — the `disabled` prop is only bound to the default button."
+    aria_is_not_automatic: >
+      The component does NOT copy aria-haspopup/aria-expanded/aria-controls onto
+      custom trigger content; those attributes exist only on the built-in button.
+      That is what the `isOpen` and `contentId` scoped props are for — bind them
+      yourself or the panel is unannounced.
+    guidance: >
+      Do not add your own @click that also toggles `open`: the anchor already
+      toggles, so a second handler double-toggles and the panel appears not to open.
 
   - name: default
     description: Popover content displayed inside the floating panel.
@@ -63,9 +78,9 @@ slots:
 a11y:
   role: dialog
   attrs:
-    - aria-haspopup="dialog" on trigger
-    - aria-expanded on trigger
-    - aria-controls linking trigger to content
+    - aria-haspopup="dialog" on the built-in trigger (custom triggers must supply it)
+    - aria-expanded on the built-in trigger (custom triggers bind it from `isOpen`)
+    - aria-controls linking trigger to content (custom triggers bind it from `contentId`)
     - tabindex="-1" on content for focus management
   keyboard:
     - Click or Enter/Space on trigger toggles popover
@@ -74,9 +89,29 @@ a11y:
   focus:
     - On open, focuses first focusable element inside content (or content itself)
     - On Escape close, restores focus to trigger
+    - >
+      Focus restore works with a custom trigger too: the ref lives on the
+      `t-popover__anchor` wrapper, not on the built-in button, and focus returns
+      to the first focusable element inside it.
+
   dismiss:
     - Outside click closes popover
     - Escape key closes popover
+
+example_custom_trigger: |
+  <TPopover id="filters-panel">
+    <template #trigger="{ isOpen, contentId }">
+      <TButton
+        variant="ghost"
+        aria-haspopup="dialog"
+        :aria-expanded="isOpen"
+        :aria-controls="isOpen ? contentId : undefined"
+      >
+        Filters
+      </TButton>
+    </template>
+    <FilterForm />
+  </TPopover>
 
 contract: overlay_contract
 composable: useControllableOpen

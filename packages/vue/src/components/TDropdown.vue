@@ -25,6 +25,7 @@ const props = withDefaults(
     size?: TSize;
     label?: string;
     align?: TDropdownAlign;
+    id?: string;
   }>(),
   {
     items: () => [],
@@ -34,6 +35,7 @@ const props = withDefaults(
     size: 'md',
     label: '',
     align: 'start',
+    id: undefined,
   },
 );
 
@@ -44,12 +46,12 @@ const emit = defineEmits<{
 }>();
 
 defineSlots<{
-  trigger(props: { isOpen: boolean }): unknown;
+  trigger(props: { isOpen: boolean; menuId: string }): unknown;
   item(props: { item: TDropdownItem; index: number }): unknown;
 }>();
 
 const attrs = useAttrs();
-const menuId = createId('t-dropdown');
+const menuId = props.id ?? createId('t-dropdown');
 const rootRef = ref<HTMLElement | null>(null);
 const triggerRef = ref<HTMLElement | null>(null);
 const itemRefs = ref<Map<string, HTMLElement>>(new Map());
@@ -238,6 +240,7 @@ onBeforeUnmount(() => {
       <slot
         name="trigger"
         :is-open="isOpen"
+        :menu-id="menuId"
       >
         <button
           v-bind="triggerAttrs"

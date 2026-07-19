@@ -100,6 +100,39 @@ component_setup:
       - "Option search checks `label`, `description`, and `keywords`."
       - "Use `maxVisibleTags` to control trigger density in compact layouts."
 
+  TFlag:
+    required:
+      - "Pass `code` as an ISO 3166-1 alpha-2 country code. Matching is case-insensitive — the value is trimmed and lowercased internally."
+      - "Allow `https://flagcdn.com` in the app `Content-Security-Policy` `img-src` directive, or point `baseUrl` at a self-hosted mirror — flag images are fetched from a third-party CDN at runtime."
+    notes:
+      - "A mirror must serve `{baseUrl}/{segment}/{code}.png` for both steps of every size: 1x `h20` (sm), `h20` (md), `h24` (lg); 2x `h40` (sm), `h40` (md), `h60` (lg). The 2x asset is emitted through `srcset`."
+      - "Those fixed-height segments are part of the contract, and they are the CDN's flat artwork — a mirror must serve flat flags, not the waving ones."
+      - "Do not substitute the CDN's ratio-normalised width-by-height endpoints. They equalise aspect ratio only by switching to the waving artwork, which reads as decoration next to flat UI icons."
+      - "The fixed-height assets keep each flag's true proportions — Nepal is a pennant, Switzerland is square, Qatar is elongated. A shared height, not a shared ratio, is what aligns a column of flags."
+      - "CSS puts the image in a fixed 3:2 box (3:2 being the most common national flag ratio) with `object-fit: contain`, so outliers centre inside the box instead of being cropped or distorted."
+      - "Each retina segment is at least twice its box height — boxes are `--tree-size-icon-sm/md/lg` = 16px/20px/24px — so 2x screens never upscale."
+      - "`baseUrl` may be written with or without a trailing slash; trailing slashes are stripped before the path is built. An unknown `size` falls back to the `md` assets."
+      - "When the image cannot load — offline, blocked by CSP, unknown code — the component renders the uppercased `code` as text. Override that text with `fallbackText`."
+      - "The flag is `aria-hidden` by default. Pass `label` only when the flag carries meaning on its own; beside a visible country or language name it should stay decorative."
+
+  TLanguageSelect:
+    required:
+      - "Pass `options` as `{ label, value, code?, description?, disabled? }[]`. TreeUI ships no language, locale, or country dataset — the app owns its language list."
+      - "Apply locale side effects (i18n locale, `lang` attribute, persistence) in the app layer; the component only reports the selected `value`."
+      - "Pass an `aria-label` whenever `iconOnly` is set — the visible language name is gone, so it is the control's only accessible name. It also labels the listbox."
+    notes:
+      - "`variant` is `field` (default) or `switcher`, typed as `TLanguageSelectVariant` and exported from `@treeui/vue`."
+      - "Use `variant=\"field\"` inside a form, next to other inputs, or wrapped in `TFormField`: the flag leads the trigger, the trigger fills its container, and `width` applies. A visible field label already says what the control changes."
+      - "Use `variant=\"switcher\"` for a page-level control in a navbar or app bar, where nothing nearby labels it. A translate icon (`TIcon name=\"languages\"`) leads and the current flag trails before the chevron, so the control reads as \"page language, now set to this\" without an external label."
+      - "A switcher sizes to its content, so `width` does not apply, and its listbox aligns to the trigger's right edge."
+      - "`iconOnly` is switcher-only and drops the visible language name, leaving the translate icon and the current flag."
+      - "`value` is an opaque application key, typically a BCP-47 tag such as `pt-BR`. TreeUI never parses or validates it."
+      - "`code` is the ISO 3166-1 alpha-2 code used for the option flag. Omit it to render the option without a flag — a language is not a country, so many entries have no honest flag."
+      - "Use `description` for a secondary line such as the endonym."
+      - "Set `flagBaseUrl` once on the select rather than per option; it is forwarded to every nested `TFlag`."
+      - "Bind `modelValue` to a `string`, and use `v-model:open` when the app controls open state."
+      - "The CDN and Content-Security-Policy requirements under `TFlag` apply whenever any option carries a `code`."
+
   TToggleGroup:
     notes:
       - "Use `selectionMode=\"single\"` for segmented single choice."
@@ -187,6 +220,7 @@ app_patterns:
       reason: "Programmatic toast rendering"
   common_compositions:
     - "TFormField + input-like control"
+    - "TFormField + TLanguageSelect"
     - "TGrid + TStat"
     - "TStat + TSparkline"
     - "TCard + TChart"

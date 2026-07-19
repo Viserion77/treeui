@@ -33,14 +33,18 @@ const emit = defineEmits<{
 }>();
 
 defineSlots<{
-  trigger(props: { isOpen: boolean }): unknown;
+  trigger(props: { isOpen: boolean; contentId: string }): unknown;
   default(): unknown;
 }>();
 
 const attrs = useAttrs();
 const contentId = props.id ?? createId('t-popover');
 const rootRef = ref<HTMLElement | null>(null);
-const triggerRef = ref<HTMLButtonElement | null>(null);
+// Bound to the anchor wrapper, not the fallback button: the fallback does not
+// render when a consumer supplies a `trigger` slot, so a ref on it would be
+// null exactly when focus restoration matters most. focusFirst() resolves the
+// real trigger either way. Mirrors TDropdown's trigger-wrapper ref.
+const triggerRef = ref<HTMLElement | null>(null);
 const contentRef = ref<HTMLElement | null>(null);
 
 const triggerAttrs = computed(() => {
@@ -89,7 +93,9 @@ const openPopover = () => {
 const closePopover = (restoreFocus = false) => {
   setValue(false);
   if (restoreFocus) {
-    nextTick(() => triggerRef.value?.focus());
+    nextTick(() => {
+      if (triggerRef.value) focusFirst(triggerRef.value);
+    });
   }
 };
 
@@ -146,6 +152,7 @@ onBeforeUnmount(() => {
     :data-state="isOpen ? 'open' : 'closed'"
   >
     <div
+      ref="triggerRef"
       class="t-popover__anchor"
       @click="togglePopover"
       @keydown="onTriggerKeydown"
@@ -153,9 +160,9 @@ onBeforeUnmount(() => {
       <slot
         name="trigger"
         :is-open="isOpen"
+        :content-id="contentId"
       >
         <button
-          ref="triggerRef"
           type="button"
           class="t-popover__trigger"
           :disabled="disabled"

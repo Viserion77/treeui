@@ -18,6 +18,8 @@ import TTooltip from './TTooltip.vue';
 import TRadio from './TRadio.vue';
 import TRadioGroup from './TRadioGroup.vue';
 import TSelect from './TSelect.vue';
+import TFlag from './TFlag.vue';
+import TLanguageSelect from './TLanguageSelect.vue';
 import TFormField from './TFormField.vue';
 import TSwitch from './TSwitch.vue';
 import TSkeleton from './TSkeleton.vue';
@@ -1996,6 +1998,666 @@ describe('@treeui/vue', () => {
     await wrapper.findAll('[role="option"]')[1].trigger('click');
 
     expect(wrapper.emitted('update:modelValue')?.[0]).toEqual([2026]);
+  });
+
+  // ── Flag ────────────────────────────────────────────────
+
+  it('builds a flag source from the country code and size', () => {
+    const wrapper = mount(TFlag, {
+      props: { code: 'BR' },
+    });
+
+    const img = wrapper.get('img');
+    expect(wrapper.classes()).toContain('t-flag');
+    expect(wrapper.classes()).toContain('t-flag--md');
+    expect(img.attributes('src')).toBe('https://flagcdn.com/h20/br.png');
+    expect(img.attributes('srcset')).toBe('https://flagcdn.com/h40/br.png 2x');
+  });
+
+  it('renders flag sizes from the shared 4:3 asset steps', () => {
+    const sm = mount(TFlag, { props: { code: 'br', size: 'sm' as const } });
+    const lg = mount(TFlag, { props: { code: 'br', size: 'lg' as const } });
+
+    expect(sm.get('img').attributes('src')).toBe('https://flagcdn.com/h20/br.png');
+    expect(lg.get('img').attributes('src')).toBe('https://flagcdn.com/h24/br.png');
+  });
+
+  it('requests flat fixed-height assets rather than ratio-normalised ones', () => {
+    // The CDN only normalises aspect ratio by switching to waving artwork, so a
+    // wxh segment here would silently change the look of every flag.
+    for (const size of ['sm', 'md', 'lg'] as const) {
+      const wrapper = mount(TFlag, { props: { code: 'br', size } });
+
+      expect([size, wrapper.get('img').attributes('src')]).toEqual([
+        size,
+        expect.stringMatching(/\/h\d+\/br\.png$/),
+      ]);
+    }
+  });
+
+  it('serves a retina asset at least twice each box height', () => {
+    // Box heights come from --tree-size-icon-{sm,md,lg}: 16px, 20px, 24px.
+    const boxHeights = { sm: 16, md: 20, lg: 24 } as const;
+
+    for (const size of ['sm', 'md', 'lg'] as const) {
+      const wrapper = mount(TFlag, { props: { code: 'br', size } });
+      const base = Number(wrapper.get('img').attributes('src')!.match(/\/h(\d+)\//)![1]);
+      const retina = Number(wrapper.get('img').attributes('srcset')!.match(/\/h(\d+)\//)![1]);
+
+      expect([size, base >= boxHeights[size], retina >= boxHeights[size] * 2]).toEqual([
+        size,
+        true,
+        true,
+      ]);
+    }
+  });
+
+  it('serves flags from a custom base url', () => {
+    const wrapper = mount(TFlag, {
+      props: { code: 'br', baseUrl: 'https://cdn.example.com/flags' },
+    });
+
+    expect(wrapper.get('img').attributes('src')).toBe(
+      'https://cdn.example.com/flags/h20/br.png',
+    );
+  });
+
+  it('normalises a base url written with a trailing slash', () => {
+    const wrapper = mount(TFlag, {
+      props: { code: 'br', baseUrl: 'https://cdn.example.com/flags/' },
+    });
+
+    expect(wrapper.get('img').attributes('src')).toBe(
+      'https://cdn.example.com/flags/h20/br.png',
+    );
+  });
+
+  it('retries the flag image after the size changes', async () => {
+    // size and baseUrl both feed the resolved src, so both must clear the
+    // failed state — not just code.
+    const wrapper = mount(TFlag, { props: { code: 'zz', size: 'sm' as const } });
+
+    await wrapper.get('img').trigger('error');
+    expect(wrapper.find('img').exists()).toBe(false);
+
+    await wrapper.setProps({ size: 'lg' as const });
+    expect(wrapper.find('img').exists()).toBe(true);
+  });
+
+  it('retries the flag image after the base url changes', async () => {
+    const wrapper = mount(TFlag, { props: { code: 'zz' } });
+
+    await wrapper.get('img').trigger('error');
+    expect(wrapper.find('img').exists()).toBe(false);
+
+    await wrapper.setProps({ baseUrl: 'https://cdn.example.com' });
+    expect(wrapper.find('img').exists()).toBe(true);
+  });
+
+  it('falls back to the medium asset for an unrecognised size', () => {
+    // A JS consumer can pass a size outside the union; it must not throw.
+    const wrapper = mount(TFlag, {
+      props: { code: 'br', size: 'xl' as unknown as 'md' },
+    });
+
+    expect(wrapper.get('img').attributes('src')).toBe('https://flagcdn.com/h20/br.png');
+  });
+
+  it('hides the flag from assistive tech unless it is labelled', () => {
+    const decorative = mount(TFlag, { props: { code: 'br' } });
+    expect(decorative.attributes('aria-hidden')).toBe('true');
+    expect(decorative.attributes('role')).toBeUndefined();
+
+    const labelled = mount(TFlag, { props: { code: 'br', label: 'Brazil' } });
+    expect(labelled.attributes('aria-hidden')).toBeUndefined();
+    expect(labelled.attributes('role')).toBe('img');
+    expect(labelled.attributes('aria-label')).toBe('Brazil');
+  });
+
+  it('falls back to the country code when the flag image fails', async () => {
+    const wrapper = mount(TFlag, { props: { code: 'zz' } });
+
+    await wrapper.get('img').trigger('error');
+
+    expect(wrapper.find('img').exists()).toBe(false);
+    expect(wrapper.get('.t-flag__fallback').text()).toBe('ZZ');
+  });
+
+  it('uses custom fallback text when the flag image fails', async () => {
+    const wrapper = mount(TFlag, {
+      props: { code: 'zz', fallbackText: 'N/A' },
+    });
+
+    await wrapper.get('img').trigger('error');
+
+    expect(wrapper.get('.t-flag__fallback').text()).toBe('N/A');
+  });
+
+  it('retries the flag image after the code changes', async () => {
+    // Regression guard: the failed state must reset when the source changes,
+    // otherwise one bad code strands every later flag on the fallback.
+    const wrapper = mount(TFlag, { props: { code: 'zz' } });
+
+    await wrapper.get('img').trigger('error');
+    expect(wrapper.find('img').exists()).toBe(false);
+
+    await wrapper.setProps({ code: 'br' });
+
+    expect(wrapper.find('.t-flag__fallback').exists()).toBe(false);
+    expect(wrapper.get('img').attributes('src')).toBe('https://flagcdn.com/h20/br.png');
+  });
+
+  // ── LanguageSelect ──────────────────────────────────────
+
+  it('renders language options and emits update:modelValue on click', async () => {
+    const wrapper = mount(TLanguageSelect, {
+      props: {
+        modelValue: '',
+        options: [
+          { label: 'Português (Brasil)', value: 'pt-BR', code: 'br' },
+          { label: 'English', value: 'en-US', code: 'us' },
+        ],
+      },
+      attrs: {
+        'aria-label': 'Language',
+      },
+    });
+
+    expect(wrapper.classes()).toContain('t-language-select');
+    const trigger = wrapper.get('button');
+    expect(trigger.attributes('aria-haspopup')).toBe('listbox');
+    expect(trigger.attributes('aria-label')).toBe('Language');
+
+    await trigger.trigger('click');
+    const options = wrapper.findAll('[role="option"]');
+    expect(options.length).toBe(2);
+
+    await options[1].trigger('click');
+    expect(wrapper.emitted('update:modelValue')?.[0]).toEqual(['en-US']);
+  });
+
+  it('renders a flag only for options that carry a country code', async () => {
+    const wrapper = mount(TLanguageSelect, {
+      props: {
+        modelValue: '',
+        options: [
+          { label: 'Português (Brasil)', value: 'pt-BR', code: 'br' },
+          { label: 'Esperanto', value: 'eo' },
+        ],
+      },
+    });
+
+    await wrapper.get('button').trigger('click');
+    const options = wrapper.findAll('[role="option"]');
+    expect(options[0].find('.t-flag').exists()).toBe(true);
+    expect(options[1].find('.t-flag').exists()).toBe(false);
+  });
+
+  it('renders the selected language flag and label in the trigger', () => {
+    const wrapper = mount(TLanguageSelect, {
+      props: {
+        modelValue: 'pt-BR',
+        options: [
+          { label: 'Português (Brasil)', value: 'pt-BR', code: 'br' },
+          { label: 'English', value: 'en-US', code: 'us' },
+        ],
+      },
+    });
+
+    expect(wrapper.get('.t-language-select__value').text()).toBe('Português (Brasil)');
+    expect(wrapper.get('button').find('.t-flag').exists()).toBe(true);
+  });
+
+  it('forwards flagBaseUrl to every nested flag', async () => {
+    const wrapper = mount(TLanguageSelect, {
+      props: {
+        modelValue: 'pt-BR',
+        options: [{ label: 'Português (Brasil)', value: 'pt-BR', code: 'br' }],
+        flagBaseUrl: 'https://cdn.example.com/flags',
+      },
+    });
+
+    await wrapper.get('button').trigger('click');
+
+    const sources = wrapper.findAll('img').map((img) => img.attributes('src'));
+    expect(sources.length).toBe(2);
+    expect(sources.every((src) => src?.startsWith('https://cdn.example.com/flags/'))).toBe(true);
+  });
+
+  it('renders language option descriptions', async () => {
+    const wrapper = mount(TLanguageSelect, {
+      props: {
+        modelValue: '',
+        options: [
+          { label: 'German', value: 'de', code: 'de', description: 'Deutsch' },
+        ],
+      },
+    });
+
+    await wrapper.get('button').trigger('click');
+    expect(wrapper.get('.t-language-select__description').text()).toBe('Deutsch');
+  });
+
+  it('renders empty text when there are no languages', async () => {
+    const wrapper = mount(TLanguageSelect, {
+      props: { modelValue: '', options: [] },
+    });
+
+    await wrapper.get('button').trigger('click');
+    expect(wrapper.get('.t-language-select__empty').text()).toBe('No languages available.');
+    expect(wrapper.findAll('[role="option"]').length).toBe(0);
+  });
+
+  it('renders language placeholder text when no value selected', () => {
+    const wrapper = mount(TLanguageSelect, {
+      props: {
+        modelValue: '',
+        options: [{ label: 'English', value: 'en-US', code: 'us' }],
+        placeholder: 'Choose a language',
+      },
+    });
+
+    expect(wrapper.get('.t-language-select__value').text()).toBe('Choose a language');
+    expect(wrapper.get('.t-language-select__value').attributes('data-placeholder')).toBeDefined();
+  });
+
+  it('applies disabled, invalid and loading states to language select', () => {
+    const disabled = mount(TLanguageSelect, {
+      props: { modelValue: '', options: [], disabled: true },
+    });
+    const invalid = mount(TLanguageSelect, {
+      props: { modelValue: '', options: [], invalid: true },
+    });
+    const loading = mount(TLanguageSelect, {
+      props: { modelValue: '', options: [], loading: true },
+    });
+
+    expect(disabled.classes()).toContain('is-disabled');
+    expect(disabled.get('button').attributes('disabled')).toBeDefined();
+    expect(invalid.classes()).toContain('is-invalid');
+    expect(invalid.get('button').attributes('aria-invalid')).toBe('true');
+    expect(loading.classes()).toContain('is-loading');
+    expect(loading.get('button').attributes('aria-busy')).toBe('true');
+    // Loading is presentational only — it must never gate interaction.
+    expect(loading.get('button').attributes('disabled')).toBeUndefined();
+  });
+
+  it('renders language select sizes', () => {
+    const sm = mount(TLanguageSelect, {
+      props: { modelValue: '', options: [], size: 'sm' as const },
+    });
+    const lg = mount(TLanguageSelect, {
+      props: { modelValue: '', options: [], size: 'lg' as const },
+    });
+
+    expect(sm.classes()).toContain('t-language-select--sm');
+    expect(lg.classes()).toContain('t-language-select--lg');
+  });
+
+  it('renders disabled language options', async () => {
+    const wrapper = mount(TLanguageSelect, {
+      props: {
+        modelValue: '',
+        options: [
+          { label: 'English', value: 'en-US', code: 'us' },
+          { label: 'Klingon', value: 'tlh', disabled: true },
+        ],
+      },
+    });
+
+    await wrapper.get('button').trigger('click');
+    const options = wrapper.findAll('[role="option"]');
+    expect(options[1].classes()).toContain('is-disabled');
+    expect(options[1].attributes('aria-disabled')).toBe('true');
+  });
+
+  it('shows check icon for the selected language option', async () => {
+    const wrapper = mount(TLanguageSelect, {
+      props: {
+        modelValue: 'pt-BR',
+        options: [
+          { label: 'Português (Brasil)', value: 'pt-BR', code: 'br' },
+          { label: 'English', value: 'en-US', code: 'us' },
+        ],
+      },
+    });
+
+    await wrapper.get('button').trigger('click');
+    const options = wrapper.findAll('[role="option"]');
+    expect(options[0].classes()).toContain('is-selected');
+    expect(options[0].find('.t-language-select__check').exists()).toBe(true);
+    expect(options[1].find('.t-language-select__check').exists()).toBe(false);
+  });
+
+  it('selects a language with the keyboard', async () => {
+    const wrapper = mount(TLanguageSelect, {
+      props: {
+        modelValue: '',
+        options: [
+          { label: 'Português (Brasil)', value: 'pt-BR', code: 'br' },
+          { label: 'English', value: 'en-US', code: 'us' },
+        ],
+      },
+      attachTo: document.body,
+    });
+
+    await wrapper.get('button').trigger('keydown', { key: 'ArrowDown' });
+    await nextTick();
+
+    const options = wrapper.findAll('[role="option"]');
+    expect(document.activeElement).toBe(options[0].element);
+
+    await options[0].trigger('keydown', { key: 'ArrowDown' });
+    await nextTick();
+    expect(document.activeElement).toBe(options[1].element);
+
+    await options[1].trigger('keydown', { key: 'Enter' });
+    expect(wrapper.emitted('update:modelValue')?.[0]).toEqual(['en-US']);
+
+    wrapper.unmount();
+  });
+
+  it('closes the language listbox on escape and restores focus to the trigger', async () => {
+    const wrapper = mount(TLanguageSelect, {
+      props: {
+        modelValue: '',
+        options: [{ label: 'English', value: 'en-US', code: 'us' }],
+      },
+      attachTo: document.body,
+    });
+
+    const trigger = wrapper.get('button');
+    await trigger.trigger('click');
+    await nextTick();
+    expect(wrapper.find('[role="listbox"]').exists()).toBe(true);
+
+    await wrapper.get('[role="option"]').trigger('keydown', { key: 'Escape' });
+    await nextTick();
+
+    expect(wrapper.find('[role="listbox"]').exists()).toBe(false);
+    expect(document.activeElement).toBe(trigger.element);
+
+    wrapper.unmount();
+  });
+
+  it('skips disabled language options when arrowing', async () => {
+    const wrapper = mount(TLanguageSelect, {
+      props: {
+        modelValue: '',
+        options: [
+          { label: 'English', value: 'en-US', code: 'us' },
+          { label: 'Klingon', value: 'tlh', disabled: true },
+          { label: 'German', value: 'de', code: 'de' },
+        ],
+      },
+      attachTo: document.body,
+    });
+
+    await wrapper.get('button').trigger('keydown', { key: 'ArrowDown' });
+    await nextTick();
+
+    const options = wrapper.findAll('[role="option"]');
+    await options[0].trigger('keydown', { key: 'ArrowDown' });
+    await nextTick();
+
+    expect(document.activeElement).toBe(options[2].element);
+
+    wrapper.unmount();
+  });
+
+  it('flips the language listbox above the trigger when it overflows below', async () => {
+    // Trigger near the viewport bottom; rendered listbox overflows past it.
+    const rectSpy = vi
+      .spyOn(HTMLElement.prototype, 'getBoundingClientRect')
+      .mockImplementation(function (this: HTMLElement) {
+        const rect = { x: 0, y: 0, left: 0, right: 200, width: 200, height: 0, top: 0, bottom: 0, toJSON: () => ({}) };
+        if (this.getAttribute('role') === 'listbox') {
+          return { ...rect, top: 746, bottom: 946, height: 200 } as DOMRect;
+        }
+        if (this.tagName === 'BUTTON') {
+          return { ...rect, top: 700, bottom: 738, height: 38 } as DOMRect;
+        }
+        return rect as DOMRect;
+      });
+
+    const wrapper = mount(TLanguageSelect, {
+      props: {
+        modelValue: '',
+        options: [{ label: 'English', value: 'en-US', code: 'us' }],
+      },
+    });
+
+    expect(wrapper.classes()).not.toContain('t-language-select--drop-up');
+    await wrapper.get('button').trigger('click');
+    await nextTick();
+    expect(wrapper.classes()).toContain('t-language-select--drop-up');
+
+    rectSpy.mockRestore();
+  });
+
+  it('forwards its size to every nested flag and defaults the flag origin', async () => {
+    const wrapper = mount(TLanguageSelect, {
+      props: {
+        modelValue: 'pt-BR',
+        options: [{ label: 'Português (Brasil)', value: 'pt-BR', code: 'br' }],
+        size: 'lg' as const,
+      },
+    });
+
+    await wrapper.get('button').trigger('click');
+
+    // No flagBaseUrl given, so TFlag's own default must come through.
+    const sources = wrapper.findAll('img').map((img) => img.attributes('src'));
+    expect(sources).toEqual([
+      'https://flagcdn.com/h24/br.png',
+      'https://flagcdn.com/h24/br.png',
+    ]);
+  });
+
+  it('leads the switcher variant with a translate icon and trails it with the flag', async () => {
+    const wrapper = mount(TLanguageSelect, {
+      props: {
+        modelValue: 'pt-BR',
+        options: [{ label: 'Português (Brasil)', value: 'pt-BR', code: 'br' }],
+        variant: 'switcher' as const,
+      },
+      attrs: { 'aria-label': 'Page language' },
+    });
+
+    expect(wrapper.classes()).toContain('t-language-select--switcher');
+
+    // Order matters: the icon states the purpose, the flag states the value.
+    const trigger = wrapper.get('button');
+    const marks = trigger.findAll('.t-language-select__translate, .t-flag');
+    expect(marks.length).toBe(2);
+    expect(marks[0].classes()).toContain('t-language-select__translate');
+    expect(marks[1].classes()).toContain('t-flag');
+  });
+
+  it('keeps the flag ahead of the label in the default field variant', () => {
+    const wrapper = mount(TLanguageSelect, {
+      props: {
+        modelValue: 'pt-BR',
+        options: [{ label: 'Português (Brasil)', value: 'pt-BR', code: 'br' }],
+      },
+    });
+
+    expect(wrapper.classes()).toContain('t-language-select--field');
+    expect(wrapper.get('button').find('.t-language-select__translate').exists()).toBe(false);
+    expect(wrapper.get('button').find('.t-flag').exists()).toBe(true);
+  });
+
+  it('drops the language name in an icon-only switcher but keeps it labelled', () => {
+    const wrapper = mount(TLanguageSelect, {
+      props: {
+        modelValue: 'pt-BR',
+        options: [{ label: 'Português (Brasil)', value: 'pt-BR', code: 'br' }],
+        variant: 'switcher' as const,
+        iconOnly: true,
+      },
+      attrs: { 'aria-label': 'Page language' },
+    });
+
+    expect(wrapper.classes()).toContain('t-language-select--icon-only');
+    expect(wrapper.find('.t-language-select__value').exists()).toBe(false);
+    // Losing the visible text must not lose the accessible name.
+    expect(wrapper.get('button').attributes('aria-label')).toBe('Page language');
+  });
+
+  it('keeps the language name in an icon-only switcher when the option has no flag', () => {
+    // Without a flag there is nothing left to state the current value, so
+    // iconOnly has to give the name back rather than render a blank trigger.
+    const wrapper = mount(TLanguageSelect, {
+      props: {
+        modelValue: 'eo',
+        options: [{ label: 'Esperanto', value: 'eo' }],
+        variant: 'switcher' as const,
+        iconOnly: true,
+      },
+      attrs: { 'aria-label': 'Page language' },
+    });
+
+    expect(wrapper.get('.t-language-select__value').text()).toBe('Esperanto');
+  });
+
+  it('jumps to the first and last enabled language with Home and End', async () => {
+    const wrapper = mount(TLanguageSelect, {
+      props: {
+        modelValue: '',
+        options: [
+          { label: 'Disabled first', value: 'x', disabled: true },
+          { label: 'English', value: 'en-US', code: 'us' },
+          { label: 'German', value: 'de', code: 'de' },
+          { label: 'Disabled last', value: 'z', disabled: true },
+        ],
+      },
+      attachTo: document.body,
+    });
+
+    await wrapper.get('button').trigger('click');
+    await nextTick();
+    const options = wrapper.findAll('[role="option"]');
+
+    await options[1].trigger('keydown', { key: 'End' });
+    await nextTick();
+    expect(document.activeElement).toBe(options[2].element);
+
+    await options[2].trigger('keydown', { key: 'Home' });
+    await nextTick();
+    expect(document.activeElement).toBe(options[1].element);
+
+    wrapper.unmount();
+  });
+
+  it('renders a custom empty state through the empty slot', async () => {
+    const wrapper = mount(TLanguageSelect, {
+      props: { modelValue: '', options: [] },
+      slots: { empty: '<span class="custom-empty">Nothing here</span>' },
+    });
+
+    await wrapper.get('button').trigger('click');
+    expect(wrapper.get('.custom-empty').text()).toBe('Nothing here');
+  });
+
+  it('renders custom empty text', async () => {
+    const wrapper = mount(TLanguageSelect, {
+      props: { modelValue: '', options: [], emptyText: 'Nenhum idioma.' },
+    });
+
+    await wrapper.get('button').trigger('click');
+    expect(wrapper.get('.t-language-select__empty').text()).toBe('Nenhum idioma.');
+  });
+
+  it('dismisses a listbox that mounted already open on outside click', async () => {
+    // Opening through defaultOpen never routes via the trigger, so the outside
+    // click listener has to be wired from the open state itself.
+    const wrapper = mount(TLanguageSelect, {
+      props: {
+        modelValue: '',
+        options: [{ label: 'English', value: 'en-US', code: 'us' }],
+        defaultOpen: true,
+      },
+      attachTo: document.body,
+    });
+
+    await nextTick();
+    expect(wrapper.find('[role="listbox"]').exists()).toBe(true);
+
+    // jsdom does not implement PointerEvent; the handler only reads event.target.
+    document.body.dispatchEvent(new Event('pointerdown', { bubbles: true }));
+    await nextTick();
+
+    expect(wrapper.find('[role="listbox"]').exists()).toBe(false);
+
+    wrapper.unmount();
+  });
+
+  it('focuses the selected language when opened through the open prop', async () => {
+    const wrapper = mount(TLanguageSelect, {
+      props: {
+        modelValue: 'de',
+        options: [
+          { label: 'English', value: 'en-US', code: 'us' },
+          { label: 'German', value: 'de', code: 'de' },
+        ],
+        open: false,
+      },
+      attachTo: document.body,
+    });
+
+    await wrapper.setProps({ open: true });
+    await nextTick();
+
+    const options = wrapper.findAll('[role="option"]');
+    expect(document.activeElement).toBe(options[1].element);
+
+    wrapper.unmount();
+  });
+
+  it('keeps arrow navigation alive when the option list shrinks while open', async () => {
+    const wrapper = mount(TLanguageSelect, {
+      props: {
+        modelValue: '',
+        options: [
+          { label: 'A', value: 'a' },
+          { label: 'B', value: 'b' },
+          { label: 'C', value: 'c' },
+        ],
+      },
+      attachTo: document.body,
+    });
+
+    await wrapper.get('button').trigger('click');
+    await nextTick();
+    await wrapper.findAll('[role="option"]')[0].trigger('keydown', { key: 'End' });
+    await nextTick();
+
+    await wrapper.setProps({ options: [{ label: 'A', value: 'a' }] });
+    await nextTick();
+
+    // focusedIndex was 2; with one option left it must be clamped so ArrowUp/Down
+    // still has somewhere to walk from.
+    const remaining = wrapper.findAll('[role="option"]');
+    expect(remaining.length).toBe(1);
+    await remaining[0].trigger('keydown', { key: 'ArrowUp' });
+    await nextTick();
+
+    wrapper.unmount();
+  });
+
+  it('renders a custom language option through the option slot', async () => {
+    const wrapper = mount(TLanguageSelect, {
+      props: {
+        modelValue: 'pt-BR',
+        options: [{ label: 'Português (Brasil)', value: 'pt-BR', code: 'br' }],
+      },
+      slots: {
+        option: '<template #option="{ option, selected }"><span class="custom">{{ option.value }}:{{ selected }}</span></template>',
+      },
+    });
+
+    await wrapper.get('button').trigger('click');
+    expect(wrapper.get('.custom').text()).toBe('pt-BR:true');
   });
 
   it('renders form field with label and hint', () => {

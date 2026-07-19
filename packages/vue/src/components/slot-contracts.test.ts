@@ -3,6 +3,7 @@ import { mount } from '@vue/test-utils';
 import { nextTick } from 'vue';
 import TCard from './TCard.vue';
 import TDropdown from './TDropdown.vue';
+import TPopover from './TPopover.vue';
 
 const items = [
   { label: 'Edit', value: 'edit' },
@@ -174,6 +175,111 @@ describe('TDropdown trigger slot contract', () => {
 
     expect(wrapper.find('.t-dropdown__menu').exists()).toBe(false);
     expect(wrapper.emitted('update:open')).toBeUndefined();
+    wrapper.unmount();
+  });
+
+  it('exposes the menu id so a custom trigger can wire aria-controls', async () => {
+    const wrapper = mount(TDropdown, {
+      attachTo: document.body,
+      props: { items, id: 'dropdown-menu' },
+      slots: {
+        trigger: `
+          <button
+            class="custom-trigger"
+            type="button"
+            aria-haspopup="menu"
+            :aria-expanded="isOpen"
+            :aria-controls="isOpen ? menuId : undefined"
+          >Open</button>
+        `,
+      },
+    });
+
+    const trigger = wrapper.find('.custom-trigger');
+    expect(trigger.attributes('aria-expanded')).toBe('false');
+    expect(trigger.attributes('aria-controls')).toBeUndefined();
+
+    await trigger.trigger('click');
+    await nextTick();
+
+    expect(trigger.attributes('aria-expanded')).toBe('true');
+    expect(trigger.attributes('aria-controls')).toBe('dropdown-menu');
+    expect(wrapper.find('.t-dropdown__menu').attributes('id')).toBe('dropdown-menu');
+    wrapper.unmount();
+  });
+});
+
+describe('TPopover trigger slot contract', () => {
+  const mountWithCustomTrigger = () =>
+    mount(TPopover, {
+      attachTo: document.body,
+      slots: {
+        trigger: '<button class="custom-trigger" type="button">Open</button>',
+        default: '<button class="panel-action" type="button">Act</button>',
+      },
+    });
+
+  it('restores focus to the custom trigger on Escape', async () => {
+    const wrapper = mountWithCustomTrigger();
+    const trigger = wrapper.find('.custom-trigger');
+
+    await trigger.trigger('click');
+    await nextTick();
+    expect(wrapper.find('.t-popover__content').exists()).toBe(true);
+
+    await wrapper.find('.t-popover__content').trigger('keydown', { key: 'Escape' });
+    await nextTick();
+
+    expect(wrapper.find('.t-popover__content').exists()).toBe(false);
+    expect(document.activeElement).toBe(trigger.element);
+    wrapper.unmount();
+  });
+
+  it('restores focus to the built-in trigger on Escape', async () => {
+    const wrapper = mount(TPopover, {
+      attachTo: document.body,
+      slots: { default: '<button class="panel-action" type="button">Act</button>' },
+    });
+
+    const trigger = wrapper.find('.t-popover__trigger');
+    await trigger.trigger('click');
+    await nextTick();
+
+    await wrapper.find('.t-popover__content').trigger('keydown', { key: 'Escape' });
+    await nextTick();
+
+    expect(document.activeElement).toBe(trigger.element);
+    wrapper.unmount();
+  });
+
+  it('exposes the content id so a custom trigger can wire aria-controls', async () => {
+    const wrapper = mount(TPopover, {
+      attachTo: document.body,
+      props: { id: 'popover-panel' },
+      slots: {
+        trigger: `
+          <button
+            class="custom-trigger"
+            type="button"
+            aria-haspopup="dialog"
+            :aria-expanded="isOpen"
+            :aria-controls="isOpen ? contentId : undefined"
+          >Open</button>
+        `,
+        default: 'Panel',
+      },
+    });
+
+    const trigger = wrapper.find('.custom-trigger');
+    expect(trigger.attributes('aria-expanded')).toBe('false');
+    expect(trigger.attributes('aria-controls')).toBeUndefined();
+
+    await trigger.trigger('click');
+    await nextTick();
+
+    expect(trigger.attributes('aria-expanded')).toBe('true');
+    expect(trigger.attributes('aria-controls')).toBe('popover-panel');
+    expect(wrapper.find('.t-popover__content').attributes('id')).toBe('popover-panel');
     wrapper.unmount();
   });
 });

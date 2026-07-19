@@ -31,8 +31,8 @@ const preview: Preview = {
           'Components',
           [
             'Actions', ['Button'],
-            'Data Entry', ['Checkbox', 'DatePicker', 'FormField', 'Input', 'Radio', 'Select', 'Switch', 'Textarea'],
-            'Data Display', ['Accordion', 'Avatar', 'Badge', 'Card', 'Table', 'Tag'],
+            'Data Entry', ['Checkbox', 'DatePicker', 'FormField', 'Input', 'LanguageSelect', 'Radio', 'Select', 'Switch', 'Textarea'],
+            'Data Display', ['Accordion', 'Avatar', 'Badge', 'Card', 'Flag', 'Table', 'Tag'],
             'Feedback', ['Alert', 'Progress', 'Skeleton', 'Spinner', 'Toast'],
             'Navigation', ['Breadcrumb', 'Pagination', 'Tabs'],
             'Overlay', ['ContextMenu', 'Drawer', 'Dropdown', 'Modal', 'Popover', 'Tooltip'],

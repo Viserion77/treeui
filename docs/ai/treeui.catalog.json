@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-19T00:14:17.067Z",
+  "generatedAt": "2026-07-19T14:12:00.767Z",
   "packageName": "@treeui/vue",
   "packageVersion": "0.16.0",
   "decisionGuides": [
@@ -50,6 +50,14 @@
           "use": "TTreeView",
           "when": [
             "The options are hierarchical."
+          ],
+          "notes": []
+        },
+        {
+          "use": "TLanguageSelect",
+          "when": [
+            "The value is the application language or locale.",
+            "Each language should show a country flag beside its name."
           ],
           "notes": []
         }
@@ -537,6 +545,24 @@
       "notes": [
         "Use `selectionMode=\"multiple\"` when permissions or tag assignment spans nested nodes."
       ]
+    },
+    {
+      "id": "language-switcher",
+      "name": "Application language switcher",
+      "useWhen": [
+        "The app lets the user pick a language or locale, with an optional flag per option."
+      ],
+      "compose": [
+        "TFormField",
+        "TLanguageSelect"
+      ],
+      "notes": [
+        "The app owns the language list: TreeUI ships no locale dataset, so pass `options` with your own `label`, `value`, and optional `code` and `description`.",
+        "`TLanguageSelect` only emits the chosen `value` through `update:modelValue`; the app performs every locale side effect (i18n locale, persistence, `document.documentElement.lang`, route or API updates).",
+        "Set `code` only where a flag is meaningful — a language is not a country — and omit it to render that option without a flag.",
+        "Set `flagBaseUrl` once, at the switcher, when flag assets are self-hosted; it is forwarded to every nested `TFlag`.",
+        "Wrap with `TFormField` when the switcher sits in a form and needs a label, hint, or error text; drop the wrapper for a bare toolbar or header control."
+      ]
     }
   ],
   "setup": {
@@ -609,6 +635,43 @@
           "Pass `modelValue` as `string[]`.",
           "Option search checks `label`, `description`, and `keywords`.",
           "Use `maxVisibleTags` to control trigger density in compact layouts."
+        ]
+      },
+      "TFlag": {
+        "required": [
+          "Pass `code` as an ISO 3166-1 alpha-2 country code. Matching is case-insensitive — the value is trimmed and lowercased internally.",
+          "Allow `https://flagcdn.com` in the app `Content-Security-Policy` `img-src` directive, or point `baseUrl` at a self-hosted mirror — flag images are fetched from a third-party CDN at runtime."
+        ],
+        "notes": [
+          "A mirror must serve `{baseUrl}/{segment}/{code}.png` for both steps of every size: 1x `h20` (sm), `h20` (md), `h24` (lg); 2x `h40` (sm), `h40` (md), `h60` (lg). The 2x asset is emitted through `srcset`.",
+          "Those fixed-height segments are part of the contract, and they are the CDN's flat artwork — a mirror must serve flat flags, not the waving ones.",
+          "Do not substitute the CDN's ratio-normalised width-by-height endpoints. They equalise aspect ratio only by switching to the waving artwork, which reads as decoration next to flat UI icons.",
+          "The fixed-height assets keep each flag's true proportions — Nepal is a pennant, Switzerland is square, Qatar is elongated. A shared height, not a shared ratio, is what aligns a column of flags.",
+          "CSS puts the image in a fixed 3:2 box (3:2 being the most common national flag ratio) with `object-fit: contain`, so outliers centre inside the box instead of being cropped or distorted.",
+          "Each retina segment is at least twice its box height — boxes are `--tree-size-icon-sm/md/lg` = 16px/20px/24px — so 2x screens never upscale.",
+          "`baseUrl` may be written with or without a trailing slash; trailing slashes are stripped before the path is built. An unknown `size` falls back to the `md` assets.",
+          "When the image cannot load — offline, blocked by CSP, unknown code — the component renders the uppercased `code` as text. Override that text with `fallbackText`.",
+          "The flag is `aria-hidden` by default. Pass `label` only when the flag carries meaning on its own; beside a visible country or language name it should stay decorative."
+        ]
+      },
+      "TLanguageSelect": {
+        "required": [
+          "Pass `options` as `{ label, value, code?, description?, disabled? }[]`. TreeUI ships no language, locale, or country dataset — the app owns its language list.",
+          "Apply locale side effects (i18n locale, `lang` attribute, persistence) in the app layer; the component only reports the selected `value`.",
+          "Pass an `aria-label` whenever `iconOnly` is set — the visible language name is gone, so it is the control's only accessible name. It also labels the listbox."
+        ],
+        "notes": [
+          "`variant` is `field` (default) or `switcher`, typed as `TLanguageSelectVariant` and exported from `@treeui/vue`.",
+          "Use `variant=\"field\"` inside a form, next to other inputs, or wrapped in `TFormField`: the flag leads the trigger, the trigger fills its container, and `width` applies. A visible field label already says what the control changes.",
+          "Use `variant=\"switcher\"` for a page-level control in a navbar or app bar, where nothing nearby labels it. A translate icon (`TIcon name=\"languages\"`) leads and the current flag trails before the chevron, so the control reads as \"page language, now set to this\" without an external label.",
+          "A switcher sizes to its content, so `width` does not apply, and its listbox aligns to the trigger's right edge.",
+          "`iconOnly` is switcher-only and drops the visible language name, leaving the translate icon and the current flag.",
+          "`value` is an opaque application key, typically a BCP-47 tag such as `pt-BR`. TreeUI never parses or validates it.",
+          "`code` is the ISO 3166-1 alpha-2 code used for the option flag. Omit it to render the option without a flag — a language is not a country, so many entries have no honest flag.",
+          "Use `description` for a secondary line such as the endonym.",
+          "Set `flagBaseUrl` once on the select rather than per option; it is forwarded to every nested `TFlag`.",
+          "Bind `modelValue` to a `string`, and use `v-model:open` when the app controls open state.",
+          "The CDN and Content-Security-Policy requirements under `TFlag` apply whenever any option carries a `code`."
         ]
       },
       "TToggleGroup": {
@@ -732,6 +795,7 @@
       ],
       "commonCompositions": [
         "TFormField + input-like control",
+        "TFormField + TLanguageSelect",
         "TGrid + TStat",
         "TStat + TSparkline",
         "TCard + TChart",
@@ -3150,6 +3214,12 @@
             "end"
           ],
           "note": "Horizontal alignment of the menu relative to the trigger. Use `end` when the trigger sits near the right edge of a clipping container (e.g. a table actions column)."
+        },
+        {
+          "name": "id",
+          "type": "string",
+          "default": "undefined",
+          "note": "Custom id for the menu element. Auto-generated when omitted; also exposed to the `trigger` slot as `menuId` so a custom trigger can wire aria-controls."
         }
       ],
       "events": [
@@ -3176,6 +3246,7 @@
         "trigger_aria_haspopup: menu",
         "trigger_aria_expanded: true",
         "trigger_aria_controls: menu id, while open",
+        "custom_trigger_caveat: The three trigger_aria_* guarantees above describe the BUILT-IN trigger button only. A custom `trigger` slot replaces that button, so the consumer must bind them from the `isOpen` and `menuId` scoped props — see slots.trigger.",
         "aria_disabled_on_disabled_items: true",
         "focus_visible_on_trigger: true",
         "keyboard_arrow_navigation: true",
@@ -3564,6 +3635,123 @@
       "recipes": []
     },
     {
+      "name": "TFlag",
+      "aliases": [],
+      "package": "@treeui/vue",
+      "kind": "display",
+      "category": "Data Display",
+      "status": "available",
+      "purpose": "Render a flat country flag image from a CDN at a fixed height, centred in a 3:2 box, with a text fallback when the request fails.",
+      "sourceFile": "packages/vue/src/components/TFlag.vue",
+      "storyFile": "apps/docs/src/stories/Flag.stories.ts",
+      "storyTitle": "Components/Data Display/Flag",
+      "manifestFile": "docs/ai/COMPONENTS/flag.yaml",
+      "props": [
+        {
+          "name": "code",
+          "type": "string",
+          "required": true,
+          "description": "ISO 3166-1 alpha-2 country code. Case-insensitive — trimmed and lowercased before the URL is built."
+        },
+        {
+          "name": "baseUrl",
+          "type": "string",
+          "default": "https://flagcdn.com",
+          "description": "Origin serving the flag assets. The component appends a fixed path built from the CDN's fixed-height segments, so a self-hosted mirror must reproduce it exactly: 1x is `${baseUrl}/h20/{code}.png` (sm), `${baseUrl}/h20/{code}.png` (md), `${baseUrl}/h24/{code}.png` (lg); the matching 2x asset is emitted via srcset as `${baseUrl}/h40/{code}.png` (sm), `${baseUrl}/h40/{code}.png` (md), `${baseUrl}/h60/{code}.png` (lg). A trailing slash is stripped, so `https://cdn.example.com/flags/` and `https://cdn.example.com/flags` behave identically."
+        },
+        {
+          "name": "size",
+          "type": "TSize",
+          "default": "md",
+          "values": [
+            "sm",
+            "md",
+            "lg"
+          ]
+        },
+        {
+          "name": "label",
+          "type": "string",
+          "default": "undefined",
+          "description": "Accessible label. When set, the flag becomes role=\"img\" with aria-label; otherwise it is aria-hidden."
+        },
+        {
+          "name": "fallbackText",
+          "type": "string",
+          "default": "undefined",
+          "description": "Text shown when the image cannot load. Defaults to the uppercased `code`."
+        }
+      ],
+      "events": [],
+      "slots": [],
+      "a11y": [
+        "decorative_by_default: true",
+        "becomes_image_when_labeled: true",
+        "rule: Provide `label` only when the flag carries meaning that is not already in adjacent text — inside a language option the label is redundant."
+      ],
+      "behavior": [
+        "falls_back_to_text_when_image_fails: true",
+        "failed_state_resets_when_resolved_src_changes: true",
+        "code_is_trimmed_and_lowercased: true",
+        "fixed_height_endpoints_serve_flat_artwork_at_true_proportions: The CDN's ratio-normalised (width-by-height) endpoints do force every flag into one box, but only by serving the WAVING artwork, which reads as decoration next to flat UI icons. The fixed-height endpoints used here (h20, h24, h40, h60) serve the flat artwork at each flag's true proportions instead: Nepal stays a pennant, Switzerland stays square, Qatar stays elongated.",
+        "shared_height_not_shared_ratio_is_what_aligns_a_column: Within a size step every flag is requested at the same asset height, so a stacked list lines up even though the widths differ. CSS then places each flag in a fixed 3:2 box (3:2 being the most common national flag ratio) with `object-fit: contain`, so the majority fill the box and the outliers centre inside it rather than being cropped or distorted.",
+        "retina_asset_is_at_least_twice_the_box_height: Box heights come from `--tree-size-icon-sm/md/lg` (16px / 20px / 24px) and the srcset asset is h40 (sm, md) or h60 (lg), so a 2x screen never upscales.",
+        "size_outside_the_union_falls_back_to_md: A JS consumer can pass a size outside `TSize`; the asset lookup falls back to the md pair rather than throwing on an undefined entry.",
+        "base_url_trailing_slash_is_normalised: Trailing slashes are stripped from `baseUrl` before the path is appended, so a self-hosted mirror cannot silently produce a double-slashed URL.",
+        "path_template_is_public_contract: Changing `baseUrl` is a config change, not a breaking one, as long as the mirror serves the same fixed-height segments (h20, h24, h40, h60).",
+        "no_country_or_locale_dataset_is_shipped: TreeUI never maps a language or locale to a country code — the application owns that decision."
+      ],
+      "selection": {
+        "keywords": [
+          "flag",
+          "country flag",
+          "country",
+          "nationality",
+          "region",
+          "iso 3166",
+          "alpha-2"
+        ],
+        "useWhen": [
+          "You need a country flag rendered from an ISO 3166-1 alpha-2 code.",
+          "Flags stacked in a list must share one height so rows stay aligned — the flat assets keep each flag's true proportions and centre inside a fixed 3:2 box.",
+          "You want a text fallback when the flag asset cannot load."
+        ],
+        "avoidWhen": [
+          "The flag would be the only carrier of meaning — always pair it with adjacent text such as the language or country name.",
+          "You need an interface glyph rather than a country flag.",
+          "You are treating the flag as a language identity — a flag names a country, not a language."
+        ],
+        "alternatives": [
+          {
+            "component": "TIcon",
+            "when": "The graphic is a registered TreeUI icon, not a country flag."
+          },
+          {
+            "component": "TLanguageSelect",
+            "when": "The flag belongs to a language or locale picker rather than standing alone."
+          }
+        ]
+      },
+      "setup": {
+        "required": [
+          "Pass `code` as an ISO 3166-1 alpha-2 country code. Matching is case-insensitive — the value is trimmed and lowercased internally.",
+          "Allow `https://flagcdn.com` in the app `Content-Security-Policy` `img-src` directive, or point `baseUrl` at a self-hosted mirror — flag images are fetched from a third-party CDN at runtime."
+        ],
+        "notes": [
+          "A mirror must serve `{baseUrl}/{segment}/{code}.png` for both steps of every size: 1x `h20` (sm), `h20` (md), `h24` (lg); 2x `h40` (sm), `h40` (md), `h60` (lg). The 2x asset is emitted through `srcset`.",
+          "Those fixed-height segments are part of the contract, and they are the CDN's flat artwork — a mirror must serve flat flags, not the waving ones.",
+          "Do not substitute the CDN's ratio-normalised width-by-height endpoints. They equalise aspect ratio only by switching to the waving artwork, which reads as decoration next to flat UI icons.",
+          "The fixed-height assets keep each flag's true proportions — Nepal is a pennant, Switzerland is square, Qatar is elongated. A shared height, not a shared ratio, is what aligns a column of flags.",
+          "CSS puts the image in a fixed 3:2 box (3:2 being the most common national flag ratio) with `object-fit: contain`, so outliers centre inside the box instead of being cropped or distorted.",
+          "Each retina segment is at least twice its box height — boxes are `--tree-size-icon-sm/md/lg` = 16px/20px/24px — so 2x screens never upscale.",
+          "`baseUrl` may be written with or without a trailing slash; trailing slashes are stripped before the path is built. An unknown `size` falls back to the `md` assets.",
+          "When the image cannot load — offline, blocked by CSP, unknown code — the component renders the uppercased `code` as text. Override that text with `fallbackText`.",
+          "The flag is `aria-hidden` by default. Pass `label` only when the flag carries meaning on its own; beside a visible country or language name it should stay decorative."
+        ]
+      },
+      "recipes": []
+    },
+    {
       "name": "TFormField",
       "aliases": [],
       "package": "@treeui/vue",
@@ -3690,7 +3878,8 @@
         "date-range-form",
         "color-field",
         "tag-input",
-        "hierarchy-picker"
+        "hierarchy-picker",
+        "language-switcher"
       ]
     },
     {
@@ -3819,6 +4008,7 @@
             "chevron-down",
             "chevron-right",
             "info",
+            "languages",
             "loader-circle",
             "search",
             "x"
@@ -3829,7 +4019,8 @@
           "name": "size",
           "type": "number | string",
           "default": "20",
-          "description": "Pixel size for both width and height of the rendered svg."
+          "description": "Pixel size for both width and height of the rendered svg.",
+          "note": "This is a PIXEL COUNT, not the sm | md | lg token scale used by nearly every\nother TreeUI component. `<TIcon size=\"md\" />` does not fail loudly: it writes\nwidth=\"md\" / height=\"md\" onto the svg, which the browser discards, so the\nicon becomes unsized and stretches to fill its container. Pass a number\n(20, 32) or a numeric string (\"20\"). To size an icon from tokens, leave `size`\nalone and set width/height in CSS from --tree-size-icon-sm | -md | -lg\n(16px / 20px / 24px) — this is what TLanguageSelect's switcher variant does.\n"
         },
         {
           "name": "strokeWidth",
@@ -4046,6 +4237,241 @@
         "notes": []
       },
       "recipes": []
+    },
+    {
+      "name": "TLanguageSelect",
+      "aliases": [],
+      "package": "@treeui/vue",
+      "kind": "form_overlay",
+      "category": "Data Entry",
+      "status": "available",
+      "purpose": "Language/locale picker with a listbox, a flag per option, and the shared overlay contract; controlled and uncontrolled via v-model and open/defaultOpen.",
+      "sourceFile": "packages/vue/src/components/TLanguageSelect.vue",
+      "storyFile": "apps/docs/src/stories/LanguageSelect.stories.ts",
+      "storyTitle": "Components/Data Entry/LanguageSelect",
+      "manifestFile": "docs/ai/COMPONENTS/language-select.yaml",
+      "props": [
+        {
+          "name": "modelValue",
+          "type": "string",
+          "default": ""
+        },
+        {
+          "name": "options",
+          "type": "TLanguageOption[]",
+          "default": "[]",
+          "note": "Array of { label: string; value: string; code?: string; description?: string; disabled?: boolean }. `value` is an opaque application key (typically a BCP-47 tag) — never parsed or validated. `code` is an ISO 3166-1 alpha-2 country code for the flag; omit it to render the option without one. `description` is a secondary line, e.g. the endonym."
+        },
+        {
+          "name": "open",
+          "type": "boolean",
+          "default": "undefined"
+        },
+        {
+          "name": "defaultOpen",
+          "type": "boolean",
+          "default": "false"
+        },
+        {
+          "name": "size",
+          "type": "TSize",
+          "default": "md",
+          "values": [
+            "sm",
+            "md",
+            "lg"
+          ]
+        },
+        {
+          "name": "variant",
+          "type": "TLanguageSelectVariant",
+          "default": "field",
+          "values": [
+            "field",
+            "switcher"
+          ],
+          "note": "`field` is a form control, sized and laid out like any other input. `switcher` is a page-level control for a navbar/appbar where nothing nearby labels it: it leads with a translate icon, trails the current flag, and sizes to its content."
+        },
+        {
+          "name": "iconOnly",
+          "type": "boolean",
+          "default": "false",
+          "note": "`switcher` only — ignored by `field`. Drops the visible language name, leaving the translate icon, the current flag, and the chevron. The trigger then has no text, so the consumer MUST pass an `aria-label`."
+        },
+        {
+          "name": "width",
+          "type": "TFieldWidth",
+          "default": "full",
+          "values": [
+            "xs",
+            "sm",
+            "md",
+            "lg",
+            "xl",
+            "full"
+          ],
+          "note": "Inline-size cap (max-inline-size). Fluid by default; use instead of an inline width style. Applies to `variant: field` only — a `switcher` sizes to its content and ignores it."
+        },
+        {
+          "name": "disabled",
+          "type": "boolean",
+          "default": "false"
+        },
+        {
+          "name": "loading",
+          "type": "boolean",
+          "default": "false"
+        },
+        {
+          "name": "invalid",
+          "type": "boolean",
+          "default": "false"
+        },
+        {
+          "name": "placeholder",
+          "type": "string",
+          "default": ""
+        },
+        {
+          "name": "flagBaseUrl",
+          "type": "string",
+          "default": "undefined",
+          "note": "Forwarded to every nested TFlag. When omitted, TFlag's own default origin applies. Set once here to self-host flag assets."
+        },
+        {
+          "name": "emptyText",
+          "type": "string",
+          "default": "No languages available."
+        }
+      ],
+      "events": [
+        {
+          "name": "update:modelValue"
+        },
+        {
+          "name": "update:open"
+        },
+        {
+          "name": "open-change"
+        }
+      ],
+      "slots": [
+        {
+          "name": "prefix",
+          "description": "Leading content inside the trigger, before everything else — the selected flag and label in `field`, the translate icon in `switcher`."
+        },
+        {
+          "name": "option",
+          "description": "Replaces the default option body (flag, label, description). Renders INSIDE the row's <li role=\"option\">, so it must contain only presentational content.\n"
+        },
+        {
+          "name": "empty",
+          "description": "Replaces `emptyText` when `options` is empty."
+        }
+      ],
+      "a11y": [
+        "role: listbox",
+        "trigger_aria_haspopup: listbox",
+        "trigger_aria_expanded: true",
+        "trigger_aria_controls_when_open: true",
+        "aria_invalid_when_invalid: true",
+        "aria_busy_when_loading: true",
+        "aria_selected_on_options: true",
+        "aria_disabled_on_disabled_options: true",
+        "focus_visible_on_trigger: true",
+        "keyboard_arrow_navigation: true",
+        "escape_closes_dropdown: true",
+        "enter_space_selects_option: true",
+        "home_end_navigation: true",
+        "home_end_target_first_last_enabled_option: true",
+        "focus_restores_to_trigger_on_close: true",
+        "icon_only_removes_the_visible_language_name: true",
+        "icon_only_requires_a_consumer_supplied_aria_label_on_the_trigger: true",
+        "translate_icon_and_flags_are_decorative_not_the_accessible_name: true"
+      ],
+      "behavior": [
+        "update_payload_type: string",
+        "loading_does_not_disable_by_itself: true",
+        "placeholder_shown_as_muted_text: true",
+        "chevron_rotates_when_open: true",
+        "check_icon_on_selected_option: true",
+        "outside_click_closes_dropdown: true",
+        "listbox_flips_above_trigger_when_space_below_is_insufficient: true",
+        "options_without_a_code_render_without_a_flag: true",
+        "empty_options_render_the_empty_slot_or_empty_text: true",
+        "field_variant_leads_the_trigger_with_the_selected_flag: true",
+        "field_variant_trigger_fills_its_container: true",
+        "switcher_variant_leads_the_trigger_with_a_translate_icon: true",
+        "switcher_variant_trails_the_current_flag_before_the_chevron: true",
+        "switcher_variant_trigger_sizes_to_its_content: true",
+        "switcher_variant_ignores_the_width_prop: true",
+        "switcher_listbox_aligns_to_the_trigger_right_edge: true",
+        "switcher_listbox_may_be_wider_than_the_trigger: true",
+        "icon_only_applies_to_the_switcher_variant_only: true",
+        "root_classes: t-language-select--field | t-language-select--switcher, plus t-language-select--icon-only"
+      ],
+      "selection": {
+        "keywords": [
+          "language select",
+          "language picker",
+          "locale",
+          "locale picker",
+          "i18n",
+          "internationalization",
+          "translation",
+          "country flag"
+        ],
+        "useWhen": [
+          "The user is picking the interface language or locale.",
+          "The control is a labelled form field for the language value — `variant=\"field\"` (the default), where the flag leads the trigger and `width` applies.",
+          "The control is a page-level language switcher in a navbar or app bar, where nothing nearby says what it changes — `variant=\"switcher\"` leads with a translate icon and trails the current flag, sizes to its content, and ignores `width`.",
+          "A navbar switcher should shrink to icon and flag only — `iconOnly` drops the language name, so pass an `aria-label` to name the control.",
+          "Each language should render with its country flag, and optionally an endonym as a second line.",
+          "The app owns the language list and applies the locale side effects itself."
+        ],
+        "avoidWhen": [
+          "The values are not languages or locales.",
+          "The language list is long enough that the user must type to narrow it down.",
+          "You expect TreeUI to supply the locale dataset — it ships none, so pass your own `options`."
+        ],
+        "alternatives": [
+          {
+            "component": "TSelect",
+            "when": "The values are ordinary application data rather than languages or locales."
+          },
+          {
+            "component": "TCombobox",
+            "when": "The language list is long enough that typing to narrow it down is required."
+          },
+          {
+            "component": "TFlag",
+            "when": "You only need to render one country flag, without a picker around it."
+          }
+        ]
+      },
+      "setup": {
+        "required": [
+          "Pass `options` as `{ label, value, code?, description?, disabled? }[]`. TreeUI ships no language, locale, or country dataset — the app owns its language list.",
+          "Apply locale side effects (i18n locale, `lang` attribute, persistence) in the app layer; the component only reports the selected `value`.",
+          "Pass an `aria-label` whenever `iconOnly` is set — the visible language name is gone, so it is the control's only accessible name. It also labels the listbox."
+        ],
+        "notes": [
+          "`variant` is `field` (default) or `switcher`, typed as `TLanguageSelectVariant` and exported from `@treeui/vue`.",
+          "Use `variant=\"field\"` inside a form, next to other inputs, or wrapped in `TFormField`: the flag leads the trigger, the trigger fills its container, and `width` applies. A visible field label already says what the control changes.",
+          "Use `variant=\"switcher\"` for a page-level control in a navbar or app bar, where nothing nearby labels it. A translate icon (`TIcon name=\"languages\"`) leads and the current flag trails before the chevron, so the control reads as \"page language, now set to this\" without an external label.",
+          "A switcher sizes to its content, so `width` does not apply, and its listbox aligns to the trigger's right edge.",
+          "`iconOnly` is switcher-only and drops the visible language name, leaving the translate icon and the current flag.",
+          "`value` is an opaque application key, typically a BCP-47 tag such as `pt-BR`. TreeUI never parses or validates it.",
+          "`code` is the ISO 3166-1 alpha-2 code used for the option flag. Omit it to render the option without a flag — a language is not a country, so many entries have no honest flag.",
+          "Use `description` for a secondary line such as the endonym.",
+          "Set `flagBaseUrl` once on the select rather than per option; it is forwarded to every nested `TFlag`.",
+          "Bind `modelValue` to a `string`, and use `v-model:open` when the app controls open state.",
+          "The CDN and Content-Security-Policy requirements under `TFlag` apply whenever any option carries a `code`."
+        ]
+      },
+      "recipes": [
+        "language-switcher"
+      ]
     },
     {
       "name": "TLink",
@@ -5246,7 +5672,7 @@
       "slots": [
         {
           "name": "trigger",
-          "description": "Custom trigger element. Receives current open state."
+          "description": "Custom trigger element. Receives the current open state and the id of the content panel, so aria-expanded and aria-controls can be wired by hand.\n"
         },
         {
           "name": "default",
@@ -5255,9 +5681,9 @@
       ],
       "a11y": [
         "role: dialog",
-        "attrs: [\"aria-haspopup=\\\"dialog\\\" on trigger\",\"aria-expanded on trigger\",\"aria-controls linking trigger to content\",\"tabindex=\\\"-1\\\" on content for focus management\"]",
+        "attrs: [\"aria-haspopup=\\\"dialog\\\" on the built-in trigger (custom triggers must supply it)\",\"aria-expanded on the built-in trigger (custom triggers bind it from `isOpen`)\",\"aria-controls linking trigger to content (custom triggers bind it from `contentId`)\",\"tabindex=\\\"-1\\\" on content for focus management\"]",
         "keyboard: [\"Click or Enter/Space on trigger toggles popover\",\"Escape closes popover and restores focus to trigger\",\"Tab navigates within popover content\"]",
-        "focus: [\"On open, focuses first focusable element inside content (or content itself)\",\"On Escape close, restores focus to trigger\"]",
+        "focus: [\"On open, focuses first focusable element inside content (or content itself)\",\"On Escape close, restores focus to trigger\",\"Focus restore works with a custom trigger too: the ref lives on the `t-popover__anchor` wrapper, not on the built-in button, and focus returns to the first focusable element inside it.\\n\"]",
         "dismiss: [\"Outside click closes popover\",\"Escape key closes popover\"]"
       ],
       "behavior": [],

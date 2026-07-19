@@ -1745,6 +1745,111 @@ components:
       DOC-03: { status: PENDING }
       DOC-04: { status: PENDING }
 
+  # ─────────────────────────────────────────────────────
+  # FLAG
+  # ─────────────────────────────────────────────────────
+  flag:
+    display-name: TFlag
+    category: data-display
+    screenshots:
+      - components-data-display-flag--playground.png
+      - components-data-display-flag--sizes.png
+      - components-data-display-flag--aspect-ratio.png
+      - components-data-display-flag--labelled.png
+      - components-data-display-flag--fallback.png
+      - components-data-display-flag--self-hosted.png
+    criteria:
+      NAM-01: { status: PENDING }
+      NAM-02: { status: PENDING }
+      NAM-03: { status: PENDING }
+      NAM-04: { status: PENDING }
+      NAM-05: { status: PENDING }
+      STR-01: { status: PENDING }
+      STR-02: { status: PENDING }
+      STR-03: { status: PENDING }
+      STR-04: { status: PENDING }
+      STR-05: { status: PENDING }
+      CSS-01: { status: PENDING }
+      CSS-02: { status: PENDING }
+      CSS-03: { status: PENDING }
+      CSS-04: { status: PENDING }
+      CSS-05: { status: PENDING }
+      CSS-06: { status: PENDING }
+      CSS-07: { status: PENDING }
+      STA-01: { status: PENDING }
+      STA-02: { status: PENDING }
+      STA-03: { status: PENDING }
+      STA-04: { status: PENDING }
+      STA-05: { status: PENDING }
+      STA-06: { status: PENDING }
+      A11Y-01: { status: PENDING }
+      A11Y-02: { status: PENDING }
+      A11Y-03: { status: PENDING }
+      A11Y-04: { status: PENDING }
+      A11Y-05: { status: PENDING }
+      A11Y-06: { status: PENDING }
+      A11Y-07: { status: PENDING }
+      A11Y-08: { status: PENDING }
+      A11Y-09: { status: PENDING }
+      A11Y-10: { status: PENDING }
+      DOC-01: { status: PENDING }
+      DOC-02: { status: PENDING }
+      DOC-03: { status: PENDING }
+      DOC-04: { status: PENDING }
+
+  # ─────────────────────────────────────────────────────
+  # LANGUAGE SELECT
+  # ─────────────────────────────────────────────────────
+  language-select:
+    display-name: TLanguageSelect
+    category: data-entry
+    screenshots:
+      - components-data-entry-languageselect--playground.png
+      - components-data-entry-languageselect--states.png
+      - components-data-entry-languageselect--sizes.png
+      - components-data-entry-languageselect--with-descriptions.png
+      - components-data-entry-languageselect--without-flags.png
+      - components-data-entry-languageselect--disabled-options.png
+      - components-data-entry-languageselect--empty.png
+    criteria:
+      NAM-01: { status: PENDING }
+      NAM-02: { status: PENDING }
+      NAM-03: { status: PENDING }
+      NAM-04: { status: PENDING }
+      NAM-05: { status: PENDING }
+      STR-01: { status: PENDING }
+      STR-02: { status: PENDING }
+      STR-03: { status: PENDING }
+      STR-04: { status: PENDING }
+      STR-05: { status: PENDING }
+      CSS-01: { status: PENDING }
+      CSS-02: { status: PENDING }
+      CSS-03: { status: PENDING }
+      CSS-04: { status: PENDING }
+      CSS-05: { status: PENDING }
+      CSS-06: { status: PENDING }
+      CSS-07: { status: PENDING }
+      STA-01: { status: PENDING }
+      STA-02: { status: PENDING }
+      STA-03: { status: PENDING }
+      STA-04: { status: PENDING }
+      STA-05: { status: PENDING }
+      STA-06: { status: PENDING }
+      A11Y-01: { status: PENDING }
+      A11Y-02: { status: PENDING }
+      A11Y-03: { status: PENDING }
+      A11Y-04: { status: PENDING }
+      A11Y-05: { status: PENDING }
+      A11Y-06: { status: PENDING }
+      A11Y-07: { status: PENDING }
+      A11Y-08: { status: PENDING }
+      A11Y-09: { status: PENDING }
+      A11Y-10: { status: PENDING }
+      DOC-01: { status: PENDING }
+      DOC-02: { status: PENDING }
+      DOC-03: { status: PENDING }
+      DOC-04: { status: PENDING }
+
 # ═══════════════════════════════════════════════════════════════
 # RESUMO DA VALIDAÇÃO — TOTAIS
 # ═══════════════════════════════════════════════════════════════

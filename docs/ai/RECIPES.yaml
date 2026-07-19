@@ -191,3 +191,17 @@ recipes:
       - TFormField
     notes:
       - "Use `selectionMode=\"multiple\"` when permissions or tag assignment spans nested nodes."
+
+  - id: language-switcher
+    name: "Application language switcher"
+    use_when:
+      - "The app lets the user pick a language or locale, with an optional flag per option."
+    compose:
+      - TFormField
+      - TLanguageSelect
+    notes:
+      - "The app owns the language list: TreeUI ships no locale dataset, so pass `options` with your own `label`, `value`, and optional `code` and `description`."
+      - "`TLanguageSelect` only emits the chosen `value` through `update:modelValue`; the app performs every locale side effect (i18n locale, persistence, `document.documentElement.lang`, route or API updates)."
+      - "Set `code` only where a flag is meaningful — a language is not a country — and omit it to render that option without a flag."
+      - "Set `flagBaseUrl` once, at the switcher, when flag assets are self-hosted; it is forwarded to every nested `TFlag`."
+      - "Wrap with `TFormField` when the switcher sits in a form and needs a label, hint, or error text; drop the wrapper for a bare toolbar or header control."

@@ -30,6 +30,10 @@ props:
     default: start
     values: [start, end]
     note: "Horizontal alignment of the menu relative to the trigger. Use `end` when the trigger sits near the right edge of a clipping container (e.g. a table actions column)."
+  id:
+    type: string
+    default: undefined
+    note: "Custom id for the menu element. Auto-generated when omitted; also exposed to the `trigger` slot as `menuId` so a custom trigger can wire aria-controls."
 
 events:
   - select
@@ -38,7 +42,7 @@ events:
 
 slots:
   trigger:
-    scoped_props: "{ isOpen: boolean }"
+    scoped_props: "{ isOpen: boolean, menuId: string }"
     replaces: "the built-in trigger button (label + chevron)"
     note: >
       Overriding this slot replaces the default button element. Open/close and
@@ -47,12 +51,13 @@ slots:
       button, and focus is restored to the first focusable element inside it.
     you_must_supply:
       - "A focusable element as the slot root — a native <button type=\"button\"> is the safe default. Focus restore targets the first focusable descendant; with none, focus is lost on close."
-      - "aria-haspopup=\"menu\" and :aria-expanded=\"isOpen\" on that element."
+      - "aria-haspopup=\"menu\", :aria-expanded=\"isOpen\", and :aria-controls=\"isOpen ? menuId : undefined\" on that element."
       - "The disabled state, if you need one — the `disabled` prop is only bound to the default button."
     aria_is_not_automatic: >
-      The component does NOT copy aria-haspopup/aria-expanded onto custom trigger
-      content; those attributes exist only on the built-in button. That is what the
-      `isOpen` scoped prop is for — bind it yourself or the menu is unannounced.
+      The component does NOT copy aria-haspopup/aria-expanded/aria-controls onto
+      custom trigger content; those attributes exist only on the built-in button.
+      That is what the `isOpen` and `menuId` scoped props are for — bind them
+      yourself or the menu is unannounced.
     guidance: >
       Do not add your own @click that also toggles `open`: the wrapper already
       toggles, so a second handler double-toggles and the menu appears not to open.
@@ -70,6 +75,10 @@ a11y:
   trigger_aria_haspopup: menu
   trigger_aria_expanded: true
   trigger_aria_controls: "menu id, while open"
+  custom_trigger_caveat: >
+    The three trigger_aria_* guarantees above describe the BUILT-IN trigger button
+    only. A custom `trigger` slot replaces that button, so the consumer must bind
+    them from the `isOpen` and `menuId` scoped props — see slots.trigger.
   aria_disabled_on_disabled_items: true
   focus_visible_on_trigger: true
   keyboard_arrow_navigation: true
@@ -93,11 +102,12 @@ behavior:
 
 example_custom_trigger: |
   <TDropdown :items="items" @select="handleAction">
-    <template #trigger="{ isOpen }">
+    <template #trigger="{ isOpen, menuId }">
       <TButton
         variant="ghost"
         aria-haspopup="menu"
         :aria-expanded="isOpen"
+        :aria-controls="isOpen ? menuId : undefined"
       >
         Actions
       </TButton>

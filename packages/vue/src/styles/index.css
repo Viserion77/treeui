@@ -7017,3 +7017,311 @@ body:has(.t-app-shell) {
     stroke-dashoffset: 0;
   }
 }
+
+/* ── Flag ───────────────────────────────────────────────── */
+
+.t-flag {
+  --tree-flag-height: var(--tree-size-icon-md);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  block-size: var(--tree-flag-height);
+  /* 3:2 is the most common national flag ratio, so most flags fill the box and
+     the outliers (square, pennant) simply centre inside it. */
+  inline-size: calc(var(--tree-flag-height) * 3 / 2);
+  overflow: hidden;
+  border: var(--tree-border-width-subtle) solid var(--tree-color-border-default);
+  border-radius: var(--tree-radius-sm);
+  background: var(--tree-color-bg-subtle);
+  font-family: var(--tree-font-family-sans);
+  vertical-align: middle;
+  user-select: none;
+}
+
+.t-flag--sm {
+  --tree-flag-height: var(--tree-size-icon-sm);
+}
+
+.t-flag--md {
+  --tree-flag-height: var(--tree-size-icon-md);
+}
+
+.t-flag--lg {
+  --tree-flag-height: var(--tree-size-icon-lg);
+}
+
+/* contain, not cover: the assets keep their true proportions, so cropping them
+   to the box would clip the artwork. */
+.t-flag__image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.t-flag__fallback {
+  overflow: hidden;
+  font-size: var(--tree-font-size-xs);
+  font-weight: var(--tree-font-weight-medium);
+  line-height: var(--tree-font-lineHeight-tight);
+  white-space: nowrap;
+  color: var(--tree-color-text-muted);
+}
+
+/* The fallback shares the flag's fixed box, so it has to scale with it rather
+   than staying at one size across the scale. */
+.t-flag--lg .t-flag__fallback {
+  font-size: var(--tree-font-size-sm);
+}
+
+/* ── LanguageSelect ─────────────────────────────────────── */
+
+.t-language-select {
+  position: relative;
+  display: inline-flex;
+  width: 100%;
+  min-inline-size: 0;
+}
+
+.t-language-select__trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--tree-space-2);
+  width: 100%;
+  min-height: var(--tree-size-control-md);
+  padding-inline: var(--tree-space-3);
+  border: var(--tree-border-width-subtle) solid var(--tree-color-border-default);
+  border-radius: var(--tree-radius-md);
+  background: var(--tree-color-bg-surface);
+  color: var(--tree-color-text-primary);
+  font: inherit;
+  cursor: pointer;
+  text-align: start;
+  transition:
+    border-color var(--tree-motion-duration-fast) var(--tree-motion-easing-standard),
+    box-shadow var(--tree-motion-duration-fast) var(--tree-motion-easing-standard);
+}
+
+.t-language-select__trigger:focus-visible {
+  border-color: var(--tree-color-brand-primary);
+  box-shadow: 0 0 0 4px var(--tree-color-focus-ring);
+  outline: none;
+}
+
+.t-language-select.is-open .t-language-select__trigger {
+  border-color: var(--tree-color-brand-primary);
+  box-shadow: 0 0 0 4px var(--tree-color-focus-ring);
+}
+
+.t-language-select.is-invalid .t-language-select__trigger {
+  border-color: var(--tree-color-status-error);
+}
+
+.t-language-select.is-invalid .t-language-select__trigger:focus-visible,
+.t-language-select.is-invalid.is-open .t-language-select__trigger {
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--tree-color-status-error) 20%, transparent);
+}
+
+.t-language-select.is-disabled .t-language-select__trigger {
+  opacity: 0.68;
+  cursor: not-allowed;
+}
+
+.t-language-select--sm .t-language-select__trigger {
+  min-height: var(--tree-size-control-sm);
+  padding-inline: var(--tree-space-2);
+}
+
+.t-language-select--lg .t-language-select__trigger {
+  min-height: var(--tree-size-control-lg);
+  padding-inline: var(--tree-space-4);
+}
+
+.t-language-select__value {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.t-language-select__value[data-placeholder] {
+  color: var(--tree-color-text-muted);
+}
+
+.t-language-select__chevron {
+  width: 1em;
+  height: 1em;
+  flex-shrink: 0;
+  color: var(--tree-color-text-muted);
+  pointer-events: none;
+  transition: transform var(--tree-motion-duration-fast) var(--tree-motion-easing-standard);
+}
+
+.t-language-select.is-open .t-language-select__chevron {
+  transform: rotate(180deg);
+}
+
+.t-language-select__slot {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--tree-color-text-muted);
+}
+
+.t-language-select__listbox {
+  position: absolute;
+  top: calc(100% + var(--tree-space-2));
+  left: 0;
+  z-index: var(--tree-z-dropdown);
+  width: 100%;
+  max-height: 15rem;
+  overflow-y: auto;
+  margin: 0;
+  padding: var(--tree-space-1);
+  list-style: none;
+  border: var(--tree-border-width-subtle) solid var(--tree-color-border-default);
+  border-radius: var(--tree-radius-md);
+  background: var(--tree-color-bg-surface);
+  box-shadow: var(--tree-shadow-md);
+}
+
+.t-language-select--drop-up .t-language-select__listbox {
+  top: auto;
+  bottom: calc(100% + var(--tree-space-2));
+}
+
+.t-language-select__option {
+  display: flex;
+  align-items: center;
+  gap: var(--tree-space-2);
+  padding: var(--tree-space-2) var(--tree-space-3);
+  border-radius: var(--tree-radius-sm);
+  font-size: var(--tree-font-size-md);
+  line-height: var(--tree-font-lineHeight-ui);
+  color: var(--tree-color-text-primary);
+  cursor: pointer;
+  outline: none;
+  transition: background-color var(--tree-motion-duration-fast) var(--tree-motion-easing-standard);
+}
+
+.t-language-select__option:hover,
+.t-language-select__option.is-focused {
+  background: var(--tree-color-brand-soft);
+}
+
+.t-language-select__option:focus-visible {
+  background: var(--tree-color-brand-soft);
+  box-shadow: 0 0 0 2px var(--tree-color-focus-ring) inset;
+}
+
+.t-language-select__option.is-selected {
+  font-weight: var(--tree-font-weight-medium);
+  color: var(--tree-color-brand-primary);
+}
+
+.t-language-select__option.is-disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.t-language-select__option.is-disabled:hover {
+  background: transparent;
+}
+
+.t-language-select__check {
+  width: 1em;
+  height: 1em;
+  flex-shrink: 0;
+  margin-inline-start: auto;
+  color: var(--tree-color-brand-primary);
+}
+
+.t-language-select .t-fade-enter-active,
+.t-language-select .t-fade-leave-active {
+  transition:
+    opacity var(--tree-motion-duration-fast) var(--tree-motion-easing-standard),
+    transform var(--tree-motion-duration-fast) var(--tree-motion-easing-standard);
+}
+
+.t-language-select .t-fade-enter-from,
+.t-language-select .t-fade-leave-to {
+  opacity: 0;
+  transform: translateY(4px);
+}
+
+/* Switcher: sizes to its content and sits inline in a navbar, so it drops the
+   field's full-width fill and its listbox is free to be wider than the trigger. */
+.t-language-select--switcher {
+  width: auto;
+}
+
+.t-language-select--switcher .t-language-select__trigger {
+  width: auto;
+  gap: var(--tree-space-2);
+}
+
+.t-language-select--switcher .t-language-select__value {
+  flex: 0 1 auto;
+}
+
+.t-language-select--icon-only .t-language-select__trigger {
+  padding-inline: var(--tree-space-2);
+}
+
+.t-language-select--switcher .t-language-select__listbox {
+  width: max-content;
+  min-width: 100%;
+  right: 0;
+  left: auto;
+}
+
+/* TIcon's `size` prop is a pixel count, so the icon is sized here instead to keep
+   it on the token scale and in step with the flag beside it. */
+.t-language-select__translate {
+  flex-shrink: 0;
+  inline-size: var(--tree-size-icon-md);
+  block-size: var(--tree-size-icon-md);
+  color: var(--tree-color-text-muted);
+}
+
+.t-language-select--sm .t-language-select__translate {
+  inline-size: var(--tree-size-icon-sm);
+  block-size: var(--tree-size-icon-sm);
+}
+
+.t-language-select--lg .t-language-select__translate {
+  inline-size: var(--tree-size-icon-lg);
+  block-size: var(--tree-size-icon-lg);
+}
+
+.t-language-select__option-text {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Truncation lives on the individual lines: with a block-level description
+   inside, ellipsis on the wrapper never applies and long text hard-clips. */
+.t-language-select__option-label {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.t-language-select__description {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: var(--tree-font-size-sm);
+  line-height: var(--tree-font-lineHeight-tight);
+  color: var(--tree-color-text-muted);
+}
+
+.t-language-select__empty {
+  padding: var(--tree-space-2) var(--tree-space-3);
+  font-size: var(--tree-font-size-sm);
+  color: var(--tree-color-text-muted);
+}

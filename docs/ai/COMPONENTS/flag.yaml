@@ -1,0 +1,63 @@
+name: TFlag
+source_file: packages/vue/src/components/TFlag.vue
+package: "@treeui/vue"
+kind: display
+status: available
+purpose: "Render a flat country flag image from a CDN at a fixed height, centred in a 3:2 box, with a text fallback when the request fails."
+
+props:
+  code:
+    type: string
+    required: true
+    description: "ISO 3166-1 alpha-2 country code. Case-insensitive — trimmed and lowercased before the URL is built."
+  baseUrl:
+    type: string
+    default: "https://flagcdn.com"
+    description: "Origin serving the flag assets. The component appends a fixed path built from the CDN's fixed-height segments, so a self-hosted mirror must reproduce it exactly: 1x is `${baseUrl}/h20/{code}.png` (sm), `${baseUrl}/h20/{code}.png` (md), `${baseUrl}/h24/{code}.png` (lg); the matching 2x asset is emitted via srcset as `${baseUrl}/h40/{code}.png` (sm), `${baseUrl}/h40/{code}.png` (md), `${baseUrl}/h60/{code}.png` (lg). A trailing slash is stripped, so `https://cdn.example.com/flags/` and `https://cdn.example.com/flags` behave identically."
+  size:
+    type: TSize
+    default: md
+    values: [sm, md, lg]
+  label:
+    type: string
+    default: undefined
+    description: "Accessible label. When set, the flag becomes role=\"img\" with aria-label; otherwise it is aria-hidden."
+  fallbackText:
+    type: string
+    default: undefined
+    description: "Text shown when the image cannot load. Defaults to the uppercased `code`."
+
+events: []
+slots: []
+
+a11y:
+  decorative_by_default: true
+  becomes_image_when_labeled: true
+  rule: "Provide `label` only when the flag carries meaning that is not already in adjacent text — inside a language option the label is redundant."
+
+behavior:
+  falls_back_to_text_when_image_fails: true
+  failed_state_resets_when_resolved_src_changes: true
+  code_is_trimmed_and_lowercased: true
+  fixed_height_endpoints_serve_flat_artwork_at_true_proportions: "The CDN's ratio-normalised (width-by-height) endpoints do force every flag into one box, but only by serving the WAVING artwork, which reads as decoration next to flat UI icons. The fixed-height endpoints used here (h20, h24, h40, h60) serve the flat artwork at each flag's true proportions instead: Nepal stays a pennant, Switzerland stays square, Qatar stays elongated."
+  shared_height_not_shared_ratio_is_what_aligns_a_column: "Within a size step every flag is requested at the same asset height, so a stacked list lines up even though the widths differ. CSS then places each flag in a fixed 3:2 box (3:2 being the most common national flag ratio) with `object-fit: contain`, so the majority fill the box and the outliers centre inside it rather than being cropped or distorted."
+  retina_asset_is_at_least_twice_the_box_height: "Box heights come from `--tree-size-icon-sm/md/lg` (16px / 20px / 24px) and the srcset asset is h40 (sm, md) or h60 (lg), so a 2x screen never upscales."
+  size_outside_the_union_falls_back_to_md: "A JS consumer can pass a size outside `TSize`; the asset lookup falls back to the md pair rather than throwing on an undefined entry."
+  base_url_trailing_slash_is_normalised: "Trailing slashes are stripped from `baseUrl` before the path is appended, so a self-hosted mirror cannot silently produce a double-slashed URL."
+  path_template_is_public_contract: "Changing `baseUrl` is a config change, not a breaking one, as long as the mirror serves the same fixed-height segments (h20, h24, h40, h60)."
+  no_country_or_locale_dataset_is_shipped: "TreeUI never maps a language or locale to a country code — the application owns that decision."
+
+example: |
+  <!-- Decorative: adjacent text already names the country -->
+  <TFlag code="BR" /> Brazil
+
+  <!-- Meaningful (no adjacent text) -->
+  <TFlag code="jp" label="Japan" size="lg" />
+
+  <!-- Self-hosted mirror -->
+  <TFlag code="ch" base-url="/assets/flags" fallback-text="CHE" />
+
+related:
+  - TLanguageSelect
+  - TIcon
+  - TAvatar

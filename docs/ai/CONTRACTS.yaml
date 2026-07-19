@@ -10,7 +10,7 @@ source_component_filename_prefix: "T"
 # Maintenance: must stay 1:1 with the `export { default as ... }` lines in
 # packages/vue/src/components/index.ts. Verify with:
 #   grep -oP '^export \{ default as \K\w+' packages/vue/src/components/index.ts | sort
-primary_exports_count: 75
+primary_exports_count: 77
 primary_exports:
   - TAccordion
   - TAccordionItem
@@ -38,11 +38,13 @@ primary_exports:
   - TDropdown
   - TEmptyState
   - TFileUpload
+  - TFlag
   - TFormField
   - TGrid
   - TIcon
   - TInput
   - TKbd
+  - TLanguageSelect
   - TLink
   - TMarkdownEditor
   - TModal
@@ -132,8 +134,10 @@ shared_sizes:
     - TDropdown
     - TEmptyState
     - TFileUpload
+    - TFlag
     - TFormField
     - TInput
+    - TLanguageSelect
     - TSelect
     - TTextarea
     - TModal
@@ -159,9 +163,9 @@ shared_props:
   tone:
     used_by: [TBadge, TStat]
   size:
-    used_by: [TBadge, TButton, TCard, TCheckbox, TCombobox, TConfirmDialog, TDatePicker, TDropdown, TFileUpload, TInput, TModal, TRadio, TRadioGroup, TSelect, TSpinner, TTextarea, TTimeline]
+    used_by: [TBadge, TButton, TCard, TCheckbox, TCombobox, TConfirmDialog, TDatePicker, TDropdown, TFileUpload, TFlag, TInput, TLanguageSelect, TModal, TRadio, TRadioGroup, TSelect, TSpinner, TTextarea, TTimeline]
   width:
-    used_by: [TInput, TSelect, TTextarea]
+    used_by: [TInput, TLanguageSelect, TSelect, TTextarea]
     values: [xs, sm, md, lg, xl, full]
     default: full
     note: >-
@@ -170,14 +174,14 @@ shared_props:
       still shrink on narrow containers. Prefer this over inline width styles.
       Caps: xs 8rem, sm 12rem, md 18rem, lg 24rem, xl 32rem.
   disabled:
-    used_by: [TButton, TCheckbox, TCombobox, TConfirmDialog, TDatePicker, TDropdown, TFileUpload, TInput, TModal, TRadio, TRadioGroup, TSelect, TSwitch, TTextarea, TTooltip]
+    used_by: [TButton, TCheckbox, TCombobox, TConfirmDialog, TDatePicker, TDropdown, TFileUpload, TInput, TLanguageSelect, TModal, TRadio, TRadioGroup, TSelect, TSwitch, TTextarea, TTooltip]
   loading:
-    used_by: [TButton, TCombobox, TConfirmDialog, TFileUpload, TInput, TSelect, TTextarea, TChart, TDonutChart]
+    used_by: [TButton, TCombobox, TConfirmDialog, TFileUpload, TInput, TLanguageSelect, TSelect, TTextarea, TChart, TDonutChart]
     note: >-
       loading conveys busy state. On single action controls (TButton, TConfirmDialog)
       it also disables that one control to prevent double submission. On form value
-      controls (TFileUpload, TInput, TSelect, TTextarea, TCombobox) it is presentational
-      only and must never gate interaction.
+      controls (TFileUpload, TInput, TSelect, TTextarea, TCombobox, TLanguageSelect) it is
+      presentational only and must never gate interaction.
   as:
     used_by: [TButton, TCard]
   class:
@@ -185,11 +189,11 @@ shared_props:
 
 shared_events:
   update:modelValue:
-    used_by: [TCheckbox, TCombobox, TDatePicker, TFileUpload, TInput, TRadioGroup, TSelect, TSwitch, TTextarea]
+    used_by: [TCheckbox, TCombobox, TDatePicker, TFileUpload, TInput, TLanguageSelect, TRadioGroup, TSelect, TSwitch, TTextarea]
   update:open:
-    used_by: [TCombobox, TConfirmDialog, TDatePicker, TDrawer, TDropdown, TModal, TSelect, TTooltip]
+    used_by: [TCombobox, TConfirmDialog, TDatePicker, TDrawer, TDropdown, TLanguageSelect, TModal, TSelect, TTooltip]
   open-change:
-    used_by: [TCombobox, TConfirmDialog, TDatePicker, TDrawer, TDropdown, TModal, TSelect, TTooltip]
+    used_by: [TCombobox, TConfirmDialog, TDatePicker, TDrawer, TDropdown, TLanguageSelect, TModal, TSelect, TTooltip]
 
 shared_slots:
   default:
@@ -197,7 +201,7 @@ shared_slots:
   icon:
     used_by: [TBadge, TButton, TFileUpload]
   prefix:
-    used_by: [TCombobox, TDatePicker, TInput]
+    used_by: [TCombobox, TDatePicker, TInput, TLanguageSelect]
   suffix:
     used_by: [TDatePicker, TInput]
   trigger:

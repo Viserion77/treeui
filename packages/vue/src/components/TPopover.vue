@@ -2,7 +2,7 @@
 import { computed, nextTick, onBeforeUnmount, ref, toRef, useAttrs, watch } from 'vue';
 import { createId, focusFirst, isEscapeKey } from '@treeui/utils';
 import { useControllableOpen } from '../composables/useControllableOpen';
-import type { TTooltipSide } from '../types/contracts';
+import type { TSize, TTooltipSide } from '../types/contracts';
 
 defineOptions({
   inheritAttrs: false,
@@ -15,6 +15,8 @@ const props = withDefaults(
     disabled?: boolean;
     side?: TTooltipSide;
     align?: 'start' | 'center' | 'end';
+    /** Panel density. Scales the content padding by the shared size tokens. */
+    size?: TSize;
     id?: string;
   }>(),
   {
@@ -23,6 +25,7 @@ const props = withDefaults(
     disabled: false,
     side: 'bottom',
     align: 'center',
+    size: 'md',
     id: undefined,
   },
 );
@@ -76,6 +79,7 @@ const contentClasses = computed(() => [
   't-popover__content',
   `t-popover__content--${props.side}`,
   `t-popover__content--align-${props.align}`,
+  `t-popover__content--${props.size}`,
 ]);
 
 const openPopover = () => {

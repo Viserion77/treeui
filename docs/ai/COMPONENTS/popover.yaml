@@ -38,6 +38,11 @@ props:
     default: "'center'"
     description: Alignment along the placement axis
 
+  - name: size
+    type: TSize
+    default: "'md'"
+    description: "Panel density. Scales the content padding by the shared size tokens (sm → space-3, md → space-4, lg → space-5), so compact rich panels use a prop instead of overriding `.t-popover__content`. This is the `size` axis, not a density prop — TreeUI has no density axis (see DECISIONS.md → Density). For a compact menu of actions use TDropdown, which owns role=menu semantics; use TPopover for a rich non-menu panel."
+
   - name: id
     type: string
     optional: true

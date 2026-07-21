@@ -130,6 +130,15 @@ slots:
       Header region sitting over the sidebar rail (typically the brand mark). Filling
       it adds `has-start` to the header, which switches the header to the shell's own
       two-column grid and tracks the rail width as it collapses.
+  header-end:
+    scoped: true
+    bindings: "AppShellSlotProps"
+    description: >
+      Trailing header region for actions/controls, pinned to the far end of the row.
+      Filling it adds `has-end`; in the plain flex header the content region's grow
+      already pushes it to the end, and in the `has-start` grid it becomes a
+      content-sized third column with the trailing padding. Replaces the consumer's
+      own `TStack justify=flex-end` wrapper inside `#header`.
   sidebar-header:
     scoped: true
     bindings: "AppShellSlotProps"

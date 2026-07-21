@@ -1,7 +1,7 @@
 {
-  "generatedAt": "2026-07-21T19:56:41.320Z",
+  "generatedAt": "2026-07-21T23:02:53.565Z",
   "packageName": "@treeui/vue",
-  "packageVersion": "0.18.0",
+  "packageVersion": "0.19.1",
   "decisionGuides": [
     {
       "id": "single-choice",
@@ -632,7 +632,8 @@
         "TTabs",
         "TPagination",
         "TDropdown",
-        "TSelectableList"
+        "TSelectableList",
+        "TCard"
       ]
     },
     {
@@ -1426,6 +1427,11 @@
           "note": "AppShellSlotProps"
         },
         {
+          "name": "header-end",
+          "description": "Trailing header region for actions/controls, pinned to the far end of the row. Filling it adds `has-end`; in the plain flex header the content region's grow already pushes it to the end, and in the `has-start` grid it becomes a content-sized third column with the trailing padding. Replaces the consumer's own `TStack justify=flex-end` wrapper inside `#header`.\n",
+          "note": "AppShellSlotProps"
+        },
+        {
           "name": "sidebar-header",
           "description": "Pinned above the sidebar body, inset to line up with nav item icons. Rendered in both the desktop aside and the mobile drawer.\n",
           "note": "AppShellSlotProps"
@@ -1876,7 +1882,7 @@
           "name": "label",
           "type": "string",
           "default": "undefined",
-          "note": "Accessible name, rendered as `aria-label`. Required whenever `iconOnly` is set; ignored for ordinary buttons that already have visible text."
+          "note": "Accessible name, rendered as `aria-label`. Required whenever `iconOnly` is set; ignored for ordinary buttons that already have visible text. In development, an `iconOnly` button with no `label`/`aria-label`/`aria-labelledby` logs a console warning; the check is guarded by `process.env.NODE_ENV` so it is stripped from the consumer's production build (the vue package's vite build keeps `process.env.NODE_ENV` as a runtime reference for this)."
         },
         {
           "name": "type",
@@ -1991,6 +1997,12 @@
           "type": "string",
           "default": "undefined",
           "description": "Optional card heading. Rendered as the fallback content of the `header` slot inside a `span.t-card__title`, so supplying `#header` replaces it entirely. Setting it also forces the header element to render. Because it is declared as a prop it is consumed by the component and never reaches the root element as the native HTML `title` tooltip attribute.\n"
+        },
+        {
+          "name": "interactive",
+          "type": "boolean",
+          "default": "false",
+          "description": "Treats the card as an interactive surface — adds hover elevation, a focus-visible ring, `cursor: pointer`, and clears text-decoration/colour. Use with `as=\"a\"` / `as=\"router-link\"` to make the whole card a single link WITHOUT an inner TLink, which would underline the card's text via decoration inheritance. The consumer owns the interactive element's accessible name and href/to; the card only supplies the affordance.\n"
         }
       ],
       "events": [],
@@ -2058,6 +2070,7 @@
         "chart-surface"
       ],
       "practices": [
+        "interaction-feedback",
         "predictable-api",
         "token-driven"
       ]
@@ -5721,7 +5734,30 @@
             "default",
             "muted",
             "danger"
-          ]
+          ],
+          "note": "Emphasis axis (colour), not decoration. There is deliberately no `plain` value — a decoration-free link uses `underline=\"none\"` + `weight`, keeping `variant` a pure emphasis axis (a `plain` value would be a homonym, the mistake that removed `solid` from TCard)."
+        },
+        {
+          "name": "underline",
+          "type": "TLinkUnderline",
+          "default": "always",
+          "values": [
+            "always",
+            "hover",
+            "none"
+          ],
+          "note": "When the underline shows. `always` is the base; `hover` underlines only on hover; `none` removes it (e.g. for a nav item or an icon+label lockup)."
+        },
+        {
+          "name": "weight",
+          "type": "TLinkWeight",
+          "default": "medium",
+          "values": [
+            "regular",
+            "medium",
+            "semibold"
+          ],
+          "note": "Text weight. `medium` matches the base link."
         }
       ],
       "events": [],
@@ -6885,6 +6921,11 @@
           "name": "align",
           "type": "'start' | 'center' | 'end'",
           "description": "Alignment along the placement axis"
+        },
+        {
+          "name": "size",
+          "type": "TSize",
+          "description": "Panel density. Scales the content padding by the shared size tokens (sm → space-3, md → space-4, lg → space-5), so compact rich panels use a prop instead of overriding `.t-popover__content`. This is the `size` axis, not a density prop — TreeUI has no density axis (see DECISIONS.md → Density). For a compact menu of actions use TDropdown, which owns role=menu semantics; use TPopover for a rich non-menu panel."
         },
         {
           "name": "id",
@@ -8200,6 +8241,16 @@
           "type": "boolean",
           "default": "false",
           "note": "Expands the stack to fill available space along its parent's main axis (flex: 1 with min-size 0). Use it to make a sidebar column fill its container height."
+        },
+        {
+          "name": "fill",
+          "type": "TStackFill",
+          "default": "undefined",
+          "values": [
+            "viewport",
+            "parent"
+          ],
+          "note": "Gives the stack a minimum block size so a centered child fills the screen (`viewport` → min-block-size 100dvh) or its parent (`parent` → min-block-size 100%). Compose with align/justify=center for a centered loading or empty state, and with TContainer/TPage for a reading width — no local height CSS. Distinct from `grow`, which fills a flex parent's main axis; `fill` sets a floor height on any block."
         }
       ],
       "events": [],
@@ -8691,6 +8742,18 @@
           "required": false,
           "description": "Visible `<caption>` naming the table.",
           "note": "For a name without visible text, pass `aria-label` / `aria-labelledby` instead — attribute inheritance is disabled and every non-class/style attr is forwarded to the `<table>`, so the name lands on the named element rather than the scroll wrapper."
+        },
+        {
+          "name": "rowKey",
+          "type": "string | ((row, index) => string | number)",
+          "required": false,
+          "description": "Stable per-row identity. A field name or a function of the row, so rows keep identity across sorting. Without it Vue keys by array index and rowState styling would follow the position, not the data. Falls back to the index."
+        },
+        {
+          "name": "rowState",
+          "type": "(row, index) => 'default' | 'muted'",
+          "required": false,
+          "description": "Semantic per-row state applied by data, not position, so it survives sorting. `muted` recesses a row (e.g. a resource that no longer exists) via `t-table__row--muted`, written at compound specificity so it wins over the zebra/hover rules."
         }
       ],
       "events": [
@@ -9008,6 +9071,16 @@
             "semibold",
             "bold"
           ]
+        },
+        {
+          "name": "family",
+          "type": "TTextFamily",
+          "default": "undefined",
+          "values": [
+            "sans",
+            "mono"
+          ],
+          "note": "Font family. Omitted = inherit. `mono` maps to --tree-font-family-mono for inline code, IDs, ARNs and machine text — the token-driven alternative to a local monospace class. Not a substitute for a code/log block."
         },
         {
           "name": "truncate",

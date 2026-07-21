@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite';
-import { TBadge, TButton, TCard, treeCardVariants, treeSizes } from '@treeui/vue';
+import { TBadge, TButton, TCard, TText, treeCardVariants, treeSizes } from '@treeui/vue';
 import { practiceNote } from './practice-refs';
 
 const meta = {
@@ -208,6 +208,18 @@ export const PolymorphicRoot: Story = {
           </p>
         </TCard>
       </div>
+    `,
+  }),
+};
+
+export const InteractiveLink: Story = {
+  render: () => ({
+    components: { TCard, TText },
+    template: `
+      <TCard as="a" href="#lambda" interactive variant="outline" style="max-width: 22rem;">
+        <TText weight="semibold">orders-processor</TText>
+        <TText tone="muted" size="sm">Lambda · us-east-1 · 128 MB</TText>
+      </TCard>
     `,
   }),
 };

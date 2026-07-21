@@ -26,6 +26,8 @@ export type TTableSortState = {
   direction: TTableSortDirection;
 };
 
+export type TTableRowState = 'default' | 'muted';
+
 const props = withDefaults(
   defineProps<{
     columns: TTableColumn[];
@@ -37,11 +39,26 @@ const props = withDefaults(
      * pass `aria-label` / `aria-labelledby` instead — both land on the `<table>`.
      */
     caption?: string;
+    /**
+     * Stable identity per row. A key (or a function of the row) so rows keep
+     * their identity across sorting — otherwise Vue keys by array index and
+     * `rowState` styling follows the position, not the data.
+     */
+    rowKey?: string | ((row: Record<string, unknown>, index: number) => string | number);
+    /**
+     * Semantic per-row state. `muted` recesses a row (e.g. a resource that no
+     * longer exists). It is applied by data, not position, so it survives
+     * sorting. Dimming is not an accessible signal on its own — pair it with a
+     * status cell or visually hidden text conveying the same meaning.
+     */
+    rowState?: (row: Record<string, unknown>, index: number) => TTableRowState;
   }>(),
   {
     size: 'md',
     sortBy: undefined,
     caption: undefined,
+    rowKey: undefined,
+    rowState: undefined,
   },
 );
 
@@ -127,6 +144,20 @@ function sortIconName(column: TTableColumn): TIconName {
   return cur?.direction === 'asc' ? 'chevron-up' : 'chevron-down';
 }
 
+function resolveRowKey(row: Record<string, unknown>, index: number): string | number {
+  if (typeof props.rowKey === 'function') return props.rowKey(row, index);
+  if (typeof props.rowKey === 'string') {
+    const value = row[props.rowKey];
+    if (typeof value === 'string' || typeof value === 'number') return value;
+  }
+  return index;
+}
+
+function rowStateClass(row: Record<string, unknown>, index: number): string | null {
+  const state = props.rowState?.(row, index);
+  return state && state !== 'default' ? `t-table__row--${state}` : null;
+}
+
 const attrs = useAttrs();
 
 // class/style stay on the scroll wrapper (the root); everything else —
@@ -208,8 +239,9 @@ const tableAttrs = computed(() => {
         </tr>
         <tr
           v-for="(row, index) in sortedRows"
-          :key="index"
+          :key="resolveRowKey(row, index)"
           class="t-table__row"
+          :class="rowStateClass(row, index)"
         >
           <td
             v-for="column in columns"

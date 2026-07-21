@@ -1150,6 +1150,28 @@ table.t-visually-hidden {
   box-shadow: none;
 }
 
+/* Interactive surface: whole-card link/button affordance. `text-decoration:
+   none` keeps a card rendered as `<a>` from underlining its own text. */
+.t-card--interactive {
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
+  transition:
+    border-color var(--tree-motion-duration-fast) var(--tree-motion-easing-standard),
+    box-shadow var(--tree-motion-duration-fast) var(--tree-motion-easing-standard),
+    transform var(--tree-motion-duration-fast) var(--tree-motion-easing-standard);
+}
+
+.t-card--interactive:hover {
+  border-color: var(--tree-color-border-strong);
+  box-shadow: var(--tree-shadow-md);
+}
+
+.t-card--interactive:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--tree-color-focus-ring);
+}
+
 .t-card__header,
 .t-card__footer {
   color: var(--tree-color-text-muted);
@@ -3276,7 +3298,7 @@ table.t-visually-hidden {
   z-index: var(--tree-z-dropdown);
   min-width: 12rem;
   max-width: 24rem;
-  padding: var(--tree-space-4);
+  padding: var(--tree-popover-pad, var(--tree-space-4));
   border: var(--tree-border-width-subtle) solid var(--tree-color-border-default);
   border-radius: var(--tree-radius-lg);
   background: var(--tree-color-bg-surface);
@@ -3285,6 +3307,16 @@ table.t-visually-hidden {
   font-size: var(--tree-font-size-md);
   line-height: var(--tree-font-lineHeight-base);
   outline: none;
+}
+
+/* ── Density ── (padding scales by the shared size axis; `md` is the base) */
+
+.t-popover__content--sm {
+  --tree-popover-pad: var(--tree-space-3);
+}
+
+.t-popover__content--lg {
+  --tree-popover-pad: var(--tree-space-5);
 }
 
 /* ── Side positioning ── */
@@ -4168,6 +4200,14 @@ table.t-visually-hidden {
 
 .t-table__body .t-table__row:hover {
   background: var(--tree-color-brand-soft);
+}
+
+/* Muted row state. Compound selector (0,2,0) declared after the zebra/hover
+   rules so it wins on source order without an id or !important. Dimming is a
+   visual aid only — the accessible signal must also live in a cell. */
+.t-table__body .t-table__row--muted {
+  color: var(--tree-color-text-muted);
+  background: transparent;
 }
 
 .t-table__cell {
@@ -5743,6 +5783,16 @@ table.t-visually-hidden {
   min-block-size: 0;
 }
 
+/* Fill: give the stack a floor height so a centered child fills the screen or
+   its parent without the consumer computing height. Pairs with align/justify. */
+.t-stack--fill-viewport {
+  min-block-size: 100dvh;
+}
+
+.t-stack--fill-parent {
+  min-block-size: 100%;
+}
+
 .t-stack-item {
   min-inline-size: 0;
 }
@@ -5920,6 +5970,13 @@ table.t-visually-hidden {
 }
 .t-text--weight-bold {
   font-weight: var(--tree-font-weight-bold);
+}
+
+.t-text--family-sans {
+  font-family: var(--tree-font-family-sans);
+}
+.t-text--family-mono {
+  font-family: var(--tree-font-family-mono);
 }
 
 .t-text.is-truncated {
@@ -6251,6 +6308,24 @@ a.t-nav-menu__item.is-disabled {
   box-shadow: 0 0 0 2px var(--tree-color-focus-ring);
 }
 
+.t-link--underline-none {
+  text-decoration: none;
+}
+
+.t-link--underline-hover {
+  text-decoration: none;
+}
+.t-link--underline-hover:hover {
+  text-decoration: underline;
+}
+
+.t-link--weight-regular {
+  font-weight: var(--tree-font-weight-regular);
+}
+.t-link--weight-semibold {
+  font-weight: var(--tree-font-weight-semibold);
+}
+
 .t-link--default {
   color: var(--tree-color-brand-primary);
 }
@@ -6364,6 +6439,16 @@ a.t-nav-menu__item.is-disabled {
   min-inline-size: 0;
 }
 
+/* Trailing header region. In the plain flex header the content region's
+   flex-grow already pushes this to the end; it just holds its content size. */
+.t-app-shell__header-end {
+  display: flex;
+  align-items: center;
+  gap: var(--tree-space-2);
+  flex: 0 0 auto;
+  min-inline-size: 0;
+}
+
 /* With a start region the header mirrors the shell's own columns, so whatever
    sits in the `header` slot lines up with the content panel underneath it
    instead of floating over the rail boundary. */
@@ -6389,6 +6474,20 @@ a.t-nav-menu__item.is-disabled {
   padding-inline: 0 var(--tree-app-shell-header-pad);
 }
 
+/* With a trailing region the grid gains a content-sized third column, and the
+   trailing padding moves from the content region onto header-end. */
+.t-app-shell__header.has-start.has-end {
+  grid-template-columns: var(--tree-app-shell-track) minmax(0, 1fr) auto;
+}
+
+.t-app-shell__header.has-start.has-end > .t-app-shell__header-content {
+  padding-inline: 0;
+}
+
+.t-app-shell__header.has-start.has-end > .t-app-shell__header-end {
+  padding-inline: 0 var(--tree-app-shell-header-pad);
+}
+
 /* Mobile has no rail, so fall back to a single flowing row. */
 .t-app-shell.is-mobile .t-app-shell__header.has-start {
   display: flex;
@@ -6397,7 +6496,8 @@ a.t-nav-menu__item.is-disabled {
 }
 
 .t-app-shell.is-mobile .t-app-shell__header.has-start > .t-app-shell__header-start,
-.t-app-shell.is-mobile .t-app-shell__header.has-start > .t-app-shell__header-content {
+.t-app-shell.is-mobile .t-app-shell__header.has-start > .t-app-shell__header-content,
+.t-app-shell.is-mobile .t-app-shell__header.has-start > .t-app-shell__header-end {
   padding-inline: 0;
 }
 

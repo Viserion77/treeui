@@ -24,6 +24,11 @@ props:
     type: TTextWeight
     default: undefined
     values: [regular, medium, semibold, bold]
+  family:
+    type: TTextFamily
+    default: undefined
+    values: [sans, mono]
+    note: "Font family. Omitted = inherit. `mono` maps to --tree-font-family-mono for inline code, IDs, ARNs and machine text — the token-driven alternative to a local monospace class. Not a substitute for a code/log block."
   truncate:
     type: boolean
     default: false

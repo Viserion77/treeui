@@ -25,8 +25,22 @@ props:
     type: TLinkVariant
     default: default
     values: [default, muted, danger]
+    note: "Emphasis axis (colour), not decoration. There is deliberately no `plain` value — a decoration-free link uses `underline=\"none\"` + `weight`, keeping `variant` a pure emphasis axis (a `plain` value would be a homonym, the mistake that removed `solid` from TCard)."
+  underline:
+    type: TLinkUnderline
+    default: always
+    values: [always, hover, none]
+    note: "When the underline shows. `always` is the base; `hover` underlines only on hover; `none` removes it (e.g. for a nav item or an icon+label lockup)."
+  weight:
+    type: TLinkWeight
+    default: medium
+    values: [regular, medium, semibold]
+    note: "Text weight. `medium` matches the base link."
 
 events: []
+
+guidance:
+  wrapping_a_card_or_button: "Do NOT wrap a TCard/TButton in TLink — text-decoration inherits to in-flow descendants and underlines the whole surface, and `.t-link` is display:inline around a grid child. Use the target's own `as` escape hatch instead: `<TCard as=\"a\" :href=\"…\" interactive>` or `<TCard as=\"router-link\" :to=\"…\" interactive>`. `interactive` adds the hover/focus affordance."
 
 slots:
   - default

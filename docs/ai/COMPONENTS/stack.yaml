@@ -32,6 +32,11 @@ props:
     type: boolean
     default: false
     note: "Expands the stack to fill available space along its parent's main axis (flex: 1 with min-size 0). Use it to make a sidebar column fill its container height."
+  fill:
+    type: TStackFill
+    default: undefined
+    values: [viewport, parent]
+    note: "Gives the stack a minimum block size so a centered child fills the screen (`viewport` → min-block-size 100dvh) or its parent (`parent` → min-block-size 100%). Compose with align/justify=center for a centered loading or empty state, and with TContainer/TPage for a reading width — no local height CSS. Distinct from `grow`, which fills a flex parent's main axis; `fill` sets a floor height on any block."
 
 slots:
   - default

@@ -21,6 +21,13 @@ export default defineConfig({
       aliasesExclude: [/^@treeui\//],
     }),
   ],
+  // Keep `process.env.NODE_ENV` as a runtime reference in the published bundle
+  // instead of letting Vite freeze it to this build's mode. Dev-only warnings
+  // then resolve against the *consumer's* environment and tree-shake out of
+  // their production build.
+  define: {
+    'process.env.NODE_ENV': 'process.env.NODE_ENV',
+  },
   build: {
     sourcemap: true,
     lib: {

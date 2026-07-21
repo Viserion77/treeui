@@ -5218,3 +5218,131 @@ describe('TAppShell immersive + drawer interaction', () => {
     expect(document.body.style.overflow).not.toBe('hidden');
   });
 });
+
+describe('TREEUX round 3 — closed-contract prop additions', () => {
+  describe('TButton icon-only dev warning (S7-001 / LSS-006)', () => {
+    it('warns when iconOnly has no accessible name', () => {
+      const spy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+      mount(TButton, { props: { iconOnly: true }, slots: { icon: '<svg/>' } });
+      expect(spy).toHaveBeenCalledWith(expect.stringContaining('accessible name'));
+      spy.mockRestore();
+    });
+
+    it('stays silent when label is provided', () => {
+      const spy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+      mount(TButton, { props: { iconOnly: true, label: 'Excluir' }, slots: { icon: '<svg/>' } });
+      expect(spy).not.toHaveBeenCalled();
+      spy.mockRestore();
+    });
+
+    it('stays silent when aria-label is provided via fallthrough', () => {
+      const spy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+      mount(TButton, {
+        props: { iconOnly: true },
+        attrs: { 'aria-label': 'Excluir' },
+        slots: { icon: '<svg/>' },
+      });
+      expect(spy).not.toHaveBeenCalled();
+      spy.mockRestore();
+    });
+  });
+
+  describe('TStack fill (S7-006)', () => {
+    it('applies the viewport and parent fill modifiers', () => {
+      expect(mount(TStack, { props: { fill: 'viewport' } }).classes()).toContain('t-stack--fill-viewport');
+      expect(mount(TStack, { props: { fill: 'parent' } }).classes()).toContain('t-stack--fill-parent');
+    });
+
+    it('emits no fill modifier by default', () => {
+      const cls = mount(TStack).classes().join(' ');
+      expect(cls).not.toContain('t-stack--fill');
+    });
+  });
+
+  describe('TPopover size (S7-004)', () => {
+    it('scales the content density by the shared size axis', () => {
+      const wrapper = mount(TPopover, {
+        props: { defaultOpen: true, size: 'sm' },
+        slots: { default: '<p>painel</p>' },
+      });
+      expect(wrapper.find('.t-popover__content').classes()).toContain('t-popover__content--sm');
+    });
+  });
+
+  describe('TText family (LSS-001)', () => {
+    it('maps mono to the mono family class', () => {
+      expect(mount(TText, { props: { family: 'mono' } }).classes()).toContain('t-text--family-mono');
+    });
+    it('inherits the family when unset', () => {
+      expect(mount(TText).classes().join(' ')).not.toContain('t-text--family');
+    });
+  });
+
+  describe('TTable rowState + rowKey (LSS-012)', () => {
+    const columns = [{ key: 'name', label: 'Nome' }];
+    const rows = [{ id: 'a', name: 'Ana' }, { id: 'b', name: 'Bruno' }];
+
+    it('applies the muted state per data, not position', () => {
+      const wrapper = mount(TTable, {
+        props: { columns, rows, rowState: (r: Record<string, unknown>) => (r.name === 'Bruno' ? 'muted' : 'default') },
+      });
+      const bodyRows = wrapper.findAll('.t-table__body .t-table__row');
+      expect(bodyRows[0].classes()).not.toContain('t-table__row--muted');
+      expect(bodyRows[1].classes()).toContain('t-table__row--muted');
+    });
+
+    it('keys rows by rowKey so identity survives sorting', () => {
+      // A string key selects the field; the smoke test is simply that render
+      // succeeds and the rows are present with the key applied.
+      const wrapper = mount(TTable, { props: { columns, rows, rowKey: 'id' } });
+      expect(wrapper.findAll('.t-table__body .t-table__row')).toHaveLength(2);
+    });
+  });
+
+  describe('TLink underline + weight (LSS-002)', () => {
+    it('emits modifiers only for non-default underline/weight', () => {
+      const plain = mount(TLink, { props: { underline: 'none', weight: 'semibold' }, slots: { default: 'x' } });
+      expect(plain.classes()).toContain('t-link--underline-none');
+      expect(plain.classes()).toContain('t-link--weight-semibold');
+
+      const base = mount(TLink, { slots: { default: 'x' } });
+      expect(base.classes().join(' ')).not.toContain('t-link--underline');
+      expect(base.classes().join(' ')).not.toContain('t-link--weight');
+    });
+  });
+
+  describe('TCard interactive (LSS-002)', () => {
+    it('adds the interactive modifier and works as a link element', () => {
+      const wrapper = mount(TCard, {
+        props: { interactive: true, as: 'a' },
+        attrs: { href: '#x' },
+        slots: { default: 'conteudo' },
+      });
+      expect(wrapper.classes()).toContain('t-card--interactive');
+      expect(wrapper.element.tagName).toBe('A');
+      expect(wrapper.attributes('href')).toBe('#x');
+    });
+  });
+
+  describe('TAppShell header-end (LSS-007)', () => {
+    it('renders the trailing region and flags the header', () => {
+      const wrapper = mount(TAppShell, {
+        props: { mobile: false },
+        slots: {
+          'header-start': '<span>marca</span>',
+          header: '<span>titulo</span>',
+          'header-end': '<button class="acts">acoes</button>',
+        },
+      });
+      expect(wrapper.find('.t-app-shell__header-end .acts').exists()).toBe(true);
+      expect(wrapper.find('.t-app-shell__header').classes()).toContain('has-end');
+      expect(wrapper.find('.t-app-shell__header').classes()).toContain('has-start');
+    });
+
+    it('omits the trailing region when the slot is empty', () => {
+      const wrapper = mount(TAppShell, { props: { mobile: false }, slots: { header: '<span>x</span>' } });
+      expect(wrapper.find('.t-app-shell__header-end').exists()).toBe(false);
+      expect(wrapper.find('.t-app-shell__header').classes()).not.toContain('has-end');
+    });
+  });
+});

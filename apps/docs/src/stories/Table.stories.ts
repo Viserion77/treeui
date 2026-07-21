@@ -120,3 +120,28 @@ export const NamedTable: Story = {
     `,
   }),
 };
+
+export const MutedRows: Story = {
+  render: () => ({
+    components: { TTable, TBadge },
+    setup: () => ({
+      columns: [
+        { key: 'name', label: 'Resource', sortable: true },
+        { key: 'status', label: 'Status' },
+      ],
+      rows: [
+        { id: 'q1', name: 'orders-queue', status: 'active', exists: true },
+        { id: 'q2', name: 'legacy-queue', status: 'deleted', exists: false },
+        { id: 'q3', name: 'events-queue', status: 'active', exists: true },
+      ],
+      rowState: (row: Record<string, unknown>) => (row.exists ? 'default' : 'muted'),
+    }),
+    template: `
+      <TTable :columns="columns" :rows="rows" row-key="id" :row-state="rowState" caption="Queues">
+        <template #cell-status="{ row }">
+          <TBadge :tone="row.exists ? 'success' : 'neutral'">{{ row.status }}</TBadge>
+        </template>
+      </TTable>
+    `,
+  }),
+};

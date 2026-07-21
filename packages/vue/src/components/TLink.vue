@@ -2,6 +2,8 @@
 import { computed, getCurrentInstance, type Component } from 'vue';
 
 export type TLinkVariant = 'default' | 'muted' | 'danger';
+export type TLinkUnderline = 'always' | 'hover' | 'none';
+export type TLinkWeight = 'regular' | 'medium' | 'semibold';
 
 const props = withDefaults(
   defineProps<{
@@ -10,6 +12,10 @@ const props = withDefaults(
     external?: boolean;
     disabled?: boolean;
     variant?: TLinkVariant;
+    /** When the underline shows. `always` (default), `hover`, or `none`. */
+    underline?: TLinkUnderline;
+    /** Text weight. Defaults to `medium`, matching the base link. */
+    weight?: TLinkWeight;
   }>(),
   {
     to: undefined,
@@ -17,6 +23,8 @@ const props = withDefaults(
     external: false,
     disabled: false,
     variant: 'default',
+    underline: 'always',
+    weight: 'medium',
   },
 );
 
@@ -51,6 +59,8 @@ const linkProps = computed(() => {
 const classes = computed(() => [
   't-link',
   `t-link--${props.variant}`,
+  props.underline !== 'always' ? `t-link--underline-${props.underline}` : null,
+  props.weight !== 'medium' ? `t-link--weight-${props.weight}` : null,
   {
     'is-disabled': props.disabled,
   },

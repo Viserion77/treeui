@@ -6,8 +6,10 @@ defineOptions({
 });
 
 const _treeStackDirections = ['vertical', 'horizontal'] as const;
+const _treeStackFills = ['viewport', 'parent'] as const;
 
 export type TStackDirection = (typeof _treeStackDirections)[number];
+export type TStackFill = (typeof _treeStackFills)[number];
 
 const props = withDefaults(
   defineProps<{
@@ -20,6 +22,12 @@ const props = withDefaults(
     reverse?: boolean;
     /** Expand to fill available space along the parent's main axis. */
     grow?: boolean;
+    /**
+     * Give the stack a minimum block size so a centered child fills the screen
+     * or its parent: `viewport` → `100dvh`, `parent` → `100%`. Compose with
+     * `align`/`justify="center"` for a centered loading or empty state.
+     */
+    fill?: TStackFill;
   }>(),
   {
     as: 'div',
@@ -30,6 +38,7 @@ const props = withDefaults(
     wrap: false,
     reverse: false,
     grow: false,
+    fill: undefined,
   },
 );
 
@@ -38,6 +47,7 @@ const attrs = useAttrs();
 const rootClasses = computed(() => [
   't-stack',
   `t-stack--${props.direction}`,
+  props.fill ? `t-stack--fill-${props.fill}` : null,
   {
     'is-wrapping': props.wrap,
     'is-reversed': props.reverse,

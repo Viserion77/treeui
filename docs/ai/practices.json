@@ -34,7 +34,8 @@
         "TTabs",
         "TPagination",
         "TDropdown",
-        "TSelectableList"
+        "TSelectableList",
+        "TCard"
       ]
     },
     {

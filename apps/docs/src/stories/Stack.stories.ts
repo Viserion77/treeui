@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite';
-import { TBadge, TButton, TCard, TStack } from '@treeui/vue';
+import { TBadge, TButton, TCard, TSpinner, TStack } from '@treeui/vue';
 import { practiceNote } from './practice-refs';
 
 const meta = {
@@ -74,6 +74,19 @@ export const Reversed: Story = {
         <div style="padding: 0.75rem 1rem; border-radius: 0.75rem; background: var(--tree-color-brand-soft);">Second</div>
         <div style="padding: 0.75rem 1rem; border-radius: 0.75rem; background: var(--tree-color-brand-soft);">First</div>
       </TStack>
+    `,
+  }),
+};
+
+export const FillAndCenter: Story = {
+  render: () => ({
+    components: { TStack, TSpinner },
+    template: `
+      <div style="height: 18rem; border: 1px dashed var(--tree-color-border-default);">
+        <TStack fill="parent" align="center" justify="center">
+          <TSpinner size="lg" label="Loading dashboards" />
+        </TStack>
+      </div>
     `,
   }),
 };

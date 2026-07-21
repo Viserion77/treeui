@@ -8,12 +8,20 @@ const props = withDefaults(
     variant?: TCardVariant;
     size?: TSize;
     title?: string;
+    /**
+     * Treat the card as an interactive surface — adds hover elevation and a
+     * focus-visible ring. Use with `as="a"` / `as="router-link"` to make the
+     * whole card a link without an inner `TLink` (which would underline the
+     * card's text via decoration inheritance).
+     */
+    interactive?: boolean;
   }>(),
   {
     as: 'section',
     variant: 'outline',
     size: 'md',
     title: undefined,
+    interactive: false,
   },
 );
 
@@ -21,6 +29,7 @@ const classes = computed(() => [
   't-card',
   `t-card--${props.variant}`,
   `t-card--${props.size}`,
+  { 't-card--interactive': props.interactive },
 ]);
 
 const hasHeader = computed(() => !!props.title);

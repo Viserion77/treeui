@@ -90,3 +90,16 @@ export const PreserveWhitespace: Story = {
     `,
   }),
 };
+
+export const MonospaceFamily: Story = {
+  render: () => ({
+    components: { TText },
+    template: `
+      <div style="display: grid; gap: 0.5rem;">
+        <TText family="mono">arn:aws:sqs:us-east-1:000000000000:orders</TText>
+        <TText family="mono" size="sm" tone="muted">i-0a1b2c3d4e5f · 2026-07-21T14:03:11Z</TText>
+        <TText>Body text stays in the sans family for comparison.</TText>
+      </div>
+    `,
+  }),
+};

@@ -61,3 +61,16 @@ export const ExternalLink: Story = {
     `,
   }),
 };
+
+export const UnderlineAndWeight: Story = {
+  render: () => ({
+    components: { TLink },
+    template: `
+      <div style="display: flex; gap: 1.5rem; flex-wrap: wrap;">
+        <TLink href="#a">Always underlined</TLink>
+        <TLink href="#b" underline="hover">Underline on hover</TLink>
+        <TLink href="#c" underline="none" weight="semibold">Undecorated, semibold</TLink>
+      </div>
+    `,
+  }),
+};

@@ -34,6 +34,16 @@ props:
       entirely. Setting it also forces the header element to render. Because it
       is declared as a prop it is consumed by the component and never reaches
       the root element as the native HTML `title` tooltip attribute.
+  interactive:
+    type: boolean
+    default: false
+    description: >
+      Treats the card as an interactive surface — adds hover elevation, a
+      focus-visible ring, `cursor: pointer`, and clears text-decoration/colour.
+      Use with `as="a"` / `as="router-link"` to make the whole card a single
+      link WITHOUT an inner TLink, which would underline the card's text via
+      decoration inheritance. The consumer owns the interactive element's
+      accessible name and href/to; the card only supplies the affordance.
 
 events: []
 
@@ -79,6 +89,7 @@ css:
     - t-card--sm
     - t-card--md
     - t-card--lg
+    - t-card--interactive
   elements:
     - t-card__header
     - t-card__title

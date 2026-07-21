@@ -43,7 +43,7 @@ props:
   label:
     type: string
     default: undefined
-    note: "Accessible name, rendered as `aria-label`. Required whenever `iconOnly` is set; ignored for ordinary buttons that already have visible text."
+    note: "Accessible name, rendered as `aria-label`. Required whenever `iconOnly` is set; ignored for ordinary buttons that already have visible text. In development, an `iconOnly` button with no `label`/`aria-label`/`aria-labelledby` logs a console warning; the check is guarded by `process.env.NODE_ENV` so it is stripped from the consumer's production build (the vue package's vite build keeps `process.env.NODE_ENV` as a runtime reference for this)."
   type:
     type: "button | submit | reset"
     default: button

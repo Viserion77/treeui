@@ -25,6 +25,15 @@ props:
     required: false
     description: Visible `<caption>` naming the table.
     note: "For a name without visible text, pass `aria-label` / `aria-labelledby` instead — attribute inheritance is disabled and every non-class/style attr is forwarded to the `<table>`, so the name lands on the named element rather than the scroll wrapper."
+  rowKey:
+    type: "string | ((row, index) => string | number)"
+    required: false
+    description: "Stable per-row identity. A field name or a function of the row, so rows keep identity across sorting. Without it Vue keys by array index and rowState styling would follow the position, not the data. Falls back to the index."
+  rowState:
+    type: "(row, index) => 'default' | 'muted'"
+    required: false
+    description: "Semantic per-row state applied by data, not position, so it survives sorting. `muted` recesses a row (e.g. a resource that no longer exists) via `t-table__row--muted`, written at compound specificity so it wins over the zebra/hover rules."
+    a11y_note: "Dimming is a visual aid only, never the sole signal — pair `muted` with a status cell (TBadge/TTag) or visually hidden text conveying the same meaning, per the accessible-by-default practice."
 
 events:
   sort:

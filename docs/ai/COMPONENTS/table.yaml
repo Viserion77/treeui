@@ -20,6 +20,11 @@ props:
     type: TTableSortState
     required: false
     description: Controlled sort state. When provided, overrides internal sort tracking.
+  caption:
+    type: string
+    required: false
+    description: Visible `<caption>` naming the table.
+    note: "For a name without visible text, pass `aria-label` / `aria-labelledby` instead — attribute inheritance is disabled and every non-class/style attr is forwarded to the `<table>`, so the name lands on the named element rather than the scroll wrapper."
 
 events:
   sort:
@@ -46,8 +51,13 @@ types:
     key: string
     direction: "'asc' | 'desc' | 'none'"
 
+forwards_attrs_to: table_element
+attr_inheritance: "inheritAttrs is false. `class` and `style` stay on the `.t-table-wrapper` scroll container (the root); every other attribute — aria-label, aria-labelledby, id, data-* — is forwarded to the `<table>`."
+
 accessibility:
-  role: grid
+  role: "table (native). No explicit role is emitted."
+  why_not_grid: "TTable previously set role=\"grid\" without implementing the composite-widget keyboard model — no roving tabindex, no gridcell/row roles, no 2D arrow-key navigation. Screen readers switched to application/focus mode and offered cell navigation that did not exist. The role was removed so the component is honestly a reading table. An opt-in interactive grid mode is deliberately NOT offered until the keyboard model ships."
+  accessible_name: "Use `caption` for a visible name or `aria-label` / `aria-labelledby` for an invisible one. Both land on the `<table>`."
   aria-sort: Set on sortable column headers (ascending, descending, none).
   keyboard: Sortable headers are focusable and activated with Enter or Space.
   scope: col on all th elements.

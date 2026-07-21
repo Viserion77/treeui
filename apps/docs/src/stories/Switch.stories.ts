@@ -1,10 +1,14 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite';
 import { ref } from 'vue';
 import { TSwitch } from '@treeui/vue';
+import { practiceNote } from './practice-refs';
 
 const meta = {
   title: 'Components/Data Entry/Switch',
   component: TSwitch,
+  parameters: {
+    docs: { description: { component: practiceNote('TSwitch') } },
+  },
   tags: ['autodocs'],
   args: {
     size: 'md',

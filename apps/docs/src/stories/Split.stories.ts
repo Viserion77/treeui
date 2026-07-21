@@ -1,11 +1,15 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite';
 import { TSplit } from '@treeui/vue';
+import { practiceNote } from './practice-refs';
 
 const meta = {
   title: 'Components/Layout/Split',
   component: TSplit,
   tags: ['autodocs'],
-  parameters: { layout: 'fullscreen' },
+  parameters: {
+    layout: 'fullscreen',
+    docs: { description: { component: practiceNote('TSplit') } },
+  },
   args: {
     gap: 'var(--tree-space-5)',
     ratio: 2,

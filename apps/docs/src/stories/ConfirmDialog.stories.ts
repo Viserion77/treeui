@@ -2,10 +2,14 @@ import type { Meta, StoryObj } from '@storybook/vue3-vite';
 import { ref } from 'vue';
 import { TButton, TConfirmDialog } from '@treeui/vue';
 import { InfoIcon, iconProps } from './icon-helpers';
+import { practiceNote } from './practice-refs';
 
 const meta = {
   title: 'Components/Overlay/ConfirmDialog',
   component: TConfirmDialog,
+  parameters: {
+    docs: { description: { component: practiceNote('TConfirmDialog') } },
+  },
   tags: ['autodocs'],
   args: {
     size: 'sm',

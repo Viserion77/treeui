@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from '@storybook/vue3-vite';
 import { ref } from 'vue';
 import { TAlert, TButton, TIcon } from '@treeui/vue';
 import { InfoIcon, iconProps } from './icon-helpers';
+import { practiceNote } from './practice-refs';
 
 const notices = [
   { id: 1, variant: 'success', message: 'Deployment finished successfully.' },
@@ -12,6 +13,9 @@ const notices = [
 const meta = {
   title: 'Components/Feedback/Alert',
   component: TAlert,
+  parameters: {
+    docs: { description: { component: practiceNote('TAlert') } },
+  },
   tags: ['autodocs'],
   args: {
     variant: 'info',

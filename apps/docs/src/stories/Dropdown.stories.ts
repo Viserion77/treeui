@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite';
 import { ref } from 'vue';
 import { TDropdown, TButton } from '@treeui/vue';
+import { practiceNote } from './practice-refs';
 
 const menuItems = [
   { label: 'Edit', value: 'edit' },
@@ -12,6 +13,9 @@ const menuItems = [
 const meta = {
   title: 'Components/Overlay/Dropdown',
   component: TDropdown,
+  parameters: {
+    docs: { description: { component: practiceNote('TDropdown') } },
+  },
   tags: ['autodocs'],
   args: {
     size: 'md',

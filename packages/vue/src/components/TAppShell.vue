@@ -27,6 +27,7 @@ defineOptions({
 });
 
 const CloseIcon = computed(() => getTreeIcon('x'));
+const MenuIcon = computed(() => getTreeIcon('menu'));
 
 const props = withDefaults(
   defineProps<{
@@ -41,6 +42,12 @@ const props = withDefaults(
     breakpoint?: string;
     sidebarOpen?: boolean;
     defaultSidebarOpen?: boolean;
+    /**
+     * Hide the shell chrome (header and sidebar) so the content fills the
+     * viewport. The default slot stays mounted across the toggle.
+     */
+    immersive?: boolean;
+    defaultImmersive?: boolean;
     closeOnEscape?: boolean;
     closeOnOverlay?: boolean;
     showMenuButton?: boolean;
@@ -64,6 +71,8 @@ const props = withDefaults(
     breakpoint: '768px',
     sidebarOpen: undefined,
     defaultSidebarOpen: false,
+    immersive: undefined,
+    defaultImmersive: false,
     closeOnEscape: true,
     closeOnOverlay: true,
     showMenuButton: true,
@@ -81,15 +90,19 @@ const emit = defineEmits<{
   'collapse-change': [value: boolean];
   'update:sidebarOpen': [value: boolean];
   'sidebar-open-change': [value: boolean];
+  'update:immersive': [value: boolean];
+  'immersive-change': [value: boolean];
 }>();
 
 export interface AppShellSlotProps {
   mobile: boolean;
   collapsed: boolean;
   sidebarOpen: boolean;
+  immersive: boolean;
   toggleSidebar: () => void;
   closeSidebar: () => void;
   toggleCollapsed: () => void;
+  toggleImmersive: () => void;
 }
 
 defineSlots<{
@@ -101,7 +114,13 @@ defineSlots<{
   sidebar?: (props: AppShellSlotProps) => unknown;
   /** Pinned to the bottom of the sidebar, inset to line up with nav item icons. */
   'sidebar-footer'?: (props: AppShellSlotProps) => unknown;
-  default?: (props: Pick<AppShellSlotProps, 'mobile' | 'collapsed'>) => unknown;
+  /**
+   * Immersive hides the chrome, so the content is the only place an exit
+   * control can live — `immersive` and `toggleImmersive` are passed through.
+   */
+  default?: (
+    props: Pick<AppShellSlotProps, 'mobile' | 'collapsed' | 'immersive' | 'toggleImmersive'>,
+  ) => unknown;
   'menu-icon'?: (props: { sidebarOpen: boolean }) => unknown;
   'collapse-icon'?: (props: { collapsed: boolean }) => unknown;
 }>();
@@ -126,6 +145,19 @@ const { value: isSidebarOpen, setValue: setSidebarOpen } = useControllableOpen(
     emit('sidebar-open-change', value);
   },
 );
+
+const { value: isImmersive, setValue: setImmersive } = useControllableOpen(
+  toRef(props, 'immersive'),
+  props.defaultImmersive,
+  (value) => {
+    emit('update:immersive', value);
+    emit('immersive-change', value);
+  },
+);
+
+const toggleImmersive = () => {
+  setImmersive(!isImmersive.value);
+};
 
 // Auto responsive detection when `mobile` is not explicitly controlled.
 const autoMobile = ref(false);
@@ -163,6 +195,13 @@ const showCollapseToggle = computed(
 const effectiveCollapsed = computed(() =>
   isMobile.value ? false : isCollapsed.value,
 );
+
+// The glyph points the way the rail will move: collapsing a left sidebar folds
+// it left, expanding it pushes right (mirrored for a right-anchored sidebar).
+const CollapseIcon = computed(() => {
+  const pointsStart = props.side === 'right' ? effectiveCollapsed.value : !effectiveCollapsed.value;
+  return getTreeIcon(pointsStart ? 'panel-left' : 'panel-right');
+});
 
 const surfaceRef = ref<HTMLElement | null>(null);
 const previousFocusedElement = ref<HTMLElement | null>(null);
@@ -335,6 +374,7 @@ const rootClasses = computed(() => [
     'is-collapsed':
       !isMobile.value && props.collapsible && isCollapsed.value,
     'is-sidebar-open': isMobile.value && isSidebarOpen.value,
+    'is-immersive': isImmersive.value,
   },
   attrs.class,
 ]);
@@ -356,9 +396,11 @@ const slotProps = computed<AppShellSlotProps>(() => ({
   mobile: isMobile.value,
   collapsed: effectiveCollapsed.value,
   sidebarOpen: isSidebarOpen.value,
+  immersive: isImmersive.value,
   toggleSidebar,
   closeSidebar,
   toggleCollapsed,
+  toggleImmersive,
 }));
 </script>
 
@@ -387,37 +429,11 @@ const slotProps = computed<AppShellSlotProps>(() => ({
           name="menu-icon"
           :sidebar-open="isSidebarOpen"
         >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
+          <MenuIcon
+            v-bind="treeIconDefaults"
+            :size="24"
             aria-hidden="true"
-          >
-            <line
-              x1="4"
-              x2="20"
-              y1="6"
-              y2="6"
-            />
-            <line
-              x1="4"
-              x2="20"
-              y1="12"
-              y2="12"
-            />
-            <line
-              x1="4"
-              x2="20"
-              y1="18"
-              y2="18"
-            />
-          </svg>
+          />
         </slot>
       </button>
 
@@ -484,27 +500,10 @@ const slotProps = computed<AppShellSlotProps>(() => ({
             name="collapse-icon"
             :collapsed="effectiveCollapsed"
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="20"
-              height="20"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
+            <CollapseIcon
+              v-bind="treeIconDefaults"
               aria-hidden="true"
-            >
-              <rect
-                x="3"
-                y="3"
-                width="18"
-                height="18"
-                rx="2"
-              />
-              <path d="M9 3v18" />
-            </svg>
+            />
           </slot>
         </button>
       </div>
@@ -514,12 +513,14 @@ const slotProps = computed<AppShellSlotProps>(() => ({
       <slot
         :mobile="isMobile"
         :collapsed="effectiveCollapsed"
+        :immersive="isImmersive"
+        :toggle-immersive="toggleImmersive"
       />
     </main>
 
     <transition name="t-app-shell-fade">
       <div
-        v-if="isMobile && isSidebarOpen"
+        v-if="isMobile && isSidebarOpen && !isImmersive"
         class="t-app-shell__overlay"
       >
         <div

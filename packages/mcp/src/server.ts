@@ -45,6 +45,12 @@ const resourceList = [
     mimeType: 'application/json',
   },
   {
+    uri: 'treeui://practices',
+    name: 'TreeUI practices',
+    description: 'Named UX practices and the components that follow them.',
+    mimeType: 'application/json',
+  },
+  {
     uri: 'treeui://tokens',
     name: 'TreeUI design tokens',
     description: 'Flat list of --tree-* design tokens with per-theme values.',
@@ -80,6 +86,10 @@ const readResourcePayload = (uri: string) => {
 
   if (uri === 'treeui://recipes') {
     return catalog.recipes;
+  }
+
+  if (uri === 'treeui://practices') {
+    return catalog.practices;
   }
 
   if (uri === 'treeui://tokens') {

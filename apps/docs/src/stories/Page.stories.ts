@@ -1,9 +1,13 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite';
 import { TButton, TCard, TPage, TPageHeader } from '@treeui/vue';
+import { practiceNote } from './practice-refs';
 
 const meta = {
   title: 'Components/Layout/Page',
   component: TPage,
+  parameters: {
+    docs: { description: { component: practiceNote('TPage') } },
+  },
   tags: ['autodocs'],
   args: {
     as: 'div',

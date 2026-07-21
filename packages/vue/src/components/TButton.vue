@@ -11,6 +11,23 @@ const props = withDefaults(
     size?: TSize;
     disabled?: boolean;
     loading?: boolean;
+    /**
+     * Accessible announcement while `loading`, forwarded to the spinner.
+     * The default is English; pass the active locale's string to localize it.
+     */
+    loadingLabel?: string;
+    /**
+     * While `loading`, hide the `icon` slot so the spinner replaces the icon
+     * instead of rendering beside it. Set to `false` to keep both visible.
+     */
+    hideIconWhileLoading?: boolean;
+    /**
+     * Square, icon-only button. The visible label is dropped, so an accessible
+     * name is required — pass `label` (or `aria-label`).
+     */
+    iconOnly?: boolean;
+    /** Accessible name, rendered as `aria-label`. Required when `iconOnly`. */
+    label?: string;
     type?: 'button' | 'submit' | 'reset';
     /** Stretch to the full width of the container. */
     block?: boolean;
@@ -23,6 +40,10 @@ const props = withDefaults(
     size: 'md',
     disabled: false,
     loading: false,
+    loadingLabel: 'Loading',
+    hideIconWhileLoading: true,
+    iconOnly: false,
+    label: undefined,
     type: 'button',
     block: false,
     align: 'center',
@@ -54,6 +75,11 @@ const buttonClass = tv({
 
 const isNativeButton = computed(() => props.as === 'button');
 const isDisabled = computed(() => props.disabled || props.loading);
+
+// The spinner takes the icon's leading position, so rendering both would show
+// two glyphs and widen the button mid-action.
+const isIconHidden = computed(() => props.loading && props.hideIconWhileLoading);
+
 const classes = computed(() =>
   buttonClass({
     variant: props.variant,
@@ -62,6 +88,7 @@ const classes = computed(() =>
       'is-loading': props.loading,
       'is-disabled': isDisabled.value,
       't-button--block': props.block,
+      't-button--icon': props.iconOnly,
       't-button--align-start': props.align === 'start',
       't-button--align-end': props.align === 'end',
     },
@@ -87,6 +114,7 @@ const onClick = (event: MouseEvent) => {
     :disabled="isNativeButton ? isDisabled : undefined"
     :aria-disabled="!isNativeButton && isDisabled ? 'true' : undefined"
     :aria-busy="loading || undefined"
+    :aria-label="label"
     :tabindex="!isNativeButton && isDisabled ? -1 : undefined"
     @click="onClick"
   >
@@ -96,17 +124,20 @@ const onClick = (event: MouseEvent) => {
     >
       <TSpinner
         size="sm"
-        label="Loading"
+        :label="loadingLabel"
       />
     </span>
     <span
-      v-if="$slots.icon"
+      v-if="$slots.icon && !isIconHidden"
       class="t-button__icon"
       aria-hidden="true"
     >
       <slot name="icon" />
     </span>
-    <span class="t-button__label">
+    <span
+      v-if="!iconOnly"
+      class="t-button__label"
+    >
       <slot />
     </span>
   </component>

@@ -1,9 +1,13 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite';
 import { TBadge, TButton, TCard, TStack } from '@treeui/vue';
+import { practiceNote } from './practice-refs';
 
 const meta = {
   title: 'Components/Layout/Stack',
   component: TStack,
+  parameters: {
+    docs: { description: { component: practiceNote('TStack') } },
+  },
   tags: ['autodocs'],
   args: {
     direction: 'vertical',

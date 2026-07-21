@@ -1,10 +1,14 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite';
 import { ref } from 'vue';
 import { TPagination } from '@treeui/vue';
+import { practiceNote } from './practice-refs';
 
 const meta = {
   title: 'Components/Navigation/Pagination',
   component: TPagination,
+  parameters: {
+    docs: { description: { component: practiceNote('TPagination') } },
+  },
   tags: ['autodocs'],
   args: {
     modelValue: 1,

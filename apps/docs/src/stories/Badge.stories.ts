@@ -1,10 +1,14 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite';
 import { TBadge } from '@treeui/vue';
 import { InfoIcon, iconProps } from './icon-helpers';
+import { practiceNote } from './practice-refs';
 
 const meta = {
   title: 'Components/Data Display/Badge',
   component: TBadge,
+  parameters: {
+    docs: { description: { component: practiceNote('TBadge') } },
+  },
   tags: ['autodocs'],
   args: {
     variant: 'soft',

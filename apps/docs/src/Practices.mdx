@@ -1,0 +1,43 @@
+import { Fragment } from 'react';
+import { Meta, Title } from '@storybook/addon-docs/blocks';
+import practicesData from '../../../docs/ai/practices.json';
+
+<Meta title="Foundation/Practices" />
+
+<Title>Practices</Title>
+
+<p>{practicesData.philosophy.statement}</p>
+
+<ul>
+  {practicesData.philosophy.pillars.map((pillar) => (
+    <li key={pillar}>{pillar}</li>
+  ))}
+</ul>
+
+These practices are a public contract, not aspirations: each one names the
+components that follow it, every listed component links back here from its own
+docs page, and the canonical data lives in <code>docs/ai/practices.json</code>.
+The same list powers the "Best practices" section of the landing page.
+
+{practicesData.practices.map((practice) => (
+  <Fragment key={practice.id}>
+    <h2 id={practice.id}>{practice.title}</h2>
+    <p>{practice.summary}</p>
+    <ul>
+      {practice.rules.map((rule) => (
+        <li key={rule}>{rule}</li>
+      ))}
+    </ul>
+    <p>
+      <strong>Followed by: </strong>
+      {practice.components.map((name, index) => (
+        <Fragment key={name}>
+          {index > 0 ? ' · ' : ''}
+          <a target="_top" href={`./?path=/docs/${practicesData.components[name]}--docs`}>
+            <code>{name}</code>
+          </a>
+        </Fragment>
+      ))}
+    </p>
+  </Fragment>
+))}

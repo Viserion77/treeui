@@ -28,6 +28,10 @@ props:
     type: boolean
     default: false
     note: "Clip to a single line with an ellipsis."
+  preserveWhitespace:
+    type: boolean
+    default: false
+    note: "Render authored line breaks and blank lines as written (`white-space: pre-wrap`) while still wrapping long lines. Use for plain-text output such as AI responses, so consumers never need a local `white-space: pre-wrap` class. Mutually exclusive with `truncate`, which needs `nowrap`; when both are set `truncate` wins and no `is-pre-wrap` class is emitted."
 
 slots:
   - default
@@ -35,6 +39,7 @@ slots:
 behavior:
   semantic_element_controlled_by_as: true
   token_driven_size_tone_weight: true
+  truncate_takes_precedence_over_preserve_whitespace: true
 
 a11y:
   - "Choose `as` to convey the correct semantics (e.g. headings via h1–h6); TText adds only visual styling."

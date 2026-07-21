@@ -1,7 +1,14 @@
 <script setup lang="ts">
 import { TBadge, TCard } from '@treeui/vue';
+import practicesData from '../../../docs/ai/practices.json';
 import wordmarkUrl from './assets/treeui-wordmark.svg';
 import markUrl from './assets/treeui-logo.svg';
+
+const { philosophy, practices } = practicesData;
+const componentDocs = practicesData.components as Record<string, string>;
+
+const componentHref = (name: string) => `./vue/?path=/docs/${componentDocs[name]}--docs`;
+const practicesDocsHref = `./vue/?path=/docs/${practicesData.storybookDocPage}--docs`;
 
 const features = [
   {
@@ -37,6 +44,7 @@ const features = [
           alt="TreeUI"
         >
         <nav class="top__nav">
+          <a href="#practices">Best practices</a>
           <a href="./vue/">Vue docs</a>
           <a href="./react/">React docs</a>
           <a href="./examples/dashboard-vue/">Examples</a>
@@ -203,6 +211,53 @@ const features = [
               </p>
             </TCard>
           </div>
+        </section>
+
+        <section
+          id="practices"
+          class="practices"
+          aria-label="Best practices"
+        >
+          <h3>Best practices, built in</h3>
+          <p class="practices__intro">
+            {{ philosophy.statement }}
+          </p>
+          <div class="practices__grid">
+            <TCard
+              v-for="practice in practices"
+              :key="practice.id"
+              variant="outline"
+              class="practice"
+            >
+              <template #header>
+                <h4 class="practice__title">
+                  {{ practice.title }}
+                </h4>
+              </template>
+              <p class="practice__summary">
+                {{ practice.summary }}
+              </p>
+              <template #footer>
+                <div class="practice__foot">
+                  <span class="practice__foot-label">Components that follow it</span>
+                  <ul class="practice__chips">
+                    <li
+                      v-for="component in practice.components"
+                      :key="component"
+                    >
+                      <a
+                        class="chip"
+                        :href="componentHref(component)"
+                      >{{ component }}</a>
+                    </li>
+                  </ul>
+                </div>
+              </template>
+            </TCard>
+          </div>
+          <p class="practices__more">
+            <a :href="practicesDocsHref">Every practice, with its rules and live component demos, in Storybook →</a>
+          </p>
         </section>
       </div>
     </main>
@@ -420,6 +475,105 @@ a {
   color: var(--tree-color-text-muted);
 }
 
+.practices {
+  padding-block: var(--tree-space-8) var(--tree-space-3);
+  /* Anchor target: keep the section heading clear of the viewport edge. */
+  scroll-margin-top: var(--tree-space-8);
+}
+
+.practices h3 {
+  font-size: var(--tree-font-size-lg);
+  margin: 0 0 var(--tree-space-2);
+  letter-spacing: -0.01em;
+}
+
+.practices__intro {
+  margin: 0 0 var(--tree-space-5);
+  color: var(--tree-color-text-muted);
+  max-width: 72ch;
+}
+
+.practices__grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--tree-space-5);
+}
+
+.practice__title {
+  margin: 0;
+  font-size: var(--tree-font-size-md);
+  letter-spacing: -0.01em;
+}
+
+.practice__summary {
+  margin: 0;
+  color: var(--tree-color-text-muted);
+  font-size: var(--tree-font-size-sm);
+  line-height: 1.6;
+}
+
+.practice__foot {
+  display: grid;
+  gap: var(--tree-space-2);
+}
+
+.practice__foot-label {
+  font-size: var(--tree-font-size-xs);
+  font-weight: var(--tree-font-weight-medium);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--tree-color-text-muted);
+}
+
+.practice__chips {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--tree-space-2);
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--tree-space-1) var(--tree-space-2);
+  border: var(--tree-border-width-subtle) solid var(--tree-color-border-default);
+  border-radius: var(--tree-radius-sm);
+  font-family: var(--tree-font-family-mono, ui-monospace, monospace);
+  font-size: var(--tree-font-size-xs);
+  color: var(--tree-color-text-muted);
+  text-decoration: none;
+  transition:
+    color 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.chip:hover {
+  color: var(--tree-color-brand-primary);
+  border-color: var(--tree-color-brand-primary);
+}
+
+.chip:focus-visible {
+  outline: var(--tree-border-width-strong) solid var(--tree-color-focus-ring);
+  outline-offset: 2px;
+}
+
+.practices__more {
+  margin: var(--tree-space-5) 0 0;
+  font-size: var(--tree-font-size-sm);
+}
+
+.practices__more a {
+  color: var(--tree-color-brand-primary);
+  text-decoration: none;
+  font-weight: var(--tree-font-weight-medium);
+}
+
+.practices__more a:hover {
+  text-decoration: underline;
+}
+
 .foot {
   margin-top: var(--tree-space-12);
   border-top: var(--tree-border-width-subtle) solid var(--tree-color-border-default);
@@ -453,7 +607,8 @@ a {
 @media (max-width: 720px) {
   .paths,
   .examples__grid,
-  .foundation__grid {
+  .foundation__grid,
+  .practices__grid {
     grid-template-columns: 1fr;
   }
 }

@@ -1,10 +1,14 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite';
 import { computed, ref } from 'vue';
 import { TCheckbox } from '@treeui/vue';
+import { practiceNote } from './practice-refs';
 
 const meta = {
   title: 'Components/Data Entry/Checkbox',
   component: TCheckbox,
+  parameters: {
+    docs: { description: { component: practiceNote('TCheckbox') } },
+  },
   tags: ['autodocs'],
   args: {
     size: 'md',

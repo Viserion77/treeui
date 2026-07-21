@@ -431,6 +431,7 @@ export const formatComponentSummary = (component: TreeuiComponentEntry) => {
       [...component.setup.required, ...component.setup.notes],
     ),
     component.recipes.length > 0 ? `Recipes: ${component.recipes.join(', ')}` : undefined,
+    component.practices.length > 0 ? `Practices: ${component.practices.join(', ')}` : undefined,
   ].filter(Boolean);
 
   return lines.join('\n');

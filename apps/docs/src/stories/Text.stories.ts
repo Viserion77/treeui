@@ -68,3 +68,25 @@ export const Truncated: Story = {
     `,
   }),
 };
+
+export const PreserveWhitespace: Story = {
+  render: () => ({
+    components: { TText },
+    setup: () => ({
+      answer: 'Resumo do dia:\n\n- Tres feitos concluidos\n- Um bloqueio aberto\n\nSegue amanha.',
+    }),
+    template: `
+      <div style="display: grid; gap: 1rem; max-width: 28rem;">
+        <div style="border: 1px dashed var(--tree-color-border-default); padding: 0.5rem;">
+          <TText as="p" preserve-whitespace>{{ answer }}</TText>
+        </div>
+        <div style="border: 1px dashed var(--tree-color-border-default); padding: 0.5rem;">
+          <TText as="p">{{ answer }}</TText>
+        </div>
+        <div style="font-size: var(--tree-font-size-sm); color: var(--tree-color-text-muted);">
+          Above: line breaks preserved. Below: the same string collapsed into one paragraph.
+        </div>
+      </div>
+    `,
+  }),
+};

@@ -1,9 +1,13 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite';
 import { TButton, TToastProvider, useToast } from '@treeui/vue';
+import { practiceNote } from './practice-refs';
 
 const meta = {
   title: 'Components/Feedback/Toast',
   component: TToastProvider,
+  parameters: {
+    docs: { description: { component: practiceNote('TToastProvider') } },
+  },
   tags: ['autodocs'],
   args: {
     position: 'bottom-right',

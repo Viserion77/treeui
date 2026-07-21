@@ -2,10 +2,14 @@ import type { Meta, StoryObj } from '@storybook/vue3-vite';
 import { ref } from 'vue';
 import { TChart } from '@treeui/vue';
 import type { TChartActivePayload } from '@treeui/vue';
+import { practiceNote } from './practice-refs';
 
 const meta = {
   title: 'Components/Data Display/Chart',
   component: TChart,
+  parameters: {
+    docs: { description: { component: practiceNote('TChart') } },
+  },
   tags: ['autodocs'],
   args: {
     type: 'line',

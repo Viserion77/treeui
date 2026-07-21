@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite';
 import { ref } from 'vue';
 import { TSelect } from '@treeui/vue';
+import { practiceNote } from './practice-refs';
 
 const fruitOptions = [
   { label: 'Apple', value: 'apple' },
@@ -20,6 +21,9 @@ const monthOptions = [
 const meta = {
   title: 'Components/Data Entry/Select',
   component: TSelect,
+  parameters: {
+    docs: { description: { component: practiceNote('TSelect') } },
+  },
   tags: ['autodocs'],
   args: {
     size: 'md',

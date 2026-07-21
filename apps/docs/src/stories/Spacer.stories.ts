@@ -1,9 +1,13 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite';
 import { TSpacer, TStack, TButton } from '@treeui/vue';
+import { practiceNote } from './practice-refs';
 
 const meta = {
   title: 'Components/Layout/Spacer',
   component: TSpacer,
+  parameters: {
+    docs: { description: { component: practiceNote('TSpacer') } },
+  },
   tags: ['autodocs'],
 } satisfies Meta<typeof TSpacer>;
 

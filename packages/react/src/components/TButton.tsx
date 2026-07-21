@@ -25,6 +25,11 @@ export interface TButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   size?: TSize;
   loading?: boolean;
   icon?: ReactNode;
+  /**
+   * Square, icon-only button. The visible label is dropped, so an accessible
+   * name is required — pass `aria-label`.
+   */
+  iconOnly?: boolean;
 }
 
 export const TButton = forwardRef<HTMLButtonElement, TButtonProps>(function TButton(
@@ -34,6 +39,7 @@ export const TButton = forwardRef<HTMLButtonElement, TButtonProps>(function TBut
     loading = false,
     disabled = false,
     icon,
+    iconOnly = false,
     className,
     children,
     type = 'button',
@@ -51,7 +57,10 @@ export const TButton = forwardRef<HTMLButtonElement, TButtonProps>(function TBut
       className={buttonClass({
         variant,
         size,
-        class: [className, { 'is-loading': loading, 'is-disabled': isDisabled }],
+        class: [
+          className,
+          { 'is-loading': loading, 'is-disabled': isDisabled, 't-button--icon': iconOnly },
+        ],
       })}
       disabled={isDisabled}
       aria-busy={loading || undefined}
@@ -61,7 +70,7 @@ export const TButton = forwardRef<HTMLButtonElement, TButtonProps>(function TBut
           {icon}
         </span>
       ) : null}
-      <span className="t-button__label">{children}</span>
+      {iconOnly ? null : <span className="t-button__label">{children}</span>}
     </button>
   );
 });

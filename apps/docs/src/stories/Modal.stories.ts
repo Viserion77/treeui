@@ -1,10 +1,14 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite';
 import { ref } from 'vue';
 import { TButton, TInput, TModal } from '@treeui/vue';
+import { practiceNote } from './practice-refs';
 
 const meta = {
   title: 'Components/Overlay/Modal',
   component: TModal,
+  parameters: {
+    docs: { description: { component: practiceNote('TModal') } },
+  },
   tags: ['autodocs'],
   args: {
     size: 'md',

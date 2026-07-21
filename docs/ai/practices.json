@@ -1,0 +1,176 @@
+{
+  "version": "0.1",
+  "source": "TreeUI UX practices — canonical contract",
+  "note": "Single source of truth for the named TreeUI practices. Consumed by the landing page (apps/landing), the Storybook Foundation/Practices page and per-story practice notes (apps/docs), and the AI catalog (packages/mcp). If a component starts or stops following a practice, update this file in the same change.",
+  "storybookDocPage": "foundation-practices",
+  "philosophy": {
+    "statement": "TreeUI is optimized for clarity — visual clarity for users and development clarity for teams — with consistency and accessibility as defaults, never opt-ins. Components are tuned for good UI and UX through the named practices below, and the library takes on layout and alignment work so product code doesn't have to.",
+    "pillars": [
+      "Clarity over decoration — in the interface and in the API.",
+      "Consistency and accessibility are defaults, not options.",
+      "Good UI and UX through named, well-defined practices.",
+      "The library absorbs layout and alignment busywork."
+    ]
+  },
+  "practices": [
+    {
+      "id": "interaction-feedback",
+      "title": "Visual interaction feedback",
+      "summary": "Every interaction answers back. Hover, focus, active, loading, and disabled are designed states — never afterthoughts left to the consumer.",
+      "rules": [
+        "Interactive surfaces ship hover, active, and focus-visible treatments out of the box.",
+        "Loading states announce themselves (aria-busy, spinner) and block duplicate activation.",
+        "Disabled and loading elements never emit activation events.",
+        "Focus indicators stay visible in both light and dark themes."
+      ],
+      "components": [
+        "TButton",
+        "TLink",
+        "TInput",
+        "TSelect",
+        "TCheckbox",
+        "TSwitch",
+        "TTabs",
+        "TPagination",
+        "TDropdown",
+        "TSelectableList"
+      ]
+    },
+    {
+      "id": "accessible-by-default",
+      "title": "Accessible by default",
+      "summary": "Native semantics first, ARIA where the pattern requires it, full keyboard support, and focus management the consumer never has to write.",
+      "rules": [
+        "Native elements before roles; role=\"dialog\", aria-modal, aria-labelledby only where semantics require them.",
+        "Tab/Shift+Tab order, Escape to close, Enter/Space to activate, arrow keys where the pattern expects them.",
+        "Overlays trap focus while open and restore it on close.",
+        "Clickable targets stay at or above 44×44px."
+      ],
+      "components": [
+        "TModal",
+        "TDrawer",
+        "TConfirmDialog",
+        "TDropdown",
+        "TTooltip",
+        "TAccordion",
+        "TFormField",
+        "TTreeView",
+        "TToastProvider"
+      ]
+    },
+    {
+      "id": "predictable-api",
+      "title": "One predictable API",
+      "summary": "The same contracts everywhere: one size scale, one action-variant scale, v-model for form controls, open/close for overlays. Learn one component and you know them all.",
+      "rules": [
+        "Sizes are sm | md | lg across the library.",
+        "Action variants come from one scale: solid, outline, ghost, soft, danger.",
+        "Form controls speak modelValue + update:modelValue (v-model).",
+        "Overlays speak open/defaultOpen + update:open/open-change."
+      ],
+      "components": [
+        "TButton",
+        "TInput",
+        "TSelect",
+        "TBadge",
+        "TTag",
+        "TCard",
+        "TModal"
+      ]
+    },
+    {
+      "id": "state-clarity",
+      "title": "Empty, loading, and error are designed states",
+      "summary": "Screens communicate status honestly: skeletons while loading, purposeful empty states, and status surfaces on one semantic tone scale.",
+      "rules": [
+        "Default, hover, active, focus, disabled, loading, and error/empty states are designed and documented — not just the happy path.",
+        "Status tones map to semantic tokens (success, warning, error, info) and pass both themes.",
+        "Async feedback is immediate: skeleton or spinner first, toast or alert on completion."
+      ],
+      "components": [
+        "TSkeleton",
+        "TSpinner",
+        "TProgress",
+        "TEmptyState",
+        "TAlert",
+        "TToastProvider",
+        "TBadge"
+      ]
+    },
+    {
+      "id": "content-alignment",
+      "title": "Alignment without custom CSS",
+      "summary": "Layout primitives absorb spacing, alignment, and rhythm so product code never hand-rolls the same flexbox again.",
+      "rules": [
+        "Spacing comes from the --tree-space-* scale, applied by layout components.",
+        "Compose TPage, TStack, TGrid, and TSplit before writing a custom layout div.",
+        "Forms align through TFormField + TStack + TGrid — labels, hints, and errors line up by contract.",
+        "Reading widths and page gutters come from TContainer/TPage, not local max-widths."
+      ],
+      "components": [
+        "TStack",
+        "TGrid",
+        "TSplit",
+        "TContainer",
+        "TSpacer",
+        "TPage",
+        "TPageHeader",
+        "TFormField"
+      ]
+    },
+    {
+      "id": "token-driven",
+      "title": "Token-driven clarity",
+      "summary": "No raw hex, px, or font values anywhere. Every visual decision references a --tree-* token, so light/dark and brand theming stay coherent by construction.",
+      "rules": [
+        "Zero hardcoded colors, spacing, or typography in component code.",
+        "Light and dark are first-class themes; every state passes both.",
+        "Themes switch by attribute (data-tree-theme) with no component changes."
+      ],
+      "components": [
+        "TCard",
+        "TNavbar",
+        "TBadge",
+        "TTag",
+        "TChart"
+      ]
+    }
+  ],
+  "components": {
+    "TAccordion": "components-data-display-accordion",
+    "TAlert": "components-feedback-alert",
+    "TBadge": "components-data-display-badge",
+    "TButton": "components-actions-button",
+    "TCard": "components-data-display-card",
+    "TChart": "components-data-display-chart",
+    "TCheckbox": "components-data-entry-checkbox",
+    "TConfirmDialog": "components-overlay-confirmdialog",
+    "TContainer": "components-layout-container",
+    "TDrawer": "components-overlay-drawer",
+    "TDropdown": "components-overlay-dropdown",
+    "TEmptyState": "components-feedback-emptystate",
+    "TFormField": "components-data-entry-formfield",
+    "TGrid": "components-layout-grid",
+    "TInput": "components-data-entry-input",
+    "TLink": "components-navigation-link",
+    "TModal": "components-overlay-modal",
+    "TNavbar": "components-layout-navbar",
+    "TPage": "components-layout-page",
+    "TPageHeader": "components-layout-pageheader",
+    "TPagination": "components-navigation-pagination",
+    "TProgress": "components-feedback-progress",
+    "TSelect": "components-data-entry-select",
+    "TSelectableList": "components-navigation-disclosure-selectablelist",
+    "TSkeleton": "components-feedback-skeleton",
+    "TSpacer": "components-layout-spacer",
+    "TSpinner": "components-feedback-spinner",
+    "TSplit": "components-layout-split",
+    "TStack": "components-layout-stack",
+    "TSwitch": "components-data-entry-switch",
+    "TTabs": "components-navigation-tabs",
+    "TTag": "components-data-display-tag",
+    "TToastProvider": "components-feedback-toast",
+    "TTooltip": "components-overlay-tooltip",
+    "TTreeView": "components-navigation-disclosure-treeview"
+  }
+}

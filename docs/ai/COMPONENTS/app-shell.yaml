@@ -50,6 +50,14 @@ props:
     type: boolean
     default: false
     note: "Initial value for uncontrolled use. Read once during setup."
+  immersive:
+    type: boolean
+    default: undefined
+    note: "Controlled immersive state (v-model:immersive). Hides the header and sidebar so the content fills the viewport. The chrome is hidden with CSS rather than unmounted, so toggling never remounts the default slot. While immersive, the mobile drawer is not rendered."
+  defaultImmersive:
+    type: boolean
+    default: false
+    note: "Initial value for uncontrolled use. Read once during setup."
   closeOnEscape:
     type: boolean
     default: true
@@ -100,11 +108,17 @@ events:
   - name: sidebar-open-change
     payload: "[value: boolean]"
     description: "Same change as update:sidebarOpen, for non-v-model usage. Both always fire together."
+  - name: update:immersive
+    payload: "[value: boolean]"
+    description: "Immersive state changed. Enables v-model:immersive."
+  - name: immersive-change
+    payload: "[value: boolean]"
+    description: "Same change as update:immersive, for non-v-model usage. Both always fire together."
 
 slots:
   header:
     scoped: true
-    bindings: "AppShellSlotProps — { mobile, collapsed, sidebarOpen, toggleSidebar, closeSidebar, toggleCollapsed }"
+    bindings: "AppShellSlotProps — { mobile, collapsed, sidebarOpen, immersive, toggleSidebar, closeSidebar, toggleCollapsed, toggleImmersive }"
     description: >
       Main header region. Spans the full header width by default; once `header-start`
       is filled it is constrained to the content column so it lines up with the panel
@@ -139,7 +153,7 @@ slots:
       content alone.
   default:
     scoped: true
-    bindings: "{ mobile: boolean, collapsed: boolean } — a subset of AppShellSlotProps, no toggles"
+    bindings: "{ mobile: boolean, collapsed: boolean, immersive: boolean, toggleImmersive: () => void } — a subset of AppShellSlotProps. toggleImmersive is included because immersive hides the chrome, so the content is the only place an exit control can live."
     description: "Main content area. Scrolls independently of the header and sidebar."
   menu-icon:
     scoped: true
@@ -159,7 +173,7 @@ forwards_attrs_to: root
 
 types:
   TSidebarSide: "'left' | 'right'"
-  AppShellSlotProps: "{ mobile: boolean; collapsed: boolean; sidebarOpen: boolean; toggleSidebar: () => void; closeSidebar: () => void; toggleCollapsed: () => void }"
+  AppShellSlotProps: "{ mobile: boolean; collapsed: boolean; sidebarOpen: boolean; immersive: boolean; toggleSidebar: () => void; closeSidebar: () => void; toggleCollapsed: () => void; toggleImmersive: () => void }"
 
 a11y:
   semantic_regions: "<header>, <aside> and <main>; the shell root itself is a plain div and is not a landmark"
@@ -193,7 +207,10 @@ behavior:
   auto_menu_button_in_header_on_mobile: true
   controlled_and_uncontrolled_collapsed_state: true
   controlled_and_uncontrolled_sidebar_open_state: true
-  controlled_mode_does_not_self_update: "when collapsed or sidebarOpen is bound, the component only emits — the parent must apply the value"
+  controlled_and_uncontrolled_immersive_state: true
+  immersive_hides_chrome_without_remounting_content: "the header and sidebar are hidden with CSS and the grid collapses to a single `main` area, so the default slot keeps its component state across the toggle — unlike the mobile breakpoint, which does remount the sidebar slot"
+  immersive_suppresses_the_mobile_drawer: "while immersive the overlay is not rendered, since the trigger that opens it lives in the hidden header"
+  controlled_mode_does_not_self_update: "when collapsed, sidebarOpen or immersive is bound, the component only emits — the parent must apply the value"
   no_emit_when_the_value_is_unchanged: true
   toggle_collapsed_is_a_noop_when_collapsible_is_false: true
   collapse_toggle_requires_desktop_and_collapsible_and_show_collapse_button: true
@@ -255,7 +272,7 @@ css_variables:
   --tree-app-shell-rail-inset: "inline padding of the sidebar header and footer, matched to nav item icons"
 
 usage:
-  vue_pattern: "Supports v-model:collapsed (desktop rail) and v-model:sidebarOpen (mobile drawer). The header, header-start, sidebar, sidebar-header and sidebar-footer slots receive the full AppShellSlotProps { mobile, collapsed, sidebarOpen, toggleSidebar, closeSidebar, toggleCollapsed }; the default slot receives only { mobile, collapsed }; menu-icon receives { sidebarOpen } and collapse-icon receives { collapsed }. Place a TNavMenu in the sidebar slot; it inherits collapsed state automatically. Set collapsible to enable the desktop rail — without it the built-in toggle is not rendered and toggleCollapsed does nothing. Call closeSidebar after navigation so the mobile drawer does not stay open over the new route. The shell fills 100dvh and 100% width, so mount it at the app root and do not wrap its content in a max-width TContainer unless a specific region needs constrained reading width."
+  vue_pattern: "Supports v-model:collapsed (desktop rail) and v-model:sidebarOpen (mobile drawer). The header, header-start, sidebar, sidebar-header and sidebar-footer slots receive the full AppShellSlotProps { mobile, collapsed, sidebarOpen, toggleSidebar, closeSidebar, toggleCollapsed }; the default slot receives { mobile, collapsed, immersive, toggleImmersive }; menu-icon receives { sidebarOpen } and collapse-icon receives { collapsed }. Place a TNavMenu in the sidebar slot; it inherits collapsed state automatically. Set collapsible to enable the desktop rail — without it the built-in toggle is not rendered and toggleCollapsed does nothing. Call closeSidebar after navigation so the mobile drawer does not stay open over the new route. The shell fills 100dvh and 100% width, so mount it at the app root and do not wrap its content in a max-width TContainer unless a specific region needs constrained reading width."
 
 example: |
   <TAppShell collapsible>

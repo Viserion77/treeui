@@ -5020,3 +5020,168 @@ describe('TDonutChart', () => {
     wrapper.unmount();
   });
 });
+
+describe('TREEUX round 1 — consumer contract hardening', () => {
+  describe('TButton icon-only (TREEUX-001)', () => {
+    it('renders a square control, drops the label span and names it via `label`', () => {
+      const wrapper = mount(TButton, {
+        props: { iconOnly: true, label: 'Excluir' },
+        slots: { icon: '<svg class="glyph" />' },
+      });
+
+      expect(wrapper.classes()).toContain('t-button--icon');
+      expect(wrapper.attributes('aria-label')).toBe('Excluir');
+      expect(wrapper.find('.t-button__icon .glyph').exists()).toBe(true);
+      // Icon-only has no visible text, so the label wrapper is not emitted.
+      expect(wrapper.find('.t-button__label').exists()).toBe(false);
+    });
+
+    it('keeps the label span and stays non-square by default', () => {
+      const wrapper = mount(TButton, { slots: { default: 'Salvar' } });
+
+      expect(wrapper.classes()).not.toContain('t-button--icon');
+      expect(wrapper.find('.t-button__label').text()).toBe('Salvar');
+      expect(wrapper.attributes('aria-label')).toBeUndefined();
+    });
+  });
+
+  describe('TButton loading (TREEUX-013)', () => {
+    it('announces the loading state with the localized `loadingLabel`', () => {
+      const wrapper = mount(TButton, {
+        props: { loading: true, loadingLabel: 'Gerando resumo' },
+        slots: { default: 'Gerar' },
+      });
+
+      expect(wrapper.attributes('aria-busy')).toBe('true');
+      expect(wrapper.find('[role="status"]').attributes('aria-label')).toBe('Gerando resumo');
+    });
+
+    it('defaults to the English label for back-compat', () => {
+      const wrapper = mount(TButton, { props: { loading: true } });
+      expect(wrapper.find('[role="status"]').attributes('aria-label')).toBe('Loading');
+    });
+
+    it('swaps the icon for the spinner instead of rendering both', () => {
+      const wrapper = mount(TButton, {
+        props: { loading: true },
+        slots: { icon: '<svg class="glyph" />', default: 'Gerar' },
+      });
+
+      expect(wrapper.find('.t-button__spinner').exists()).toBe(true);
+      expect(wrapper.find('.t-button__icon').exists()).toBe(false);
+    });
+
+    it('can keep both when `hideIconWhileLoading` is disabled', () => {
+      const wrapper = mount(TButton, {
+        props: { loading: true, hideIconWhileLoading: false },
+        slots: { icon: '<svg class="glyph" />' },
+      });
+
+      expect(wrapper.find('.t-button__spinner').exists()).toBe(true);
+      expect(wrapper.find('.t-button__icon').exists()).toBe(true);
+    });
+  });
+
+  describe('TText preserveWhitespace (TREEUX-003)', () => {
+    it('preserves authored line breaks', () => {
+      const wrapper = mount(TText, { props: { preserveWhitespace: true } });
+      expect(wrapper.classes()).toContain('is-pre-wrap');
+    });
+
+    it('is inert when truncating, since the two conflict', () => {
+      const wrapper = mount(TText, { props: { preserveWhitespace: true, truncate: true } });
+      expect(wrapper.classes()).toContain('is-truncated');
+      expect(wrapper.classes()).not.toContain('is-pre-wrap');
+    });
+  });
+
+  describe('TTable semantics (TREEUX-014)', () => {
+    const columns = [{ key: 'name', label: 'Nome', sortable: true }];
+    const rows = [{ name: 'Ana' }];
+
+    it('is a reading table, not an unmanaged grid', () => {
+      const wrapper = mount(TTable, { props: { columns, rows } });
+      expect(wrapper.find('table').attributes('role')).toBeUndefined();
+    });
+
+    it('renders a visible caption', () => {
+      const wrapper = mount(TTable, { props: { columns, rows, caption: 'Feitos de hoje' } });
+      expect(wrapper.find('caption').text()).toBe('Feitos de hoje');
+    });
+
+    it('binds the accessible name to the <table>, not the scroll wrapper', () => {
+      const wrapper = mount(TTable, {
+        props: { columns, rows },
+        attrs: { 'aria-label': 'Feitos' },
+      });
+
+      expect(wrapper.find('table').attributes('aria-label')).toBe('Feitos');
+      expect(wrapper.find('.t-table-wrapper').attributes('aria-label')).toBeUndefined();
+    });
+
+    it('keeps consumer class on the scroll wrapper', () => {
+      const wrapper = mount(TTable, {
+        props: { columns, rows },
+        attrs: { class: 'minha-tabela' },
+      });
+
+      const root = wrapper.find('.t-table-wrapper');
+      expect(root.classes()).toContain('minha-tabela');
+      expect(wrapper.find('table').classes()).not.toContain('minha-tabela');
+    });
+  });
+
+  describe('internal glyphs resolve through the registry (TREEUX-010)', () => {
+    it('TTag remove button uses a registry icon', () => {
+      const wrapper = mount(TTag, { props: { removable: true } });
+      expect(wrapper.find('.t-tag__remove .t-icon').exists()).toBe(true);
+    });
+
+    it('TTable sort affordance uses a registry icon and recesses when unsorted', () => {
+      const wrapper = mount(TTable, {
+        props: { columns: [{ key: 'name', label: 'Nome', sortable: true }], rows: [] },
+      });
+
+      const icon = wrapper.find('.t-table__sort-icon');
+      expect(icon.find('.t-icon').exists()).toBe(true);
+      expect(icon.classes()).toContain('is-inactive');
+    });
+
+    it('TAppShell collapse toggle uses a registry icon', () => {
+      const wrapper = mount(TAppShell, {
+        props: { mobile: false, collapsible: true },
+      });
+      expect(wrapper.find('.t-app-shell__collapse-button svg').exists()).toBe(true);
+    });
+  });
+
+  describe('TAppShell immersive (TREEUX-005)', () => {
+    it('hides the chrome while keeping the content slot mounted', () => {
+      const wrapper = mount(TAppShell, {
+        props: { mobile: false, immersive: true },
+        slots: { header: '<span>tools</span>', default: '<article class="doc">conteudo</article>' },
+      });
+
+      expect(wrapper.classes()).toContain('is-immersive');
+      // Chrome is hidden via CSS, never unmounted, so no remount occurs.
+      expect(wrapper.find('.t-app-shell__main .doc').exists()).toBe(true);
+    });
+
+    it('exposes the exit control to the content slot', async () => {
+      const wrapper = mount(TAppShell, {
+        props: { mobile: false, defaultImmersive: true },
+        slots: {
+          default: `<template #default="{ immersive, toggleImmersive }">
+            <button class="exit" :data-immersive="String(immersive)" @click="toggleImmersive">sair</button>
+          </template>`,
+        },
+      });
+
+      const exit = wrapper.find('.exit');
+      expect(exit.attributes('data-immersive')).toBe('true');
+
+      await exit.trigger('click');
+      expect(wrapper.emitted('update:immersive')?.[0]).toEqual([false]);
+    });
+  });
+});

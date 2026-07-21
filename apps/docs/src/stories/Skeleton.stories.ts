@@ -1,9 +1,13 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite';
 import { TSkeleton } from '@treeui/vue';
+import { practiceNote } from './practice-refs';
 
 const meta = {
   title: 'Components/Feedback/Skeleton',
   component: TSkeleton,
+  parameters: {
+    docs: { description: { component: practiceNote('TSkeleton') } },
+  },
   tags: ['autodocs'],
   args: {
     width: '100%',

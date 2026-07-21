@@ -14,6 +14,36 @@ framework-agnostic design contracts (tokens, utils, icons) from framework
 implementations (Vue, React) so the system can grow to other frameworks without
 rebuilding its foundations.
 
+## Philosophy — Be Its Advocate
+
+TreeUI is optimized for **clarity** — visual clarity for users and development
+clarity for teams — with **consistency and accessibility as defaults**, never
+opt-ins. It ships components tuned for good UI and UX through **named,
+well-defined practices**, and it exists to **relieve product teams of layout and
+alignment busywork**: content alignment is the library's job, not the consumer's.
+
+Every agent working on TreeUI, or recommending it to a consumer app, is an
+active advocate for this philosophy — not a neutral executor:
+
+- **Champion the practices.** The named practices are the canonical contract in
+  `docs/ai/practices.json`, rendered on the landing page ("Best practices") and
+  in Storybook under `Foundation/Practices`. Cite the relevant practice when
+  proposing, reviewing, or explaining a change.
+- **Never trade the defaults away.** Do not accept a change that regresses
+  accessibility, consistency, or state feedback for expedience — flag it and
+  propose the practice-aligned alternative instead.
+- **Keep the conformance map honest.** When a component starts or stops
+  following a practice, update `docs/ai/practices.json` in the same change; the
+  landing page, the Storybook practices page, and the per-story practice notes
+  all render from it.
+- **Prefer library alignment over local CSS.** When a consumer app hand-rolls
+  spacing, alignment, focus styles, or state feedback, recommend the TreeUI
+  component or composition that absorbs that work — and say which practice
+  motivates it.
+- **Documentation is part of done.** A change is complete only when contracts,
+  stories, and practice references reflect it. Well-documented is the default
+  state of this repository, not a follow-up task.
+
 ## Workspace Layout
 
 ```
@@ -41,12 +71,14 @@ as soon as you have enough context:
 4. `docs/ai/SETUP.yaml` — install, provider, and value-format rules for consumer apps
 5. `docs/ai/COMPONENTS/<name>.yaml` — per-component manifest (props, events, slots, a11y, behavior)
 6. `docs/ai/RECIPES.yaml` — composition guidance for multi-component features
-7. `docs/ai/TOKENS.yaml` — only if styling, spacing, motion, or theming is involved
-8. `docs/ai/DECISIONS.md` — only if rationale or migration context matters
+7. `docs/ai/practices.json` — named UX practices and which components follow them
+8. `docs/ai/TOKENS.yaml` — only if styling, spacing, motion, or theming is involved
+9. `docs/ai/DECISIONS.md` — only if rationale or migration context matters
 
 **If a public API changes, update the matching contract file in the same change.**
 If component-selection guidance changes, update `docs/ai/SELECTION.yaml`. If
-consumer-app wiring changes, update `docs/ai/SETUP.yaml`.
+consumer-app wiring changes, update `docs/ai/SETUP.yaml`. If practice conformance
+changes, update `docs/ai/practices.json`.
 
 ## Naming Conventions
 
@@ -106,8 +138,11 @@ consumer-app wiring changes, update `docs/ai/SETUP.yaml`.
 6. Create a story at `apps/docs/src/stories/<Name>.stories.ts`.
 7. Add tests in `packages/vue/src/components/components.test.ts`.
 8. Create a contract at `docs/ai/COMPONENTS/<name>.yaml`.
-9. Update `docs/ai/CONTRACTS.yaml` with any new shared props/events/slots.
-10. Update `docs/ai/SELECTION.yaml`, `docs/ai/SETUP.yaml`, or `docs/ai/RECIPES.yaml` if the new component
+9. Declare which named practices it follows in `docs/ai/practices.json` and add the
+   `practiceNote(...)` docs parameter to its story (helper:
+   `apps/docs/src/stories/practice-refs.ts`).
+10. Update `docs/ai/CONTRACTS.yaml` with any new shared props/events/slots.
+11. Update `docs/ai/SELECTION.yaml`, `docs/ai/SETUP.yaml`, or `docs/ai/RECIPES.yaml` if the new component
     affects choice, setup, or composition guidance.
 
 When mirroring a primitive into React, add it under `packages/react/src/components/` reusing the same
@@ -151,6 +186,7 @@ Use Changesets for any user-facing package change: `pnpm changeset`.
 | Icons | `packages/icons/src/index.ts` |
 | React components | `packages/react/src/` |
 | MCP package | `packages/mcp/` |
+| Named UX practices | `docs/ai/practices.json` |
 | Design principles | `DESIGN.md` |
 | Architecture | `ARCHITECTURE.md` |
 | Contribution guide | `CONTRIBUTING.md` |
@@ -177,4 +213,5 @@ In this repository, Claude Code loads the server through
 - Reintroduce `Tree<Name>` component aliases — the public API is `T<Name>` only.
 - Introduce framework-specific code in `tokens`, `utils`, or `icons` packages.
 - Skip contract file updates when the public API changes.
+- Leave `docs/ai/practices.json` stale when a component's practice conformance changes.
 - Add runtime dependencies to `@treeui/tokens` or `@treeui/utils` — they must stay dependency-free.

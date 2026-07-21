@@ -28,6 +28,22 @@ props:
     type: boolean
     default: false
     note: "loading implies disabled behavior — the effective disabled state is `disabled || loading`, so `loading` on its own disables the button and applies `is-disabled`."
+  loadingLabel:
+    type: string
+    default: Loading
+    note: "Accessible announcement while loading, forwarded to the nested TSpinner's `label`. The default is English because TreeUI ships no i18n layer — pass the active locale's string to localize it (see DECISIONS.md → Locale Data)."
+  hideIconWhileLoading:
+    type: boolean
+    default: true
+    note: "While loading, the `icon` slot is not rendered so the spinner replaces the icon instead of rendering beside it. Set to `false` to restore the pre-0.19 behavior of showing both."
+  iconOnly:
+    type: boolean
+    default: false
+    note: "Square, icon-only button — collapses the inline padding to a 1:1 control matching the size token and suppresses the `t-button__label` wrapper. Requires an accessible name via `label` (or `aria-label`), since the icon slot is aria-hidden."
+  label:
+    type: string
+    default: undefined
+    note: "Accessible name, rendered as `aria-label`. Required whenever `iconOnly` is set; ignored for ordinary buttons that already have visible text."
   type:
     type: "button | submit | reset"
     default: button
@@ -59,7 +75,8 @@ a11y:
   aria_disabled_for_non_button: true
   tabindex_minus_one_when_non_button_disabled: true
   icon_slot_marked_aria_hidden: true
-  loading_spinner_is_announced: "The nested TSpinner carries role=\"status\" and a visually hidden \"Loading\" label, so the button's accessible name gains that text while loading."
+  loading_spinner_is_announced: "The nested TSpinner carries role=\"status\" and a visually hidden label, so the button's accessible name gains that text while loading. The text comes from `loadingLabel`, so it follows the app's locale."
+  icon_only_requires_an_accessible_name: "With `iconOnly` there is no visible text and the icon slot is aria-hidden, so the name must come from `label` or `aria-label`. This is a documented requirement, not a runtime assertion — the package ships ESM+CJS with no dev-only build define, so there is no dev-stripped warning."
   touch_targets: "44×44px minimum via the .t-button::after overlay"
   focus_visible: "box-shadow focus ring on the root element"
 
@@ -76,6 +93,7 @@ css:
     - t-button--md
     - t-button--lg
     - t-button--block
+    - t-button--icon
     - t-button--align-start
     - t-button--align-end
   elements:
@@ -89,8 +107,13 @@ css:
 behavior:
   blocks_click_when_disabled_or_loading: true
   renders_spinner_when_loading: true
-  spinner_does_not_replace_the_icon_slot: "The spinner is prepended, so with both `loading` and an `icon` slot the order is spinner, icon, label."
+  spinner_replaces_the_icon_slot_while_loading: "The spinner takes the icon's leading position, so by default the icon slot is withheld while loading and the order is spinner, label. Set `hideIconWhileLoading: false` for the older spinner, icon, label order."
   icon_slot_wrapper_rendered_only_when_filled: true
-  default_slot_always_wrapped_in_label_element: true
+  default_slot_wrapped_in_label_element_unless_icon_only: true
 
-example: '<TButton variant="outline">Invite teammate</TButton>'
+example: |
+  <TButton variant="outline">Invite teammate</TButton>
+  <TButton :loading="saving" loading-label="Salvando">Salvar</TButton>
+  <TButton icon-only label="Excluir" variant="ghost">
+    <template #icon><TIcon name="trash-2" /></template>
+  </TButton>

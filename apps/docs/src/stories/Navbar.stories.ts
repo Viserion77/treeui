@@ -1,9 +1,13 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite';
 import { TAppBar, TBadge, TButton, TNavbar } from '@treeui/vue';
+import { practiceNote } from './practice-refs';
 
 const meta = {
   title: 'Components/Layout/Navbar',
   component: TNavbar,
+  parameters: {
+    docs: { description: { component: practiceNote('TNavbar') } },
+  },
   tags: ['autodocs'],
   args: {
     size: 'md',

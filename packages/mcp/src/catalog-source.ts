@@ -8,6 +8,7 @@ import type {
   TreeuiComponentEntry,
   TreeuiComponentSetup,
   TreeuiDecisionGuide,
+  TreeuiPractice,
   TreeuiRecipe,
   TreeuiSelectionProfile,
   TreeuiSetupEntry,
@@ -292,6 +293,23 @@ const normalizeRecipes = (value: unknown): TreeuiRecipe[] => {
   });
 };
 
+const normalizePractices = (value: unknown): TreeuiPractice[] => {
+  if (!Array.isArray(value)) {
+    return [];
+  }
+
+  return value.map((practice) => {
+    const record = practice as UnknownRecord;
+    return {
+      id: String(record.id),
+      title: String(record.title),
+      summary: stringifyValue(record.summary) ?? '',
+      rules: normalizeStringList(record.rules),
+      components: normalizeStringList(record.components),
+    };
+  });
+};
+
 const loadYamlDocuments = (filePath: string): UnknownRecord[] =>
   parseAllDocuments(readText(filePath))
     .map((document) => document.toJSON() as UnknownRecord | null)
@@ -343,10 +361,13 @@ export const buildCatalogFromRepo = (repoRoot: string): TreeuiCatalog => {
   const recipesDoc = loadYamlDocuments(path.join(docsDir, 'RECIPES.yaml'))[0] ?? {};
   const contractsDoc = loadYamlDocuments(path.join(docsDir, 'CONTRACTS.yaml'))[0] ?? {};
 
+  const practicesDoc = JSON.parse(readText(path.join(docsDir, 'practices.json'))) as UnknownRecord;
+
   const componentProfiles = (selectionDoc.component_profiles ?? {}) as UnknownRecord;
   const componentSetup = (setupDoc.component_setup ?? {}) as UnknownRecord;
   const aliasMap = (contractsDoc.compatibility_aliases ?? {}) as Record<string, string>;
   const recipes = normalizeRecipes(recipesDoc.recipes);
+  const practices = normalizePractices(practicesDoc.practices);
 
   const components = fs
     .readdirSync(componentsDir)
@@ -376,6 +397,10 @@ export const buildCatalogFromRepo = (repoRoot: string): TreeuiCatalog => {
           .filter((recipe) => recipe.compose.includes(name))
           .map((recipe) => recipe.id);
 
+        const componentPractices = practices
+          .filter((practice) => practice.components.includes(name))
+          .map((practice) => practice.id);
+
         const entry: TreeuiComponentEntry = {
           name,
           legacyAlias: aliasMap[name] ?? aliases.find((alias) => alias.startsWith('Tree')),
@@ -398,6 +423,7 @@ export const buildCatalogFromRepo = (repoRoot: string): TreeuiCatalog => {
           selection,
           setup,
           recipes: componentRecipes,
+          practices: componentPractices,
         };
 
         return [entry];
@@ -447,6 +473,7 @@ export const buildCatalogFromRepo = (repoRoot: string): TreeuiCatalog => {
     packageVersion: vuePackage.version,
     decisionGuides: normalizeDecisionGuides(selectionDoc.decision_guides),
     recipes,
+    practices,
     setup,
     components,
     tokens: buildTokenEntries(),

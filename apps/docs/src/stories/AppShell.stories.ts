@@ -496,3 +496,35 @@ export const ControlledDrawer: Story = {
     `,
   }),
 };
+
+export const Immersive: Story = {
+  render: (args: Record<string, unknown>) => ({
+    components: { TAppShell, TButton, TNavMenu },
+    setup: () => {
+      const immersive = ref(false);
+      const active = ref('overview');
+      return { args, immersive, active, items };
+    },
+    template: `
+      <TAppShell v-bind="args" v-model:immersive="immersive">
+        <template #header-start><strong>Orchard</strong></template>
+        <template #header><span>Workspace</span></template>
+        <template #sidebar>
+          <TNavMenu v-model="active" :items="items" />
+        </template>
+        <template #default="{ immersive: isImmersive, toggleImmersive }">
+          <div style="padding: 1.5rem; display: grid; gap: 1rem; justify-items: start;">
+            <p style="margin: 0;">
+              Chrome is {{ isImmersive ? 'hidden' : 'visible' }}. The content never
+              remounts across the toggle, so anything typed below survives it.
+            </p>
+            <input placeholder="Type here, then toggle" style="padding: 0.5rem;" />
+            <TButton @click="toggleImmersive">
+              {{ isImmersive ? 'Exit immersive' : 'Enter immersive' }}
+            </TButton>
+          </div>
+        </template>
+      </TAppShell>
+    `,
+  }),
+};

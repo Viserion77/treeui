@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite';
 import { TButton, TTooltip } from '@treeui/vue';
+import { practiceNote } from './practice-refs';
 
 const meta = {
   title: 'Components/Overlay/Tooltip',
@@ -7,6 +8,7 @@ const meta = {
   tags: ['autodocs'],
   parameters: {
     layout: 'centered',
+    docs: { description: { component: practiceNote('TTooltip') } },
   },
   args: {
     content: 'Invite another teammate to the workspace.',

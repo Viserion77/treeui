@@ -2,10 +2,14 @@ import type { Meta, StoryObj } from '@storybook/vue3-vite';
 import { ref } from 'vue';
 import { TButton } from '@treeui/vue';
 import { CheckIcon, iconProps } from './icon-helpers';
+import { practiceNote } from './practice-refs';
 
 const meta = {
   title: 'Components/Actions/Button',
   component: TButton,
+  parameters: {
+    docs: { description: { component: practiceNote('TButton') } },
+  },
   tags: ['autodocs'],
   args: {
     variant: 'solid',
@@ -190,6 +194,61 @@ export const ClickHandling: Story = {
         </div>
         <div style="font-size: var(--tree-font-size-sm); color: var(--tree-color-text-muted);">
           Clicks received: {{ count }} — disabled and loading buttons never emit.
+        </div>
+      </div>
+    `,
+  }),
+};
+
+export const IconOnly: Story = {
+  render: () => ({
+    components: { TButton, CheckIcon },
+    setup: () => ({ iconProps }),
+    template: `
+      <div style="display: grid; gap: 0.75rem;">
+        <div style="display: flex; gap: 0.75rem; align-items: center;">
+          <TButton icon-only label="Confirm" size="sm">
+            <template #icon><CheckIcon v-bind="iconProps" /></template>
+          </TButton>
+          <TButton icon-only label="Confirm" variant="outline">
+            <template #icon><CheckIcon v-bind="iconProps" /></template>
+          </TButton>
+          <TButton icon-only label="Confirm" variant="ghost" size="lg">
+            <template #icon><CheckIcon v-bind="iconProps" /></template>
+          </TButton>
+        </div>
+        <div style="font-size: var(--tree-font-size-sm); color: var(--tree-color-text-muted);">
+          The icon slot is aria-hidden, so <code>label</code> supplies the accessible name.
+          The square is the size token; the 44×44 hit area still comes from the base rule.
+        </div>
+      </div>
+    `,
+  }),
+};
+
+export const LoadingReplacesTheIcon: Story = {
+  render: () => ({
+    components: { TButton, CheckIcon },
+    setup: () => ({ iconProps }),
+    template: `
+      <div style="display: grid; gap: 0.75rem;">
+        <div style="display: flex; gap: 0.75rem; flex-wrap: wrap; align-items: center;">
+          <TButton>
+            <template #icon><CheckIcon v-bind="iconProps" /></template>
+            Idle
+          </TButton>
+          <TButton loading loading-label="Gerando resumo">
+            <template #icon><CheckIcon v-bind="iconProps" /></template>
+            Generating
+          </TButton>
+          <TButton loading :hide-icon-while-loading="false">
+            <template #icon><CheckIcon v-bind="iconProps" /></template>
+            Both shown
+          </TButton>
+        </div>
+        <div style="font-size: var(--tree-font-size-sm); color: var(--tree-color-text-muted);">
+          The spinner replaces the icon by default, so loading never shows two glyphs.
+          <code>loading-label</code> is the announced text — pass your locale's string.
         </div>
       </div>
     `,

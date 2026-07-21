@@ -1,6 +1,15 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed, ref, useAttrs } from 'vue';
+import type { TIconName } from '@treeui/icons';
 import type { TSize } from '../types/contracts';
+import TIcon from './TIcon.vue';
+
+// The scroll container is the root element, but the accessible name and any
+// aria-*/id belong on the <table> itself, so attrs are split rather than
+// inherited onto the wrapper.
+defineOptions({
+  inheritAttrs: false,
+});
 
 export type TTableColumn = {
   key: string;
@@ -23,10 +32,16 @@ const props = withDefaults(
     rows: Record<string, unknown>[];
     size?: TSize;
     sortBy?: TTableSortState;
+    /**
+     * Visible `<caption>` naming the table. For a name without visible text,
+     * pass `aria-label` / `aria-labelledby` instead — both land on the `<table>`.
+     */
+    caption?: string;
   }>(),
   {
     size: 'md',
     sortBy: undefined,
+    caption: undefined,
   },
 );
 
@@ -100,14 +115,44 @@ function handleHeaderKeydown(event: KeyboardEvent, column: TTableColumn) {
     handleSort(column);
   }
 }
+
+function isSortedBy(column: TTableColumn): boolean {
+  const cur = currentSort.value;
+  return cur?.key === column.key && cur.direction !== 'none';
+}
+
+function sortIconName(column: TTableColumn): TIconName {
+  const cur = currentSort.value;
+  if (!isSortedBy(column)) return 'chevrons-up-down';
+  return cur?.direction === 'asc' ? 'chevron-up' : 'chevron-down';
+}
+
+const attrs = useAttrs();
+
+// class/style stay on the scroll wrapper (the root); everything else —
+// aria-label, aria-labelledby, id, data-* — is forwarded to the <table>.
+const tableAttrs = computed(() => {
+  const { class: _class, style: _style, ...rest } = attrs;
+  return rest;
+});
 </script>
 
 <template>
-  <div class="t-table-wrapper">
+  <div
+    class="t-table-wrapper"
+    :class="attrs.class"
+    :style="attrs.style"
+  >
     <table
+      v-bind="tableAttrs"
       :class="classes"
-      role="grid"
     >
+      <caption
+        v-if="caption"
+        class="t-table__caption"
+      >
+        {{ caption }}
+      </caption>
       <thead class="t-table__head">
         <tr class="t-table__row">
           <th
@@ -134,52 +179,13 @@ function handleHeaderKeydown(event: KeyboardEvent, column: TTableColumn) {
                 <span
                   v-if="column.sortable"
                   class="t-table__sort-icon"
+                  :class="{ 'is-inactive': !isSortedBy(column) }"
                   aria-hidden="true"
                 >
-                  <svg
-                    v-if="currentSort?.key === column.key && currentSort.direction === 'asc'"
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="14"
-                    height="14"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                  >
-                    <path d="m18 15-6-6-6 6" />
-                  </svg>
-                  <svg
-                    v-else-if="currentSort?.key === column.key && currentSort.direction === 'desc'"
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="14"
-                    height="14"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                  >
-                    <path d="m6 9 6 6 6-6" />
-                  </svg>
-                  <svg
-                    v-else
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="14"
-                    height="14"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    style="opacity: 0.4"
-                  >
-                    <path d="m7 15 5 5 5-5" />
-                    <path d="m7 9 5-5 5 5" />
-                  </svg>
+                  <TIcon
+                    :name="sortIconName(column)"
+                    :size="14"
+                  />
                 </span>
               </span>
             </slot>

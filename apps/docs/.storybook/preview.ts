@@ -30,7 +30,7 @@ const preview: Preview = {
       storySort: {
         order: [
           'Foundation',
-          ['Introduction', 'Philosophy', 'Installation', 'Tokens', 'Theming', 'Icons', 'Accessibility', 'Conventions', 'Components', 'Patterns', 'Roadmap', 'Contribution'],
+          ['Introduction', 'Philosophy', 'Installation', 'Tokens', 'Theming', 'Icons', 'Accessibility', 'Practices', 'Conventions', 'Components', 'Patterns', 'Roadmap', 'Contribution'],
           'Showcase',
           ['All Components'],
           'Patterns',

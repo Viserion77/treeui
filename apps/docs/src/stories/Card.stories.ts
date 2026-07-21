@@ -1,9 +1,13 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite';
 import { TBadge, TButton, TCard, treeCardVariants, treeSizes } from '@treeui/vue';
+import { practiceNote } from './practice-refs';
 
 const meta = {
   title: 'Components/Data Display/Card',
   component: TCard,
+  parameters: {
+    docs: { description: { component: practiceNote('TCard') } },
+  },
   tags: ['autodocs'],
   args: {
     variant: 'outline',

@@ -1,10 +1,14 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite';
 import { ref } from 'vue';
 import { TFormField, TInput, TCheckbox } from '@treeui/vue';
+import { practiceNote } from './practice-refs';
 
 const meta = {
   title: 'Components/Data Entry/FormField',
   component: TFormField,
+  parameters: {
+    docs: { description: { component: practiceNote('TFormField') } },
+  },
   tags: ['autodocs'],
   args: {
     label: 'Email address',

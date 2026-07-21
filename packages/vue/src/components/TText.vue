@@ -18,6 +18,12 @@ const props = withDefaults(
     weight?: TTextWeight;
     /** Truncate to a single line with an ellipsis. */
     truncate?: boolean;
+    /**
+     * Preserve authored line breaks and paragraph spacing (`white-space: pre-wrap`)
+     * while still wrapping long lines. Use for plain-text output such as AI
+     * responses. Ignored when `truncate` is set, since the two conflict.
+     */
+    preserveWhitespace?: boolean;
   }>(),
   {
     as: 'span',
@@ -25,6 +31,7 @@ const props = withDefaults(
     tone: 'default',
     weight: undefined,
     truncate: false,
+    preserveWhitespace: false,
   },
 );
 
@@ -33,7 +40,10 @@ const classes = computed(() => [
   props.size ? `t-text--size-${props.size}` : null,
   props.tone !== 'default' ? `t-text--${props.tone}` : null,
   props.weight ? `t-text--weight-${props.weight}` : null,
-  { 'is-truncated': props.truncate },
+  {
+    'is-truncated': props.truncate,
+    'is-pre-wrap': props.preserveWhitespace && !props.truncate,
+  },
 ]);
 </script>
 

@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite';
 import { ref } from 'vue';
 import { TTreeView } from '@treeui/vue';
+import { practiceNote } from './practice-refs';
 
 const nodes = [
   {
@@ -42,6 +43,9 @@ const nodes = [
 const meta = {
   title: 'Components/Navigation & Disclosure/TreeView',
   component: TTreeView,
+  parameters: {
+    docs: { description: { component: practiceNote('TTreeView') } },
+  },
   tags: ['autodocs'],
   args: {
     selectionMode: 'single',

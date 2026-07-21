@@ -48,6 +48,7 @@ export interface TreeuiComponentEntry {
   selection: TreeuiSelectionProfile;
   setup: TreeuiComponentSetup;
   recipes: string[];
+  practices: string[];
 }
 
 export interface TreeuiDecisionGuideOption {
@@ -68,6 +69,14 @@ export interface TreeuiRecipe {
   useWhen: string[];
   compose: string[];
   notes: string[];
+}
+
+export interface TreeuiPractice {
+  id: string;
+  title: string;
+  summary: string;
+  rules: string[];
+  components: string[];
 }
 
 export interface TreeuiSetupEntry {
@@ -113,6 +122,7 @@ export interface TreeuiCatalog {
   packageVersion: string;
   decisionGuides: TreeuiDecisionGuide[];
   recipes: TreeuiRecipe[];
+  practices: TreeuiPractice[];
   setup: TreeuiSetupEntry;
   components: TreeuiComponentEntry[];
   tokens: TreeuiTokenEntry[];

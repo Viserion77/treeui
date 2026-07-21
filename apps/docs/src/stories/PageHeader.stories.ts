@@ -1,9 +1,13 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite';
 import { TBadge, TButton, TPageHeader } from '@treeui/vue';
+import { practiceNote } from './practice-refs';
 
 const meta = {
   title: 'Components/Layout/PageHeader',
   component: TPageHeader,
+  parameters: {
+    docs: { description: { component: practiceNote('TPageHeader') } },
+  },
   tags: ['autodocs'],
   args: {
     title: 'Tasks',

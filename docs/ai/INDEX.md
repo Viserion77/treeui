@@ -20,10 +20,11 @@ Load files in this order and stop as soon as you have enough context:
 4. `docs/ai/SETUP.yaml` when installation, providers, model formats, or app wiring matter
 5. One or more files in `docs/ai/COMPONENTS/`
 6. `docs/ai/RECIPES.yaml` when composing multiple components into a feature
-7. `docs/ai/TOKENS.yaml` only if visual, spacing, motion, or theming details matter
-8. `docs/ai/STANDARDS.yaml` for design-system conformance rules
-9. `docs/ai/VALIDATION.yaml` for acceptance-criteria auditing
-10. `docs/ai/DECISIONS.md` only if rationale matters
+7. `docs/ai/practices.json` when practice conformance, UX guidance, or advocacy matters
+8. `docs/ai/TOKENS.yaml` only if visual, spacing, motion, or theming details matter
+9. `docs/ai/STANDARDS.yaml` for design-system conformance rules
+10. `docs/ai/VALIDATION.yaml` for acceptance-criteria auditing
+11. `docs/ai/DECISIONS.md` only if rationale matters
 
 ## Canonical Files
 
@@ -35,9 +36,10 @@ Load files in this order and stop as soon as you have enough context:
 - `STANDARDS.yaml`: design-system conformance rules (colors, typography, spacing, motion, icons)
 - `VALIDATION.yaml`: per-component acceptance criteria (naming, CSS, states, a11y, docs)
 - `COMPONENTS/*.yaml`: component-level public API manifests
+- `practices.json`: named UX practices, the philosophy statement, and per-component conformance; rendered by the landing page, the Storybook `Foundation/Practices` page, and per-story practice notes
 - `DECISIONS.md`: rationale behind the contract shape
 
-If a public API changes, update the matching file here in the same change. If a component-selection rule changes, update `SELECTION.yaml` in the same change. If provider or install requirements change, update `SETUP.yaml` in the same change.
+If a public API changes, update the matching file here in the same change. If a component-selection rule changes, update `SELECTION.yaml` in the same change. If provider or install requirements change, update `SETUP.yaml` in the same change. If a component starts or stops following a named practice, update `practices.json` in the same change.
 
 ## Usage Hints
 

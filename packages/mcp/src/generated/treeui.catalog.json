@@ -1,7 +1,7 @@
 {
-  "generatedAt": "2026-07-19T20:47:41.141Z",
+  "generatedAt": "2026-07-21T18:51:21.285Z",
   "packageName": "@treeui/vue",
-  "packageVersion": "0.17.0",
+  "packageVersion": "0.18.0",
   "decisionGuides": [
     {
       "id": "single-choice",
@@ -591,6 +591,130 @@
       ]
     }
   ],
+  "practices": [
+    {
+      "id": "interaction-feedback",
+      "title": "Visual interaction feedback",
+      "summary": "Every interaction answers back. Hover, focus, active, loading, and disabled are designed states — never afterthoughts left to the consumer.",
+      "rules": [
+        "Interactive surfaces ship hover, active, and focus-visible treatments out of the box.",
+        "Loading states announce themselves (aria-busy, spinner) and block duplicate activation.",
+        "Disabled and loading elements never emit activation events.",
+        "Focus indicators stay visible in both light and dark themes."
+      ],
+      "components": [
+        "TButton",
+        "TLink",
+        "TInput",
+        "TSelect",
+        "TCheckbox",
+        "TSwitch",
+        "TTabs",
+        "TPagination",
+        "TDropdown",
+        "TSelectableList"
+      ]
+    },
+    {
+      "id": "accessible-by-default",
+      "title": "Accessible by default",
+      "summary": "Native semantics first, ARIA where the pattern requires it, full keyboard support, and focus management the consumer never has to write.",
+      "rules": [
+        "Native elements before roles; role=\"dialog\", aria-modal, aria-labelledby only where semantics require them.",
+        "Tab/Shift+Tab order, Escape to close, Enter/Space to activate, arrow keys where the pattern expects them.",
+        "Overlays trap focus while open and restore it on close.",
+        "Clickable targets stay at or above 44×44px."
+      ],
+      "components": [
+        "TModal",
+        "TDrawer",
+        "TConfirmDialog",
+        "TDropdown",
+        "TTooltip",
+        "TAccordion",
+        "TFormField",
+        "TTreeView",
+        "TToastProvider"
+      ]
+    },
+    {
+      "id": "predictable-api",
+      "title": "One predictable API",
+      "summary": "The same contracts everywhere: one size scale, one action-variant scale, v-model for form controls, open/close for overlays. Learn one component and you know them all.",
+      "rules": [
+        "Sizes are sm | md | lg across the library.",
+        "Action variants come from one scale: solid, outline, ghost, soft, danger.",
+        "Form controls speak modelValue + update:modelValue (v-model).",
+        "Overlays speak open/defaultOpen + update:open/open-change."
+      ],
+      "components": [
+        "TButton",
+        "TInput",
+        "TSelect",
+        "TBadge",
+        "TTag",
+        "TCard",
+        "TModal"
+      ]
+    },
+    {
+      "id": "state-clarity",
+      "title": "Empty, loading, and error are designed states",
+      "summary": "Screens communicate status honestly: skeletons while loading, purposeful empty states, and status surfaces on one semantic tone scale.",
+      "rules": [
+        "Default, hover, active, focus, disabled, loading, and error/empty states are designed and documented — not just the happy path.",
+        "Status tones map to semantic tokens (success, warning, error, info) and pass both themes.",
+        "Async feedback is immediate: skeleton or spinner first, toast or alert on completion."
+      ],
+      "components": [
+        "TSkeleton",
+        "TSpinner",
+        "TProgress",
+        "TEmptyState",
+        "TAlert",
+        "TToastProvider",
+        "TBadge"
+      ]
+    },
+    {
+      "id": "content-alignment",
+      "title": "Alignment without custom CSS",
+      "summary": "Layout primitives absorb spacing, alignment, and rhythm so product code never hand-rolls the same flexbox again.",
+      "rules": [
+        "Spacing comes from the --tree-space-* scale, applied by layout components.",
+        "Compose TPage, TStack, TGrid, and TSplit before writing a custom layout div.",
+        "Forms align through TFormField + TStack + TGrid — labels, hints, and errors line up by contract.",
+        "Reading widths and page gutters come from TContainer/TPage, not local max-widths."
+      ],
+      "components": [
+        "TStack",
+        "TGrid",
+        "TSplit",
+        "TContainer",
+        "TSpacer",
+        "TPage",
+        "TPageHeader",
+        "TFormField"
+      ]
+    },
+    {
+      "id": "token-driven",
+      "title": "Token-driven clarity",
+      "summary": "No raw hex, px, or font values anywhere. Every visual decision references a --tree-* token, so light/dark and brand theming stay coherent by construction.",
+      "rules": [
+        "Zero hardcoded colors, spacing, or typography in component code.",
+        "Light and dark are first-class themes; every state passes both.",
+        "Themes switch by attribute (data-tree-theme) with no component changes."
+      ],
+      "components": [
+        "TCard",
+        "TNavbar",
+        "TBadge",
+        "TTag",
+        "TChart"
+      ]
+    }
+  ],
   "setup": {
     "install": {
       "packageManagerExamples": {
@@ -965,7 +1089,10 @@
         "required": [],
         "notes": []
       },
-      "recipes": []
+      "recipes": [],
+      "practices": [
+        "accessible-by-default"
+      ]
     },
     {
       "name": "TAlert",
@@ -1079,7 +1206,10 @@
         "required": [],
         "notes": []
       },
-      "recipes": []
+      "recipes": [],
+      "practices": [
+        "state-clarity"
+      ]
     },
     {
       "name": "TAppShell",
@@ -1164,6 +1294,18 @@
           "note": "Initial value for uncontrolled use. Read once during setup."
         },
         {
+          "name": "immersive",
+          "type": "boolean",
+          "default": "undefined",
+          "note": "Controlled immersive state (v-model:immersive). Hides the header and sidebar so the content fills the viewport. The chrome is hidden with CSS rather than unmounted, so toggling never remounts the default slot. While immersive, the mobile drawer is not rendered."
+        },
+        {
+          "name": "defaultImmersive",
+          "type": "boolean",
+          "default": "false",
+          "note": "Initial value for uncontrolled use. Read once during setup."
+        },
+        {
           "name": "closeOnEscape",
           "type": "boolean",
           "default": "true",
@@ -1238,13 +1380,23 @@
           "name": "sidebar-open-change",
           "description": "Same change as update:sidebarOpen, for non-v-model usage. Both always fire together.",
           "payload": "[value: boolean]"
+        },
+        {
+          "name": "update:immersive",
+          "description": "Immersive state changed. Enables v-model:immersive.",
+          "payload": "[value: boolean]"
+        },
+        {
+          "name": "immersive-change",
+          "description": "Same change as update:immersive, for non-v-model usage. Both always fire together.",
+          "payload": "[value: boolean]"
         }
       ],
       "slots": [
         {
           "name": "header",
           "description": "Main header region. Spans the full header width by default; once `header-start` is filled it is constrained to the content column so it lines up with the panel underneath. On mobile the header falls back to a single flex row either way.\n",
-          "note": "AppShellSlotProps — { mobile, collapsed, sidebarOpen, toggleSidebar, closeSidebar, toggleCollapsed }"
+          "note": "AppShellSlotProps — { mobile, collapsed, sidebarOpen, immersive, toggleSidebar, closeSidebar, toggleCollapsed, toggleImmersive }"
         },
         {
           "name": "header-start",
@@ -1269,7 +1421,7 @@
         {
           "name": "default",
           "description": "Main content area. Scrolls independently of the header and sidebar.",
-          "note": "{ mobile: boolean, collapsed: boolean } — a subset of AppShellSlotProps, no toggles"
+          "note": "{ mobile: boolean, collapsed: boolean, immersive: boolean, toggleImmersive: () => void } — a subset of AppShellSlotProps. toggleImmersive is included because immersive hides the chrome, so the content is the only place an exit control can live."
         },
         {
           "name": "menu-icon",
@@ -1314,7 +1466,10 @@
         "auto_menu_button_in_header_on_mobile: true",
         "controlled_and_uncontrolled_collapsed_state: true",
         "controlled_and_uncontrolled_sidebar_open_state: true",
-        "controlled_mode_does_not_self_update: when collapsed or sidebarOpen is bound, the component only emits — the parent must apply the value",
+        "controlled_and_uncontrolled_immersive_state: true",
+        "immersive_hides_chrome_without_remounting_content: the header and sidebar are hidden with CSS and the grid collapses to a single `main` area, so the default slot keeps its component state across the toggle — unlike the mobile breakpoint, which does remount the sidebar slot",
+        "immersive_suppresses_the_mobile_drawer: while immersive the overlay is not rendered, since the trigger that opens it lives in the hidden header",
+        "controlled_mode_does_not_self_update: when collapsed, sidebarOpen or immersive is bound, the component only emits — the parent must apply the value",
         "no_emit_when_the_value_is_unchanged: true",
         "toggle_collapsed_is_a_noop_when_collapsible_is_false: true",
         "collapse_toggle_requires_desktop_and_collapsible_and_show_collapse_button: true",
@@ -1381,7 +1536,8 @@
       },
       "recipes": [
         "app-shell"
-      ]
+      ],
+      "practices": []
     },
     {
       "name": "TAvatar",
@@ -1462,7 +1618,8 @@
         "required": [],
         "notes": []
       },
-      "recipes": []
+      "recipes": [],
+      "practices": []
     },
     {
       "name": "TBadge",
@@ -1550,6 +1707,11 @@
       },
       "recipes": [
         "pricing-section"
+      ],
+      "practices": [
+        "predictable-api",
+        "state-clarity",
+        "token-driven"
       ]
     },
     {
@@ -1608,7 +1770,8 @@
           "Use `to` when the app has vue-router and breadcrumb items should render RouterLink."
         ]
       },
-      "recipes": []
+      "recipes": [],
+      "practices": []
     },
     {
       "name": "TButton",
@@ -1667,6 +1830,30 @@
           "note": "loading implies disabled behavior — the effective disabled state is `disabled || loading`, so `loading` on its own disables the button and applies `is-disabled`."
         },
         {
+          "name": "loadingLabel",
+          "type": "string",
+          "default": "Loading",
+          "note": "Accessible announcement while loading, forwarded to the nested TSpinner's `label`. The default is English because TreeUI ships no i18n layer — pass the active locale's string to localize it (see DECISIONS.md → Locale Data)."
+        },
+        {
+          "name": "hideIconWhileLoading",
+          "type": "boolean",
+          "default": "true",
+          "note": "While loading, the `icon` slot is not rendered so the spinner replaces the icon instead of rendering beside it. Set to `false` to restore the pre-0.19 behavior of showing both."
+        },
+        {
+          "name": "iconOnly",
+          "type": "boolean",
+          "default": "false",
+          "note": "Square, icon-only button — collapses the inline padding to a 1:1 control matching the size token and suppresses the `t-button__label` wrapper. Requires an accessible name via `label` (or `aria-label`), since the icon slot is aria-hidden."
+        },
+        {
+          "name": "label",
+          "type": "string",
+          "default": "undefined",
+          "note": "Accessible name, rendered as `aria-label`. Required whenever `iconOnly` is set; ignored for ordinary buttons that already have visible text."
+        },
+        {
           "name": "type",
           "type": "button | submit | reset",
           "default": "button",
@@ -1707,16 +1894,17 @@
         "aria_disabled_for_non_button: true",
         "tabindex_minus_one_when_non_button_disabled: true",
         "icon_slot_marked_aria_hidden: true",
-        "loading_spinner_is_announced: The nested TSpinner carries role=\"status\" and a visually hidden \"Loading\" label, so the button's accessible name gains that text while loading.",
+        "loading_spinner_is_announced: The nested TSpinner carries role=\"status\" and a visually hidden label, so the button's accessible name gains that text while loading. The text comes from `loadingLabel`, so it follows the app's locale.",
+        "icon_only_requires_an_accessible_name: With `iconOnly` there is no visible text and the icon slot is aria-hidden, so the name must come from `label` or `aria-label`. This is a documented requirement, not a runtime assertion — the package ships ESM+CJS with no dev-only build define, so there is no dev-stripped warning.",
         "touch_targets: 44×44px minimum via the .t-button::after overlay",
         "focus_visible: box-shadow focus ring on the root element"
       ],
       "behavior": [
         "blocks_click_when_disabled_or_loading: true",
         "renders_spinner_when_loading: true",
-        "spinner_does_not_replace_the_icon_slot: The spinner is prepended, so with both `loading` and an `icon` slot the order is spinner, icon, label.",
+        "spinner_replaces_the_icon_slot_while_loading: The spinner takes the icon's leading position, so by default the icon slot is withheld while loading and the order is spinner, label. Set `hideIconWhileLoading: false` for the older spinner, icon, label order.",
         "icon_slot_wrapper_rendered_only_when_filled: true",
-        "default_slot_always_wrapped_in_label_element: true"
+        "default_slot_wrapped_in_label_element_unless_icon_only: true"
       ],
       "selection": {
         "keywords": [],
@@ -1731,6 +1919,10 @@
       "recipes": [
         "confirm-destructive-action",
         "pricing-section"
+      ],
+      "practices": [
+        "interaction-feedback",
+        "predictable-api"
       ]
     },
     {
@@ -1838,6 +2030,10 @@
       },
       "recipes": [
         "chart-surface"
+      ],
+      "practices": [
+        "predictable-api",
+        "token-driven"
       ]
     },
     {
@@ -2050,6 +2246,9 @@
       "recipes": [
         "chart-surface",
         "metric-dashboard"
+      ],
+      "practices": [
+        "token-driven"
       ]
     },
     {
@@ -2164,7 +2363,10 @@
         "required": [],
         "notes": []
       },
-      "recipes": []
+      "recipes": [],
+      "practices": [
+        "interaction-feedback"
+      ]
     },
     {
       "name": "TColorSwatch",
@@ -2260,7 +2462,8 @@
         "required": [],
         "notes": []
       },
-      "recipes": []
+      "recipes": [],
+      "practices": []
     },
     {
       "name": "TCombobox",
@@ -2463,7 +2666,8 @@
           "Pass `options` as labeled items and keep labels human-readable because search matches visible fields."
         ]
       },
-      "recipes": []
+      "recipes": [],
+      "practices": []
     },
     {
       "name": "TConfirmDialog",
@@ -2667,6 +2871,9 @@
       },
       "recipes": [
         "confirm-destructive-action"
+      ],
+      "practices": [
+        "accessible-by-default"
       ]
     },
     {
@@ -2765,6 +2972,9 @@
       },
       "recipes": [
         "sidebar-shell"
+      ],
+      "practices": [
+        "content-alignment"
       ]
     },
     {
@@ -2885,7 +3095,8 @@
         "required": [],
         "notes": []
       },
-      "recipes": []
+      "recipes": [],
+      "practices": []
     },
     {
       "name": "TDatePicker",
@@ -3088,7 +3299,8 @@
           "Use `min` and `max` with the same format."
         ]
       },
-      "recipes": []
+      "recipes": [],
+      "practices": []
     },
     {
       "name": "TDateTimePicker",
@@ -3284,7 +3496,8 @@
       },
       "recipes": [
         "date-range-form"
-      ]
+      ],
+      "practices": []
     },
     {
       "name": "TDivider",
@@ -3344,7 +3557,8 @@
         "required": [],
         "notes": []
       },
-      "recipes": []
+      "recipes": [],
+      "practices": []
     },
     {
       "name": "TDonutChart",
@@ -3493,7 +3707,8 @@
       },
       "recipes": [
         "metric-dashboard"
-      ]
+      ],
+      "practices": []
     },
     {
       "name": "TDrawer",
@@ -3677,7 +3892,10 @@
         "required": [],
         "notes": []
       },
-      "recipes": []
+      "recipes": [],
+      "practices": [
+        "accessible-by-default"
+      ]
     },
     {
       "name": "TDropdown",
@@ -3838,7 +4056,11 @@
         "required": [],
         "notes": []
       },
-      "recipes": []
+      "recipes": [],
+      "practices": [
+        "interaction-feedback",
+        "accessible-by-default"
+      ]
     },
     {
       "name": "TEmptyState",
@@ -3930,7 +4152,10 @@
         "required": [],
         "notes": []
       },
-      "recipes": []
+      "recipes": [],
+      "practices": [
+        "state-clarity"
+      ]
     },
     {
       "name": "TFileUpload",
@@ -4183,7 +4408,8 @@
           "Use `accept`, `multiple`, and size limits in the app layer to constrain uploads."
         ]
       },
-      "recipes": []
+      "recipes": [],
+      "practices": []
     },
     {
       "name": "TFlag",
@@ -4306,7 +4532,8 @@
           "The flag is `aria-hidden` by default. Pass `label` only when the flag carries meaning on its own; beside a visible country or language name it should stay decorative."
         ]
       },
-      "recipes": []
+      "recipes": [],
+      "practices": []
     },
     {
       "name": "TFormField",
@@ -4437,6 +4664,10 @@
         "tag-input",
         "hierarchy-picker",
         "language-switcher"
+      ],
+      "practices": [
+        "accessible-by-default",
+        "content-alignment"
       ]
     },
     {
@@ -4538,6 +4769,9 @@
         "date-range-form",
         "stat-grid",
         "metric-dashboard"
+      ],
+      "practices": [
+        "content-alignment"
       ]
     },
     {
@@ -5010,7 +5244,8 @@
       },
       "recipes": [
         "nav-menu-icons"
-      ]
+      ],
+      "practices": []
     },
     {
       "name": "TInput",
@@ -5136,6 +5371,10 @@
       "recipes": [
         "form-field-input",
         "tag-input"
+      ],
+      "practices": [
+        "interaction-feedback",
+        "predictable-api"
       ]
     },
     {
@@ -5173,7 +5412,8 @@
         "required": [],
         "notes": []
       },
-      "recipes": []
+      "recipes": [],
+      "practices": []
     },
     {
       "name": "TLanguageSelect",
@@ -5408,7 +5648,8 @@
       },
       "recipes": [
         "language-switcher"
-      ]
+      ],
+      "practices": []
     },
     {
       "name": "TLink",
@@ -5509,7 +5750,10 @@
         "required": [],
         "notes": []
       },
-      "recipes": []
+      "recipes": [],
+      "practices": [
+        "interaction-feedback"
+      ]
     },
     {
       "name": "TMarkdownEditor",
@@ -5618,7 +5862,8 @@
         "required": [],
         "notes": []
       },
-      "recipes": []
+      "recipes": [],
+      "practices": []
     },
     {
       "name": "TModal",
@@ -5766,7 +6011,11 @@
           "Use `v-model:open` for the idiomatic Vue controlled pattern."
         ]
       },
-      "recipes": []
+      "recipes": [],
+      "practices": [
+        "accessible-by-default",
+        "predictable-api"
+      ]
     },
     {
       "name": "TMultiSelect",
@@ -5925,7 +6174,8 @@
       },
       "recipes": [
         "searchable-multi-choice"
-      ]
+      ],
+      "practices": []
     },
     {
       "name": "TNavbar",
@@ -6023,6 +6273,9 @@
       },
       "recipes": [
         "sidebar-shell"
+      ],
+      "practices": [
+        "token-driven"
       ]
     },
     {
@@ -6151,7 +6404,8 @@
         "app-shell",
         "sidebar-shell",
         "nav-menu-icons"
-      ]
+      ],
+      "practices": []
     },
     {
       "name": "TNumberInput",
@@ -6258,7 +6512,8 @@
         "required": [],
         "notes": []
       },
-      "recipes": []
+      "recipes": [],
+      "practices": []
     },
     {
       "name": "TPage",
@@ -6351,7 +6606,10 @@
         "required": [],
         "notes": []
       },
-      "recipes": []
+      "recipes": [],
+      "practices": [
+        "content-alignment"
+      ]
     },
     {
       "name": "TPageHeader",
@@ -6445,7 +6703,10 @@
         "required": [],
         "notes": []
       },
-      "recipes": []
+      "recipes": [],
+      "practices": [
+        "content-alignment"
+      ]
     },
     {
       "name": "TPagination",
@@ -6558,6 +6819,9 @@
       },
       "recipes": [
         "data-listing"
+      ],
+      "practices": [
+        "interaction-feedback"
       ]
     },
     {
@@ -6661,7 +6925,8 @@
       },
       "recipes": [
         "anchored-help"
-      ]
+      ],
+      "practices": []
     },
     {
       "name": "TPricing",
@@ -6725,7 +6990,8 @@
       },
       "recipes": [
         "pricing-section"
-      ]
+      ],
+      "practices": []
     },
     {
       "name": "TPricingCard",
@@ -6854,7 +7120,8 @@
       },
       "recipes": [
         "pricing-section"
-      ]
+      ],
+      "practices": []
     },
     {
       "name": "TProgress",
@@ -6916,7 +7183,10 @@
         "required": [],
         "notes": []
       },
-      "recipes": []
+      "recipes": [],
+      "practices": [
+        "state-clarity"
+      ]
     },
     {
       "name": "TRadio",
@@ -6984,7 +7254,8 @@
         "required": [],
         "notes": []
       },
-      "recipes": []
+      "recipes": [],
+      "practices": []
     },
     {
       "name": "TRadioGroup",
@@ -7059,7 +7330,8 @@
         "required": [],
         "notes": []
       },
-      "recipes": []
+      "recipes": [],
+      "practices": []
     },
     {
       "name": "TSelect",
@@ -7214,6 +7486,10 @@
       },
       "recipes": [
         "chart-surface"
+      ],
+      "practices": [
+        "interaction-feedback",
+        "predictable-api"
       ]
     },
     {
@@ -7323,7 +7599,10 @@
         "required": [],
         "notes": []
       },
-      "recipes": []
+      "recipes": [],
+      "practices": [
+        "interaction-feedback"
+      ]
     },
     {
       "name": "TSidebar",
@@ -7471,7 +7750,8 @@
       },
       "recipes": [
         "sidebar-shell"
-      ]
+      ],
+      "practices": []
     },
     {
       "name": "TSkeleton",
@@ -7534,7 +7814,10 @@
         "required": [],
         "notes": []
       },
-      "recipes": []
+      "recipes": [],
+      "practices": [
+        "state-clarity"
+      ]
     },
     {
       "name": "TSpacer",
@@ -7574,7 +7857,10 @@
         "required": [],
         "notes": []
       },
-      "recipes": []
+      "recipes": [],
+      "practices": [
+        "content-alignment"
+      ]
     },
     {
       "name": "TSparkline",
@@ -7697,7 +7983,8 @@
       },
       "recipes": [
         "metric-dashboard"
-      ]
+      ],
+      "practices": []
     },
     {
       "name": "TSpinner",
@@ -7746,7 +8033,10 @@
         "required": [],
         "notes": []
       },
-      "recipes": []
+      "recipes": [],
+      "practices": [
+        "state-clarity"
+      ]
     },
     {
       "name": "TSplit",
@@ -7822,7 +8112,10 @@
         "required": [],
         "notes": []
       },
-      "recipes": []
+      "recipes": [],
+      "practices": [
+        "content-alignment"
+      ]
     },
     {
       "name": "TStack",
@@ -7926,6 +8219,9 @@
         "tag-input",
         "data-listing",
         "chart-surface"
+      ],
+      "practices": [
+        "content-alignment"
       ]
     },
     {
@@ -8000,7 +8296,8 @@
         "required": [],
         "notes": []
       },
-      "recipes": []
+      "recipes": [],
+      "practices": []
     },
     {
       "name": "TStat",
@@ -8122,7 +8419,8 @@
       "recipes": [
         "stat-grid",
         "metric-dashboard"
-      ]
+      ],
+      "practices": []
     },
     {
       "name": "TSteps",
@@ -8226,7 +8524,8 @@
           "Pass explicit `status` per item only when the app should override the computed complete/current/upcoming logic."
         ]
       },
-      "recipes": []
+      "recipes": [],
+      "practices": []
     },
     {
       "name": "TSwitch",
@@ -8315,7 +8614,10 @@
         "required": [],
         "notes": []
       },
-      "recipes": []
+      "recipes": [],
+      "practices": [
+        "interaction-feedback"
+      ]
     },
     {
       "name": "TTable",
@@ -8355,6 +8657,13 @@
           "type": "TTableSortState",
           "required": false,
           "description": "Controlled sort state. When provided, overrides internal sort tracking."
+        },
+        {
+          "name": "caption",
+          "type": "string",
+          "required": false,
+          "description": "Visible `<caption>` naming the table.",
+          "note": "For a name without visible text, pass `aria-label` / `aria-labelledby` instead — attribute inheritance is disabled and every non-class/style attr is forwarded to the `<table>`, so the name lands on the named element rather than the scroll wrapper."
         }
       ],
       "events": [
@@ -8379,7 +8688,9 @@
         }
       ],
       "a11y": [
-        "role: grid",
+        "role: table (native). No explicit role is emitted.",
+        "why_not_grid: TTable previously set role=\"grid\" without implementing the composite-widget keyboard model — no roving tabindex, no gridcell/row roles, no 2D arrow-key navigation. Screen readers switched to application/focus mode and offered cell navigation that did not exist. The role was removed so the component is honestly a reading table. An opt-in interactive grid mode is deliberately NOT offered until the keyboard model ships.",
+        "accessible_name: Use `caption` for a visible name or `aria-label` / `aria-labelledby` for an invisible one. Both land on the `<table>`.",
         "aria-sort: Set on sortable column headers (ascending, descending, none).",
         "keyboard: Sortable headers are focusable and activated with Enter or Space.",
         "scope: col on all th elements."
@@ -8416,7 +8727,8 @@
       },
       "recipes": [
         "data-listing"
-      ]
+      ],
+      "practices": []
     },
     {
       "name": "TTabs",
@@ -8522,6 +8834,9 @@
       },
       "recipes": [
         "router-backed-tabs"
+      ],
+      "practices": [
+        "interaction-feedback"
       ]
     },
     {
@@ -8602,6 +8917,10 @@
       },
       "recipes": [
         "tag-input"
+      ],
+      "practices": [
+        "predictable-api",
+        "token-driven"
       ]
     },
     {
@@ -8666,6 +8985,12 @@
           "type": "boolean",
           "default": "false",
           "note": "Clip to a single line with an ellipsis."
+        },
+        {
+          "name": "preserveWhitespace",
+          "type": "boolean",
+          "default": "false",
+          "note": "Render authored line breaks and blank lines as written (`white-space: pre-wrap`) while still wrapping long lines. Use for plain-text output such as AI responses, so consumers never need a local `white-space: pre-wrap` class. Mutually exclusive with `truncate`, which needs `nowrap`; when both are set `truncate` wins and no `is-pre-wrap` class is emitted."
         }
       ],
       "events": [],
@@ -8679,7 +9004,8 @@
       ],
       "behavior": [
         "semantic_element_controlled_by_as: true",
-        "token_driven_size_tone_weight: true"
+        "token_driven_size_tone_weight: true",
+        "truncate_takes_precedence_over_preserve_whitespace: true"
       ],
       "selection": {
         "keywords": [],
@@ -8691,7 +9017,8 @@
         "required": [],
         "notes": []
       },
-      "recipes": []
+      "recipes": [],
+      "practices": []
     },
     {
       "name": "TTextarea",
@@ -8808,7 +9135,8 @@
         "required": [],
         "notes": []
       },
-      "recipes": []
+      "recipes": [],
+      "practices": []
     },
     {
       "name": "TTimeline",
@@ -8868,7 +9196,8 @@
         "required": [],
         "notes": []
       },
-      "recipes": []
+      "recipes": [],
+      "practices": []
     },
     {
       "name": "TToast",
@@ -8931,7 +9260,8 @@
       },
       "recipes": [
         "confirm-destructive-action"
-      ]
+      ],
+      "practices": []
     },
     {
       "name": "TToggleGroup",
@@ -9048,7 +9378,8 @@
           "Use `selectionMode=\"multiple\"` for small visible multi-choice sets."
         ]
       },
-      "recipes": []
+      "recipes": [],
+      "practices": []
     },
     {
       "name": "TTooltip",
@@ -9160,6 +9491,9 @@
       },
       "recipes": [
         "anchored-help"
+      ],
+      "practices": [
+        "accessible-by-default"
       ]
     },
     {
@@ -9282,6 +9616,9 @@
       },
       "recipes": [
         "hierarchy-picker"
+      ],
+      "practices": [
+        "accessible-by-default"
       ]
     }
   ],

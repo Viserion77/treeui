@@ -98,3 +98,21 @@ export const CustomCells: Story = {
     `,
   }),
 };
+
+export const NamedTable: Story = {
+  render: (args: Record<string, unknown>) => ({
+    components: { TTable },
+    setup: () => ({ args }),
+    template: `
+      <div style="display: grid; gap: 1rem;">
+        <TTable v-bind="args" caption="Team members and their roles" />
+        <div style="font-size: var(--tree-font-size-sm); color: var(--tree-color-text-muted);">
+          <code>caption</code> renders a visible name. For an invisible one pass
+          <code>aria-label</code> — attribute inheritance is off, so it lands on the
+          <code>&lt;table&gt;</code> rather than the scroll wrapper.
+        </div>
+        <TTable v-bind="args" aria-label="Team members and their roles" />
+      </div>
+    `,
+  }),
+};

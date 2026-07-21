@@ -138,6 +138,25 @@ table.t-visually-hidden {
   justify-content: flex-end;
 }
 
+/* Icon-only: collapse the inline padding so the control renders as a square
+   matching its size token. The 44x44 hit area still comes from .t-button::after. */
+.t-button--icon {
+  gap: 0;
+  width: var(--tree-size-control-md);
+  min-width: var(--tree-size-control-md);
+  padding-inline: 0;
+}
+
+.t-button--sm.t-button--icon {
+  width: var(--tree-size-control-sm);
+  min-width: var(--tree-size-control-sm);
+}
+
+.t-button--lg.t-button--icon {
+  width: var(--tree-size-control-lg);
+  min-width: var(--tree-size-control-lg);
+}
+
 .t-button--solid {
   --tree-button-bg: var(--tree-color-brand-primary);
   --tree-button-text: var(--tree-color-brand-contrast);
@@ -4073,6 +4092,14 @@ table.t-visually-hidden {
   color: var(--tree-color-text-primary);
 }
 
+.t-table__caption {
+  padding: var(--tree-space-3) var(--tree-space-4);
+  text-align: left;
+  font-size: var(--tree-font-size-sm);
+  font-weight: var(--tree-font-weight-medium);
+  color: var(--tree-color-text-muted);
+}
+
 .t-table__head {
   border-bottom: var(--tree-border-width-subtle) solid var(--tree-color-border-default);
 }
@@ -4120,6 +4147,11 @@ table.t-visually-hidden {
 .t-table__sort-icon {
   display: inline-flex;
   align-items: center;
+}
+
+/* Unsorted columns keep the affordance visible but recessed. */
+.t-table__sort-icon.is-inactive {
+  opacity: 0.4;
 }
 
 .t-table__row {
@@ -5898,6 +5930,11 @@ table.t-visually-hidden {
   white-space: nowrap;
 }
 
+.t-text.is-pre-wrap {
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+}
+
 /* ── Navbar ───────────────────────────────────────────── */
 
 .t-navbar {
@@ -6495,6 +6532,25 @@ body:has(.t-app-shell) {
 
 .t-app-shell--right:not(.is-mobile) .t-app-shell__main {
   border-start-end-radius: var(--tree-radius-lg);
+}
+
+/* Immersive: the chrome leaves the grid so <main> owns the whole viewport.
+   The header and sidebar are hidden rather than unmounted, so toggling never
+   remounts the default slot. Declared after the mobile and radius rules so it
+   wins on source order at equal specificity. */
+.t-app-shell.is-immersive {
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr);
+  grid-template-areas: 'main';
+}
+
+.t-app-shell.is-immersive > .t-app-shell__header,
+.t-app-shell.is-immersive > .t-app-shell__sidebar {
+  display: none;
+}
+
+.t-app-shell.is-immersive .t-app-shell__main {
+  border-radius: 0;
 }
 
 /* Off-canvas overlay (mobile) */

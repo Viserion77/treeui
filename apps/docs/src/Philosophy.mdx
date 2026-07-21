@@ -7,5 +7,19 @@ import { Meta, Title } from '@storybook/addon-docs/blocks';
 TreeUI prefers clarity over decoration, consistency over option overload, and accessible behavior by default.
 It is designed for mature SaaS, dashboards, admin panels, and internal tools that need polish without visual noise.
 
+The library is optimized for two kinds of clarity at once: **visual clarity** for the people using the product,
+and **development clarity** for the teams building it. Consistency and accessibility are defaults — never
+opt-ins the consumer has to remember to enable.
+
+Four pillars guide every component and every review:
+
+- **Clarity over decoration** — in the interface and in the API.
+- **Consistency and accessibility are defaults, not options.**
+- **Good UI and UX through named, well-defined practices** — see
+  <a target="_top" href="./?path=/docs/foundation-practices--docs">Practices</a>
+  for the full contract and which components follow each one.
+- **The library absorbs layout and alignment busywork** — spacing, rhythm, and content alignment are
+  TreeUI's job, so product code doesn't hand-roll them.
+
 The goal for v0.1.0 is not breadth. It is quality, portability, and a public foundation that future packages can extend.
 Foundations stay semantic and framework-agnostic so React, Svelte, Web Components, and future wrappers can inherit the same contract.

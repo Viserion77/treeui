@@ -1,9 +1,13 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite';
 import { TBadge, TButton, TContainer } from '@treeui/vue';
+import { practiceNote } from './practice-refs';
 
 const meta = {
   title: 'Components/Layout/Container',
   component: TContainer,
+  parameters: {
+    docs: { description: { component: practiceNote('TContainer') } },
+  },
   tags: ['autodocs'],
   args: {
     as: 'div',

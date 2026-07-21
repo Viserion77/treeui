@@ -2,10 +2,14 @@ import type { Meta, StoryObj } from '@storybook/vue3-vite';
 import { ref } from 'vue';
 import { TInput } from '@treeui/vue';
 import { CheckIcon, SearchIcon, iconProps } from './icon-helpers';
+import { practiceNote } from './practice-refs';
 
 const meta = {
   title: 'Components/Data Entry/Input',
   component: TInput,
+  parameters: {
+    docs: { description: { component: practiceNote('TInput') } },
+  },
   tags: ['autodocs'],
   args: {
     size: 'md',

@@ -1,9 +1,13 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite';
 import { TSpinner } from '@treeui/vue';
+import { practiceNote } from './practice-refs';
 
 const meta = {
   title: 'Components/Feedback/Spinner',
   component: TSpinner,
+  parameters: {
+    docs: { description: { component: practiceNote('TSpinner') } },
+  },
   tags: ['autodocs'],
   args: {
     size: 'md',

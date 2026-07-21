@@ -1,10 +1,14 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite';
 import { ref } from 'vue';
 import { TTabs, TTabList, TTab, TTabPanel } from '@treeui/vue';
+import { practiceNote } from './practice-refs';
 
 const meta = {
   title: 'Components/Navigation/Tabs',
   component: TTabs,
+  parameters: {
+    docs: { description: { component: practiceNote('TTabs') } },
+  },
   tags: ['autodocs'],
   args: {
     size: 'md',

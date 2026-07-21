@@ -1,10 +1,14 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite';
 import { ref } from 'vue';
 import { TAccordion, TAccordionItem } from '@treeui/vue';
+import { practiceNote } from './practice-refs';
 
 const meta = {
   title: 'Components/Data Display/Accordion',
   component: TAccordion,
+  parameters: {
+    docs: { description: { component: practiceNote('TAccordion') } },
+  },
   tags: ['autodocs'],
   args: {
     type: 'single',

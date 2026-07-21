@@ -1,9 +1,13 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite';
 import { TLink } from '@treeui/vue';
+import { practiceNote } from './practice-refs';
 
 const meta = {
   title: 'Components/Navigation/Link',
   component: TLink,
+  parameters: {
+    docs: { description: { component: practiceNote('TLink') } },
+  },
   tags: ['autodocs'],
   args: {
     variant: 'default',

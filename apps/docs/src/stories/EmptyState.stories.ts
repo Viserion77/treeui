@@ -1,10 +1,14 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite';
 import { TBadge, TButton, TEmptyState } from '@treeui/vue';
 import { InfoIcon, SearchIcon, iconProps } from './icon-helpers';
+import { practiceNote } from './practice-refs';
 
 const meta = {
   title: 'Components/Feedback/EmptyState',
   component: TEmptyState,
+  parameters: {
+    docs: { description: { component: practiceNote('TEmptyState') } },
+  },
   tags: ['autodocs'],
   args: {
     as: 'section',

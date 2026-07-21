@@ -1,9 +1,13 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite';
 import { TTag } from '@treeui/vue';
+import { practiceNote } from './practice-refs';
 
 const meta = {
   title: 'Components/Data Display/Tag',
   component: TTag,
+  parameters: {
+    docs: { description: { component: practiceNote('TTag') } },
+  },
   tags: ['autodocs'],
   args: {
     variant: 'soft',

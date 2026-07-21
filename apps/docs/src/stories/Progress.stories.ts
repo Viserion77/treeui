@@ -1,9 +1,13 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite';
 import { TProgress } from '@treeui/vue';
+import { practiceNote } from './practice-refs';
 
 const meta = {
   title: 'Components/Feedback/Progress',
   component: TProgress,
+  parameters: {
+    docs: { description: { component: practiceNote('TProgress') } },
+  },
   tags: ['autodocs'],
   args: {
     value: 60,

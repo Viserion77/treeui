@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite';
 import { ref } from 'vue';
 import { TSelectableList } from '@treeui/vue';
+import { practiceNote } from './practice-refs';
 
 const items = [
   {
@@ -26,6 +27,9 @@ const items = [
 const meta = {
   title: 'Components/Navigation & Disclosure/SelectableList',
   component: TSelectableList,
+  parameters: {
+    docs: { description: { component: practiceNote('TSelectableList') } },
+  },
   tags: ['autodocs'],
   args: {
     size: 'md',

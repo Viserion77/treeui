@@ -1,6 +1,6 @@
 {
   "name": "@treeui/docs-react",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "private": true,
   "scripts": {
     "docs:dev": "pnpm exec storybook dev -p 6007 --host 0.0.0.0 --ci",

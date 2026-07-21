@@ -1,5 +1,12 @@
 # @treeui/docs-react
 
+## 0.1.7
+
+### Patch Changes
+
+- Updated dependencies [8810382]
+  - @treeui/react@0.3.0
+
 ## 0.1.6
 
 ### Patch Changes

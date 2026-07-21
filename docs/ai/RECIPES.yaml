@@ -62,6 +62,22 @@ recipes:
       - "Let `TNavMenu` inherit collapsed state from `TSidebar` when possible."
       - "Prefer `TAppShell` (recipe `app-shell`) when you also need full-viewport sizing and a responsive mobile drawer."
 
+  - id: brand-lockup
+    name: "Product brand lockup in a shell header"
+    use_when:
+      - "A shell header needs a logo plus a product name (and optional subtitle) that stays aligned as the sidebar collapses."
+    compose:
+      - TAppShell
+      - TAvatar
+      - TText
+      - TStack
+    notes:
+      - "Put the lockup in the `header-start` slot, not `header`. Filling `header-start` switches the header to the shell's own grid, so the mark tracks `--tree-app-shell-sidebar-width` and animates with the collapse — no local column math."
+      - "The slot is scoped: use its `collapsed` binding to drop the wordmark and keep only the mark (`v-if=\"!collapsed\"`), rather than hiding text with CSS."
+      - "Logo is `TAvatar` (`size`, `alt`, `initials` fallback) or a plain `<img>` sized with `--tree-size-icon-*`; name and subtitle are `TText` (`weight`, `tone=\"muted\"`, `truncate`) — never raw `<strong>`/`<span>` with a local class."
+      - "TreeUI ships no `TBrand` component on purpose: the logo asset, the product name, and what survives collapse are product identity, which must stay in the consumer. See DECISIONS.md → Portability Boundary."
+      - "Company and service logos (AWS, LocalStack, social networks) are brand assets and are not TreeUI icons — source them from the app's brand policy, not the icon registry."
+
   - id: nav-menu-icons
     name: "Icons on navigation items"
     use_when:

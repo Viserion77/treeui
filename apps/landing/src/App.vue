@@ -1,37 +1,85 @@
 <script setup lang="ts">
-import { TBadge, TCard } from '@treeui/vue';
+import { computed, ref, watchEffect } from 'vue';
+import { TBadge, TButton, TCard, TIcon, TLanguageSelect, useTheme } from '@treeui/vue';
+import type { TIconName } from '@treeui/icons';
+// Brand marks follow the repo policy: Simple Icons is the standardized source,
+// and each official brand color comes from the package data, never hardcoded.
+import { siReact, siVuedotjs } from 'simple-icons';
 import practicesData from '../../../docs/ai/practices.json';
+import {
+  LOCALE_STORAGE_KEY,
+  detectLocale,
+  isLandingLocale,
+  localeOptions,
+  messages,
+} from './i18n';
 import wordmarkUrl from './assets/treeui-wordmark.svg';
+import wordmarkDarkUrl from './assets/treeui-wordmark-dark.svg';
 import markUrl from './assets/treeui-logo.svg';
 
-const { philosophy, practices } = practicesData;
-const componentDocs = practicesData.components as Record<string, string>;
+const INSTALL_COMMAND = 'pnpm add @treeui/vue';
 
+const { resolved: resolvedTheme, setMode } = useTheme({ storageKey: 'treeui-landing-theme' });
+const toggleTheme = () => setMode(resolvedTheme.value === 'dark' ? 'light' : 'dark');
+const wordmarkSrc = computed(() =>
+  resolvedTheme.value === 'dark' ? wordmarkDarkUrl : wordmarkUrl,
+);
+
+const locale = ref(detectLocale());
+const localeModel = computed({
+  get: () => locale.value,
+  set: (value: string) => {
+    if (isLandingLocale(value)) {
+      locale.value = value;
+    }
+  },
+});
+const copy = computed(() => messages[locale.value]);
+
+watchEffect(() => {
+  document.documentElement.lang = locale.value;
+  document.title = `TreeUI — ${copy.value.hero.title}`;
+  try {
+    localStorage.setItem(LOCALE_STORAGE_KEY, locale.value);
+  } catch {
+    // Storage can be blocked (private mode) — persistence is best-effort.
+  }
+});
+
+const componentDocs = practicesData.components as Record<string, string>;
 const componentHref = (name: string) => `./vue/?path=/docs/${componentDocs[name]}--docs`;
 const practicesDocsHref = `./vue/?path=/docs/${practicesData.storybookDocPage}--docs`;
 
-const features = [
-  {
-    label: '@treeui/tokens',
-    title: 'Design tokens',
-    body: 'Framework-agnostic --tree-* variables, themes, and a brand-ramp generator.',
-  },
-  {
-    label: 'a11y',
-    title: 'Accessible by default',
-    body: 'Native semantics, keyboard support, focus management, and visible focus.',
-  },
-  {
-    label: 'T<Name>',
-    title: 'Predictable API',
-    body: 'A compact, consistent surface — the same names and contracts across frameworks.',
-  },
-  {
-    label: '@treeui/mcp',
-    title: 'Agent-ready',
-    body: 'A machine-readable catalog and MCP server so coding agents pick the right component.',
-  },
-];
+// English practice copy is canonical in the contract; other locales override it
+// and fall back per practice, so a practice added without translations still
+// renders.
+const practiceCards = computed(() =>
+  practicesData.practices.map((practice) => {
+    const localized = copy.value.practices.copyById[practice.id];
+    return {
+      id: practice.id,
+      icon: practice.icon as TIconName,
+      title: localized?.title ?? practice.title,
+      summary: localized?.summary ?? practice.summary,
+      components: practice.components,
+    };
+  }),
+);
+
+const copied = ref(false);
+let copiedTimer: ReturnType<typeof setTimeout> | undefined;
+const copyInstall = async () => {
+  try {
+    await navigator.clipboard.writeText(INSTALL_COMMAND);
+  } catch {
+    return; // Clipboard blocked — the command stays selectable as plain text.
+  }
+  copied.value = true;
+  clearTimeout(copiedTimer);
+  copiedTimer = setTimeout(() => {
+    copied.value = false;
+  }, 2000);
+};
 </script>
 
 <template>
@@ -40,16 +88,44 @@ const features = [
       <div class="wrap top__row">
         <img
           class="top__logo"
-          :src="wordmarkUrl"
+          :src="wordmarkSrc"
           alt="TreeUI"
         >
-        <nav class="top__nav">
-          <a href="#practices">Best practices</a>
-          <a href="./vue/">Vue docs</a>
-          <a href="./react/">React docs</a>
-          <a href="./examples/dashboard-vue/">Examples</a>
+        <nav
+          class="top__nav"
+          :aria-label="copy.nav.ariaLabel"
+        >
+          <a href="#practices">{{ copy.nav.practices }}</a>
+          <a href="./vue/">{{ copy.nav.vueDocs }}</a>
+          <a href="./react/">{{ copy.nav.reactDocs }}</a>
+          <a href="./examples/dashboard-vue/">{{ copy.nav.examples }}</a>
           <a href="https://github.com/Viserion77/treeui">GitHub</a>
         </nav>
+        <div class="top__controls">
+          <TLanguageSelect
+            v-model="localeModel"
+            :options="localeOptions"
+            variant="switcher"
+            icon-only
+            size="sm"
+            width="xs"
+            :aria-label="copy.nav.languageLabel"
+          />
+          <TButton
+            variant="ghost"
+            size="sm"
+            :aria-label="copy.theme.toggleLabel"
+            @click="toggleTheme"
+          >
+            <template #icon>
+              <TIcon
+                :name="resolvedTheme === 'dark' ? 'sun' : 'moon'"
+                :size="16"
+              />
+            </template>
+            {{ resolvedTheme === 'dark' ? copy.theme.light : copy.theme.dark }}
+          </TButton>
+        </div>
       </div>
     </header>
 
@@ -62,19 +138,53 @@ const features = [
             alt=""
             aria-hidden="true"
           >
-          <h1>Clean components for modern products</h1>
-          <p>
-            An open-source component library on a framework-agnostic foundation — shared design
-            tokens, accessibility-first behavior, and a compact <code>T</code>-prefixed API across
-            every framework.
-          </p>
+          <h1>{{ copy.hero.title }}</h1>
+          <p>{{ copy.hero.lead }}</p>
+          <div class="hero__actions">
+            <TButton
+              as="a"
+              href="./vue/"
+            >
+              {{ copy.hero.ctaVue }}
+            </TButton>
+            <TButton
+              as="a"
+              variant="outline"
+              href="https://github.com/Viserion77/treeui"
+              target="_blank"
+              rel="noopener"
+            >
+              GitHub
+            </TButton>
+          </div>
+          <div class="hero__install">
+            <code>{{ INSTALL_COMMAND }}</code>
+            <TButton
+              variant="ghost"
+              size="sm"
+              :aria-label="copy.hero.copyLabel"
+              @click="copyInstall"
+            >
+              <template #icon>
+                <TIcon
+                  :name="copied ? 'check' : 'copy'"
+                  :size="16"
+                />
+              </template>
+              {{ copied ? copy.hero.copied : copy.hero.copy }}
+            </TButton>
+            <span
+              class="visually-hidden"
+              role="status"
+            >{{ copied ? copy.hero.copied : '' }}</span>
+          </div>
         </div>
       </section>
 
       <div class="wrap">
         <section
           class="paths"
-          aria-label="Documentation"
+          :aria-label="copy.paths.ariaLabel"
         >
           <TCard
             as="a"
@@ -84,20 +194,32 @@ const features = [
           >
             <template #header>
               <div class="path__head">
-                <h2>Vue 3</h2>
+                <div class="path__title">
+                  <span
+                    class="path__brand"
+                    aria-hidden="true"
+                  >
+                    <svg
+                      viewBox="0 0 24 24"
+                      :fill="`#${siVuedotjs.hex}`"
+                    >
+                      <path :d="siVuedotjs.path" />
+                    </svg>
+                  </span>
+                  <h2>Vue 3</h2>
+                </div>
                 <TBadge tone="info">
-                  Stable
+                  {{ copy.paths.vueBadge }}
                 </TBadge>
               </div>
             </template>
             <p class="path__body">
-              The complete library: 60+ production components, a plugin, full type exports, and the
-              entire design-system documentation.
+              {{ copy.paths.vueBody }}
             </p>
             <template #footer>
               <div class="path__foot">
                 <span class="mono">@treeui/vue</span>
-                <span class="go">Open Vue docs →</span>
+                <span class="go">{{ copy.paths.vueGo }}</span>
               </div>
             </template>
           </TCard>
@@ -110,136 +232,75 @@ const features = [
           >
             <template #header>
               <div class="path__head">
-                <h2>React</h2>
+                <div class="path__title">
+                  <span
+                    class="path__brand"
+                    aria-hidden="true"
+                  >
+                    <svg
+                      viewBox="0 0 24 24"
+                      :fill="`#${siReact.hex}`"
+                    >
+                      <path :d="siReact.path" />
+                    </svg>
+                  </span>
+                  <h2>React</h2>
+                </div>
                 <TBadge tone="warning">
-                  Early
+                  {{ copy.paths.reactBadge }}
                 </TBadge>
               </div>
             </template>
             <p class="path__body">
-              A growing package with the core primitives — Button, Input, Badge, Card — built on the
-              same tokens and <code>t-*</code> classes.
+              {{ copy.paths.reactBody }}
             </p>
             <template #footer>
               <div class="path__foot">
                 <span class="mono">@treeui/react</span>
-                <span class="go">Open React docs →</span>
+                <span class="go">{{ copy.paths.reactGo }}</span>
               </div>
             </template>
           </TCard>
         </section>
 
         <section
-          class="examples"
-          aria-label="Live examples"
-        >
-          <h3>See it running</h3>
-          <p class="examples__intro">
-            A full configurable dashboard — theme, accent color, density, and widgets — built
-            entirely with TreeUI components. No custom UI framework code.
-          </p>
-          <div class="examples__grid">
-            <TCard
-              as="a"
-              href="./examples/dashboard-vue/"
-              variant="soft"
-              class="path"
-            >
-              <template #header>
-                <div class="path__head">
-                  <h4>Vue dashboard</h4>
-                  <TBadge tone="success">
-                    Live demo
-                  </TBadge>
-                </div>
-              </template>
-              <p class="path__body">
-                Sidebar shell, sortable tables, KPI stats, toasts, and a settings drawer — the
-                complete component set working together.
-              </p>
-              <template #footer>
-                <div class="path__foot">
-                  <span class="mono">examples/dashboard-vue</span>
-                  <span class="go">Open example →</span>
-                </div>
-              </template>
-            </TCard>
-
-            <TCard
-              as="a"
-              href="./examples/dashboard-react/"
-              variant="soft"
-              class="path"
-            >
-              <template #header>
-                <div class="path__head">
-                  <h4>React dashboard</h4>
-                  <TBadge tone="success">
-                    Live demo
-                  </TBadge>
-                </div>
-              </template>
-              <p class="path__body">
-                The same dashboard concept built with the React primitives — Button, Input, Badge,
-                Card — on shared tokens.
-              </p>
-              <template #footer>
-                <div class="path__foot">
-                  <span class="mono">examples/dashboard-react</span>
-                  <span class="go">Open example →</span>
-                </div>
-              </template>
-            </TCard>
-          </div>
-        </section>
-
-        <section class="foundation">
-          <h3>One foundation, shared by every framework</h3>
-          <div class="foundation__grid">
-            <TCard
-              v-for="feature in features"
-              :key="feature.label"
-              variant="soft"
-              size="sm"
-            >
-              <p class="mono feature__label">
-                {{ feature.label }}
-              </p>
-              <h4>{{ feature.title }}</h4>
-              <p class="feature__body">
-                {{ feature.body }}
-              </p>
-            </TCard>
-          </div>
-        </section>
-
-        <section
           id="practices"
           class="practices"
-          aria-label="Best practices"
+          :aria-label="copy.nav.practices"
         >
-          <h3>Best practices, built in</h3>
+          <h3>{{ copy.practices.heading }}</h3>
           <p class="practices__intro">
-            {{ philosophy.statement }}
+            {{ copy.practices.intro }}
           </p>
           <div class="practices__grid">
             <TCard
-              v-for="practice in practices"
+              v-for="practice in practiceCards"
               :key="practice.id"
               variant="outline"
               class="practice"
             >
               <template #header>
-                <h4 class="practice__title">
-                  {{ practice.title }}
-                </h4>
+                <div class="practice__head">
+                  <span
+                    class="practice__icon"
+                    aria-hidden="true"
+                  >
+                    <TIcon
+                      :name="practice.icon"
+                      :size="18"
+                    />
+                  </span>
+                  <h4 class="practice__title">
+                    {{ practice.title }}
+                  </h4>
+                </div>
               </template>
               <p class="practice__summary">
                 {{ practice.summary }}
               </p>
               <template #footer>
                 <div class="practice__foot">
-                  <span class="practice__foot-label">Components that follow it</span>
+                  <span class="practice__foot-label">{{ copy.practices.followedBy }}</span>
                   <ul class="practice__chips">
                     <li
                       v-for="component in practice.components"
@@ -256,16 +317,99 @@ const features = [
             </TCard>
           </div>
           <p class="practices__more">
-            <a :href="practicesDocsHref">Every practice, with its rules and live component demos, in Storybook →</a>
+            <a :href="practicesDocsHref">{{ copy.practices.more }}</a>
           </p>
+        </section>
+
+        <section
+          class="examples"
+          :aria-label="copy.examples.heading"
+        >
+          <h3>{{ copy.examples.heading }}</h3>
+          <p class="examples__intro">
+            {{ copy.examples.intro }}
+          </p>
+          <div class="examples__grid">
+            <TCard
+              as="a"
+              href="./examples/dashboard-vue/"
+              variant="soft"
+              class="path"
+            >
+              <template #header>
+                <div class="path__head">
+                  <h4>{{ copy.examples.vueTitle }}</h4>
+                  <TBadge tone="success">
+                    {{ copy.examples.liveBadge }}
+                  </TBadge>
+                </div>
+              </template>
+              <p class="path__body">
+                {{ copy.examples.vueBody }}
+              </p>
+              <template #footer>
+                <div class="path__foot">
+                  <span class="mono">examples/dashboard-vue</span>
+                  <span class="go">{{ copy.examples.go }}</span>
+                </div>
+              </template>
+            </TCard>
+
+            <TCard
+              as="a"
+              href="./examples/dashboard-react/"
+              variant="soft"
+              class="path"
+            >
+              <template #header>
+                <div class="path__head">
+                  <h4>{{ copy.examples.reactTitle }}</h4>
+                  <TBadge tone="success">
+                    {{ copy.examples.liveBadge }}
+                  </TBadge>
+                </div>
+              </template>
+              <p class="path__body">
+                {{ copy.examples.reactBody }}
+              </p>
+              <template #footer>
+                <div class="path__foot">
+                  <span class="mono">examples/dashboard-react</span>
+                  <span class="go">{{ copy.examples.go }}</span>
+                </div>
+              </template>
+            </TCard>
+          </div>
+        </section>
+
+        <section class="foundation">
+          <h3>{{ copy.foundation.heading }}</h3>
+          <div class="foundation__grid">
+            <TCard
+              v-for="feature in copy.foundation.features"
+              :key="feature.label"
+              variant="soft"
+              size="sm"
+            >
+              <p class="mono feature__label">
+                {{ feature.label }}
+              </p>
+              <h4>{{ feature.title }}</h4>
+              <p class="feature__body">
+                {{ feature.body }}
+              </p>
+            </TCard>
+          </div>
         </section>
       </div>
     </main>
 
     <footer class="foot">
       <div class="wrap foot__row">
-        <span>MIT licensed · Built with token-driven theming.</span>
+        <span>{{ copy.footer.line }}</span>
         <span class="foot__links">
+          <a href="#practices">{{ copy.nav.practices }}</a>
+          <a href="./vue/">Storybook</a>
           <a href="https://github.com/Viserion77/treeui">GitHub</a>
           <a href="https://www.npmjs.com/package/@treeui/vue">npm</a>
         </span>
@@ -297,6 +441,18 @@ a {
   color: inherit;
 }
 
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
 .top {
   border-bottom: var(--tree-border-width-subtle) solid var(--tree-color-border-default);
   background: var(--tree-color-bg-surface);
@@ -307,7 +463,8 @@ a {
   align-items: center;
   justify-content: space-between;
   gap: var(--tree-space-4);
-  padding-block: var(--tree-space-4);
+  padding-block: var(--tree-space-3);
+  flex-wrap: wrap;
 }
 
 .top__logo {
@@ -320,6 +477,7 @@ a {
   display: flex;
   gap: var(--tree-space-5);
   font-size: var(--tree-font-size-sm);
+  flex-wrap: wrap;
 }
 
 .top__nav a {
@@ -329,6 +487,12 @@ a {
 
 .top__nav a:hover {
   color: var(--tree-color-text-primary);
+}
+
+.top__controls {
+  display: flex;
+  align-items: center;
+  gap: var(--tree-space-2);
 }
 
 .hero {
@@ -359,6 +523,29 @@ a {
   line-height: 1.6;
 }
 
+.hero__actions {
+  display: flex;
+  justify-content: center;
+  gap: var(--tree-space-3);
+  flex-wrap: wrap;
+  margin-top: var(--tree-space-6);
+}
+
+.hero__install {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--tree-space-3);
+  margin-top: var(--tree-space-5);
+  padding: var(--tree-space-1) var(--tree-space-1) var(--tree-space-1) var(--tree-space-4);
+  border: var(--tree-border-width-subtle) solid var(--tree-color-border-default);
+  border-radius: var(--tree-radius-md);
+  background: var(--tree-color-bg-surface);
+}
+
+.hero__install code {
+  font-size: var(--tree-font-size-sm);
+}
+
 .paths {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -384,6 +571,22 @@ a {
   align-items: center;
   justify-content: space-between;
   gap: var(--tree-space-3);
+}
+
+.path__title {
+  display: flex;
+  align-items: center;
+  gap: var(--tree-space-3);
+}
+
+.path__brand {
+  display: inline-flex;
+}
+
+.path__brand svg {
+  width: 22px;
+  height: 22px;
+  display: block;
 }
 
 .path__head h2 {
@@ -414,67 +617,6 @@ a {
   color: var(--tree-color-brand-primary);
 }
 
-.examples {
-  padding-block: var(--tree-space-8) var(--tree-space-3);
-}
-
-.examples h3 {
-  font-size: var(--tree-font-size-lg);
-  margin: 0 0 var(--tree-space-2);
-  letter-spacing: -0.01em;
-}
-
-.examples__intro {
-  margin: 0 0 var(--tree-space-5);
-  color: var(--tree-color-text-muted);
-  max-width: 64ch;
-}
-
-.examples__grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: var(--tree-space-5);
-}
-
-.examples__grid h4 {
-  margin: 0;
-  font-size: var(--tree-font-size-lg);
-  letter-spacing: -0.02em;
-}
-
-.foundation {
-  padding-block: var(--tree-space-8) var(--tree-space-3);
-}
-
-.foundation h3 {
-  font-size: var(--tree-font-size-lg);
-  margin: 0 0 var(--tree-space-5);
-  letter-spacing: -0.01em;
-}
-
-.foundation__grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: var(--tree-space-4);
-}
-
-.feature__label {
-  margin: 0 0 var(--tree-space-2);
-  font-size: var(--tree-font-size-sm);
-  color: var(--tree-color-brand-primary);
-}
-
-.foundation__grid h4 {
-  margin: 0 0 var(--tree-space-1);
-  font-size: var(--tree-font-size-md);
-}
-
-.feature__body {
-  margin: 0;
-  font-size: var(--tree-font-size-sm);
-  color: var(--tree-color-text-muted);
-}
-
 .practices {
   padding-block: var(--tree-space-8) var(--tree-space-3);
   /* Anchor target: keep the section heading clear of the viewport edge. */
@@ -497,6 +639,20 @@ a {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: var(--tree-space-5);
+}
+
+.practice__head {
+  display: flex;
+  align-items: center;
+  gap: var(--tree-space-3);
+}
+
+.practice__icon {
+  display: inline-flex;
+  padding: var(--tree-space-2);
+  border-radius: var(--tree-radius-md);
+  background: var(--tree-color-brand-soft);
+  color: var(--tree-color-brand-primary);
 }
 
 .practice__title {
@@ -574,6 +730,67 @@ a {
   text-decoration: underline;
 }
 
+.examples {
+  padding-block: var(--tree-space-8) var(--tree-space-3);
+}
+
+.examples h3 {
+  font-size: var(--tree-font-size-lg);
+  margin: 0 0 var(--tree-space-2);
+  letter-spacing: -0.01em;
+}
+
+.examples__intro {
+  margin: 0 0 var(--tree-space-5);
+  color: var(--tree-color-text-muted);
+  max-width: 64ch;
+}
+
+.examples__grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--tree-space-5);
+}
+
+.examples__grid h4 {
+  margin: 0;
+  font-size: var(--tree-font-size-lg);
+  letter-spacing: -0.02em;
+}
+
+.foundation {
+  padding-block: var(--tree-space-8) var(--tree-space-3);
+}
+
+.foundation h3 {
+  font-size: var(--tree-font-size-lg);
+  margin: 0 0 var(--tree-space-5);
+  letter-spacing: -0.01em;
+}
+
+.foundation__grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--tree-space-4);
+}
+
+.feature__label {
+  margin: 0 0 var(--tree-space-2);
+  font-size: var(--tree-font-size-sm);
+  color: var(--tree-color-brand-primary);
+}
+
+.foundation__grid h4 {
+  margin: 0 0 var(--tree-space-1);
+  font-size: var(--tree-font-size-md);
+}
+
+.feature__body {
+  margin: 0;
+  font-size: var(--tree-font-size-sm);
+  color: var(--tree-color-text-muted);
+}
+
 .foot {
   margin-top: var(--tree-space-12);
   border-top: var(--tree-border-width-subtle) solid var(--tree-color-border-default);
@@ -593,6 +810,7 @@ a {
 .foot__links {
   display: flex;
   gap: var(--tree-space-4);
+  flex-wrap: wrap;
 }
 
 .foot__links a {
@@ -606,9 +824,9 @@ a {
 
 @media (max-width: 720px) {
   .paths,
+  .practices__grid,
   .examples__grid,
-  .foundation__grid,
-  .practices__grid {
+  .foundation__grid {
     grid-template-columns: 1fr;
   }
 }

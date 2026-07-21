@@ -16,10 +16,11 @@
     {
       "id": "interaction-feedback",
       "title": "Visual interaction feedback",
+      "icon": "zap",
       "summary": "Every interaction answers back. Hover, focus, active, loading, and disabled are designed states — never afterthoughts left to the consumer.",
       "rules": [
         "Interactive surfaces ship hover, active, and focus-visible treatments out of the box.",
-        "Loading states announce themselves (aria-busy, spinner) and block duplicate activation.",
+        "Loading states announce themselves (aria-busy plus a labelled, localizable spinner), replace the resting glyph instead of stacking beside it, and block duplicate activation.",
         "Disabled and loading elements never emit activation events.",
         "Focus indicators stay visible in both light and dark themes."
       ],
@@ -39,9 +40,10 @@
     {
       "id": "accessible-by-default",
       "title": "Accessible by default",
+      "icon": "hand-check",
       "summary": "Native semantics first, ARIA where the pattern requires it, full keyboard support, and focus management the consumer never has to write.",
       "rules": [
-        "Native elements before roles; role=\"dialog\", aria-modal, aria-labelledby only where semantics require them.",
+        "Native elements before roles; role=\"dialog\", aria-modal, aria-labelledby only where semantics require them, and no composite-widget role (grid, tree) is claimed without its full keyboard model.",
         "Tab/Shift+Tab order, Escape to close, Enter/Space to activate, arrow keys where the pattern expects them.",
         "Overlays trap focus while open and restore it on close.",
         "Clickable targets stay at or above 44×44px."
@@ -55,12 +57,14 @@
         "TAccordion",
         "TFormField",
         "TTreeView",
-        "TToastProvider"
+        "TToastProvider",
+        "TButton"
       ]
     },
     {
       "id": "predictable-api",
       "title": "One predictable API",
+      "icon": "braces",
       "summary": "The same contracts everywhere: one size scale, one action-variant scale, v-model for form controls, open/close for overlays. Learn one component and you know them all.",
       "rules": [
         "Sizes are sm | md | lg across the library.",
@@ -81,6 +85,7 @@
     {
       "id": "state-clarity",
       "title": "Empty, loading, and error are designed states",
+      "icon": "activity",
       "summary": "Screens communicate status honestly: skeletons while loading, purposeful empty states, and status surfaces on one semantic tone scale.",
       "rules": [
         "Default, hover, active, focus, disabled, loading, and error/empty states are designed and documented — not just the happy path.",
@@ -94,12 +99,14 @@
         "TEmptyState",
         "TAlert",
         "TToastProvider",
-        "TBadge"
+        "TBadge",
+        "TTable"
       ]
     },
     {
       "id": "content-alignment",
       "title": "Alignment without custom CSS",
+      "icon": "layout-grid",
       "summary": "Layout primitives absorb spacing, alignment, and rhythm so product code never hand-rolls the same flexbox again.",
       "rules": [
         "Spacing comes from the --tree-space-* scale, applied by layout components.",
@@ -121,6 +128,7 @@
     {
       "id": "token-driven",
       "title": "Token-driven clarity",
+      "icon": "palette",
       "summary": "No raw hex, px, or font values anywhere. Every visual decision references a --tree-* token, so light/dark and brand theming stay coherent by construction.",
       "rules": [
         "Zero hardcoded colors, spacing, or typography in component code.",
@@ -167,6 +175,7 @@
     "TSplit": "components-layout-split",
     "TStack": "components-layout-stack",
     "TSwitch": "components-data-entry-switch",
+    "TTable": "components-data-display-table",
     "TTabs": "components-navigation-tabs",
     "TTag": "components-data-display-tag",
     "TToastProvider": "components-feedback-toast",

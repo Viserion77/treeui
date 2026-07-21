@@ -5185,3 +5185,36 @@ describe('TREEUX round 1 — consumer contract hardening', () => {
     });
   });
 });
+
+describe('TAppShell immersive + drawer interaction', () => {
+  it('releases the body scroll lock and focus when immersive hides an open drawer', async () => {
+    document.body.style.overflow = '';
+
+    const wrapper = mount(TAppShell, {
+      props: { mobile: true, sidebarOpen: false, immersive: false },
+      slots: { sidebar: '<nav><a href="#a">nav</a></nav>' },
+    });
+
+    // Opening the drawer locks body scroll.
+    await wrapper.setProps({ sidebarOpen: true });
+    await nextTick();
+    expect(wrapper.find('.t-app-shell__drawer').exists()).toBe(true);
+    expect(document.body.style.overflow).toBe('hidden');
+
+    // Immersive unmounts the drawer without changing sidebarOpen, so the lock
+    // must be released here or the page stays unscrollable.
+    await wrapper.setProps({ immersive: true });
+    await nextTick();
+    expect(wrapper.find('.t-app-shell__drawer').exists()).toBe(false);
+    expect(document.body.style.overflow).not.toBe('hidden');
+
+    // Leaving immersive re-arms the drawer that was still flagged open.
+    await wrapper.setProps({ immersive: false });
+    await nextTick();
+    expect(wrapper.find('.t-app-shell__drawer').exists()).toBe(true);
+    expect(document.body.style.overflow).toBe('hidden');
+
+    wrapper.unmount();
+    expect(document.body.style.overflow).not.toBe('hidden');
+  });
+});

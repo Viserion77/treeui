@@ -329,6 +329,26 @@ watch(isSidebarOpen, (value, previousValue) => {
   syncOverlayState(value, Boolean(previousValue));
 });
 
+// Entering immersive removes the drawer from the DOM without changing
+// `sidebarOpen`, so the sidebarOpen watcher never fires and would leave the
+// body scroll-locked with focus stranded on an unmounted surface. Release and
+// re-arm here, mirroring the responsive-mode watcher below.
+watch(isImmersive, (immersive) => {
+  if (!isSidebarOpen.value || !isMobile.value) {
+    return;
+  }
+
+  if (immersive) {
+    unlockBodyScroll();
+    nextTick(() => {
+      previousFocusedElement.value?.focus();
+    });
+  } else {
+    lockBodyScroll();
+    focusSurface();
+  }
+});
+
 watch(isMobile, (mobile) => {
   if (!isSidebarOpen.value) {
     return;

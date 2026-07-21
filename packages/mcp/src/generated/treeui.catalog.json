@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-21T18:51:21.285Z",
+  "generatedAt": "2026-07-21T19:56:41.320Z",
   "packageName": "@treeui/vue",
   "packageVersion": "0.18.0",
   "decisionGuides": [
@@ -373,6 +373,26 @@
       ]
     },
     {
+      "id": "brand-lockup",
+      "name": "Product brand lockup in a shell header",
+      "useWhen": [
+        "A shell header needs a logo plus a product name (and optional subtitle) that stays aligned as the sidebar collapses."
+      ],
+      "compose": [
+        "TAppShell",
+        "TAvatar",
+        "TText",
+        "TStack"
+      ],
+      "notes": [
+        "Put the lockup in the `header-start` slot, not `header`. Filling `header-start` switches the header to the shell's own grid, so the mark tracks `--tree-app-shell-sidebar-width` and animates with the collapse — no local column math.",
+        "The slot is scoped: use its `collapsed` binding to drop the wordmark and keep only the mark (`v-if=\"!collapsed\"`), rather than hiding text with CSS.",
+        "Logo is `TAvatar` (`size`, `alt`, `initials` fallback) or a plain `<img>` sized with `--tree-size-icon-*`; name and subtitle are `TText` (`weight`, `tone=\"muted\"`, `truncate`) — never raw `<strong>`/`<span>` with a local class.",
+        "TreeUI ships no `TBrand` component on purpose: the logo asset, the product name, and what survives collapse are product identity, which must stay in the consumer. See DECISIONS.md → Portability Boundary.",
+        "Company and service logos (AWS, LocalStack, social networks) are brand assets and are not TreeUI icons — source them from the app's brand policy, not the icon registry."
+      ]
+    },
+    {
       "id": "nav-menu-icons",
       "name": "Icons on navigation items",
       "useWhen": [
@@ -598,7 +618,7 @@
       "summary": "Every interaction answers back. Hover, focus, active, loading, and disabled are designed states — never afterthoughts left to the consumer.",
       "rules": [
         "Interactive surfaces ship hover, active, and focus-visible treatments out of the box.",
-        "Loading states announce themselves (aria-busy, spinner) and block duplicate activation.",
+        "Loading states announce themselves (aria-busy plus a labelled, localizable spinner), replace the resting glyph instead of stacking beside it, and block duplicate activation.",
         "Disabled and loading elements never emit activation events.",
         "Focus indicators stay visible in both light and dark themes."
       ],
@@ -620,7 +640,7 @@
       "title": "Accessible by default",
       "summary": "Native semantics first, ARIA where the pattern requires it, full keyboard support, and focus management the consumer never has to write.",
       "rules": [
-        "Native elements before roles; role=\"dialog\", aria-modal, aria-labelledby only where semantics require them.",
+        "Native elements before roles; role=\"dialog\", aria-modal, aria-labelledby only where semantics require them, and no composite-widget role (grid, tree) is claimed without its full keyboard model.",
         "Tab/Shift+Tab order, Escape to close, Enter/Space to activate, arrow keys where the pattern expects them.",
         "Overlays trap focus while open and restore it on close.",
         "Clickable targets stay at or above 44×44px."
@@ -634,7 +654,8 @@
         "TAccordion",
         "TFormField",
         "TTreeView",
-        "TToastProvider"
+        "TToastProvider",
+        "TButton"
       ]
     },
     {
@@ -673,7 +694,8 @@
         "TEmptyState",
         "TAlert",
         "TToastProvider",
-        "TBadge"
+        "TBadge",
+        "TTable"
       ]
     },
     {
@@ -1535,7 +1557,8 @@
         ]
       },
       "recipes": [
-        "app-shell"
+        "app-shell",
+        "brand-lockup"
       ],
       "practices": []
     },
@@ -1618,7 +1641,9 @@
         "required": [],
         "notes": []
       },
-      "recipes": [],
+      "recipes": [
+        "brand-lockup"
+      ],
       "practices": []
     },
     {
@@ -1922,6 +1947,7 @@
       ],
       "practices": [
         "interaction-feedback",
+        "accessible-by-default",
         "predictable-api"
       ]
     },
@@ -8216,6 +8242,7 @@
         "notes": []
       },
       "recipes": [
+        "brand-lockup",
         "tag-input",
         "data-listing",
         "chart-surface"
@@ -8728,7 +8755,9 @@
       "recipes": [
         "data-listing"
       ],
-      "practices": []
+      "practices": [
+        "state-clarity"
+      ]
     },
     {
       "name": "TTabs",
@@ -9017,7 +9046,9 @@
         "required": [],
         "notes": []
       },
-      "recipes": [],
+      "recipes": [
+        "brand-lockup"
+      ],
       "practices": []
     },
     {

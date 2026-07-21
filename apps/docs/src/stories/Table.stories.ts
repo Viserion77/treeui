@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite';
 import { TBadge, TTable } from '@treeui/vue';
+import { practiceNote } from './practice-refs';
 
 const sampleColumns = [
   { key: 'name', label: 'Name', sortable: true },
@@ -19,6 +20,9 @@ const sampleRows = [
 const meta = {
   title: 'Components/Data Display/Table',
   component: TTable,
+  parameters: {
+    docs: { description: { component: practiceNote('TTable') } },
+  },
   tags: ['autodocs'],
   args: {
     columns: sampleColumns,

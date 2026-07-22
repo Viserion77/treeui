@@ -1,5 +1,12 @@
 # @treeui/example-dashboard-vue
 
+## 0.1.14
+
+### Patch Changes
+
+- Updated dependencies [47d5166]
+  - @treeui/vue@0.21.0
+
 ## 0.1.13
 
 ### Patch Changes

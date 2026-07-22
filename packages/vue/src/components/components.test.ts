@@ -3,6 +3,9 @@ import { mount } from '@vue/test-utils';
 import { useTheme } from '../composables/useTheme';
 import TBadge from './TBadge.vue';
 import TButton from './TButton.vue';
+import TBrandLockup from './TBrandLockup.vue';
+import TCodeBlock from './TCodeBlock.vue';
+import TLinkTile from './TLinkTile.vue';
 import TAlert from './TAlert.vue';
 import TCard from './TCard.vue';
 import TCheckbox from './TCheckbox.vue';
@@ -5343,6 +5346,92 @@ describe('TREEUX round 3 — closed-contract prop additions', () => {
       const wrapper = mount(TAppShell, { props: { mobile: false }, slots: { header: '<span>x</span>' } });
       expect(wrapper.find('.t-app-shell__header-end').exists()).toBe(false);
       expect(wrapper.find('.t-app-shell__header').classes()).not.toContain('has-end');
+    });
+  });
+});
+
+describe('TREEUX round 5 — new components', () => {
+  describe('TBrandLockup (S7-009 / LSS-009)', () => {
+    it('renders logo slot, title and subtitle, preserving them as text', () => {
+      const wrapper = mount(TBrandLockup, {
+        props: { title: 'Orchard', subtitle: 'Tasks' },
+        slots: { logo: '<img src="/logo.svg" alt="Orchard" class="mark" />' },
+      });
+      expect(wrapper.find('.t-brand-lockup__logo .mark').exists()).toBe(true);
+      expect(wrapper.find('.t-brand-lockup__title').text()).toBe('Orchard');
+      expect(wrapper.find('.t-brand-lockup__subtitle').text()).toBe('Tasks');
+    });
+
+    it('hides the text when collapsed but keeps the logo', () => {
+      const wrapper = mount(TBrandLockup, {
+        props: { title: 'Orchard', collapsed: true },
+        slots: { logo: '<img alt="Orchard" class="mark" />' },
+      });
+      expect(wrapper.find('.t-brand-lockup__logo .mark').exists()).toBe(true);
+      expect(wrapper.find('.t-brand-lockup__text').exists()).toBe(false);
+    });
+
+    it('renders as an anchor when href is given, div otherwise', () => {
+      expect(mount(TBrandLockup, { props: { title: 'X' } }).element.tagName).toBe('DIV');
+      const link = mount(TBrandLockup, { props: { title: 'X', href: '/home' } });
+      expect(link.element.tagName).toBe('A');
+      expect(link.attributes('href')).toBe('/home');
+    });
+  });
+
+  describe('TCodeBlock (LSS-003)', () => {
+    it('renders content and a labelled scroll region', () => {
+      const wrapper = mount(TCodeBlock, { props: { code: 'arn:aws:sqs:...', label: 'Lambda log' } });
+      const pre = wrapper.find('.t-code-block__pre');
+      expect(pre.text()).toContain('arn:aws:sqs');
+      expect(pre.attributes('role')).toBe('region');
+      expect(pre.attributes('aria-label')).toBe('Lambda log');
+      expect(pre.attributes('tabindex')).toBe('0');
+    });
+
+    it('toggles the wrap modifier', () => {
+      expect(mount(TCodeBlock, { props: { code: 'x' } }).classes()).not.toContain('is-wrap');
+      expect(mount(TCodeBlock, { props: { code: 'x', wrap: true } }).classes()).toContain('is-wrap');
+    });
+
+    it('shows the copy button only when copyable and code are set, and emits on copy', async () => {
+      expect(mount(TCodeBlock, { props: { code: 'x' } }).find('.t-code-block__copy').exists()).toBe(false);
+      const writeText = vi.fn().mockResolvedValue(undefined);
+      Object.assign(navigator, { clipboard: { writeText } });
+      const wrapper = mount(TCodeBlock, { props: { code: 'hello', copyable: true } });
+      await wrapper.find('.t-code-block__copy').trigger('click');
+      await nextTick();
+      expect(writeText).toHaveBeenCalledWith('hello');
+      expect(wrapper.emitted('copy')?.[0]).toEqual(['hello']);
+    });
+
+    it('applies a max block size when given', () => {
+      const wrapper = mount(TCodeBlock, { props: { code: 'x', maxBlockSize: '20rem' } });
+      expect(wrapper.find('.t-code-block__pre').attributes('style')).toContain('20rem');
+    });
+  });
+
+  describe('TLinkTile (S7-008)', () => {
+    it('renders a single link with leading, title and description', () => {
+      const wrapper = mount(TLinkTile, {
+        props: { title: 'Lambda', description: 'us-east-1', href: '/lambda' },
+        slots: { leading: '<svg class="ic" />' },
+      });
+      expect(wrapper.element.tagName).toBe('A');
+      expect(wrapper.attributes('href')).toBe('/lambda');
+      expect(wrapper.find('.t-link-tile__leading .ic').exists()).toBe(true);
+      expect(wrapper.find('.t-link-tile__title').text()).toBe('Lambda');
+      expect(wrapper.find('.t-link-tile__description').text()).toBe('us-east-1');
+    });
+
+    it('emits aria-current only when current, and applies the tone modifier', () => {
+      const plain = mount(TLinkTile, { props: { title: 'X', href: '#', tone: 'brand' } });
+      expect(plain.classes()).toContain('t-link-tile--brand');
+      expect(plain.attributes('aria-current')).toBeUndefined();
+
+      const current = mount(TLinkTile, { props: { title: 'X', href: '#', current: true } });
+      expect(current.attributes('aria-current')).toBe('page');
+      expect(current.classes()).toContain('is-current');
     });
   });
 });

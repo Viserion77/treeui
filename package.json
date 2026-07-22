@@ -6,7 +6,8 @@
   "packageManager": "pnpm@9.15.0",
   "pnpm": {
     "overrides": {
-      "vue": "$vue"
+      "vue": "$vue",
+      "hono@<4.12.27": ">=4.12.27"
     }
   },
   "scripts": {

@@ -1,0 +1,56 @@
+name: TCodeBlock
+source_file: packages/vue/src/components/TCodeBlock.vue
+package: "@treeui/vue"
+kind: data-display
+status: available
+purpose: "Scrollable monospace surface for logs, JSON, ARNs and other machine text. Block-level only — for inline code/IDs use `TText family=\"mono\"`. No syntax highlighting and no virtualization by design; assumes bounded content (e.g. a limited log tail)."
+
+props:
+  code:
+    type: string
+    default: undefined
+    note: "Code as a string. Rendered as the block content and required for the built-in copy button. Omit and use the default slot for pre-formatted markup."
+  wrap:
+    type: boolean
+    default: false
+    note: "`false` keeps lines intact and scrolls horizontally (right for logs). `true` wraps long lines (`pre-wrap` + `overflow-wrap`, right for JSON)."
+  maxBlockSize:
+    type: string
+    default: undefined
+    note: "Any CSS length. Caps the height; the block scrolls vertically beyond it."
+  copyable:
+    type: boolean
+    default: false
+    note: "Show the built-in copy button. Requires `code` (there is nothing to copy from a slot). Copies via navigator.clipboard and emits `copy`."
+  label:
+    type: string
+    default: Code
+    note: "Accessible name for the scrollable region and the copy button. English default, overridable (TreeUI ships no i18n layer)."
+
+events:
+  - name: copy
+    payload: "[text: string]"
+    description: "Emitted after the built-in copy button writes `code` to the clipboard."
+
+slots:
+  - name: default
+    description: "Block content when `code` is not used. Rendered inside `<pre><code>`. The built-in copy button is not shown for slot content (nothing to copy from)."
+  - name: actions
+    description: "Reserved for extra toolbar controls."
+
+a11y:
+  scroll_region: "The `<pre>` is `role=\"region\"` + `tabindex=\"0\"` + `aria-label` (from `label`) so keyboard users can scroll it — the library does this for you."
+  copy_button_state: "The copy button's aria-label reflects the copied state briefly."
+
+not_for:
+  - "Inline code / IDs / ARNs in running text → use `TText family=\"mono\"`."
+  - "Rich Markdown editing/preview → use `TMarkdownEditor`."
+
+css:
+  block: t-code-block
+  states: [is-wrap]
+  elements: [t-code-block__toolbar, t-code-block__copy, t-code-block__pre, t-code-block__code]
+
+example: |
+  <TCodeBlock :code="lambdaLog" label="Lambda log" max-block-size="24rem" copyable @copy="onCopied" />
+  <TCodeBlock :code="dynamoItem" wrap label="DynamoDB item" />

@@ -4,12 +4,6 @@ import { tv } from '@treeui/utils';
 import type { TSize, TVariant } from '../types/contracts';
 import TSpinner from './TSpinner.vue';
 
-// Left as a runtime reference (see vue vite.config `define`) so the consumer's
-// bundler — not TreeUI's build — decides dev vs prod. `typeof` guards raw ESM
-// where `process` is absent; the check tree-shakes out of production bundles.
-const isDevEnv = (): boolean =>
-  typeof process !== 'undefined' && process.env != null && process.env.NODE_ENV !== 'production';
-
 const props = withDefaults(
   defineProps<{
     as?: string;
@@ -84,9 +78,16 @@ const isNativeButton = computed(() => props.as === 'button');
 const isDisabled = computed(() => props.disabled || props.loading);
 
 // An icon-only button has no visible text and an aria-hidden icon, so without a
-// name it is unlabelled for assistive tech. Warn in development only; production
-// stays silent (and the check is stripped by the consumer's bundler).
-if (isDevEnv()) {
+// name it is unlabelled for assistive tech. This is a BARE `process.env.NODE_ENV`
+// compare, inlined (no `typeof process` guard, no function wrapper): the
+// consumer's bundler statically replaces it, so the whole block runs in their
+// dev build and is dead-code-eliminated — string literals included — from their
+// production build. A `typeof process` guard would be `false` in the browser
+// (where `process` does not exist), silently disabling the warning; a function
+// wrapper would be opaque to tree-shaking. TreeUI's own build keeps
+// `process.env.NODE_ENV` as a runtime reference (vite.config `define`) so the
+// decision belongs to the consumer's environment, not this build.
+if (process.env.NODE_ENV !== 'production') {
   watchEffect(() => {
     if (
       props.iconOnly &&

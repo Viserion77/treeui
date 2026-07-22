@@ -1,0 +1,59 @@
+name: TBrandLockup
+source_file: packages/vue/src/components/TBrandLockup.vue
+package: "@treeui/vue"
+kind: navigation
+status: available
+purpose: "Generic product brand lockup — a logo mark plus a title and optional subtitle, aligned and collapse-aware, with an optional home link. Owns sizing, truncation, collapse and link so the shell header does not hand-roll them. Ships NO identity: the logo asset and the strings belong to the consumer."
+
+props:
+  title:
+    type: string
+    default: undefined
+    note: "Product name. Rendered via TText with truncation."
+  subtitle:
+    type: string
+    default: undefined
+    note: "Optional supporting line under the title. Muted, smaller, truncates."
+  size:
+    type: TSize
+    default: md
+    values: [sm, md, lg]
+    note: "Scales the logo height (sm → icon-lg, md → icon-xl, lg → control-md) and the title size."
+  collapsed:
+    type: boolean
+    default: false
+    note: "Hide the text, keeping only the logo — for a shell's collapsed rail. Bind it to TAppShell's scoped `collapsed` slot prop. When collapsed AND used as a link, the accessible name must come from the logo (e.g. `alt` on the `<img>`), since the visible text is gone."
+  href:
+    type: string
+    default: undefined
+    note: "Native href. Renders the lockup as an `<a>` (home link)."
+  to:
+    type: "string | Record<string, unknown>"
+    default: undefined
+    note: "Route target. Renders as RouterLink when vue-router is available, else falls back to `<a>`. Without href/to the root is a plain `<div>`."
+
+slots:
+  - name: logo
+    description: "The logo mark — an `<img>` or inline `<svg>`. Kept at its intrinsic aspect ratio (fixed height, free width, `object-fit: contain`), never cropped — unlike TAvatar, which imposes a square/round viewport. Give an `<img>` an `alt` for the accessible name."
+
+a11y:
+  logo_not_cropped: "The logo keeps its true proportions; a non-square wordmark is not distorted."
+  link_accessible_name: "As a link, the name comes from the title text, or from the logo `alt` when collapsed."
+  focus_visible: "Focus ring on the anchor when it is a link."
+
+why_not_tavatar: "TAvatar imposes a square/circular viewport and crops a non-square logo (e.g. a ~1.49:1 wordmark), altering the brand rather than aligning it. TBrandLockup keeps the intrinsic ratio."
+
+css:
+  block: t-brand-lockup
+  modifiers: [t-brand-lockup--sm, t-brand-lockup--lg]
+  states: [is-collapsed]
+  elements: [t-brand-lockup__logo, t-brand-lockup__text, t-brand-lockup__title, t-brand-lockup__subtitle]
+
+example: |
+  <TAppShell>
+    <template #header-start="{ collapsed }">
+      <TBrandLockup title="Orchard" subtitle="Tasks" :collapsed="collapsed" to="/">
+        <template #logo><img src="/logo.svg" alt="Orchard" /></template>
+      </TBrandLockup>
+    </template>
+  </TAppShell>

@@ -1,0 +1,82 @@
+name: TLinkTile
+source_file: packages/vue/src/components/TLinkTile.vue
+package: "@treeui/vue"
+kind: navigation
+status: available
+purpose: "Interactive navigational tile — a single link surface with a leading region, title and description, a token-driven tone accent, and library-owned hover/focus/sizing. For app launchers, product grids and settings entries. Owns no grid: compose collections with TGrid."
+
+props:
+  title:
+    type: string
+    default: undefined
+    note: "Tile heading. Rendered via TText."
+  description:
+    type: string
+    default: undefined
+    note: "Supporting line under the title. Muted, smaller."
+  tone:
+    type: TLinkTileTone
+    default: neutral
+    values: [neutral, brand, success, warning, danger, info]
+    note: "Accent for the leading region and the current/hover border. A closed axis mapped to status/brand tokens — never a free colour or custom property. The soft tint is derived from the base token with color-mix, staying theme-aware."
+  size:
+    type: TSize
+    default: md
+    values: [sm, md, lg]
+    note: "Padding scale."
+  current:
+    type: boolean
+    default: false
+    note: "Marks this tile as the current destination — emits `aria-current=\"page\"` and applies the accent surface."
+  href:
+    type: string
+    default: undefined
+    note: "Native href."
+  to:
+    type: "string | Record<string, unknown>"
+    default: undefined
+    note: "Route target. Renders as RouterLink when vue-router is available, else `<a>`. The tile is always a link (there is no non-link mode) — the whole surface is a single link with no nested secondary action."
+
+slots:
+  - name: leading
+    description: "Leading visual, typically a TIcon. Wrapped in an `aria-hidden` accent container."
+  - name: default
+    description: "Extra content appended under the description."
+
+a11y:
+  single_link_no_nested_interactive: "The entire tile is one link; do not nest a button/link inside — nested interactives inside a link are an accessibility trap."
+  accessible_name: "Comes from the title (and description) text; supply `aria-label` if the tile is icon-only."
+  aria_current: "`page` when `current`."
+  focus_visible: "Focus ring on the tile."
+
+composition:
+  responsive_collection: "TLinkTile has no grid of its own. Wrap a set in TGrid, which owns the columns and gap."
+
+css:
+  block: t-link-tile
+  modifiers:
+    - t-link-tile--sm
+    - t-link-tile--lg
+    - t-link-tile--neutral
+    - t-link-tile--brand
+    - t-link-tile--success
+    - t-link-tile--warning
+    - t-link-tile--danger
+    - t-link-tile--info
+  states: [is-current]
+  elements: [t-link-tile__leading, t-link-tile__body, t-link-tile__title, t-link-tile__description]
+
+example: |
+  <TGrid :columns="3" gap="var(--tree-space-4)">
+    <TLinkTile
+      v-for="app in apps"
+      :key="app.id"
+      :title="app.name"
+      :description="app.summary"
+      :to="app.route"
+      :tone="app.tone"
+      :current="app.id === activeId"
+    >
+      <template #leading><TIcon :name="app.icon" /></template>
+    </TLinkTile>
+  </TGrid>

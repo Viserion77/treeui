@@ -35,7 +35,8 @@
         "TPagination",
         "TDropdown",
         "TSelectableList",
-        "TCard"
+        "TCard",
+        "TLinkTile"
       ]
     },
     {
@@ -59,7 +60,9 @@
         "TFormField",
         "TTreeView",
         "TToastProvider",
-        "TButton"
+        "TButton",
+        "TCodeBlock",
+        "TLinkTile"
       ]
     },
     {
@@ -123,7 +126,8 @@
         "TSpacer",
         "TPage",
         "TPageHeader",
-        "TFormField"
+        "TFormField",
+        "TBrandLockup"
       ]
     },
     {
@@ -141,7 +145,10 @@
         "TNavbar",
         "TBadge",
         "TTag",
-        "TChart"
+        "TChart",
+        "TBrandLockup",
+        "TCodeBlock",
+        "TLinkTile"
       ]
     }
   ],
@@ -149,10 +156,12 @@
     "TAccordion": "components-data-display-accordion",
     "TAlert": "components-feedback-alert",
     "TBadge": "components-data-display-badge",
+    "TBrandLockup": "components-navigation-brandlockup",
     "TButton": "components-actions-button",
     "TCard": "components-data-display-card",
     "TChart": "components-data-display-chart",
     "TCheckbox": "components-data-entry-checkbox",
+    "TCodeBlock": "components-data-display-codeblock",
     "TConfirmDialog": "components-overlay-confirmdialog",
     "TContainer": "components-layout-container",
     "TDrawer": "components-overlay-drawer",
@@ -162,6 +171,7 @@
     "TGrid": "components-layout-grid",
     "TInput": "components-data-entry-input",
     "TLink": "components-navigation-link",
+    "TLinkTile": "components-navigation-linktile",
     "TModal": "components-overlay-modal",
     "TNavbar": "components-layout-navbar",
     "TPage": "components-layout-page",

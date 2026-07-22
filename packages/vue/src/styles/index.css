@@ -1172,6 +1172,221 @@ table.t-visually-hidden {
   box-shadow: 0 0 0 2px var(--tree-color-focus-ring);
 }
 
+/* ─── Brand lockup ─── */
+
+.t-brand-lockup {
+  --tree-brand-logo-h: var(--tree-size-icon-xl);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--tree-space-3);
+  min-inline-size: 0;
+  color: inherit;
+  text-decoration: none;
+}
+
+.t-brand-lockup--sm {
+  --tree-brand-logo-h: var(--tree-size-icon-lg);
+  gap: var(--tree-space-2);
+}
+
+.t-brand-lockup--lg {
+  --tree-brand-logo-h: var(--tree-size-control-md);
+}
+
+.t-brand-lockup__logo {
+  display: inline-flex;
+  align-items: center;
+  flex: 0 0 auto;
+  block-size: var(--tree-brand-logo-h);
+}
+
+/* The logo keeps its intrinsic ratio: fixed height, free width, never cropped. */
+.t-brand-lockup__logo :where(img, svg) {
+  block-size: 100%;
+  inline-size: auto;
+  max-inline-size: 100%;
+  object-fit: contain;
+}
+
+.t-brand-lockup__text {
+  display: flex;
+  flex-direction: column;
+  min-inline-size: 0;
+  line-height: var(--tree-font-lineHeight-tight);
+}
+
+.t-brand-lockup__title {
+  font-size: var(--tree-font-size-md);
+}
+
+.t-brand-lockup--lg .t-brand-lockup__title {
+  font-size: var(--tree-font-size-lg);
+}
+
+a.t-brand-lockup:focus-visible {
+  outline: none;
+  border-radius: var(--tree-radius-sm);
+  box-shadow: 0 0 0 2px var(--tree-color-focus-ring);
+}
+
+/* ─── Code block ─── */
+
+.t-code-block {
+  position: relative;
+  border: var(--tree-border-width-subtle) solid var(--tree-color-border-default);
+  border-radius: var(--tree-radius-md);
+  background: var(--tree-color-bg-subtle);
+  overflow: hidden;
+}
+
+.t-code-block__toolbar {
+  position: absolute;
+  inset-block-start: var(--tree-space-2);
+  inset-inline-end: var(--tree-space-2);
+  display: flex;
+  gap: var(--tree-space-1);
+  z-index: 1;
+}
+
+.t-code-block__copy {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  inline-size: 1.75rem;
+  block-size: 1.75rem;
+  padding: 0;
+  border: var(--tree-border-width-subtle) solid var(--tree-color-border-default);
+  border-radius: var(--tree-radius-sm);
+  background: var(--tree-color-bg-surface);
+  color: var(--tree-color-text-muted);
+  cursor: pointer;
+  transition: color var(--tree-motion-duration-fast) var(--tree-motion-easing-standard);
+}
+
+.t-code-block__copy:hover {
+  color: var(--tree-color-text-primary);
+}
+
+.t-code-block__copy:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--tree-color-focus-ring);
+}
+
+.t-code-block__pre {
+  margin: 0;
+  padding: var(--tree-space-3) var(--tree-space-4);
+  overflow: auto;
+  font-family: var(--tree-font-family-mono);
+  font-size: var(--tree-font-size-sm);
+  line-height: var(--tree-font-lineHeight-base);
+  color: var(--tree-color-text-primary);
+  white-space: pre;
+}
+
+.t-code-block__pre:focus-visible {
+  outline: none;
+  box-shadow: inset 0 0 0 2px var(--tree-color-focus-ring);
+}
+
+.t-code-block.is-wrap .t-code-block__pre {
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+}
+
+.t-code-block__code {
+  font: inherit;
+}
+
+/* ─── Link tile ─── */
+
+.t-link-tile {
+  --tree-link-tile-accent: var(--tree-color-border-strong);
+  --tree-link-tile-accent-soft: var(--tree-color-bg-subtle);
+  display: flex;
+  align-items: center;
+  gap: var(--tree-space-3);
+  min-inline-size: 0;
+  padding: var(--tree-space-4);
+  border: var(--tree-border-width-subtle) solid var(--tree-color-border-default);
+  border-radius: var(--tree-radius-lg);
+  background: var(--tree-color-bg-surface);
+  color: inherit;
+  text-decoration: none;
+  box-shadow: var(--tree-shadow-xs);
+  cursor: pointer;
+  transition:
+    border-color var(--tree-motion-duration-fast) var(--tree-motion-easing-standard),
+    box-shadow var(--tree-motion-duration-fast) var(--tree-motion-easing-standard),
+    transform var(--tree-motion-duration-fast) var(--tree-motion-easing-standard);
+}
+
+.t-link-tile--sm {
+  padding: var(--tree-space-3);
+  gap: var(--tree-space-2);
+}
+
+.t-link-tile--lg {
+  padding: var(--tree-space-5);
+}
+
+.t-link-tile:hover {
+  border-color: var(--tree-link-tile-accent);
+  box-shadow: var(--tree-shadow-md);
+}
+
+.t-link-tile:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--tree-color-focus-ring);
+}
+
+.t-link-tile.is-current {
+  border-color: var(--tree-link-tile-accent);
+  background: var(--tree-link-tile-accent-soft);
+}
+
+.t-link-tile__leading {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  inline-size: 2.5rem;
+  block-size: 2.5rem;
+  border-radius: var(--tree-radius-md);
+  background: var(--tree-link-tile-accent-soft);
+  color: var(--tree-link-tile-accent);
+}
+
+.t-link-tile__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--tree-space-1);
+  min-inline-size: 0;
+}
+
+/* Tone accents — closed axis mapped to status/brand tokens, never a free colour.
+   The soft tint is derived from the base token with color-mix (as TAppShell does)
+   so it stays theme-aware without needing separate -soft tokens. */
+.t-link-tile--brand {
+  --tree-link-tile-accent: var(--tree-color-brand-primary);
+  --tree-link-tile-accent-soft: var(--tree-color-brand-soft);
+}
+.t-link-tile--success {
+  --tree-link-tile-accent: var(--tree-color-status-success);
+  --tree-link-tile-accent-soft: color-mix(in srgb, var(--tree-color-status-success) 14%, var(--tree-color-bg-surface));
+}
+.t-link-tile--warning {
+  --tree-link-tile-accent: var(--tree-color-status-warning);
+  --tree-link-tile-accent-soft: color-mix(in srgb, var(--tree-color-status-warning) 14%, var(--tree-color-bg-surface));
+}
+.t-link-tile--danger {
+  --tree-link-tile-accent: var(--tree-color-status-error);
+  --tree-link-tile-accent-soft: color-mix(in srgb, var(--tree-color-status-error) 14%, var(--tree-color-bg-surface));
+}
+.t-link-tile--info {
+  --tree-link-tile-accent: var(--tree-color-status-info);
+  --tree-link-tile-accent-soft: color-mix(in srgb, var(--tree-color-status-info) 14%, var(--tree-color-bg-surface));
+}
+
 .t-card__header,
 .t-card__footer {
   color: var(--tree-color-text-muted);

@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-21T23:02:53.565Z",
+  "generatedAt": "2026-07-22T00:37:00.828Z",
   "packageName": "@treeui/vue",
   "packageVersion": "0.19.1",
   "decisionGuides": [
@@ -633,7 +633,8 @@
         "TPagination",
         "TDropdown",
         "TSelectableList",
-        "TCard"
+        "TCard",
+        "TLinkTile"
       ]
     },
     {
@@ -656,7 +657,9 @@
         "TFormField",
         "TTreeView",
         "TToastProvider",
-        "TButton"
+        "TButton",
+        "TCodeBlock",
+        "TLinkTile"
       ]
     },
     {
@@ -717,7 +720,8 @@
         "TSpacer",
         "TPage",
         "TPageHeader",
-        "TFormField"
+        "TFormField",
+        "TBrandLockup"
       ]
     },
     {
@@ -734,7 +738,10 @@
         "TNavbar",
         "TBadge",
         "TTag",
-        "TChart"
+        "TChart",
+        "TBrandLockup",
+        "TCodeBlock",
+        "TLinkTile"
       ]
     }
   ],
@@ -1746,6 +1753,90 @@
       ]
     },
     {
+      "name": "TBrandLockup",
+      "aliases": [],
+      "package": "@treeui/vue",
+      "kind": "navigation",
+      "category": "Navigation",
+      "status": "available",
+      "purpose": "Generic product brand lockup — a logo mark plus a title and optional subtitle, aligned and collapse-aware, with an optional home link. Owns sizing, truncation, collapse and link so the shell header does not hand-roll them. Ships NO identity: the logo asset and the strings belong to the consumer.",
+      "sourceFile": "packages/vue/src/components/TBrandLockup.vue",
+      "storyFile": "apps/docs/src/stories/BrandLockup.stories.ts",
+      "storyTitle": "Components/Navigation/BrandLockup",
+      "manifestFile": "docs/ai/COMPONENTS/brand-lockup.yaml",
+      "props": [
+        {
+          "name": "title",
+          "type": "string",
+          "default": "undefined",
+          "note": "Product name. Rendered via TText with truncation."
+        },
+        {
+          "name": "subtitle",
+          "type": "string",
+          "default": "undefined",
+          "note": "Optional supporting line under the title. Muted, smaller, truncates."
+        },
+        {
+          "name": "size",
+          "type": "TSize",
+          "default": "md",
+          "values": [
+            "sm",
+            "md",
+            "lg"
+          ],
+          "note": "Scales the logo height (sm → icon-lg, md → icon-xl, lg → control-md) and the title size."
+        },
+        {
+          "name": "collapsed",
+          "type": "boolean",
+          "default": "false",
+          "note": "Hide the text, keeping only the logo — for a shell's collapsed rail. Bind it to TAppShell's scoped `collapsed` slot prop. When collapsed AND used as a link, the accessible name must come from the logo (e.g. `alt` on the `<img>`), since the visible text is gone."
+        },
+        {
+          "name": "href",
+          "type": "string",
+          "default": "undefined",
+          "note": "Native href. Renders the lockup as an `<a>` (home link)."
+        },
+        {
+          "name": "to",
+          "type": "string | Record<string, unknown>",
+          "default": "undefined",
+          "note": "Route target. Renders as RouterLink when vue-router is available, else falls back to `<a>`. Without href/to the root is a plain `<div>`."
+        }
+      ],
+      "events": [],
+      "slots": [
+        {
+          "name": "logo",
+          "description": "The logo mark — an `<img>` or inline `<svg>`. Kept at its intrinsic aspect ratio (fixed height, free width, `object-fit: contain`), never cropped — unlike TAvatar, which imposes a square/round viewport. Give an `<img>` an `alt` for the accessible name."
+        }
+      ],
+      "a11y": [
+        "logo_not_cropped: The logo keeps its true proportions; a non-square wordmark is not distorted.",
+        "link_accessible_name: As a link, the name comes from the title text, or from the logo `alt` when collapsed.",
+        "focus_visible: Focus ring on the anchor when it is a link."
+      ],
+      "behavior": [],
+      "selection": {
+        "keywords": [],
+        "useWhen": [],
+        "avoidWhen": [],
+        "alternatives": []
+      },
+      "setup": {
+        "required": [],
+        "notes": []
+      },
+      "recipes": [],
+      "practices": [
+        "content-alignment",
+        "token-driven"
+      ]
+    },
+    {
       "name": "TBreadcrumb",
       "aliases": [],
       "package": "@treeui/vue",
@@ -2405,6 +2496,88 @@
       "recipes": [],
       "practices": [
         "interaction-feedback"
+      ]
+    },
+    {
+      "name": "TCodeBlock",
+      "aliases": [],
+      "package": "@treeui/vue",
+      "kind": "data-display",
+      "category": "Data Display",
+      "status": "available",
+      "purpose": "Scrollable monospace surface for logs, JSON, ARNs and other machine text. Block-level only — for inline code/IDs use `TText family=\"mono\"`. No syntax highlighting and no virtualization by design; assumes bounded content (e.g. a limited log tail).",
+      "sourceFile": "packages/vue/src/components/TCodeBlock.vue",
+      "storyFile": "apps/docs/src/stories/CodeBlock.stories.ts",
+      "storyTitle": "Components/Data Display/CodeBlock",
+      "manifestFile": "docs/ai/COMPONENTS/code-block.yaml",
+      "props": [
+        {
+          "name": "code",
+          "type": "string",
+          "default": "undefined",
+          "note": "Code as a string. Rendered as the block content and required for the built-in copy button. Omit and use the default slot for pre-formatted markup."
+        },
+        {
+          "name": "wrap",
+          "type": "boolean",
+          "default": "false",
+          "note": "`false` keeps lines intact and scrolls horizontally (right for logs). `true` wraps long lines (`pre-wrap` + `overflow-wrap`, right for JSON)."
+        },
+        {
+          "name": "maxBlockSize",
+          "type": "string",
+          "default": "undefined",
+          "note": "Any CSS length. Caps the height; the block scrolls vertically beyond it."
+        },
+        {
+          "name": "copyable",
+          "type": "boolean",
+          "default": "false",
+          "note": "Show the built-in copy button. Requires `code` (there is nothing to copy from a slot). Copies via navigator.clipboard and emits `copy`."
+        },
+        {
+          "name": "label",
+          "type": "string",
+          "default": "Code",
+          "note": "Accessible name for the scrollable region and the copy button. English default, overridable (TreeUI ships no i18n layer)."
+        }
+      ],
+      "events": [
+        {
+          "name": "copy",
+          "description": "Emitted after the built-in copy button writes `code` to the clipboard.",
+          "payload": "[text: string]"
+        }
+      ],
+      "slots": [
+        {
+          "name": "default",
+          "description": "Block content when `code` is not used. Rendered inside `<pre><code>`. The built-in copy button is not shown for slot content (nothing to copy from)."
+        },
+        {
+          "name": "actions",
+          "description": "Reserved for extra toolbar controls."
+        }
+      ],
+      "a11y": [
+        "scroll_region: The `<pre>` is `role=\"region\"` + `tabindex=\"0\"` + `aria-label` (from `label`) so keyboard users can scroll it — the library does this for you.",
+        "copy_button_state: The copy button's aria-label reflects the copied state briefly."
+      ],
+      "behavior": [],
+      "selection": {
+        "keywords": [],
+        "useWhen": [],
+        "avoidWhen": [],
+        "alternatives": []
+      },
+      "setup": {
+        "required": [],
+        "notes": []
+      },
+      "recipes": [],
+      "practices": [
+        "accessible-by-default",
+        "token-driven"
       ]
     },
     {
@@ -5815,6 +5988,110 @@
       "recipes": [],
       "practices": [
         "interaction-feedback"
+      ]
+    },
+    {
+      "name": "TLinkTile",
+      "aliases": [],
+      "package": "@treeui/vue",
+      "kind": "navigation",
+      "category": "Navigation",
+      "status": "available",
+      "purpose": "Interactive navigational tile — a single link surface with a leading region, title and description, a token-driven tone accent, and library-owned hover/focus/sizing. For app launchers, product grids and settings entries. Owns no grid: compose collections with TGrid.",
+      "sourceFile": "packages/vue/src/components/TLinkTile.vue",
+      "storyFile": "apps/docs/src/stories/LinkTile.stories.ts",
+      "storyTitle": "Components/Navigation/LinkTile",
+      "manifestFile": "docs/ai/COMPONENTS/link-tile.yaml",
+      "props": [
+        {
+          "name": "title",
+          "type": "string",
+          "default": "undefined",
+          "note": "Tile heading. Rendered via TText."
+        },
+        {
+          "name": "description",
+          "type": "string",
+          "default": "undefined",
+          "note": "Supporting line under the title. Muted, smaller."
+        },
+        {
+          "name": "tone",
+          "type": "TLinkTileTone",
+          "default": "neutral",
+          "values": [
+            "neutral",
+            "brand",
+            "success",
+            "warning",
+            "danger",
+            "info"
+          ],
+          "note": "Accent for the leading region and the current/hover border. A closed axis mapped to status/brand tokens — never a free colour or custom property. The soft tint is derived from the base token with color-mix, staying theme-aware."
+        },
+        {
+          "name": "size",
+          "type": "TSize",
+          "default": "md",
+          "values": [
+            "sm",
+            "md",
+            "lg"
+          ],
+          "note": "Padding scale."
+        },
+        {
+          "name": "current",
+          "type": "boolean",
+          "default": "false",
+          "note": "Marks this tile as the current destination — emits `aria-current=\"page\"` and applies the accent surface."
+        },
+        {
+          "name": "href",
+          "type": "string",
+          "default": "undefined",
+          "note": "Native href."
+        },
+        {
+          "name": "to",
+          "type": "string | Record<string, unknown>",
+          "default": "undefined",
+          "note": "Route target. Renders as RouterLink when vue-router is available, else `<a>`. The tile is always a link (there is no non-link mode) — the whole surface is a single link with no nested secondary action."
+        }
+      ],
+      "events": [],
+      "slots": [
+        {
+          "name": "leading",
+          "description": "Leading visual, typically a TIcon. Wrapped in an `aria-hidden` accent container."
+        },
+        {
+          "name": "default",
+          "description": "Extra content appended under the description."
+        }
+      ],
+      "a11y": [
+        "single_link_no_nested_interactive: The entire tile is one link; do not nest a button/link inside — nested interactives inside a link are an accessibility trap.",
+        "accessible_name: Comes from the title (and description) text; supply `aria-label` if the tile is icon-only.",
+        "aria_current: `page` when `current`.",
+        "focus_visible: Focus ring on the tile."
+      ],
+      "behavior": [],
+      "selection": {
+        "keywords": [],
+        "useWhen": [],
+        "avoidWhen": [],
+        "alternatives": []
+      },
+      "setup": {
+        "required": [],
+        "notes": []
+      },
+      "recipes": [],
+      "practices": [
+        "interaction-feedback",
+        "accessible-by-default",
+        "token-driven"
       ]
     },
     {

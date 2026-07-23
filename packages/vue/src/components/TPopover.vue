@@ -4,6 +4,14 @@ import { createId, focusFirst, isEscapeKey } from '@treeui/utils';
 import { useControllableOpen } from '../composables/useControllableOpen';
 import type { TSize, TTooltipSide } from '../types/contracts';
 
+export interface TPopoverCloseOptions {
+  /**
+   * Force focus back to the trigger (`true`) or suppress it (`false`). Omit for
+   * the default: restore only if focus is inside the panel at close time.
+   */
+  restoreFocus?: boolean;
+}
+
 defineOptions({
   inheritAttrs: false,
 });
@@ -37,7 +45,7 @@ const emit = defineEmits<{
 
 defineSlots<{
   trigger(props: { isOpen: boolean; contentId: string }): unknown;
-  default(): unknown;
+  default(props: { close: (options?: TPopoverCloseOptions) => void }): unknown;
 }>();
 
 const attrs = useAttrs();
@@ -94,18 +102,42 @@ const openPopover = () => {
   });
 };
 
-const closePopover = (restoreFocus = false) => {
-  setValue(false);
-  if (restoreFocus) {
-    nextTick(() => {
-      if (triggerRef.value) focusFirst(triggerRef.value);
-    });
-  }
+const focusIsInsidePanel = () => {
+  const active = typeof document === 'undefined' ? null : document.activeElement;
+  return Boolean(contentRef.value && active && contentRef.value.contains(active));
 };
+
+const restoreTriggerFocus = () => {
+  nextTick(() => {
+    if (triggerRef.value) focusFirst(triggerRef.value);
+  });
+};
+
+// Restore decision for the pending close, captured before the panel unmounts.
+// `null` means "not set by a programmatic close" — the isOpen watcher then
+// applies the default heuristic, which also covers an external v-model change.
+let pendingRestore: boolean | null = null;
+
+// All programmatic closes route through here so the restore decision is made
+// while focus is still where the caller left it. `'auto'` = restore only if
+// focus is currently inside the panel.
+const requestClose = (restore: boolean | 'auto') => {
+  if (!isOpen.value) return;
+  pendingRestore = restore === 'auto' ? focusIsInsidePanel() : restore;
+  setValue(false);
+};
+
+/**
+ * Close the popover. Without options, focus returns to the trigger only if it is
+ * inside the panel at close time; pass `restoreFocus` to force or suppress it.
+ * Exposed via template ref and to the default slot.
+ */
+const close = (options?: TPopoverCloseOptions) =>
+  requestClose(options?.restoreFocus ?? 'auto');
 
 const togglePopover = () => {
   if (isOpen.value) {
-    closePopover();
+    requestClose('auto');
   } else {
     openPopover();
   }
@@ -114,16 +146,17 @@ const togglePopover = () => {
 const onTriggerKeydown = (event: KeyboardEvent) => {
   if (props.disabled) return;
 
+  // Escape always restores focus to the trigger.
   if (isEscapeKey(event) && isOpen.value) {
     event.preventDefault();
-    closePopover();
+    requestClose(true);
   }
 };
 
 const onContentKeydown = (event: KeyboardEvent) => {
   if (isEscapeKey(event)) {
     event.preventDefault();
-    closePopover(true);
+    requestClose(true);
   }
 };
 
@@ -132,20 +165,32 @@ const onDocumentPointerDown = (event: PointerEvent) => {
   const target = event.target;
   if (!(target instanceof Node)) return;
   if (rootRef.value?.contains(target)) return;
-  closePopover();
+  // The user is interacting elsewhere — never pull focus back to the trigger.
+  requestClose(false);
 };
 
-watch(isOpen, (value) => {
+watch(isOpen, (value, previous) => {
   if (value) {
+    pendingRestore = null;
     document.addEventListener('pointerdown', onDocumentPointerDown);
-  } else {
-    document.removeEventListener('pointerdown', onDocumentPointerDown);
+    return;
   }
+
+  document.removeEventListener('pointerdown', onDocumentPointerDown);
+  if (!previous) return;
+
+  // Covers programmatic closes (pendingRestore set by requestClose) and an
+  // external v-model true→false (pendingRestore null → default heuristic).
+  const shouldRestore = pendingRestore ?? focusIsInsidePanel();
+  pendingRestore = null;
+  if (shouldRestore) restoreTriggerFocus();
 });
 
 onBeforeUnmount(() => {
   document.removeEventListener('pointerdown', onDocumentPointerDown);
 });
+
+defineExpose({ close });
 </script>
 
 <template>
@@ -188,7 +233,7 @@ onBeforeUnmount(() => {
         tabindex="-1"
         @keydown="onContentKeydown"
       >
-        <slot />
+        <slot :close="close" />
       </div>
     </transition>
   </div>

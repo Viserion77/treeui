@@ -40,6 +40,13 @@ const props = withDefaults(
     defaultCollapsed?: boolean;
     mobile?: boolean;
     breakpoint?: string;
+    /**
+     * Width (measured on the shell root) below which the sidebar auto-collapses
+     * to the rail, between `breakpoint` (drawer) and this value. Above it the
+     * user's manual collapse preference applies. Omit for the binary
+     * drawer↔expanded behavior. Must be greater than `breakpoint`.
+     */
+    railBreakpoint?: string;
     sidebarOpen?: boolean;
     defaultSidebarOpen?: boolean;
     /**
@@ -69,6 +76,7 @@ const props = withDefaults(
     defaultCollapsed: false,
     mobile: undefined,
     breakpoint: '768px',
+    railBreakpoint: undefined,
     sidebarOpen: undefined,
     defaultSidebarOpen: false,
     immersive: undefined,
@@ -161,41 +169,74 @@ const toggleImmersive = () => {
   setImmersive(!isImmersive.value);
 };
 
-// Auto responsive detection when `mobile` is not explicitly controlled.
-const autoMobile = ref(false);
-let mediaQuery: MediaQueryList | null = null;
+// Responsive policy is driven by the shell root's own width via ResizeObserver,
+// not the viewport or the content panel. Measuring the root avoids the feedback
+// loop the content panel would cause (it grows as the rail collapses).
+const rootEl = ref<HTMLElement | null>(null);
+const rootWidth = ref(0);
+let resizeObserver: ResizeObserver | null = null;
 
-const onMediaChange = (event: MediaQueryListEvent | MediaQueryList) => {
-  autoMobile.value = event.matches;
+const toPx = (length: string | undefined): number | null => {
+  if (!length) return null;
+  const match = /^([\d.]+)(px|rem|em)?$/.exec(length.trim());
+  if (!match) return null;
+  const value = Number.parseFloat(match[1]);
+  if (Number.isNaN(value)) return null;
+  if (!match[2] || match[2] === 'px') return value;
+  const rootFontSize =
+    typeof document === 'undefined'
+      ? 16
+      : Number.parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
+  return value * rootFontSize;
 };
 
-const setupMediaQuery = () => {
-  if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') {
-    return;
-  }
+const breakpointPx = computed(() => toPx(props.breakpoint) ?? 768);
+const railBreakpointPx = computed(() => toPx(props.railBreakpoint));
 
-  teardownMediaQuery();
-  mediaQuery = window.matchMedia(`(max-width: ${props.breakpoint})`);
-  autoMobile.value = mediaQuery.matches;
-  mediaQuery.addEventListener?.('change', onMediaChange);
-};
-
-const teardownMediaQuery = () => {
-  mediaQuery?.removeEventListener?.('change', onMediaChange);
-  mediaQuery = null;
-};
-
+// Before the first measurement rootWidth is 0 → treated as desktop, avoiding a
+// mobile flash on mount.
+const autoMobile = computed(() => rootWidth.value > 0 && rootWidth.value < breakpointPx.value);
 const isMobile = computed(() => props.mobile ?? autoMobile.value);
+
+// The auto-rail band: between the drawer boundary and the rail boundary the
+// sidebar is forced to the rail regardless of the manual preference.
+const railActive = computed(() => {
+  const rail = railBreakpointPx.value;
+  if (rail == null || isMobile.value || rootWidth.value <= 0) return false;
+  return rootWidth.value >= breakpointPx.value && rootWidth.value < rail;
+});
+
+const setupResizeObserver = () => {
+  const el = rootEl.value;
+  // `as` a component would yield an instance, not an element; degrade gracefully.
+  if (typeof ResizeObserver === 'undefined' || !(el instanceof Element)) return;
+  teardownResizeObserver();
+  resizeObserver = new ResizeObserver((entries) => {
+    const entry = entries[0];
+    if (entry) rootWidth.value = entry.contentRect.width;
+  });
+  resizeObserver.observe(el);
+  rootWidth.value = el.getBoundingClientRect().width;
+};
+
+const teardownResizeObserver = () => {
+  resizeObserver?.disconnect();
+  resizeObserver = null;
+};
 
 // Collapsing is desktop-only, so the built-in toggle follows the same rule.
 const showCollapseToggle = computed(
   () => !isMobile.value && props.collapsible && props.showCollapseButton,
 );
 
-// Collapse is a desktop-only concept; the mobile drawer always shows the
-// expanded sidebar, so descendants and slots see `collapsed: false` there.
+// The effective (visual) collapsed state descendants and slots see: the drawer
+// is always expanded on mobile; the auto-rail band forces the rail; otherwise
+// the user's manual preference (isCollapsed) applies. The auto band never
+// mutates isCollapsed, so it emits no update:collapsed / collapse-change — those
+// stay reserved for explicit user action, and the preference returns when the
+// width grows back past railBreakpoint.
 const effectiveCollapsed = computed(() =>
-  isMobile.value ? false : isCollapsed.value,
+  isMobile.value ? false : railActive.value ? true : isCollapsed.value,
 );
 
 // The glyph points the way the rail will move: collapsing a left sidebar folds
@@ -366,21 +407,12 @@ watch(isMobile, (mobile) => {
   }
 });
 
-watch(
-  () => props.breakpoint,
-  () => {
-    if (typeof window !== 'undefined') {
-      setupMediaQuery();
-    }
-  },
-);
-
 onMounted(() => {
-  setupMediaQuery();
+  setupResizeObserver();
 });
 
 onBeforeUnmount(() => {
-  teardownMediaQuery();
+  teardownResizeObserver();
   unlockBodyScroll();
 });
 
@@ -394,7 +426,7 @@ const rootClasses = computed(() => [
   {
     'is-mobile': isMobile.value,
     'is-collapsed':
-      !isMobile.value && props.collapsible && isCollapsed.value,
+      !isMobile.value && (railActive.value || (props.collapsible && isCollapsed.value)),
     'is-sidebar-open': isMobile.value && isSidebarOpen.value,
     'is-immersive': isImmersive.value,
   },
@@ -429,6 +461,7 @@ const slotProps = computed<AppShellSlotProps>(() => ({
 <template>
   <component
     :is="as"
+    ref="rootEl"
     v-bind="rootAttrs"
     :class="rootClasses"
     :style="rootStyle"

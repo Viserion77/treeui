@@ -6,6 +6,13 @@ import TButton from './TButton.vue';
 import TBrandLockup from './TBrandLockup.vue';
 import TCodeBlock from './TCodeBlock.vue';
 import TLinkTile from './TLinkTile.vue';
+import TList from './TList.vue';
+import TListItem from './TListItem.vue';
+import TMenu from './TMenu.vue';
+import TMenuGroup from './TMenuGroup.vue';
+import TMenuItem from './TMenuItem.vue';
+import TDescriptionList from './TDescriptionList.vue';
+import TDescriptionItem from './TDescriptionItem.vue';
 import TAlert from './TAlert.vue';
 import TCard from './TCard.vue';
 import TCheckbox from './TCheckbox.vue';
@@ -5432,6 +5439,189 @@ describe('TREEUX round 5 — new components', () => {
       const current = mount(TLinkTile, { props: { title: 'X', href: '#', current: true } });
       expect(current.attributes('aria-current')).toBe('page');
       expect(current.classes()).toContain('is-current');
+    });
+  });
+});
+
+describe('TREEUX round 6 — queue batch', () => {
+  describe('TPopover close() (TREEUX-015)', () => {
+    it('exposes close() and closes via the default slot', async () => {
+      const wrapper = mount(TPopover, {
+        props: { defaultOpen: true },
+        slots: {
+          default: `<template #default="{ close }"><button class="closer" @click="close()">x</button></template>`,
+        },
+      });
+      await nextTick();
+      expect(wrapper.find('.t-popover__content').exists()).toBe(true);
+      await wrapper.find('.closer').trigger('click');
+      await nextTick();
+      expect(wrapper.find('.t-popover__content').exists()).toBe(false);
+    });
+
+    it('restores focus to the trigger when focus is inside the panel at close', async () => {
+      const wrapper = mount(TPopover, {
+        attachTo: document.body,
+        props: { defaultOpen: true },
+        slots: {
+          trigger: `<template #trigger><button class="trg">open</button></template>`,
+          default: `<template #default="{ close }"><button class="inside" @click="close()">act</button></template>`,
+        },
+      });
+      await nextTick();
+      const inside = wrapper.find('.inside').element as HTMLElement;
+      inside.focus();
+      expect(document.activeElement).toBe(inside);
+      await wrapper.find('.inside').trigger('click');
+      await nextTick();
+      await nextTick();
+      expect(document.activeElement).toBe(wrapper.find('.trg').element);
+      wrapper.unmount();
+    });
+
+    it('does not steal focus when close({ restoreFocus: false })', async () => {
+      const wrapper = mount(TPopover, {
+        attachTo: document.body,
+        props: { defaultOpen: true },
+        slots: {
+          trigger: `<template #trigger><button class="trg">open</button></template>`,
+          default: `<template #default="{ close }"><button class="inside" @click="close({ restoreFocus: false })">act</button></template>`,
+        },
+      });
+      await nextTick();
+      const inside = wrapper.find('.inside').element as HTMLElement;
+      inside.focus();
+      await wrapper.find('.inside').trigger('click');
+      await nextTick();
+      await nextTick();
+      expect(document.activeElement).not.toBe(wrapper.find('.trg').element);
+      wrapper.unmount();
+    });
+  });
+
+  describe('TList / TListItem (TREEUX-002)', () => {
+    it('renders ul/li with the region slots and no listbox semantics', () => {
+      const wrapper = mount(TList, {
+        props: { size: 'sm' },
+        slots: {
+          default: `<TListItem>
+            <template #leading><span class="lead" /></template>
+            <span class="content">Deploy</span>
+            <template #meta><span class="m">2h</span></template>
+            <template #actions><button class="a">x</button></template>
+          </TListItem>`,
+        },
+        global: { components: { TListItem } },
+      });
+      expect(wrapper.element.tagName).toBe('UL');
+      expect(wrapper.classes()).toContain('t-list--sm');
+      expect(wrapper.attributes('role')).toBeUndefined();
+      const item = wrapper.find('.t-list-item');
+      expect(item.element.tagName).toBe('LI');
+      expect(item.find('.t-list-item__leading .lead').exists()).toBe(true);
+      expect(item.find('.t-list-item__content .content').text()).toBe('Deploy');
+      expect(item.find('.t-list-item__meta .m').exists()).toBe(true);
+      expect(item.find('.t-list-item__actions .a').exists()).toBe(true);
+    });
+  });
+
+  describe('TDescriptionList / TDescriptionItem (TREEUX-005)', () => {
+    it('renders dl/dt/dd with a value and actions', () => {
+      const wrapper = mount(TDescriptionList, {
+        slots: {
+          default: `<TDescriptionItem label="ARN">
+            <span class="val">arn:aws:...</span>
+            <template #actions><button class="copy">c</button></template>
+          </TDescriptionItem>`,
+        },
+        global: { components: { TDescriptionItem } },
+      });
+      expect(wrapper.element.tagName).toBe('DL');
+      expect(wrapper.find('dt.t-description-item__label').text()).toBe('ARN');
+      const dd = wrapper.find('dd.t-description-item__value');
+      expect(dd.find('.t-description-item__value-content .val').text()).toBe('arn:aws:...');
+      expect(dd.find('.t-description-item__actions .copy').exists()).toBe(true);
+    });
+  });
+
+  describe('TMenu compound (TREEUX-007)', () => {
+    const openMenu = () =>
+      mount(TMenu, {
+        attachTo: document.body,
+        props: { defaultOpen: true, label: 'Actions' },
+        slots: {
+          header: `<template #header><span class="hdr">Signed in</span></template>`,
+          default: `
+            <TMenuGroup label="Workspace">
+              <TMenuItem class="i1" label="Overview" href="/o" />
+              <TMenuItem class="i2" label="Team" :checked="true" />
+            </TMenuGroup>
+            <TMenuItem class="i3" label="Delete" danger />
+            <TMenuItem class="i4" label="Disabled" disabled />
+          `,
+        },
+        global: { components: { TMenuGroup, TMenuItem } },
+      });
+
+    it('renders role=menu with the header outside it, and typed items', async () => {
+      const wrapper = openMenu();
+      await nextTick();
+      const menu = wrapper.find('[role="menu"]');
+      expect(menu.exists()).toBe(true);
+      expect(menu.attributes('aria-label')).toBe('Actions');
+      // header sits outside the role=menu element
+      expect(wrapper.find('.t-menu__header .hdr').exists()).toBe(true);
+      expect(menu.find('.hdr').exists()).toBe(false);
+      // group label is non-focusable
+      expect(wrapper.find('.t-menu-group__label').text()).toBe('Workspace');
+      // link item is an anchor; radio item exposes aria-checked
+      expect(wrapper.find('.i1').element.tagName).toBe('A');
+      expect(wrapper.find('.i2').attributes('role')).toBe('menuitemradio');
+      expect(wrapper.find('.i2').attributes('aria-checked')).toBe('true');
+      expect(wrapper.find('.i3').classes()).toContain('t-menu-item--danger');
+      expect(wrapper.find('.i4').attributes('aria-disabled')).toBe('true');
+      wrapper.unmount();
+    });
+
+    it('moves roving focus with ArrowDown, skipping the disabled item', async () => {
+      const wrapper = openMenu();
+      await nextTick();
+      await nextTick();
+      const menu = wrapper.find('[role="menu"]');
+      // first enabled item is active after open
+      expect(wrapper.find('.i1').attributes('tabindex')).toBe('0');
+      await menu.trigger('keydown', { key: 'ArrowDown' });
+      expect(wrapper.find('.i2').attributes('tabindex')).toBe('0');
+      await menu.trigger('keydown', { key: 'ArrowDown' });
+      expect(wrapper.find('.i3').attributes('tabindex')).toBe('0');
+      // ArrowDown again loops past the disabled i4 back to i1
+      await menu.trigger('keydown', { key: 'ArrowDown' });
+      expect(wrapper.find('.i1').attributes('tabindex')).toBe('0');
+      expect(wrapper.find('.i4').attributes('tabindex')).toBe('-1');
+      wrapper.unmount();
+    });
+
+    it('closes the menu when an item is selected', async () => {
+      const wrapper = openMenu();
+      await nextTick();
+      expect(wrapper.find('[role="menu"]').exists()).toBe(true);
+      await wrapper.find('.i3').trigger('click');
+      await nextTick();
+      expect(wrapper.find('[role="menu"]').exists()).toBe(false);
+      wrapper.unmount();
+    });
+  });
+
+  describe('TAppShell railBreakpoint (TREEUX-011)', () => {
+    it('accepts railBreakpoint without breaking manual collapse', async () => {
+      const wrapper = mount(TAppShell, {
+        props: { mobile: false, collapsible: true, breakpoint: '1024px', railBreakpoint: '1280px' },
+        slots: { sidebar: '<nav>nav</nav>' },
+      });
+      const toggle = wrapper.find('.t-app-shell__collapse-button');
+      await toggle.trigger('click');
+      // manual toggle still emits (auto-rail transitions would not)
+      expect(wrapper.emitted('update:collapsed')?.[0]).toEqual([true]);
     });
   });
 });

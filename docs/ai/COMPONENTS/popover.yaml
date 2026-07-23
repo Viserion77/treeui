@@ -78,7 +78,26 @@ slots:
       toggles, so a second handler double-toggles and the panel appears not to open.
 
   - name: default
-    description: Popover content displayed inside the floating panel.
+    props: "{ close: (options?: { restoreFocus?: boolean }) => void }"
+    description: >
+      Popover content displayed inside the floating panel. Receives `close` so
+      content can dismiss the panel after a navigation or action without a
+      v-model watcher or manual DOM/focus handling.
+
+exposed_methods:
+  - name: close
+    signature: "close(options?: { restoreFocus?: boolean }): void"
+    description: >
+      Close the popover programmatically (also passed to the default slot).
+      Without options, focus returns to the trigger ONLY if it is inside the panel
+      at close time; `restoreFocus: true` forces it, `false` suppresses it.
+    rules:
+      - "close() with no option restores focus to the trigger only if focus is inside the panel at that moment."
+      - "close({ restoreFocus: true }) forces the return; close({ restoreFocus: false }) prevents it."
+      - "An external v-model true→false follows the same automatic heuristic as close()."
+      - "If focus is already outside the panel (incl. after an outside pointer), the close never steals focus."
+      - "Escape always restores focus to the trigger."
+    replaces_consumer_workaround: "useTriggerFocusRestore and ad-hoc v-model watchers on the consumer side."
 
 a11y:
   role: dialog

@@ -36,7 +36,8 @@
         "TDropdown",
         "TSelectableList",
         "TCard",
-        "TLinkTile"
+        "TLinkTile",
+        "TMenu"
       ]
     },
     {
@@ -62,7 +63,9 @@
         "TToastProvider",
         "TButton",
         "TCodeBlock",
-        "TLinkTile"
+        "TLinkTile",
+        "TMenu",
+        "TPopover"
       ]
     },
     {
@@ -127,7 +130,9 @@
         "TPage",
         "TPageHeader",
         "TFormField",
-        "TBrandLockup"
+        "TBrandLockup",
+        "TList",
+        "TDescriptionList"
       ]
     },
     {
@@ -148,7 +153,10 @@
         "TChart",
         "TBrandLockup",
         "TCodeBlock",
-        "TLinkTile"
+        "TLinkTile",
+        "TMenu",
+        "TList",
+        "TDescriptionList"
       ]
     }
   ],
@@ -164,6 +172,7 @@
     "TCodeBlock": "components-data-display-codeblock",
     "TConfirmDialog": "components-overlay-confirmdialog",
     "TContainer": "components-layout-container",
+    "TDescriptionList": "components-data-display-descriptionlist",
     "TDrawer": "components-overlay-drawer",
     "TDropdown": "components-overlay-dropdown",
     "TEmptyState": "components-feedback-emptystate",
@@ -172,11 +181,14 @@
     "TInput": "components-data-entry-input",
     "TLink": "components-navigation-link",
     "TLinkTile": "components-navigation-linktile",
+    "TList": "components-data-display-list",
+    "TMenu": "components-overlay-menu",
     "TModal": "components-overlay-modal",
     "TNavbar": "components-layout-navbar",
     "TPage": "components-layout-page",
     "TPageHeader": "components-layout-pageheader",
     "TPagination": "components-navigation-pagination",
+    "TPopover": "components-overlay-popover",
     "TProgress": "components-feedback-progress",
     "TSelect": "components-data-entry-select",
     "TSelectableList": "components-navigation-disclosure-selectablelist",

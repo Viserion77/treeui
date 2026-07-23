@@ -1,7 +1,7 @@
 {
-  "generatedAt": "2026-07-22T00:37:00.828Z",
+  "generatedAt": "2026-07-22T19:18:23.512Z",
   "packageName": "@treeui/vue",
-  "packageVersion": "0.19.1",
+  "packageVersion": "0.21.0",
   "decisionGuides": [
     {
       "id": "single-choice",
@@ -634,7 +634,8 @@
         "TDropdown",
         "TSelectableList",
         "TCard",
-        "TLinkTile"
+        "TLinkTile",
+        "TMenu"
       ]
     },
     {
@@ -659,7 +660,9 @@
         "TToastProvider",
         "TButton",
         "TCodeBlock",
-        "TLinkTile"
+        "TLinkTile",
+        "TMenu",
+        "TPopover"
       ]
     },
     {
@@ -721,7 +724,9 @@
         "TPage",
         "TPageHeader",
         "TFormField",
-        "TBrandLockup"
+        "TBrandLockup",
+        "TList",
+        "TDescriptionList"
       ]
     },
     {
@@ -741,7 +746,10 @@
         "TChart",
         "TBrandLockup",
         "TCodeBlock",
-        "TLinkTile"
+        "TLinkTile",
+        "TMenu",
+        "TList",
+        "TDescriptionList"
       ]
     }
   ],
@@ -1309,7 +1317,13 @@
           "name": "breakpoint",
           "type": "string",
           "default": "768px",
-          "note": "Any CSS length. Evaluated as `(max-width: <breakpoint>)` via matchMedia, and only consulted while `mobile` is undefined. Changing it tears down and rebuilds the media query listener."
+          "note": "Any CSS length (px/rem/em). The drawer boundary: below this width the sidebar becomes the off-canvas drawer. Measured on the shell root via ResizeObserver (not the viewport, not the content panel — measuring the root avoids the feedback loop the panel would cause as the rail collapses). Only consulted while `mobile` is undefined."
+        },
+        {
+          "name": "railBreakpoint",
+          "type": "string",
+          "default": "undefined",
+          "note": "Any CSS length, greater than `breakpoint`. Enables the three-state responsive policy: below `breakpoint` → drawer; between `breakpoint` and `railBreakpoint` → the sidebar is auto-forced to the collapsed rail; at/above `railBreakpoint` → the user's manual collapse preference applies. Omit for the binary drawer↔expanded behavior. Auto-forcing the rail does NOT mutate the manual preference and emits no update:collapsed/collapse-change — the preference returns when the width grows back past railBreakpoint."
         },
         {
           "name": "sidebarOpen",
@@ -1494,6 +1508,8 @@
         "header_spans_full_width_above_sidebar_and_content: true",
         "content_area_scrolls_independently: true",
         "auto_switches_to_mobile_at_breakpoint_when_mobile_undefined: true",
+        "responsive_measured_on_root_via_resize_observer: the shell root's own width drives the policy, not the viewport or content panel; a component `as` (rather than an element) degrades gracefully to no auto-switching",
+        "three_state_rail_policy_when_rail_breakpoint_set: drawer < breakpoint <= rail < railBreakpoint <= expanded; the auto-rail band forces the collapsed rail as the effective state without changing the manual preference or emitting collapse events",
         "mobile_prop_forces_mobile_mode: true",
         "mobile_sidebar_becomes_off_canvas_drawer: true",
         "desktop_sidebar_is_removed_from_the_dom_on_mobile: crossing the breakpoint unmounts and remounts the sidebar slot, so component state inside it is not preserved",
@@ -3710,6 +3726,59 @@
         "date-range-form"
       ],
       "practices": []
+    },
+    {
+      "name": "TDescriptionList",
+      "aliases": [],
+      "package": "@treeui/vue",
+      "kind": "data-display",
+      "category": "Data Display",
+      "status": "available",
+      "purpose": "Key/value description list with real <dl>/<dt>/<dd> semantics — the label↔value rows repeated across status/config/detail panels. Distinct from TList (<ul>/<li> content rows): a description list announces label/value pairs to assistive tech.",
+      "sourceFile": "packages/vue/src/components/TDescriptionList.vue",
+      "storyFile": "apps/docs/src/stories/DescriptionList.stories.ts",
+      "storyTitle": "Components/Data Display/DescriptionList",
+      "manifestFile": "docs/ai/COMPONENTS/description-list.yaml",
+      "props": [
+        {
+          "name": "size",
+          "type": "TSize",
+          "default": "md",
+          "values": [
+            "sm",
+            "md",
+            "lg"
+          ],
+          "note": "Row padding scale. Cascades to TDescriptionItem."
+        }
+      ],
+      "events": [],
+      "slots": [
+        {
+          "name": "default",
+          "description": "The TDescriptionItem rows."
+        }
+      ],
+      "a11y": [],
+      "behavior": [
+        "responsive: On a container wider than 30rem the label and value sit side by side (value truncates). On a narrower container the label moves ABOVE the value — right for long values like ARNs (CSS container query; the list sets container-type).",
+        "semantics: Real <dl>/<dt>/<dd>; each item wraps its dt/dd in a <div>, which is valid grouping inside <dl>."
+      ],
+      "selection": {
+        "keywords": [],
+        "useWhen": [],
+        "avoidWhen": [],
+        "alternatives": []
+      },
+      "setup": {
+        "required": [],
+        "notes": []
+      },
+      "recipes": [],
+      "practices": [
+        "content-alignment",
+        "token-driven"
+      ]
     },
     {
       "name": "TDivider",
@@ -6095,6 +6164,68 @@
       ]
     },
     {
+      "name": "TList",
+      "aliases": [],
+      "package": "@treeui/vue",
+      "kind": "data-display",
+      "category": "Data Display",
+      "status": "available",
+      "purpose": "Non-selectable content list — plain <ul>/<li> rows with leading/content/meta/actions regions. Unlike TSelectableList (role=listbox / role=option), the rows carry no selection semantics, so the actions region can hold REAL interactive controls (buttons, links) as focusable siblings.",
+      "sourceFile": "packages/vue/src/components/TList.vue",
+      "storyFile": "apps/docs/src/stories/List.stories.ts",
+      "storyTitle": "Components/Data Display/List",
+      "manifestFile": "docs/ai/COMPONENTS/list.yaml",
+      "props": [
+        {
+          "name": "as",
+          "type": "string",
+          "default": "ul",
+          "note": "Root element. Default <ul>."
+        },
+        {
+          "name": "size",
+          "type": "TSize",
+          "default": "md",
+          "values": [
+            "sm",
+            "md",
+            "lg"
+          ],
+          "note": "Row padding scale. Cascades to TListItem via the t-list--{size} class."
+        }
+      ],
+      "events": [],
+      "slots": [
+        {
+          "name": "default",
+          "description": "The TListItem rows."
+        }
+      ],
+      "a11y": [
+        "plain_list_semantics: <ul>/<li> with no role override, so screen readers announce a list, not a listbox, and interactive controls in `actions` are reachable.",
+        "not_selectable: For a single-select list of options use TSelectableList instead."
+      ],
+      "behavior": [
+        "responsive: On a container narrower than 30rem the row wraps: meta drops below the content while actions stay visible inline. Actions are NEVER hidden or auto-collapsed into an overflow menu — compose a TMenu inside the actions slot deliberately if an overflow is wanted (uses a CSS container query; the list sets container-type).",
+        "no_overflow_ownership: TList does not create, own, or collapse an actions overflow."
+      ],
+      "selection": {
+        "keywords": [],
+        "useWhen": [],
+        "avoidWhen": [],
+        "alternatives": []
+      },
+      "setup": {
+        "required": [],
+        "notes": []
+      },
+      "recipes": [],
+      "practices": [
+        "content-alignment",
+        "token-driven"
+      ]
+    },
+    {
       "name": "TMarkdownEditor",
       "aliases": [],
       "package": "@treeui/vue",
@@ -6203,6 +6334,112 @@
       },
       "recipes": [],
       "practices": []
+    },
+    {
+      "name": "TMenu",
+      "aliases": [],
+      "package": "@treeui/vue",
+      "kind": "overlay",
+      "category": "Overlay",
+      "status": "available",
+      "purpose": "Rich action menu in a popover — slot-driven compound with groups, icons, descriptions, meta, destructive items, link items, and a radio (workspace-switch) item, with roving focus and keyboard support. Built on TPopover, so anchoring and focus restore come from there (TREEUX-015).",
+      "sourceFile": "packages/vue/src/components/TMenu.vue",
+      "storyFile": "apps/docs/src/stories/Menu.stories.ts",
+      "storyTitle": "Components/Overlay/Menu",
+      "manifestFile": "docs/ai/COMPONENTS/menu.yaml",
+      "props": [
+        {
+          "name": "open",
+          "type": "boolean",
+          "default": "undefined",
+          "note": "Controlled open state (v-model:open)."
+        },
+        {
+          "name": "defaultOpen",
+          "type": "boolean",
+          "default": "false"
+        },
+        {
+          "name": "disabled",
+          "type": "boolean",
+          "default": "false"
+        },
+        {
+          "name": "side",
+          "type": "TTooltipSide",
+          "default": "bottom"
+        },
+        {
+          "name": "align",
+          "type": "'start' | 'center' | 'end'",
+          "default": "start"
+        },
+        {
+          "name": "size",
+          "type": "TSize",
+          "default": "md",
+          "note": "Forwarded to TPopover panel density."
+        },
+        {
+          "name": "label",
+          "type": "string",
+          "default": "undefined",
+          "note": "Accessible name for the role=menu element."
+        },
+        {
+          "name": "closeOnSelect",
+          "type": "boolean",
+          "default": "true",
+          "note": "Close the menu after an item is chosen. Closing routes through TPopover's close heuristic, so focus returns to the trigger."
+        }
+      ],
+      "events": [
+        {
+          "name": "update:open",
+          "payload": "[value: boolean]"
+        },
+        {
+          "name": "open-change",
+          "payload": "[value: boolean]"
+        }
+      ],
+      "slots": [
+        {
+          "name": "trigger",
+          "description": "Forwarded to TPopover's trigger slot ({ isOpen, contentId })."
+        },
+        {
+          "name": "header",
+          "description": "Panel header, rendered OUTSIDE the role=menu element (so it is not a menu item)."
+        },
+        {
+          "name": "default",
+          "description": "TMenuGroup and TMenuItem children."
+        }
+      ],
+      "a11y": [
+        "roles: role=menu on the list; role=menuitem / menuitemradio on items; role=group + aria-labelledby on groups. The header is outside role=menu.",
+        "roving_focus: One item holds tabindex=0, the rest -1. ArrowUp/Down move (skipping disabled), Home/End jump to edges, pointer focus syncs the active item.",
+        "escape_and_restore: Escape bubbles to the TPopover content, which closes and restores focus to the trigger. Selecting an item closes via the same TPopover close path, so focus returns to the trigger.",
+        "destructive_not_color_only: danger items still carry their text label, so meaning does not depend on colour alone; pair with a leading icon where helpful."
+      ],
+      "behavior": [],
+      "selection": {
+        "keywords": [],
+        "useWhen": [],
+        "avoidWhen": [],
+        "alternatives": []
+      },
+      "setup": {
+        "required": [],
+        "notes": []
+      },
+      "recipes": [],
+      "practices": [
+        "interaction-feedback",
+        "accessible-by-default",
+        "token-driven"
+      ]
     },
     {
       "name": "TModal",
@@ -7229,7 +7466,7 @@
         },
         {
           "name": "default",
-          "description": "Popover content displayed inside the floating panel."
+          "description": "Popover content displayed inside the floating panel. Receives `close` so content can dismiss the panel after a navigation or action without a v-model watcher or manual DOM/focus handling.\n"
         }
       ],
       "a11y": [
@@ -7270,7 +7507,9 @@
       "recipes": [
         "anchored-help"
       ],
-      "practices": []
+      "practices": [
+        "accessible-by-default"
+      ]
     },
     {
       "name": "TPricing",

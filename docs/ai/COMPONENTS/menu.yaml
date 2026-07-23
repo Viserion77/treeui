@@ -1,0 +1,101 @@
+name: TMenu
+source_file: packages/vue/src/components/TMenu.vue
+package: "@treeui/vue"
+kind: overlay
+status: available
+purpose: "Rich action menu in a popover — slot-driven compound with groups, icons, descriptions, meta, destructive items, link items, and a radio (workspace-switch) item, with roving focus and keyboard support. Built on TPopover, so anchoring and focus restore come from there (TREEUX-015)."
+
+subcomponents: [TMenuGroup, TMenuItem]
+
+coexists_with:
+  TDropdown: "TDropdown stays the lightweight, data-driven action menu (items prop). Reach for TMenu when you need groups, link items (real <a role=menuitem>), icon+description+meta, a destructive item, or a menuitemradio — none of which TDropdown's presentational-only item slot can host."
+
+props:
+  open:
+    type: boolean
+    default: undefined
+    note: "Controlled open state (v-model:open)."
+  defaultOpen:
+    type: boolean
+    default: false
+  disabled:
+    type: boolean
+    default: false
+  side:
+    type: TTooltipSide
+    default: bottom
+  align:
+    type: "'start' | 'center' | 'end'"
+    default: start
+  size:
+    type: TSize
+    default: md
+    note: "Forwarded to TPopover panel density."
+  label:
+    type: string
+    default: undefined
+    note: "Accessible name for the role=menu element."
+  closeOnSelect:
+    type: boolean
+    default: true
+    note: "Close the menu after an item is chosen. Closing routes through TPopover's close heuristic, so focus returns to the trigger."
+
+events:
+  - name: update:open
+    payload: "[value: boolean]"
+  - name: open-change
+    payload: "[value: boolean]"
+
+slots:
+  - name: trigger
+    description: "Forwarded to TPopover's trigger slot ({ isOpen, contentId })."
+  - name: header
+    description: "Panel header, rendered OUTSIDE the role=menu element (so it is not a menu item)."
+  - name: default
+    description: "TMenuGroup and TMenuItem children."
+
+group_component:
+  name: TMenuGroup
+  props:
+    label: "string — non-focusable group label, announced via role=group + aria-labelledby."
+
+item_component:
+  name: TMenuItem
+  source_file: packages/vue/src/components/TMenuItem.vue
+  props:
+    label: "string — item text (or use the default slot)."
+    description: "string — secondary line."
+    meta: "string — trailing text (e.g. a shortcut)."
+    disabled: "boolean."
+    danger: "boolean — destructive styling. The label text carries the meaning, so the tone is not the only signal."
+    checked: "boolean | undefined — present makes the item a menuitemradio with aria-checked (e.g. a workspace switch). Absent = a plain menuitem."
+    href: "string — renders the item as <a role=menuitem>."
+    to: "string | object — renders as RouterLink when vue-router is available, else <a>."
+  events:
+    - name: select
+      description: "Emitted on activation (click / Enter / Space). The menu then closes if closeOnSelect."
+  element: "button by default; <a>/RouterLink when href/to is set. Space activates link items too."
+
+a11y:
+  roles: "role=menu on the list; role=menuitem / menuitemradio on items; role=group + aria-labelledby on groups. The header is outside role=menu."
+  roving_focus: "One item holds tabindex=0, the rest -1. ArrowUp/Down move (skipping disabled), Home/End jump to edges, pointer focus syncs the active item."
+  escape_and_restore: "Escape bubbles to the TPopover content, which closes and restores focus to the trigger. Selecting an item closes via the same TPopover close path, so focus returns to the trigger."
+  destructive_not_color_only: "danger items still carry their text label, so meaning does not depend on colour alone; pair with a leading icon where helpful."
+
+css:
+  blocks: [t-menu, t-menu__header, t-menu-group, t-menu-group__label, t-menu-item]
+  item_modifiers: [t-menu-item--danger]
+  item_elements: [t-menu-item__leading, t-menu-item__body, t-menu-item__label, t-menu-item__description, t-menu-item__meta, t-menu-item__check]
+
+example: |
+  <TMenu label="User menu" size="sm">
+    <template #trigger="{ isOpen }"><TButton>Menu</TButton></template>
+    <template #header><TBrandLockup title="Jef" subtitle="jef@s7.dev" /></template>
+    <TMenuGroup label="Workspace">
+      <TMenuItem v-for="ws in spaces" :key="ws.id" :label="ws.name" :checked="ws.id === current" @select="switchTo(ws.id)" />
+    </TMenuGroup>
+    <TMenuGroup>
+      <TMenuItem label="Settings" to="/settings"><template #leading><TIcon name="settings" /></template></TMenuItem>
+      <TMenuItem label="Sign out" danger @select="signOut"><template #leading><TIcon name="log-out" /></template></TMenuItem>
+    </TMenuGroup>
+  </TMenu>

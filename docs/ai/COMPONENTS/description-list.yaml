@@ -1,0 +1,56 @@
+name: TDescriptionList
+source_file: packages/vue/src/components/TDescriptionList.vue
+package: "@treeui/vue"
+kind: data-display
+status: available
+purpose: "Key/value description list with real <dl>/<dt>/<dd> semantics — the label↔value rows repeated across status/config/detail panels. Distinct from TList (<ul>/<li> content rows): a description list announces label/value pairs to assistive tech."
+
+subcomponents: [TDescriptionItem]
+
+props:
+  size:
+    type: TSize
+    default: md
+    values: [sm, md, lg]
+    note: "Row padding scale. Cascades to TDescriptionItem."
+
+slots:
+  - name: default
+    description: "The TDescriptionItem rows."
+
+item_component:
+  name: TDescriptionItem
+  source_file: packages/vue/src/components/TDescriptionItem.vue
+  props:
+    label:
+      type: string
+      note: "The term. Rendered in <dt>; use the `label` slot for rich content."
+  slots:
+    - name: default
+      description: "The value, rendered in <dd>. Opt into single-line truncation with TText `truncate` (right for ARNs)."
+    - name: label
+      description: "Rich <dt> content, overriding the `label` prop."
+    - name: actions
+      description: "Per-row controls (e.g. copy) as real siblings of the value inside <dd> — never nested in the value."
+
+behavior:
+  responsive: "On a container wider than 30rem the label and value sit side by side (value truncates). On a narrower container the label moves ABOVE the value — right for long values like ARNs (CSS container query; the list sets container-type)."
+  semantics: "Real <dl>/<dt>/<dd>; each item wraps its dt/dd in a <div>, which is valid grouping inside <dl>."
+
+not_to_use:
+  - "TStat is a display-scale KPI (large value), not a key/value row."
+  - "TSelectableList is role=listbox — using it for read-only data announces every row as a selectable option."
+
+css:
+  block: t-description-list
+  modifiers: [t-description-list--sm, t-description-list--md, t-description-list--lg]
+  elements: [t-description-item, t-description-item__label, t-description-item__value, t-description-item__value-content, t-description-item__actions]
+
+example: |
+  <TDescriptionList>
+    <TDescriptionItem label="ARN">
+      <TText family="mono" truncate>{{ queue.arn }}</TText>
+      <template #actions><TButton icon-only label="Copy" variant="ghost"><template #icon><TIcon name="copy" /></template></TButton></template>
+    </TDescriptionItem>
+    <TDescriptionItem label="Messages">{{ queue.count }}</TDescriptionItem>
+  </TDescriptionList>

@@ -1,0 +1,63 @@
+name: TList
+source_file: packages/vue/src/components/TList.vue
+package: "@treeui/vue"
+kind: data-display
+status: available
+purpose: "Non-selectable content list — plain <ul>/<li> rows with leading/content/meta/actions regions. Unlike TSelectableList (role=listbox / role=option), the rows carry no selection semantics, so the actions region can hold REAL interactive controls (buttons, links) as focusable siblings."
+
+subcomponents: [TListItem]
+
+props:
+  as:
+    type: string
+    default: ul
+    note: "Root element. Default <ul>."
+  size:
+    type: TSize
+    default: md
+    values: [sm, md, lg]
+    note: "Row padding scale. Cascades to TListItem via the t-list--{size} class."
+
+slots:
+  - name: default
+    description: "The TListItem rows."
+
+item_component:
+  name: TListItem
+  source_file: packages/vue/src/components/TListItem.vue
+  props:
+    as:
+      type: string
+      default: li
+  slots:
+    - name: leading
+      description: "Leading visual (icon/avatar)."
+    - name: default
+      description: "Primary content. Give it `min-inline-size: 0` behaviour for free; opt into single-line truncation with TText `truncate` where needed."
+    - name: meta
+      description: "Trailing metadata (timestamp, count). On a narrow container it drops below the content."
+    - name: actions
+      description: "Trailing interactive controls (buttons/links) as real focusable siblings — never nested inside a link."
+
+a11y:
+  plain_list_semantics: "<ul>/<li> with no role override, so screen readers announce a list, not a listbox, and interactive controls in `actions` are reachable."
+  not_selectable: "For a single-select list of options use TSelectableList instead."
+
+behavior:
+  responsive: "On a container narrower than 30rem the row wraps: meta drops below the content while actions stay visible inline. Actions are NEVER hidden or auto-collapsed into an overflow menu — compose a TMenu inside the actions slot deliberately if an overflow is wanted (uses a CSS container query; the list sets container-type)."
+  no_overflow_ownership: "TList does not create, own, or collapse an actions overflow."
+
+css:
+  block: t-list
+  modifiers: [t-list--sm, t-list--md, t-list--lg]
+  elements: [t-list-item, t-list-item__leading, t-list-item__content, t-list-item__meta, t-list-item__actions]
+
+example: |
+  <TList>
+    <TListItem v-for="job in jobs" :key="job.id">
+      <template #leading><TIcon :name="job.icon" /></template>
+      <TText weight="medium" truncate>{{ job.title }}</TText>
+      <template #meta><TText tone="muted" size="sm">{{ job.when }}</TText></template>
+      <template #actions><TButton icon-only label="Remove" variant="ghost"><template #icon><TIcon name="x" /></template></TButton></template>
+    </TListItem>
+  </TList>

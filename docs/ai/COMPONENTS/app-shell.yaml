@@ -41,7 +41,11 @@ props:
   breakpoint:
     type: string
     default: 768px
-    note: "Any CSS length. Evaluated as `(max-width: <breakpoint>)` via matchMedia, and only consulted while `mobile` is undefined. Changing it tears down and rebuilds the media query listener."
+    note: "Any CSS length (px/rem/em). The drawer boundary: below this width the sidebar becomes the off-canvas drawer. Measured on the shell root via ResizeObserver (not the viewport, not the content panel — measuring the root avoids the feedback loop the panel would cause as the rail collapses). Only consulted while `mobile` is undefined."
+  railBreakpoint:
+    type: string
+    default: undefined
+    note: "Any CSS length, greater than `breakpoint`. Enables the three-state responsive policy: below `breakpoint` → drawer; between `breakpoint` and `railBreakpoint` → the sidebar is auto-forced to the collapsed rail; at/above `railBreakpoint` → the user's manual collapse preference applies. Omit for the binary drawer↔expanded behavior. Auto-forcing the rail does NOT mutate the manual preference and emits no update:collapsed/collapse-change — the preference returns when the width grows back past railBreakpoint."
   sidebarOpen:
     type: boolean
     default: undefined
@@ -209,6 +213,8 @@ behavior:
   header_spans_full_width_above_sidebar_and_content: true
   content_area_scrolls_independently: true
   auto_switches_to_mobile_at_breakpoint_when_mobile_undefined: true
+  responsive_measured_on_root_via_resize_observer: "the shell root's own width drives the policy, not the viewport or content panel; a component `as` (rather than an element) degrades gracefully to no auto-switching"
+  three_state_rail_policy_when_rail_breakpoint_set: "drawer < breakpoint <= rail < railBreakpoint <= expanded; the auto-rail band forces the collapsed rail as the effective state without changing the manual preference or emitting collapse events"
   mobile_prop_forces_mobile_mode: true
   mobile_sidebar_becomes_off_canvas_drawer: true
   desktop_sidebar_is_removed_from_the_dom_on_mobile: "crossing the breakpoint unmounts and remounts the sidebar slot, so component state inside it is not preserved"

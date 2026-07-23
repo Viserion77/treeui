@@ -88,3 +88,21 @@ export const Sides: Story = {
     `,
   }),
 };
+
+export const ProgrammaticClose: Story = {
+  render: () => ({
+    components: { TButton, TPopover },
+    template: `
+      <TPopover>
+        <template #trigger><TButton variant="outline">Actions</TButton></template>
+        <template #default="{ close }">
+          <div style="display: grid; gap: 0.5rem; min-width: 12rem;">
+            <TButton block variant="ghost" @click="close()">Rename</TButton>
+            <TButton block variant="ghost" @click="close()">Duplicate</TButton>
+            <TButton block variant="ghost" @click="close({ restoreFocus: false })">Open in new tab</TButton>
+          </div>
+        </template>
+      </TPopover>
+    `,
+  }),
+};

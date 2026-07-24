@@ -169,11 +169,12 @@ const menuAriaLabel = computed(() => props.label);
 
 <template>
   <TPopover
-    v-model:open="isOpen"
+    :open="isOpen"
     :disabled="disabled"
     :side="side"
     :align="align"
     :size="size"
+    @update:open="setValue"
   >
     <template #trigger="slotProps">
       <slot

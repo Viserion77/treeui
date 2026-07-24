@@ -1,7 +1,7 @@
 {
-  "generatedAt": "2026-07-22T19:18:23.512Z",
+  "generatedAt": "2026-07-23T19:44:18.671Z",
   "packageName": "@treeui/vue",
-  "packageVersion": "0.21.0",
+  "packageVersion": "0.22.0",
   "decisionGuides": [
     {
       "id": "single-choice",

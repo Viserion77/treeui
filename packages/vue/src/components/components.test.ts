@@ -5625,3 +5625,48 @@ describe('TREEUX round 6 — queue batch', () => {
     });
   });
 });
+
+describe('TREEUX-007 regression — TMenu opens via the trigger (Rodada 8)', () => {
+  it('opens on trigger click (uncontrolled) — the v-model-on-readonly-computed bug', async () => {
+    const wrapper = mount(TMenu, {
+      attachTo: document.body,
+      props: { label: 'M' },
+      slots: {
+        trigger: `<template #trigger><button class="trg" aria-label="o">x</button></template>`,
+        default: `<TMenuItem label="A" />`,
+      },
+      global: { components: { TMenuItem } },
+    });
+    // closed initially
+    expect(wrapper.find('[role="menu"]').exists()).toBe(false);
+    await wrapper.find('.trg').trigger('click');
+    await nextTick();
+    // the panel must now be open
+    expect(wrapper.find('[role="menu"]').exists()).toBe(true);
+    expect(wrapper.find('.t-popover').attributes('data-state')).toBe('open');
+    wrapper.unmount();
+  });
+
+  it('supports v-model:open (controlled) both ways', async () => {
+    const wrapper = mount(TMenu, {
+      attachTo: document.body,
+      props: { open: false, label: 'M' },
+      slots: {
+        trigger: `<template #trigger><button class="trg" aria-label="o">x</button></template>`,
+        default: `<TMenuItem class="mi" label="A" @select="() => {}" />`,
+      },
+      global: { components: { TMenuItem } },
+    });
+    // clicking the trigger emits update:open(true) to the parent
+    await wrapper.find('.trg').trigger('click');
+    expect(wrapper.emitted('update:open')?.at(-1)).toEqual([true]);
+    // parent applies it
+    await wrapper.setProps({ open: true });
+    await nextTick();
+    expect(wrapper.find('[role="menu"]').exists()).toBe(true);
+    // selecting an item requests close (emits update:open(false))
+    await wrapper.find('.mi').trigger('click');
+    expect(wrapper.emitted('update:open')?.at(-1)).toEqual([false]);
+    wrapper.unmount();
+  });
+});

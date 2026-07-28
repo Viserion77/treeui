@@ -1,5 +1,12 @@
 # @treeui/landing
 
+## 0.2.5
+
+### Patch Changes
+
+- Updated dependencies [93f5454]
+  - @treeui/vue@0.23.0
+
 ## 0.2.4
 
 ### Patch Changes

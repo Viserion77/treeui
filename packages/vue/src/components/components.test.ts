@@ -5670,3 +5670,26 @@ describe('TREEUX-007 regression — TMenu opens via the trigger (Rodada 8)', () 
     wrapper.unmount();
   });
 });
+
+describe('TREEUX-018 — TPopover width', () => {
+  it('emits a width modifier only for non-default widths', () => {
+    const wide = mount(TPopover, {
+      props: { defaultOpen: true, width: 'content' },
+      slots: { default: '<div>x</div>' },
+    });
+    expect(wide.find('.t-popover__content').classes()).toContain('t-popover__content--w-content');
+
+    const base = mount(TPopover, { props: { defaultOpen: true }, slots: { default: '<div>x</div>' } });
+    expect(base.find('.t-popover__content').classes().join(' ')).not.toContain('t-popover__content--w-');
+  });
+
+  it('forwards width through TMenu', () => {
+    const wrapper = mount(TMenu, {
+      props: { defaultOpen: true, width: 'lg', label: 'M' },
+      slots: { default: '<TMenuItem label="A" />' },
+      global: { components: { TMenuItem } },
+    });
+    expect(wrapper.find('.t-popover__content').classes()).toContain('t-popover__content--w-lg');
+    wrapper.unmount();
+  });
+});

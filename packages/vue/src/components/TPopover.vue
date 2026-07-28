@@ -12,6 +12,8 @@ export interface TPopoverCloseOptions {
   restoreFocus?: boolean;
 }
 
+export type TPopoverWidth = 'content' | 'sm' | 'md' | 'lg';
+
 defineOptions({
   inheritAttrs: false,
 });
@@ -25,6 +27,14 @@ const props = withDefaults(
     align?: 'start' | 'center' | 'end';
     /** Panel density. Scales the content padding by the shared size tokens. */
     size?: TSize;
+    /**
+     * Panel max-width. The content always sizes to its intrinsic width; this
+     * caps it. `md` (default) = 24rem; `sm` = 18rem; `lg` = 40rem; `content`
+     * lifts the rem cap, keeping only the viewport clamp — for wide rich panels
+     * (e.g. an app-launcher grid). Height and width are always clamped to the
+     * viewport with the panel's own scroll.
+     */
+    width?: TPopoverWidth;
     id?: string;
   }>(),
   {
@@ -34,6 +44,7 @@ const props = withDefaults(
     side: 'bottom',
     align: 'center',
     size: 'md',
+    width: 'md',
     id: undefined,
   },
 );
@@ -88,6 +99,8 @@ const contentClasses = computed(() => [
   `t-popover__content--${props.side}`,
   `t-popover__content--align-${props.align}`,
   `t-popover__content--${props.size}`,
+  // `md` is the base cap; only the other widths need a modifier.
+  props.width !== 'md' ? `t-popover__content--w-${props.width}` : null,
 ]);
 
 const openPopover = () => {

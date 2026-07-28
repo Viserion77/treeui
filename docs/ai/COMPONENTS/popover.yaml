@@ -43,6 +43,12 @@ props:
     default: "'md'"
     description: "Panel density. Scales the content padding by the shared size tokens (sm → space-3, md → space-4, lg → space-5), so compact rich panels use a prop instead of overriding `.t-popover__content`. This is the `size` axis, not a density prop — TreeUI has no density axis (see DECISIONS.md → Density). For a compact menu of actions use TDropdown, which owns role=menu semantics; use TPopover for a rich non-menu panel."
 
+  - name: width
+    type: TPopoverWidth
+    default: "'md'"
+    values: [content, sm, md, lg]
+    description: "Panel max-width. The content ALWAYS sizes to its intrinsic width (`width: max-content`), so grid/flex panels no longer collapse to the min-width; this prop caps how wide it may grow: sm → 18rem, md → 24rem (base), lg → 40rem, content → no rem cap (only the viewport clamp), for a wide rich panel such as an app-launcher grid. Width and height are always clamped to the viewport (`calc(100vw - space-8)` / `calc(100dvh - space-16)`) and the panel gets its own scroll — it never runs off-screen. Replaces `:deep(.t-popover__content)` width/overflow overrides."
+
   - name: id
     type: string
     optional: true

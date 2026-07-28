@@ -103,7 +103,7 @@ export type { TPageGap } from './TPage.vue';
 export { default as TPageHeader } from './TPageHeader.vue';
 export { default as TPagination } from './TPagination.vue';
 export { default as TPopover } from './TPopover.vue';
-export type { TPopoverCloseOptions } from './TPopover.vue';
+export type { TPopoverCloseOptions, TPopoverWidth } from './TPopover.vue';
 export { default as TProgress } from './TProgress.vue';
 export { default as TTabs } from './TTabs.vue';
 export type { TabsActivationMode as TTabsActivationMode } from './tabs-context';

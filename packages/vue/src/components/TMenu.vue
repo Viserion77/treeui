@@ -3,7 +3,7 @@ import { computed, nextTick, onMounted, provide, ref, toRef, watch } from 'vue';
 import { getNextEnabledIndex } from '@treeui/utils';
 import { useControllableOpen } from '../composables/useControllableOpen';
 import type { TSize, TTooltipSide } from '../types/contracts';
-import TPopover from './TPopover.vue';
+import TPopover, { type TPopoverWidth } from './TPopover.vue';
 import { treeMenuInjectionKey, type TMenuItemHandle } from './menu-context';
 
 const props = withDefaults(
@@ -14,6 +14,8 @@ const props = withDefaults(
     side?: TTooltipSide;
     align?: 'start' | 'center' | 'end';
     size?: TSize;
+    /** Panel max-width, forwarded to TPopover. */
+    width?: TPopoverWidth;
     /** Accessible name for the `role="menu"` element. */
     label?: string;
     /** Close the menu when an item is chosen. */
@@ -26,6 +28,7 @@ const props = withDefaults(
     side: 'bottom',
     align: 'start',
     size: 'md',
+    width: 'md',
     label: undefined,
     closeOnSelect: true,
   },
@@ -174,6 +177,7 @@ const menuAriaLabel = computed(() => props.label);
     :side="side"
     :align="align"
     :size="size"
+    :width="width"
     @update:open="setValue"
   >
     <template #trigger="slotProps">

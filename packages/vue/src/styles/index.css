@@ -3770,10 +3770,18 @@ a.t-brand-lockup:focus-visible {
 }
 
 .t-popover__content {
+  --tree-popover-max-w: 24rem;
+  --tree-popover-max-h: 30rem;
   position: absolute;
   z-index: var(--tree-z-dropdown);
+  /* Size to the content's intrinsic width so grid/flex panels don't collapse to
+     the min-width; capped by `width` and always clamped to the viewport on both
+     axes, with its own scroll, so a rich panel never runs off-screen. */
+  width: max-content;
   min-width: 12rem;
-  max-width: 24rem;
+  max-width: min(var(--tree-popover-max-w), calc(100vw - var(--tree-space-8)));
+  max-height: min(var(--tree-popover-max-h), calc(100dvh - var(--tree-space-16)));
+  overflow: auto;
   padding: var(--tree-popover-pad, var(--tree-space-4));
   border: var(--tree-border-width-subtle) solid var(--tree-color-border-default);
   border-radius: var(--tree-radius-lg);
@@ -3793,6 +3801,22 @@ a.t-brand-lockup:focus-visible {
 
 .t-popover__content--lg {
   --tree-popover-pad: var(--tree-space-5);
+}
+
+/* ── Width ── (max-width cap; the panel still sizes to content up to the cap.
+   `md` is the base 24rem; `content` lifts the rem cap, keeping only the viewport
+   clamp, for wide rich panels like an app launcher grid.) */
+
+.t-popover__content--w-content {
+  --tree-popover-max-w: 100vw;
+}
+
+.t-popover__content--w-sm {
+  --tree-popover-max-w: 18rem;
+}
+
+.t-popover__content--w-lg {
+  --tree-popover-max-w: 40rem;
 }
 
 /* ── Side positioning ── */

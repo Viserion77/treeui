@@ -106,3 +106,22 @@ export const ProgrammaticClose: Story = {
     `,
   }),
 };
+
+export const WideLauncherGrid: Story = {
+  render: () => ({
+    components: { TButton, TPopover },
+    template: `
+      <TPopover width="content">
+        <template #trigger><TButton variant="outline">Apps</TButton></template>
+        <template #default>
+          <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.75rem;">
+            <a v-for="n in 8" :key="n" href="#" style="text-decoration:none; color:inherit; border:1px solid var(--tree-color-border-default); border-radius: var(--tree-radius-md); padding: 0.75rem;">
+              <div style="font-weight:600;">App {{ n }}</div>
+              <div style="font-size: var(--tree-font-size-sm); color: var(--tree-color-text-muted);">Descrição do app {{ n }}</div>
+            </a>
+          </div>
+        </template>
+      </TPopover>
+    `,
+  }),
+};

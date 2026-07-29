@@ -1,7 +1,7 @@
 {
-  "generatedAt": "2026-07-28T22:30:21.896Z",
+  "generatedAt": "2026-07-29T02:07:57.532Z",
   "packageName": "@treeui/vue",
-  "packageVersion": "0.22.1",
+  "packageVersion": "0.23.0",
   "decisionGuides": [
     {
       "id": "single-choice",
@@ -393,6 +393,22 @@
       ]
     },
     {
+      "id": "image-zoom",
+      "name": "Zoomable image (lightbox)",
+      "useWhen": [
+        "A content image should open larger on demand (chat attachment, gallery)."
+      ],
+      "compose": [
+        "TImage",
+        "TModal"
+      ],
+      "notes": [
+        "TImage has no built-in lightbox on purpose — a lightbox is an overlay (focus trap, Escape), which is TModal's job. Composing keeps the trigger a product decision (in a chat bubble it competes with download).",
+        "Trigger: wrap the thumbnail TImage in the modal's trigger; render a larger TImage (`fit=\"contain\"`, no fixed `ratio`) inside the modal body.",
+        "The thumbnail trigger needs an accessible name announcing it opens a preview (e.g. an `aria-label` on the trigger button), separate from the image's own `alt`."
+      ]
+    },
+    {
       "id": "nav-menu-icons",
       "name": "Icons on navigation items",
       "useWhen": [
@@ -662,7 +678,8 @@
         "TCodeBlock",
         "TLinkTile",
         "TMenu",
-        "TPopover"
+        "TPopover",
+        "TImage"
       ]
     },
     {
@@ -749,7 +766,8 @@
         "TLinkTile",
         "TMenu",
         "TList",
-        "TDescriptionList"
+        "TDescriptionList",
+        "TImage"
       ]
     }
   ],
@@ -5529,6 +5547,91 @@
       "practices": []
     },
     {
+      "name": "TImage",
+      "aliases": [],
+      "package": "@treeui/vue",
+      "kind": "data-display",
+      "category": "Data Display",
+      "status": "available",
+      "purpose": "Render a content image with token-driven corners, object-fit, lazy loading, and a required accessible name — so consumers stop hand-rolling `<img>` + local CSS. It is display only: it never fetches or transforms the source. Zoom/lightbox is deliberately NOT built in — compose TImage inside TModal (see recipe `image-zoom`).",
+      "sourceFile": "packages/vue/src/components/TImage.vue",
+      "storyFile": "apps/docs/src/stories/Image.stories.ts",
+      "storyTitle": "Components/Data Display/Image",
+      "manifestFile": "docs/ai/COMPONENTS/image.yaml",
+      "props": [
+        {
+          "name": "src",
+          "type": "string",
+          "required": true,
+          "note": "Image URL. Agnostic — passed straight to the native `<img>`; the component never fetches or transforms it."
+        },
+        {
+          "name": "alt",
+          "type": "string",
+          "required": true,
+          "note": "Accessible name. Required (no default) — the library never invents alt text; the product owns it. Pass an empty string only for a decorative image."
+        },
+        {
+          "name": "fit",
+          "type": "TImageFit",
+          "default": "cover",
+          "values": [
+            "cover",
+            "contain"
+          ],
+          "note": "`object-fit`. Meaningful when the box has a fixed size (via `ratio` or a sized container); a naturally sized image ignores it."
+        },
+        {
+          "name": "radius",
+          "type": "TImageRadius",
+          "default": "md",
+          "values": [
+            "none",
+            "sm",
+            "md",
+            "lg",
+            "pill"
+          ],
+          "note": "Corner radius from the token scale (`--tree-radius-*`; `pill` = fully rounded)."
+        },
+        {
+          "name": "ratio",
+          "type": "string",
+          "default": "undefined",
+          "note": "Optional CSS `aspect-ratio` (e.g. `'16 / 9'`, `'1 / 1'`). When set, the image fills a fixed box and `fit` governs cropping. Otherwise the consumer controls size via the container."
+        },
+        {
+          "name": "loading",
+          "type": "'lazy' | 'eager'",
+          "default": "lazy",
+          "note": "Native loading strategy. Use `eager` for an above-the-fold image."
+        }
+      ],
+      "events": [],
+      "slots": [],
+      "a11y": [
+        "required_alt: `alt` is a required prop, so an unnamed content image cannot ship by accident. Empty string is allowed for a decorative image (renders `alt=\"\"`)."
+      ],
+      "behavior": [],
+      "selection": {
+        "keywords": [],
+        "useWhen": [],
+        "avoidWhen": [],
+        "alternatives": []
+      },
+      "setup": {
+        "required": [],
+        "notes": []
+      },
+      "recipes": [
+        "image-zoom"
+      ],
+      "practices": [
+        "accessible-by-default",
+        "token-driven"
+      ]
+    },
+    {
       "name": "TInput",
       "aliases": [],
       "package": "@treeui/vue",
@@ -6587,7 +6690,9 @@
           "Use `v-model:open` for the idiomatic Vue controlled pattern."
         ]
       },
-      "recipes": [],
+      "recipes": [
+        "image-zoom"
+      ],
       "practices": [
         "accessible-by-default",
         "predictable-api"

@@ -65,7 +65,8 @@
         "TCodeBlock",
         "TLinkTile",
         "TMenu",
-        "TPopover"
+        "TPopover",
+        "TImage"
       ]
     },
     {
@@ -156,7 +157,8 @@
         "TLinkTile",
         "TMenu",
         "TList",
-        "TDescriptionList"
+        "TDescriptionList",
+        "TImage"
       ]
     }
   ],
@@ -178,6 +180,7 @@
     "TEmptyState": "components-feedback-emptystate",
     "TFormField": "components-data-entry-formfield",
     "TGrid": "components-layout-grid",
+    "TImage": "components-data-display-image",
     "TInput": "components-data-entry-input",
     "TLink": "components-navigation-link",
     "TLinkTile": "components-navigation-linktile",

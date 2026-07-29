@@ -65,14 +65,17 @@ const preview: Preview = {
   decorators: [
     (story, context) => {
       document.documentElement.setAttribute('data-tree-theme', context.globals.theme);
+      // Theme the preview surface on the body so it fills the standalone canvas
+      // without forcing every story to be 100vh tall — that min-height left a
+      // large empty area under short components, worst of all in autodocs where
+      // each embedded story block became a full viewport high.
+      document.body.style.background = 'var(--tree-color-bg-primary)';
+      document.body.style.color = 'var(--tree-color-text-primary)';
 
       return {
         components: { story },
-        template:
-          // `--tree-color-bg` / `--tree-color-text` are not tokens; the real
-          // names carry the `-primary` suffix. The old values resolved to
-          // nothing, so every canvas fell back to the browser defaults.
-          '<div style="min-height: 100vh; padding: 1.5rem; background: var(--tree-color-bg-primary); color: var(--tree-color-text-primary);"><story /></div>',
+        // Content-sized wrapper: just padding, so the canvas hugs the story.
+        template: '<div style="padding: 1.5rem;"><story /></div>',
       };
     },
   ],

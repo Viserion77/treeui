@@ -133,6 +133,8 @@ export { default as TSparkline } from './TSparkline.vue';
 export { default as TDonutChart } from './TDonutChart.vue';
 export type { TDonutSegment } from './TDonutChart.vue';
 export { default as TIcon } from './TIcon.vue';
+export { default as TImage } from './TImage.vue';
+export type { TImageFit, TImageRadius } from './TImage.vue';
 // Re-exported so an application can register its own icons, and introspect the
 // set, without adding @treeui/icons to its own dependencies.
 export {

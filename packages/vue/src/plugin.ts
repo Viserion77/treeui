@@ -87,6 +87,7 @@ import {
   TSparkline,
   TDonutChart,
   TIcon,
+  TImage,
 } from './components';
 
 const components = {
@@ -177,6 +178,7 @@ const components = {
   TSparkline,
   TDonutChart,
   TIcon,
+  TImage,
 };
 
 export const TreeUIPlugin: Plugin = {

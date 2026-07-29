@@ -78,6 +78,18 @@ recipes:
       - "TreeUI ships no `TBrand` component on purpose: the logo asset, the product name, and what survives collapse are product identity, which must stay in the consumer. See DECISIONS.md → Portability Boundary."
       - "Company and service logos (AWS, LocalStack, social networks) are brand assets and are not TreeUI icons — source them from the app's brand policy, not the icon registry."
 
+  - id: image-zoom
+    name: "Zoomable image (lightbox)"
+    use_when:
+      - "A content image should open larger on demand (chat attachment, gallery)."
+    compose:
+      - TImage
+      - TModal
+    notes:
+      - "TImage has no built-in lightbox on purpose — a lightbox is an overlay (focus trap, Escape), which is TModal's job. Composing keeps the trigger a product decision (in a chat bubble it competes with download)."
+      - "Trigger: wrap the thumbnail TImage in the modal's trigger; render a larger TImage (`fit=\"contain\"`, no fixed `ratio`) inside the modal body."
+      - "The thumbnail trigger needs an accessible name announcing it opens a preview (e.g. an `aria-label` on the trigger button), separate from the image's own `alt`."
+
   - id: nav-menu-icons
     name: "Icons on navigation items"
     use_when:

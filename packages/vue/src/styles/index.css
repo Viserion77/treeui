@@ -1577,6 +1577,44 @@ a.t-brand-lockup:focus-visible {
   color: var(--tree-color-brand-primary);
 }
 
+/* ─── Image ─── */
+
+.t-image {
+  display: block;
+  max-inline-size: 100%;
+  height: auto;
+}
+
+.t-image--fit-cover {
+  object-fit: cover;
+}
+
+.t-image--fit-contain {
+  object-fit: contain;
+}
+
+.t-image--radius-none {
+  border-radius: 0;
+}
+.t-image--radius-sm {
+  border-radius: var(--tree-radius-sm);
+}
+.t-image--radius-md {
+  border-radius: var(--tree-radius-md);
+}
+.t-image--radius-lg {
+  border-radius: var(--tree-radius-lg);
+}
+.t-image--radius-pill {
+  border-radius: var(--tree-radius-pill);
+}
+
+/* When a ratio is set the box is fixed, so object-fit governs how the image
+   fills it; without a ratio the image keeps its intrinsic size. */
+.t-image[style*='aspect-ratio'] {
+  inline-size: 100%;
+}
+
 /* ─── Description list (key/value) ─── */
 
 .t-description-list {

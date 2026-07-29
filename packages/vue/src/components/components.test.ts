@@ -70,6 +70,7 @@ import TPricingCard from './TPricingCard.vue';
 import TPricing from './TPricing.vue';
 import TMarkdownEditor from './TMarkdownEditor.vue';
 import TIcon from './TIcon.vue';
+import TImage from './TImage.vue';
 import TChart from './TChart.vue';
 import TSparkline from './TSparkline.vue';
 import TDonutChart from './TDonutChart.vue';
@@ -5691,5 +5692,29 @@ describe('TREEUX-018 — TPopover width', () => {
     });
     expect(wrapper.find('.t-popover__content').classes()).toContain('t-popover__content--w-lg');
     wrapper.unmount();
+  });
+});
+
+describe('TREEUX-017 — TImage', () => {
+  it('renders an img with required alt, lazy loading, fit and radius modifiers', () => {
+    const wrapper = mount(TImage, { props: { src: '/a.png', alt: 'Diagram' } });
+    const img = wrapper.find('img.t-image');
+    expect(img.exists()).toBe(true);
+    expect(img.attributes('src')).toBe('/a.png');
+    expect(img.attributes('alt')).toBe('Diagram');
+    expect(img.attributes('loading')).toBe('lazy');
+    expect(img.classes()).toContain('t-image--fit-cover');
+    expect(img.classes()).toContain('t-image--radius-md');
+  });
+
+  it('applies an aspect ratio and honours fit/radius/loading props', () => {
+    const wrapper = mount(TImage, {
+      props: { src: '/b.png', alt: 'B', fit: 'contain', radius: 'pill', ratio: '16 / 9', loading: 'eager' },
+    });
+    const img = wrapper.find('img.t-image');
+    expect(img.classes()).toContain('t-image--fit-contain');
+    expect(img.classes()).toContain('t-image--radius-pill');
+    expect(img.attributes('loading')).toBe('eager');
+    expect(img.attributes('style')).toContain('aspect-ratio');
   });
 });

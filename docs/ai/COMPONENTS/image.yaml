@@ -1,0 +1,60 @@
+name: TImage
+source_file: packages/vue/src/components/TImage.vue
+package: "@treeui/vue"
+kind: data-display
+status: available
+purpose: "Render a content image with token-driven corners, object-fit, lazy loading, and a required accessible name — so consumers stop hand-rolling `<img>` + local CSS. It is display only: it never fetches or transforms the source. Zoom/lightbox is deliberately NOT built in — compose TImage inside TModal (see recipe `image-zoom`)."
+
+props:
+  src:
+    type: string
+    required: true
+    note: "Image URL. Agnostic — passed straight to the native `<img>`; the component never fetches or transforms it."
+  alt:
+    type: string
+    required: true
+    note: "Accessible name. Required (no default) — the library never invents alt text; the product owns it. Pass an empty string only for a decorative image."
+  fit:
+    type: TImageFit
+    default: cover
+    values: [cover, contain]
+    note: "`object-fit`. Meaningful when the box has a fixed size (via `ratio` or a sized container); a naturally sized image ignores it."
+  radius:
+    type: TImageRadius
+    default: md
+    values: [none, sm, md, lg, pill]
+    note: "Corner radius from the token scale (`--tree-radius-*`; `pill` = fully rounded)."
+  ratio:
+    type: string
+    default: undefined
+    note: "Optional CSS `aspect-ratio` (e.g. `'16 / 9'`, `'1 / 1'`). When set, the image fills a fixed box and `fit` governs cropping. Otherwise the consumer controls size via the container."
+  loading:
+    type: "'lazy' | 'eager'"
+    default: lazy
+    note: "Native loading strategy. Use `eager` for an above-the-fold image."
+
+a11y:
+  required_alt: "`alt` is a required prop, so an unnamed content image cannot ship by accident. Empty string is allowed for a decorative image (renders `alt=\"\"`)."
+
+not_for:
+  - "File capture/upload previews → TFileUpload."
+  - "Brand logos / company identity → out of scope (see the marks policy); not a TImage concern."
+  - "Icons → TIcon."
+
+zoom:
+  decision: "No built-in lightbox. A lightbox is an overlay (focus trap, Escape) — i.e. TModal. Compose TImage inside TModal so the product owns the trigger (which can conflict with other actions like download). See RECIPES `image-zoom`."
+
+css:
+  block: t-image
+  modifiers:
+    - t-image--fit-cover
+    - t-image--fit-contain
+    - t-image--radius-none
+    - t-image--radius-sm
+    - t-image--radius-md
+    - t-image--radius-lg
+    - t-image--radius-pill
+
+example: |
+  <TImage src="/uploads/diagram.png" alt="Sequence diagram" ratio="16 / 9" />
+  <TImage src="/avatars/u.png" alt="" radius="pill" ratio="1 / 1" />

@@ -1,5 +1,11 @@
 # @treeui/docs-react
 
+## 0.1.8
+
+### Patch Changes
+
+- @treeui/react@0.3.1
+
 ## 0.1.7
 
 ### Patch Changes

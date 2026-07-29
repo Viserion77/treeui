@@ -1,5 +1,12 @@
 # @treeui/react
 
+## 0.3.1
+
+### Patch Changes
+
+- Updated dependencies [2a5c192]
+  - @treeui/utils@0.24.0
+
 ## 0.3.0
 
 ### Minor Changes

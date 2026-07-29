@@ -10,7 +10,7 @@ source_component_filename_prefix: "T"
 # Maintenance: must stay 1:1 with the `export { default as ... }` lines in
 # packages/vue/src/components/index.ts. Verify with:
 #   grep -oP '^export \{ default as \K\w+' packages/vue/src/components/index.ts | sort
-primary_exports_count: 77
+primary_exports_count: 88
 primary_exports:
   - TAccordion
   - TAccordionItem
@@ -19,12 +19,14 @@ primary_exports:
   - TAppShell
   - TAvatar
   - TBadge
+  - TBrandLockup
   - TBreadcrumb
   - TBreadcrumbItem
   - TButton
   - TCard
   - TChart
   - TCheckbox
+  - TCodeBlock
   - TColorSwatch
   - TCombobox
   - TConfirmDialog
@@ -32,6 +34,8 @@ primary_exports:
   - TContextMenu
   - TDatePicker
   - TDateTimePicker
+  - TDescriptionItem
+  - TDescriptionList
   - TDivider
   - TDonutChart
   - TDrawer
@@ -42,11 +46,18 @@ primary_exports:
   - TFormField
   - TGrid
   - TIcon
+  - TImage
   - TInput
   - TKbd
   - TLanguageSelect
   - TLink
+  - TLinkTile
+  - TList
+  - TListItem
   - TMarkdownEditor
+  - TMenu
+  - TMenuGroup
+  - TMenuItem
   - TModal
   - TMultiSelect
   - TNavMenu
@@ -90,6 +101,15 @@ primary_exports:
   - TTooltip
   - TTreeView
 
+manifest_status:
+  values: [available]
+  note: >-
+    The `status:` field of every COMPONENTS/*.yaml manifest, surfaced verbatim in
+    the generated catalog and by the MCP server. Everything in primary_exports is
+    shipped and plugin-registered, so `available` is currently the only value.
+    Add a new value here first if a manifest ever needs one — do not invent
+    per-file labels such as `draft` or a milestone name.
+
 export_aliases:
   note: "Two exports are aliases of the same component, not separate components. Counted individually above."
   pairs:
@@ -124,27 +144,10 @@ layout_capabilities_already_shipping:
 
 shared_sizes:
   values: [sm, md, lg]
-  used_by:
-    - TBadge
-    - TButton
-    - TCard
-    - TCombobox
-    - TConfirmDialog
-    - TDatePicker
-    - TDropdown
-    - TEmptyState
-    - TFileUpload
-    - TFlag
-    - TFormField
-    - TInput
-    - TLanguageSelect
-    - TSelect
-    - TTextarea
-    - TModal
-    - TSpinner
-    - TSwitch
-    - TTimeline
-    - TTabs
+  note: >-
+    The shared scale for interactive and form components. A few components carry
+    their own `size` scale for a different axis (TContainer, TText, TIcon,
+    TDonutChart); each is declared in its own COMPONENTS/*.yaml.
 
 shared_variants:
   action_values: [solid, outline, ghost, soft, danger]
@@ -158,14 +161,20 @@ shared_variants:
     note: "TButton adds a high-emphasis `brand` gradient variant (via `--tree-gradient-brand`) on top of the shared action values. It is button-only, not a shared action variant."
 
 shared_props:
+  # Per-component support is declared in COMPONENTS/*.yaml — that is the single
+  # place a prop roster is kept true. The entries below define the shared
+  # contract (values, defaults, semantics), not the list of components using it.
   variant:
-    used_by: [TBadge, TButton, TCard]
+    values_note: "See shared_variants — action, card, and the button-only `brand` value."
   tone:
-    used_by: [TBadge, TStat]
+    note: >-
+      Status tone, not an action variant. The accepted values differ per
+      component (TBadge/TStat omit `brand`, TTimeline omits `info`, and TText's
+      `tone` is a text-color role: default | muted | inverse | brand).
+      See DECISIONS.md → "Variant Vocabulary".
   size:
-    used_by: [TBadge, TButton, TCard, TCheckbox, TCombobox, TConfirmDialog, TDatePicker, TDropdown, TFileUpload, TFlag, TInput, TLanguageSelect, TModal, TRadio, TRadioGroup, TSelect, TSpinner, TTextarea, TTimeline]
+    values: [sm, md, lg]
   width:
-    used_by: [TInput, TLanguageSelect, TSelect, TTextarea]
     values: [xs, sm, md, lg, xl, full]
     default: full
     note: >-
@@ -173,17 +182,37 @@ shared_props:
       fluid by default; the other steps set a `max-inline-size` cap so they
       still shrink on narrow containers. Prefer this over inline width styles.
       Caps: xs 8rem, sm 12rem, md 18rem, lg 24rem, xl 32rem.
+    other_width_contracts: >-
+      `width` is only this scale on form controls. Overlay panels (TPopover,
+      TMenu) take `TPopoverWidth` (content | sm | md | lg), TPage takes the
+      container max-width scale `TContainerSize`, and TSidebar/TSkeleton take a
+      raw CSS length while TSparkline takes a number of pixels. Check the
+      component manifest before assuming `full` is valid.
   disabled:
-    used_by: [TButton, TCheckbox, TCombobox, TConfirmDialog, TDatePicker, TDropdown, TFileUpload, TInput, TLanguageSelect, TModal, TRadio, TRadioGroup, TSelect, TSwitch, TTextarea, TTooltip]
+    note: "Non-native disabled elements must also set `aria-disabled`."
   loading:
-    used_by: [TButton, TCombobox, TConfirmDialog, TFileUpload, TInput, TLanguageSelect, TSelect, TTextarea, TChart, TDonutChart]
     note: >-
       loading conveys busy state. On single action controls (TButton, TConfirmDialog)
       it also disables that one control to prevent double submission. On form value
       controls (TFileUpload, TInput, TSelect, TTextarea, TCombobox, TLanguageSelect) it is
       presentational only and must never gate interaction.
   as:
-    used_by: [TButton, TCard]
+    note: >-
+      Polymorphic root element (a tag name). Carried by the layout primitives
+      and by TButton/TCard; the manifest of each says which tags make sense.
+  label:
+    note: >-
+      `label` is the component's own label — visible where the component paints
+      one (TStat, TDescriptionItem, TFormField), announced-only where it has no
+      visible text (TIcon, TSpinner, TProgress, TPagination, an `iconOnly`
+      TButton). Either way it is the single name of the component.
+  ariaLabel:
+    note: >-
+      `ariaLabel` is an accessible SUMMARY layered over content that is already
+      visible — the dataviz trio (TChart, TSparkline, TDonutChart), where the
+      picture is on screen but needs a sentence for screen readers. Use `label`
+      for anything that is the component's own name; new components should not
+      add `ariaLabel` for that job.
   icon:
     type: TIconInput
     type_definition: >-
@@ -259,12 +288,14 @@ shared_props:
     status: "supported via standard Vue attrs when relevant"
 
 shared_events:
+  # As with shared_props: which components emit these is declared in
+  # COMPONENTS/*.yaml. Here is what they mean.
   update:modelValue:
-    used_by: [TCheckbox, TCombobox, TDatePicker, TFileUpload, TInput, TLanguageSelect, TRadioGroup, TSelect, TSwitch, TTextarea]
+    note: "Emitted by every component with a `modelValue` prop — see form_contract."
   update:open:
-    used_by: [TCombobox, TConfirmDialog, TDatePicker, TDrawer, TDropdown, TLanguageSelect, TModal, TSelect, TTooltip]
+    note: "Emitted by every overlay component — see overlay_contract."
   open-change:
-    used_by: [TCombobox, TConfirmDialog, TDatePicker, TDrawer, TDropdown, TLanguageSelect, TModal, TSelect, TTooltip]
+    note: "Emitted alongside `update:open` by every overlay component — see overlay_contract."
 
 shared_slots:
   default:

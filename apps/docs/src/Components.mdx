@@ -1,71 +1,56 @@
+import { Fragment } from 'react';
 import { Meta, Title } from '@storybook/addon-docs/blocks';
+import catalog from '../../../docs/ai/treeui.catalog.json';
 
 <Meta title="Foundation/Components" />
 
 <Title>Components</Title>
 
-TreeUI now ships a broader app-ready surface built on the original foundation.
-The package stays intentionally composable, so teams can assemble forms, overlays, data screens, and navigation without depending on one large "kitchen sink" abstraction.
+Every public component in `@treeui/vue`, grouped the same way the sidebar groups them.
+This index is generated from `docs/ai/treeui.catalog.json` (`pnpm ai:catalog`), so it
+cannot drift from the shipped surface — component counts, categories, and links all come
+from the manifests in `docs/ai/COMPONENTS/`.
 
-## Form
+The package stays intentionally composable: teams assemble forms, overlays, data screens,
+and navigation from these primitives rather than from one large "kitchen sink" abstraction.
+For naming and alias rules see <a target="_top" href="./?path=/docs/foundation-conventions--docs">Conventions</a>,
+for the patterns TreeUI deliberately keeps as recipes see <a target="_top" href="./?path=/docs/foundation-patterns--docs">Patterns</a>,
+and for the UX guarantees each component makes see <a target="_top" href="./?path=/docs/foundation-practices--docs">Practices</a>.
 
-`TInput` · `TTextarea` · `TCheckbox` · `TCombobox` · `TFileUpload` · `TLanguageSelect` · `TRadio` · `TRadioGroup` · `TSelect` · `TMultiSelect` · `TNumberInput` · `TDatePicker` · `TDateTimePicker` · `TSwitch` · `TFormField` · `TToggleGroup` · `TMarkdownEditor`
+{(() => {
+  const toId = (title) => title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+  const groups = new Map();
+  for (const component of [...catalog.components].sort((a, b) => a.name.localeCompare(b.name))) {
+    const category = component.category ?? 'Other';
+    if (!groups.has(category)) groups.set(category, []);
+    groups.get(category).push(component);
+  }
+  return [...groups.entries()]
+    .sort((a, b) => b[1].length - a[1].length || a[0].localeCompare(b[0]))
+    .map(([category, components]) => (
+      <Fragment key={category}>
+        <h2>{category} <small>({components.length})</small></h2>
+        <p>
+          {components.map((component, index) => (
+            <Fragment key={component.name}>
+              {index > 0 ? ' · ' : ''}
+              {component.storyTitle ? (
+                <a target="_top" href={`./?path=/docs/${toId(component.storyTitle)}--docs`}>
+                  <code>{component.name}</code>
+                </a>
+              ) : (
+                <code>{component.name}</code>
+              )}
+              {component.aliases?.length ? <> / {component.aliases.map((alias) => <code key={alias}>{alias}</code>)}</> : null}
+            </Fragment>
+          ))}
+        </p>
+      </Fragment>
+    ));
+})()}
 
-## Layout
+## Composition notes
 
-`TContainer` · `TGrid` · `TStack` · `TSidebar` · `TNavMenu` · `TNavbar` / `TAppBar`
-
-## Navigation & Disclosure
-
-`TAccordion` · `TAccordionItem` · `TBreadcrumb` · `TBreadcrumbItem` · `TTabs` · `TTabList` · `TTab` · `TTabPanel` · `TPagination` · `TSelectableList` · `TTreeView` · `TSteps` / `TStepper`
-
-## Feedback & Overlay
-
-`TAlert` · `TModal` · `TConfirmDialog` · `TDrawer` · `TDropdown` · `TPopover` · `TTooltip` · `TContextMenu` · `TToast` · `TToastProvider`
-
-## Data & Display
-
-`TAvatar` · `TBadge` · `TCard` · `TDivider` · `TEmptyState` · `TFlag` · `TProgress` · `TSkeleton` · `TSpinner` · `TStat` · `TTable` · `TTag` · `TTimeline` · `TPricing` · `TPricingCard`
-
-## Conventions
-
-- Primary docs use the `T` prefix for public exports.
-- `TNavbar` / `TAppBar` and `TSteps` / `TStepper` are public alias pairs for the same implementations.
-- Terms like `Snackbar`, `Banner`, and `Collapsible` stay semantic aliases in docs rather than extra exports.
-- Page assemblies that are mostly layout stay docs-first recipes until repeated behavior proves they need a dedicated API.
-
-## Docs-first compositions
-
-TreeUI keeps the following app patterns documented as recipes instead of adding more public exports:
-
-| Pattern | Compose from |
-|---|---|
-| Stat group | `TGrid` + `TStat` |
-| Section header | heading + `TStack` + optional `TBadge` / `TButton` |
-| Subpanel | `TCard`, especially `variant="soft"` |
-| Stacked card | `TCard` slots + `TTag` / `TBadge` / actions |
-| Eyebrow text | typography recipe using existing tokens |
-| Form stack | `TStack` + `TGrid` + `TFormField` |
-| Ranking | `TTable` or `TSelectableList` |
-| Action panel | `TAlert` + `TCard` + `TButton` |
-
-## Composition Notes
-
-`TTable` stays intentionally focused on structured listing. Filtering, bulk actions, pagination, and data fetching compose around it in the app layer, with `TPagination` used separately when needed.
-
-## Aliases
-
-TreeUI uses two kinds of aliases in documentation:
-
-- Export alias pairs: a few components expose two `T`-prefixed names for the same implementation (`TNavbar` / `TAppBar`, `TSteps` / `TStepper`).
-- Semantic aliases: some common UI names map to existing patterns instead of creating duplicate standalone components.
-
-These semantic aliases are documentation guidance only. They do not add extra exports to `@treeui/vue`.
-
-| Common term | Use in TreeUI |
-|---|---|
-| `Snackbar` / `Notification` | `TToast` |
-| `Banner` | `TAlert` |
-| `Collapsible` / `Details` | `TAccordion` with `type="single"` and `collapsible` |
-| `App bar` | `TNavbar` / `TAppBar` |
-| `Stepper` | `TSteps` / `TStepper` |
+`TTable` stays intentionally focused on structured listing. Filtering, bulk actions,
+pagination, and data fetching compose around it in the app layer, with `TPagination`
+used separately when needed.

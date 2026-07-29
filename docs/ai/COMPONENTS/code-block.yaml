@@ -35,8 +35,6 @@ events:
 slots:
   - name: default
     description: "Block content when `code` is not used. Rendered inside `<pre><code>`. The built-in copy button is not shown for slot content (nothing to copy from)."
-  - name: actions
-    description: "Reserved for extra toolbar controls."
 
 a11y:
   scroll_region: "The `<pre>` is `role=\"region\"` + `tabindex=\"0\"` + `aria-label` (from `label`) so keyboard users can scroll it — the library does this for you."

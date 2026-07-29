@@ -4,10 +4,14 @@ import { Meta, Title } from '@storybook/addon-docs/blocks';
 
 <Title>Accessibility</Title>
 
-Accessibility is part of the TreeUI contract, not a later pass. Interactive components include visible focus treatment,
-keyboard behavior, semantic markup, and clear disabled or loading states.
+Accessibility is part of the TreeUI contract, not a later pass. The rules themselves — native
+semantics first, the keyboard model, focus trapping and restoration, minimum target size, and the
+states every interactive component owes beyond the happy path — are the "Accessible by default" and
+"Visual interaction feedback" practices, and each one names the components that follow it on
+<a target="_top" href="./?path=/docs/foundation-practices--docs">Practices</a>.
 
-The v0.1.0 quality gate includes unit tests, interaction checks, Storybook accessibility coverage, and Playwright smoke tests.
-
-Components must be defined beyond the happy path. Focus, disabled, loading, error, empty, and keyboard states are part of the public system,
-and clickable icon affordances should preserve at least a `44x44px` target area even when the glyph itself is smaller.
+This page is about how that contract stays true. Every change runs `pnpm lint`, `pnpm typecheck`,
+and `pnpm test`; stories run through `@storybook/addon-a11y` and `@storybook/addon-vitest`, so an
+axe violation or a broken interaction fails in the same pass as the unit tests. Playwright smoke
+tests cover the flows where focus has to move correctly — the modal's focus trap and Escape
+handling, and keyboard navigation inside the date picker.

@@ -10,7 +10,7 @@ const items = [
 ];
 
 const meta = {
-  title: 'Components/Navigation & Disclosure/Steps',
+  title: 'Components/Navigation/Steps',
   component: TSteps,
   tags: ['autodocs'],
   args: {

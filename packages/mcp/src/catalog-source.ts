@@ -333,16 +333,42 @@ const buildStoryIndex = (repoRoot: string) => {
     }
 
     const componentName = componentMatch[1];
-    const titleMatch = source.match(/title:\s*'([^']+)'/);
-    const storyTitle = titleMatch?.[1];
+
+    // Only the Storybook meta title, never a `title` field inside story args.
+    // Matching the first `title:` in the file silently picked up pricing plans,
+    // timeline entries, and toast payloads, which landed components in bogus
+    // categories. A meta title is always a `<Root>/…/<Name>` path.
+    const storyTitle = [...source.matchAll(/title:\s*'([^']+)'/g)]
+      .map((match) => match[1])
+      .find((value) => /^(Components|Foundation|Patterns|Showcase)\/.+/.test(value));
+
+    if (!storyTitle) {
+      console.warn(
+        `[catalog] ${fileName} declares component: ${componentName} but no Storybook meta title — ` +
+          'it will have no category or docs link.',
+      );
+    }
+
     const titleParts = storyTitle?.split('/') ?? [];
     const category = titleParts.length > 2 ? titleParts.slice(1, -1).join(' / ') : titleParts[1];
 
-    index.set(componentName, {
+    const entry = {
       storyFile: path.relative(repoRoot, filePath),
       storyTitle,
       category,
-    });
+    };
+
+    index.set(componentName, entry);
+
+    // A family story documents several components but can only name one in
+    // `component:` — Radio.stories.ts declares TRadioGroup, Toast.stories.ts
+    // declares TToastProvider. Index the filename's component too, so the
+    // sibling it also documents still gets a category and a docs link.
+    const fileComponent = `T${fileName.replace(/\.stories\.ts$/, '')}`;
+
+    if (!index.has(fileComponent)) {
+      index.set(fileComponent, entry);
+    }
   }
 
   return index;

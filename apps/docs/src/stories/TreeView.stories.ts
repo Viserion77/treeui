@@ -41,7 +41,7 @@ const nodes = [
 ];
 
 const meta = {
-  title: 'Components/Navigation & Disclosure/TreeView',
+  title: 'Components/Navigation/TreeView',
   component: TTreeView,
   parameters: {
     docs: { description: { component: practiceNote('TTreeView') } },

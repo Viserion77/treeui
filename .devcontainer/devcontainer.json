@@ -10,16 +10,6 @@
 	"runArgs": [
 		"--net=host"
 	],
-	// WSL2 costuma esgotar o limite de file watchers e derrubar o Vite/Storybook com ENOSPC.
+	// WSL2 exhausts the inotify watcher limit and crashes Vite/Storybook with ENOSPC.
 	"postStartCommand": "sudo sysctl -w fs.inotify.max_user_watches=2097152 fs.inotify.max_user_instances=16384 || true"
-	// Features to add to the dev container. More info: https://containers.dev/features.
-	// "features": {},
-	// Use 'forwardPorts' to make a list of ports inside the container available locally.
-	// "forwardPorts": [],
-	// Use 'postCreateCommand' to run commands after the container is created.
-	// "postCreateCommand": "yarn install",
-	// Configure tool-specific properties.
-	// "customizations": {},
-	// Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
-	// "remoteUser": "root"
 }

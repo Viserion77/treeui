@@ -1,4 +1,5 @@
 component: TTag
+status: available
 package: "@treeui/vue"
 source: TTag.vue
 description: Removable label/chip for filters and selections.

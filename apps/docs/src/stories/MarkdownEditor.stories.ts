@@ -3,7 +3,7 @@ import { ref } from 'vue';
 import { TMarkdownEditor } from '@treeui/vue';
 
 const meta = {
-  title: 'Components/Form/MarkdownEditor',
+  title: 'Components/Data Entry/MarkdownEditor',
   component: TMarkdownEditor,
   tags: ['autodocs'],
   args: {

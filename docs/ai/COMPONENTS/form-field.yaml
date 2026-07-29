@@ -1,5 +1,5 @@
 component: TFormField
-status: milestone-1
+status: available
 package: "@treeui/vue"
 source: TFormField.vue
 description: >

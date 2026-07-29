@@ -7,6 +7,19 @@
   box-sizing: border-box;
 }
 
+/* Focus ring geometry. @treeui/tokens ships the colour
+   (--tree-color-focus-ring) but no width, so the standard ring is written once
+   here and every rule that draws it references this variable — one edit
+   re-tunes the whole library. Use it for standalone controls (buttons, fields,
+   triggers). The two deliberate exceptions are a 2px inset ring for options
+   inside a scrollable listbox, where an outer glow is clipped by the overflow,
+   and a 2px outline on chips and other controls packed tight enough that a
+   full ring would collide with a neighbour. Belongs in @treeui/tokens the next
+   time that package's public surface changes. */
+:root {
+  --tree-focus-ring-width: 4px;
+}
+
 /* Base typography. The per-component rules below guarantee the design font even
    when a component sits inside a consumer element with its own font-family, but
    they cannot cover unstyled prose or the overlays teleported to <body>. This
@@ -105,7 +118,7 @@ table.t-visually-hidden {
 
 .t-button:focus-visible {
   outline: none;
-  box-shadow: 0 0 0 4px var(--tree-color-focus-ring);
+  box-shadow: 0 0 0 var(--tree-focus-ring-width) var(--tree-color-focus-ring);
 }
 
 .t-button.is-disabled {
@@ -225,7 +238,7 @@ table.t-visually-hidden {
 
 .t-input:focus-within {
   border-color: var(--tree-color-brand-primary);
-  box-shadow: 0 0 0 4px var(--tree-color-focus-ring);
+  box-shadow: 0 0 0 var(--tree-focus-ring-width) var(--tree-color-focus-ring);
 }
 
 .t-input.is-invalid {
@@ -344,7 +357,7 @@ table.t-visually-hidden {
 .t-date-time-picker__select:focus-visible {
   outline: none;
   border-color: var(--tree-color-brand-primary);
-  box-shadow: 0 0 0 4px var(--tree-color-focus-ring);
+  box-shadow: 0 0 0 var(--tree-focus-ring-width) var(--tree-color-focus-ring);
 }
 
 .t-date-time-picker__select:disabled {
@@ -391,7 +404,7 @@ table.t-visually-hidden {
 .t-file-upload__dropzone:focus-visible {
   outline: none;
   border-color: var(--tree-color-brand-primary);
-  box-shadow: 0 0 0 4px var(--tree-color-focus-ring);
+  box-shadow: 0 0 0 var(--tree-focus-ring-width) var(--tree-color-focus-ring);
 }
 
 .t-file-upload.is-drag-active .t-file-upload__dropzone {
@@ -682,7 +695,7 @@ table.t-visually-hidden {
 .t-file-upload__remove:focus-visible,
 .t-file-upload__retry:focus-visible {
   outline: none;
-  box-shadow: 0 0 0 4px var(--tree-color-focus-ring);
+  box-shadow: 0 0 0 var(--tree-focus-ring-width) var(--tree-color-focus-ring);
   border-radius: var(--tree-radius-sm);
 }
 
@@ -739,7 +752,7 @@ table.t-visually-hidden {
 
 .t-textarea:focus-within {
   border-color: var(--tree-color-brand-primary);
-  box-shadow: 0 0 0 4px var(--tree-color-focus-ring);
+  box-shadow: 0 0 0 var(--tree-focus-ring-width) var(--tree-color-focus-ring);
 }
 
 .t-textarea.is-invalid {
@@ -812,7 +825,7 @@ table.t-visually-hidden {
 .t-date-picker.is-open .t-date-picker__trigger {
   outline: none;
   border-color: var(--tree-color-brand-primary);
-  box-shadow: 0 0 0 4px var(--tree-color-focus-ring);
+  box-shadow: 0 0 0 var(--tree-focus-ring-width) var(--tree-color-focus-ring);
 }
 
 .t-date-picker.is-disabled .t-date-picker__trigger {
@@ -923,7 +936,7 @@ table.t-visually-hidden {
 .t-date-picker__nav:focus-visible,
 .t-date-picker__day:focus-visible {
   outline: none;
-  box-shadow: 0 0 0 3px var(--tree-color-focus-ring);
+  box-shadow: 0 0 0 var(--tree-focus-ring-width) var(--tree-color-focus-ring);
 }
 
 .t-date-picker__nav:disabled,
@@ -1041,7 +1054,7 @@ table.t-visually-hidden {
   outline: none;
   box-shadow:
     var(--tree-shadow-md),
-    0 0 0 4px var(--tree-color-focus-ring);
+    0 0 0 var(--tree-focus-ring-width) var(--tree-color-focus-ring);
 }
 
 .t-modal__surface--sm {
@@ -1115,7 +1128,7 @@ table.t-visually-hidden {
 
 .t-modal__close:focus-visible {
   outline: none;
-  box-shadow: 0 0 0 4px var(--tree-color-focus-ring);
+  box-shadow: 0 0 0 var(--tree-focus-ring-width) var(--tree-color-focus-ring);
 }
 
 .t-card {
@@ -1249,6 +1262,7 @@ a.t-brand-lockup:focus-visible {
 }
 
 .t-code-block__copy {
+  position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -1261,6 +1275,19 @@ a.t-brand-lockup:focus-visible {
   color: var(--tree-color-text-muted);
   cursor: pointer;
   transition: color var(--tree-motion-duration-fast) var(--tree-motion-easing-standard);
+}
+
+/* Ensure 44×44px touch target. The button is the only child of the toolbar and
+   floats over the code with clear space around it, so the expander cannot steal
+   a neighbour's clicks. */
+.t-code-block__copy::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  min-width: 44px;
+  min-height: 44px;
+  transform: translate(-50%, -50%);
 }
 
 .t-code-block__copy:hover {
@@ -2139,7 +2166,7 @@ a.t-brand-lockup:focus-visible {
   outline: none;
   box-shadow:
     var(--tree-shadow-md),
-    0 0 0 4px var(--tree-color-focus-ring);
+    0 0 0 var(--tree-focus-ring-width) var(--tree-color-focus-ring);
 }
 
 /* Side positioning */
@@ -2276,7 +2303,7 @@ a.t-brand-lockup:focus-visible {
 
 .t-drawer__close:focus-visible {
   outline: none;
-  box-shadow: 0 0 0 4px var(--tree-color-focus-ring);
+  box-shadow: 0 0 0 var(--tree-focus-ring-width) var(--tree-color-focus-ring);
 }
 
 /* Transitions */
@@ -2393,7 +2420,7 @@ a.t-brand-lockup:focus-visible {
 }
 
 .t-checkbox__input:focus-visible ~ .t-checkbox__control {
-  box-shadow: 0 0 0 4px var(--tree-color-focus-ring);
+  box-shadow: 0 0 0 var(--tree-focus-ring-width) var(--tree-color-focus-ring);
 }
 
 .t-checkbox.is-invalid .t-checkbox__control {
@@ -2503,7 +2530,7 @@ a.t-brand-lockup:focus-visible {
 }
 
 .t-radio__input:focus-visible ~ .t-radio__control {
-  box-shadow: 0 0 0 4px var(--tree-color-focus-ring);
+  box-shadow: 0 0 0 var(--tree-focus-ring-width) var(--tree-color-focus-ring);
 }
 
 .t-radio.is-invalid .t-radio__control {
@@ -2640,7 +2667,7 @@ a.t-brand-lockup:focus-visible {
 }
 
 .t-switch__input:focus-visible ~ .t-switch__track {
-  box-shadow: 0 0 0 4px var(--tree-color-focus-ring);
+  box-shadow: 0 0 0 var(--tree-focus-ring-width) var(--tree-color-focus-ring);
 }
 
 .t-switch.is-invalid .t-switch__track {
@@ -2714,12 +2741,12 @@ a.t-brand-lockup:focus-visible {
 
 .t-combobox:focus-within .t-combobox__control {
   border-color: var(--tree-color-brand-primary);
-  box-shadow: 0 0 0 4px var(--tree-color-focus-ring);
+  box-shadow: 0 0 0 var(--tree-focus-ring-width) var(--tree-color-focus-ring);
 }
 
 .t-combobox.is-open .t-combobox__control {
   border-color: var(--tree-color-brand-primary);
-  box-shadow: 0 0 0 4px var(--tree-color-focus-ring);
+  box-shadow: 0 0 0 var(--tree-focus-ring-width) var(--tree-color-focus-ring);
 }
 
 .t-combobox.is-invalid .t-combobox__control {
@@ -2906,13 +2933,13 @@ a.t-brand-lockup:focus-visible {
 
 .t-select__trigger:focus-visible {
   border-color: var(--tree-color-brand-primary);
-  box-shadow: 0 0 0 4px var(--tree-color-focus-ring);
+  box-shadow: 0 0 0 var(--tree-focus-ring-width) var(--tree-color-focus-ring);
   outline: none;
 }
 
 .t-select.is-open .t-select__trigger {
   border-color: var(--tree-color-brand-primary);
-  box-shadow: 0 0 0 4px var(--tree-color-focus-ring);
+  box-shadow: 0 0 0 var(--tree-focus-ring-width) var(--tree-color-focus-ring);
 }
 
 .t-select.is-invalid .t-select__trigger {
@@ -3252,7 +3279,7 @@ a.t-brand-lockup:focus-visible {
 
 .t-alert__dismiss:focus-visible {
   outline: none;
-  box-shadow: 0 0 0 4px var(--tree-color-focus-ring);
+  box-shadow: 0 0 0 var(--tree-focus-ring-width) var(--tree-color-focus-ring);
 }
 
 /* ── Skeleton ───────────────────────────────── */
@@ -3476,7 +3503,7 @@ a.t-brand-lockup:focus-visible {
 
 .t-toast__close:focus-visible {
   outline: none;
-  box-shadow: 0 0 0 4px var(--tree-color-focus-ring);
+  box-shadow: 0 0 0 var(--tree-focus-ring-width) var(--tree-color-focus-ring);
 }
 
 /* Toast transitions */
@@ -3562,7 +3589,7 @@ a.t-brand-lockup:focus-visible {
 
 .t-pagination__button:focus-visible {
   outline: none;
-  box-shadow: 0 0 0 4px var(--tree-color-focus-ring);
+  box-shadow: 0 0 0 var(--tree-focus-ring-width) var(--tree-color-focus-ring);
 }
 
 .t-pagination__button.is-active {
@@ -3672,13 +3699,13 @@ a.t-brand-lockup:focus-visible {
 
 .t-dropdown__trigger:focus-visible {
   border-color: var(--tree-color-brand-primary);
-  box-shadow: 0 0 0 4px var(--tree-color-focus-ring);
+  box-shadow: 0 0 0 var(--tree-focus-ring-width) var(--tree-color-focus-ring);
   outline: none;
 }
 
 .t-dropdown.is-open .t-dropdown__trigger {
   border-color: var(--tree-color-brand-primary);
-  box-shadow: 0 0 0 4px var(--tree-color-focus-ring);
+  box-shadow: 0 0 0 var(--tree-focus-ring-width) var(--tree-color-focus-ring);
 }
 
 .t-dropdown.is-disabled .t-dropdown__trigger {
@@ -4027,7 +4054,7 @@ a.t-brand-lockup:focus-visible {
 
 .t-accordion__trigger:focus-visible {
   outline: none;
-  box-shadow: 0 0 0 4px var(--tree-color-focus-ring);
+  box-shadow: 0 0 0 var(--tree-focus-ring-width) var(--tree-color-focus-ring);
   border-radius: var(--tree-radius-sm);
 }
 
@@ -4109,7 +4136,7 @@ a.t-brand-lockup:focus-visible {
 
 .t-breadcrumb__link:focus-visible {
   outline: none;
-  box-shadow: 0 0 0 4px var(--tree-color-focus-ring);
+  box-shadow: 0 0 0 var(--tree-focus-ring-width) var(--tree-color-focus-ring);
 }
 
 .t-breadcrumb__current {
@@ -4188,7 +4215,7 @@ a.t-brand-lockup:focus-visible {
 /* States */
 
 .t-tabs__tab:focus-visible {
-  box-shadow: 0 0 0 4px var(--tree-color-focus-ring);
+  box-shadow: 0 0 0 var(--tree-focus-ring-width) var(--tree-color-focus-ring);
   z-index: 1;
 }
 
@@ -4206,7 +4233,7 @@ a.t-brand-lockup:focus-visible {
 }
 
 .t-tabs__panel:focus-visible {
-  box-shadow: 0 0 0 4px var(--tree-color-focus-ring);
+  box-shadow: 0 0 0 var(--tree-focus-ring-width) var(--tree-color-focus-ring);
   border-radius: var(--tree-radius-sm);
 }
 
@@ -4939,7 +4966,7 @@ a.t-brand-lockup:focus-visible {
 .t-md-editor {
   display: flex;
   flex-direction: column;
-  border: 1px solid var(--tree-color-border-default);
+  border: var(--tree-border-width-subtle) solid var(--tree-color-border-default);
   border-radius: var(--tree-radius-lg);
   background: var(--tree-color-bg-primary);
   font-family: var(--tree-font-family-sans);
@@ -4960,7 +4987,7 @@ a.t-brand-lockup:focus-visible {
   gap: var(--tree-space-1);
   padding: var(--tree-space-2) var(--tree-space-3);
   background: var(--tree-color-bg-subtle);
-  border-bottom: 1px solid var(--tree-color-border-default);
+  border-bottom: var(--tree-border-width-subtle) solid var(--tree-color-border-default);
 }
 
 .t-md-editor__toolbar-group {
@@ -4970,7 +4997,7 @@ a.t-brand-lockup:focus-visible {
 }
 
 .t-md-editor__toolbar-divider {
-  width: 1px;
+  width: var(--tree-border-width-subtle);
   height: 1.25rem;
   background: var(--tree-color-border-default);
   margin: 0 var(--tree-space-1);
@@ -4990,7 +5017,9 @@ a.t-brand-lockup:focus-visible {
   font-size: var(--tree-font-size-sm);
   font-family: var(--tree-font-family-sans);
   cursor: pointer;
-  transition: background 0.15s ease, color 0.15s ease;
+  transition:
+    background var(--tree-motion-duration-fast) var(--tree-motion-easing-standard),
+    color var(--tree-motion-duration-fast) var(--tree-motion-easing-standard);
   line-height: 1;
 }
 
@@ -5000,7 +5029,7 @@ a.t-brand-lockup:focus-visible {
 }
 
 .t-md-editor__toolbar-btn:focus-visible {
-  outline: 2px solid var(--tree-color-brand-primary);
+  outline: 2px solid var(--tree-color-focus-ring);
   outline-offset: -2px;
 }
 
@@ -5015,7 +5044,7 @@ a.t-brand-lockup:focus-visible {
   display: flex;
   flex: 1;
   flex-direction: row;
-  min-height: 200px;
+  min-height: 12.5rem;
 }
 
 .t-md-editor__pane {
@@ -5024,7 +5053,7 @@ a.t-brand-lockup:focus-visible {
 }
 
 .t-md-editor__pane--preview {
-  border-left: 1px solid var(--tree-color-border-default);
+  border-left: var(--tree-border-width-subtle) solid var(--tree-color-border-default);
 }
 
 /* ── Textarea ── */
@@ -5033,14 +5062,14 @@ a.t-brand-lockup:focus-visible {
   display: block;
   width: 100%;
   height: 100%;
-  min-height: 200px;
+  min-height: 12.5rem;
   padding: var(--tree-space-3);
   border: none;
   background: transparent;
   color: var(--tree-color-text-primary);
   font-family: var(--tree-font-family-mono);
   font-size: var(--tree-font-size-sm);
-  line-height: 1.7;
+  line-height: var(--tree-font-lineHeight-relaxed);
   resize: vertical;
   outline: none;
 }
@@ -5055,27 +5084,27 @@ a.t-brand-lockup:focus-visible {
   padding: var(--tree-space-3);
   color: var(--tree-color-text-primary);
   font-size: var(--tree-font-size-sm);
-  line-height: 1.7;
+  line-height: var(--tree-font-lineHeight-relaxed);
   word-break: break-word;
   overflow-y: auto;
-  min-height: 200px;
+  min-height: 12.5rem;
 }
 
 .t-md-editor__heading {
   margin: 0 0 var(--tree-space-2);
   color: var(--tree-color-text-primary);
-  line-height: 1.3;
+  line-height: var(--tree-font-lineHeight-heading);
 }
 
 .t-md-editor__heading--1 {
   font-size: var(--tree-font-size-2xl);
-  border-bottom: 1px solid var(--tree-color-border-default);
+  border-bottom: var(--tree-border-width-subtle) solid var(--tree-color-border-default);
   padding-bottom: var(--tree-space-2);
 }
 
 .t-md-editor__heading--2 {
   font-size: var(--tree-font-size-xl);
-  border-bottom: 1px solid var(--tree-color-border-default);
+  border-bottom: var(--tree-border-width-subtle) solid var(--tree-color-border-default);
   padding-bottom: var(--tree-space-1);
 }
 
@@ -5117,12 +5146,12 @@ a.t-brand-lockup:focus-visible {
   margin: 0 0 var(--tree-space-2);
   padding: var(--tree-space-3);
   background: var(--tree-color-bg-subtle);
-  border: 1px solid var(--tree-color-border-default);
+  border: var(--tree-border-width-subtle) solid var(--tree-color-border-default);
   border-radius: var(--tree-radius-md);
   overflow-x: auto;
   font-family: var(--tree-font-family-mono);
   font-size: var(--tree-font-size-sm);
-  line-height: 1.5;
+  line-height: var(--tree-font-lineHeight-base);
 }
 
 .t-md-editor__code-block code {
@@ -5134,7 +5163,7 @@ a.t-brand-lockup:focus-visible {
 .t-md-editor__inline-code {
   padding: 0.15em 0.4em;
   background: var(--tree-color-bg-subtle);
-  border: 1px solid var(--tree-color-border-default);
+  border: var(--tree-border-width-subtle) solid var(--tree-color-border-default);
   border-radius: var(--tree-radius-sm);
   font-family: var(--tree-font-family-mono);
   font-size: 0.9em;
@@ -5159,7 +5188,7 @@ a.t-brand-lockup:focus-visible {
 
 .t-md-editor__hr {
   border: none;
-  border-top: 1px solid var(--tree-color-border-default);
+  border-top: var(--tree-border-width-subtle) solid var(--tree-color-border-default);
   margin: var(--tree-space-3) 0;
 }
 
@@ -5173,7 +5202,7 @@ a.t-brand-lockup:focus-visible {
 }
 
 .t-md-editor__preview strong {
-  font-weight: 600;
+  font-weight: var(--tree-font-weight-semibold);
 }
 
 /* ── Upload bar ── */
@@ -5181,7 +5210,7 @@ a.t-brand-lockup:focus-visible {
 .t-md-editor__upload-bar {
   padding: var(--tree-space-1) var(--tree-space-3);
   background: var(--tree-color-bg-subtle);
-  border-top: 1px solid var(--tree-color-border-default);
+  border-top: var(--tree-border-width-subtle) solid var(--tree-color-border-default);
   color: var(--tree-color-text-muted);
   font-size: var(--tree-font-size-xs);
   text-align: center;
@@ -5203,22 +5232,22 @@ a.t-brand-lockup:focus-visible {
 .t-md-editor--sm .t-md-editor__preview {
   font-size: var(--tree-font-size-xs);
   padding: var(--tree-space-2);
-  min-height: 150px;
+  min-height: 9.375rem;
 }
 
 .t-md-editor--sm .t-md-editor__body {
-  min-height: 150px;
+  min-height: 9.375rem;
 }
 
 .t-md-editor--lg .t-md-editor__textarea,
 .t-md-editor--lg .t-md-editor__preview {
   font-size: var(--tree-font-size-md);
   padding: var(--tree-space-4);
-  min-height: 300px;
+  min-height: 18.75rem;
 }
 
 .t-md-editor--lg .t-md-editor__body {
-  min-height: 300px;
+  min-height: 18.75rem;
 }
 
 /* ── Stat ─────────────────────────────────────────────── */
@@ -5226,6 +5255,9 @@ a.t-brand-lockup:focus-visible {
 .t-stat {
   --tree-stat-accent: var(--tree-color-brand-primary);
   --tree-stat-soft: var(--tree-color-brand-soft);
+  /* The value scales to the card, not the viewport, so a long number stays on
+     one line beside its trend chip instead of pushing it out of the card. */
+  container-type: inline-size;
   display: grid;
   grid-template-columns: auto 1fr;
   gap: var(--tree-space-3);
@@ -5279,8 +5311,14 @@ a.t-brand-lockup:focus-visible {
   color: var(--tree-stat-accent);
 }
 
+/* Two fixed rows — topline, then content — so a row of TStats in a TGrid keeps
+   the same internal structure regardless of how long any single value is. The
+   content row stretches, and .t-stat__content anchors to its end, which is what
+   lines the big numbers up across sibling cards. */
 .t-stat__body {
   display: grid;
+  grid-template-rows: auto 1fr;
+  align-content: stretch;
   gap: var(--tree-space-2);
   min-width: 0;
 }
@@ -5312,10 +5350,23 @@ a.t-brand-lockup:focus-visible {
   height: 0.875rem;
 }
 
-.t-stat__topline,
-.t-stat__content {
+.t-stat__topline {
   display: flex;
   align-items: center;
+  justify-content: space-between;
+  gap: var(--tree-space-3);
+  flex-wrap: wrap;
+}
+
+/* Value and trend share one line so a row of stats keeps its rhythm: a long
+   value used to push the chip onto its own line in one card and not its
+   neighbours, leaving the numerals unaligned. The container-relative font size
+   above is what makes that fit; `wrap` stays only as a last-resort guard so an
+   extreme value degrades by wrapping rather than overflowing the card. */
+.t-stat__content {
+  display: flex;
+  align-items: flex-end;
+  align-content: flex-end;
   justify-content: space-between;
   gap: var(--tree-space-3);
   flex-wrap: wrap;
@@ -5336,7 +5387,8 @@ a.t-brand-lockup:focus-visible {
 }
 
 .t-stat__value {
-  font-size: clamp(1.75rem, 3vw, 2.5rem);
+  min-width: 0;
+  font-size: clamp(1.5rem, 9cqi, 2.5rem);
   font-weight: var(--tree-font-weight-semibold);
   line-height: var(--tree-font-lineHeight-heading);
   letter-spacing: -0.02em;
@@ -5344,6 +5396,7 @@ a.t-brand-lockup:focus-visible {
 
 .t-stat__trend {
   display: inline-flex;
+  flex: 0 0 auto;
   align-items: center;
   gap: var(--tree-space-1);
   padding: 0.35rem 0.625rem;
@@ -5379,7 +5432,7 @@ a.t-brand-lockup:focus-visible {
 
 .t-number-input:focus-within {
   border-color: var(--tree-color-brand-primary);
-  box-shadow: 0 0 0 4px var(--tree-color-focus-ring);
+  box-shadow: 0 0 0 var(--tree-focus-ring-width) var(--tree-color-focus-ring);
 }
 
 .t-number-input.is-invalid {
@@ -5499,7 +5552,7 @@ a.t-brand-lockup:focus-visible {
 
 .t-toggle-group__item:focus-visible {
   outline: none;
-  box-shadow: 0 0 0 4px var(--tree-color-focus-ring);
+  box-shadow: 0 0 0 var(--tree-focus-ring-width) var(--tree-color-focus-ring);
 }
 
 .t-toggle-group__item.is-selected {
@@ -5698,7 +5751,7 @@ a.t-brand-lockup:focus-visible {
 
 .t-steps__button:focus-visible {
   outline: none;
-  box-shadow: 0 0 0 4px var(--tree-color-focus-ring);
+  box-shadow: 0 0 0 var(--tree-focus-ring-width) var(--tree-color-focus-ring);
 }
 
 .t-steps__item.is-current .t-steps__button {
@@ -5952,7 +6005,7 @@ a.t-brand-lockup:focus-visible {
 .t-multi-select:focus-within .t-multi-select__control,
 .t-multi-select.is-open .t-multi-select__control {
   border-color: var(--tree-color-brand-primary);
-  box-shadow: 0 0 0 4px var(--tree-color-focus-ring);
+  box-shadow: 0 0 0 var(--tree-focus-ring-width) var(--tree-color-focus-ring);
 }
 
 .t-multi-select.is-invalid .t-multi-select__control {
@@ -6030,6 +6083,14 @@ a.t-brand-lockup:focus-visible {
   opacity: 0.8;
 }
 
+/* Chips sit a few pixels apart in a wrapping row, so the outer glow used on
+   standalone controls would spill over the neighbouring chip and the text
+   input. Same tight outline as .t-tag__remove. */
+.t-multi-select__tag-remove:focus-visible {
+  outline: 2px solid var(--tree-color-focus-ring);
+  outline-offset: 1px;
+}
+
 .t-multi-select__overflow {
   color: var(--tree-color-text-muted);
   font-size: var(--tree-font-size-sm);
@@ -6099,6 +6160,15 @@ a.t-brand-lockup:focus-visible {
 .t-multi-select__option:hover,
 .t-multi-select__option.is-active {
   background: var(--tree-color-brand-soft);
+}
+
+/* Options are aria-activedescendant targets and carry tabindex="-1", so this
+   only fires if something focuses one programmatically. Matches the inset ring
+   the other listboxes draw. */
+.t-multi-select__option:focus-visible {
+  outline: none;
+  background: var(--tree-color-brand-soft);
+  box-shadow: 0 0 0 2px var(--tree-color-focus-ring) inset;
 }
 
 .t-multi-select__option.is-selected {
@@ -6670,7 +6740,7 @@ a.t-brand-lockup:focus-visible {
 
 .t-sidebar__toggle:focus-visible {
   outline: none;
-  box-shadow: 0 0 0 4px var(--tree-color-focus-ring);
+  box-shadow: 0 0 0 var(--tree-focus-ring-width) var(--tree-color-focus-ring);
 }
 
 .t-sidebar.is-collapsed .t-sidebar__toggle {
@@ -7115,6 +7185,7 @@ body:has(.t-app-shell) {
 }
 
 .t-app-shell__collapse-button {
+  position: relative;
   display: inline-flex;
   align-items: center;
   /* Icon flush to the footer inset so it lands on the same axis as nav icons. */
@@ -7129,6 +7200,19 @@ body:has(.t-app-shell) {
   color: var(--tree-color-text-muted);
   cursor: pointer;
   transition: background var(--tree-motion-duration-fast) var(--tree-motion-easing-standard);
+}
+
+/* Ensure 44×44px touch target. The button is the last row of the sidebar
+   footer, which lays its rows out with a var(--tree-space-3) gap — wider than
+   the 6px the expander adds per side, so it stays clear of the row above. */
+.t-app-shell__collapse-button::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  min-width: 44px;
+  min-height: 44px;
+  transform: translate(-50%, -50%);
 }
 
 .t-app-shell__collapse-button:hover {
@@ -7225,7 +7309,7 @@ body:has(.t-app-shell) {
   outline: none;
   box-shadow:
     var(--tree-shadow-md),
-    0 0 0 4px var(--tree-color-focus-ring);
+    0 0 0 var(--tree-focus-ring-width) var(--tree-color-focus-ring);
 }
 
 .t-app-shell--left .t-app-shell__drawer {
@@ -7799,13 +7883,13 @@ body:has(.t-app-shell) {
 
 .t-language-select__trigger:focus-visible {
   border-color: var(--tree-color-brand-primary);
-  box-shadow: 0 0 0 4px var(--tree-color-focus-ring);
+  box-shadow: 0 0 0 var(--tree-focus-ring-width) var(--tree-color-focus-ring);
   outline: none;
 }
 
 .t-language-select.is-open .t-language-select__trigger {
   border-color: var(--tree-color-brand-primary);
-  box-shadow: 0 0 0 4px var(--tree-color-focus-ring);
+  box-shadow: 0 0 0 var(--tree-focus-ring-width) var(--tree-color-focus-ring);
 }
 
 .t-language-select.is-invalid .t-language-select__trigger {

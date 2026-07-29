@@ -4,159 +4,34 @@ import { Meta, Title } from '@storybook/addon-docs/blocks';
 
 <Title>Roadmap</Title>
 
-TreeUI ships components in milestones, grouped by dependency depth and product impact.
-Each milestone builds on the previous one while keeping the public API compact and composable.
-Not every repeated UI shape becomes a public export. When a pattern is mostly layout or styling,
-TreeUI prefers documenting a composition recipe on top of existing primitives.
+What TreeUI plans to add, and the rule it uses to decide. For what already ships, see the
+generated <a target="_top" href="./?path=/docs/foundation-components--docs">Components</a> index;
+for naming, aliases, and promotion rules see <a target="_top" href="./?path=/docs/foundation-conventions--docs">Conventions</a>;
+for the compositions TreeUI deliberately keeps as recipes see <a target="_top" href="./?path=/docs/foundation-patterns--docs">Patterns</a>.
 
----
+## Shipped
 
-## Admission filter
+Milestones 1–3 are complete and part of the public surface:
 
-A repeated app pattern graduates into a public component when it:
+- **Milestone 1 — Application primitives**: `TStat`, `TMultiSelect`, `TNumberInput`, `TSelectableList`, `TTreeView`, `TSteps` / `TStepper`, `TToggleGroup`.
+- **Milestone 2 — App shell & layout**: `TSidebar` / `TNavMenu`, `TNavbar` / `TAppBar`, `TContainer`, `TGrid`, `TStack`.
+- **Milestone 3 — Routing, cards & inline links**: `TNavMenu` RouterLink support, `TCard` `title` prop and `#actions` slot, `TCard variant="inset"`, `TLink`.
+- **Data visualization**: `TChart`, `TSparkline`, `TDonutChart`, sharing a framework-agnostic geometry engine in `@treeui/utils` and the `--tree-color-chart-*` palette.
+- **React package**: `@treeui/react` ships the core primitives on the same tokens and `t-*` classes.
 
-- adds reusable interaction, accessibility, or state behavior
-- carries domain-agnostic semantics that can travel across products
-- removes real API friction beyond what `TCard`, `TBadge`, `TButton`, and layout primitives already cover
+## Planned
 
-## Current state — Public surface (shipped)
-
-Milestone 1 and Milestone 2 now ship as part of the public TreeUI surface.
-The next round of work moves from closing core component gaps to documenting composition recipes,
-hardening conventions, and choosing the next future-facing milestone.
-
-| Area | Components |
+| Item | Notes |
 |---|---|
-| Form | `TInput`, `TTextarea`, `TCheckbox`, `TCombobox`, `TFileUpload`, `TRadio`, `TRadioGroup`, `TSelect`, `TMultiSelect`, `TNumberInput`, `TDatePicker`, `TSwitch`, `TFormField`, `TToggleGroup`, `TMarkdownEditor` |
-| Layout & shell | `TContainer`, `TGrid`, `TStack`, `TSidebar`, `TNavMenu`, `TNavbar`, `TAppBar` |
-| Feedback & status | `TAlert`, `TToast`, `TToastProvider`, `TProgress`, `TSkeleton`, `TSpinner` |
-| Navigation & disclosure | `TTabs`, `TAccordion`, `TAccordionItem`, `TDropdown`, `TPagination`, `TBreadcrumb`, `TBreadcrumbItem`, `TSelectableList`, `TTreeView`, `TSteps`, `TStepper` |
-| Overlay & interaction | `TModal`, `TConfirmDialog`, `TDrawer`, `TPopover`, `TTooltip`, `TContextMenu` |
-| Data & display | `TAvatar`, `TBadge`, `TCard`, `TDivider`, `TEmptyState`, `TTable`, `TTag`, `TTimeline`, `TPricing`, `TPricingCard`, `TStat` |
-
----
+| `TCarousel` | Focused media and card browsing patterns. Not started. |
+| `@treeui/react` parity | Grow the React package beyond the core primitives, same tokens and class names. In progress. |
+| Right-to-left layout | Logical properties across the component CSS plus an RTL story axis. Not started. |
+| Motion token expansion | More duration/easing steps and a reduced-motion contract. Not started. |
+| Theme builder | Visual token editor on top of `@treeui/tokens`. Exploratory. |
+| Additional framework packages | `@treeui/svelte` and Web Components reusing the same tokens, naming, and accessibility guidance. Exploratory. |
 
 ## Table direction
 
-`TTable` stays intentionally lean and focused on structured listing. Pagination, filters, toolbars, bulk actions, and data fetching stay composable outside the table, with `TPagination` used separately when needed.
-
----
-
-## Milestone 1 — Application Primitives
-
-Status: shipped.
-
-Close the highest-friction gaps for SaaS products, dashboards, admin panels, and internal tools.
-
-| Component | Description |
-|---|---|
-| `TStat` | Compact metric block with label, value, and optional trend or meta content for dashboards and summaries |
-| `TMultiSelect` | Multiple selection for filters, tags, teams, permissions, and bulk actions |
-| `TNumberInput` | Numeric field with increment and decrement stepper controls, min/max, and step behavior |
-| `TSelectableList` | Persistent single-select list with active state, keyboard navigation, and flexible item slots for templates, events, guides, and goals |
-| `TTreeView` | Hierarchical navigation and nested selection for files, categories, and permissions |
-| `TSteps` / `TStepper` | Step-by-step progress pattern for onboarding, wizards, and setup flows |
-| `TToggleGroup` | Compact single and multi-select toggle buttons as a visual alternative to radios and checkboxes |
-
----
-
-## Milestone 2 — App Shell & Layout
-
-Status: shipped.
-
-Add layout helpers and application shell building blocks without forcing a full page framework.
-
-| Component | Description |
-|---|---|
-| `TSidebar` / `TNavMenu` | Collapsible lateral navigation for dashboards and workspace layouts |
-| `TNavbar` / `TAppBar` | Top-level application navigation and global action bar |
-| `TContainer` | Width-constrained layout wrapper for content sections |
-| `TGrid` | Semantic grid helper for dashboard cards, stat groups, forms, and responsive layouts |
-| `TStack` | Vertical and horizontal spacing primitive for common flex layouts, section headers, and inline actions |
-
----
-
-## Pattern track — Docs-first compositions
-
-Some repeated app UI should land as documented recipes instead of standalone exports.
-These patterns stay important, but TreeUI keeps them composable until they prove they need
-their own public API. The recipes now live in docs as guidance rather than new package surface.
-
-| Suggested pattern | TreeUI direction | Delivery status |
-|---|---|---|
-| Stat group (`TStatGroup`) | Document as `TStat` + `TGrid`; no standalone `TStatGroup` planned | Delivered as docs recipe |
-| Section header (`TSectionHeader`) | Document as heading + `TStack` + optional `TBadge` or `TButton`; no dedicated export planned | Delivered as docs recipe |
-| Subpanel (`TPanel`) | Prefer `TCard` composition, especially `variant="soft"`; see also planned `TCard variant="inset"` for nested sub-sections | Delivered as docs recipe |
-| Stacked card (`TStackCard`) | Use `TCard` slots plus `TTag`, `TBadge`, and actions; revisit later only if a stable slot contract repeats across products | Delivered as docs recipe |
-| Eyebrow text (`TEyebrow`) | Keep as a typography recipe for now; `.t-eyebrow` utility class planned using existing tokens | Delivered as docs recipe |
-| Form stack (`TFormStack`) | Covered by `TStack`, `TGrid`, and `TFormField`; no extra layout wrapper planned | Delivered as docs recipe |
-| Ranking (`TRanking`) | Defer as a narrower data-display recipe until the dashboard/data pack grows | Delivered as docs recipe |
-| Action panel (`TActionPanel`) | Keep app-level for now; usually composes from `TAlert`, `TCard`, and `TButton` | Delivered as docs recipe |
-| Skeleton compositions (`SkeletonCard`, `SkeletonTable`) | Compose multiple `TSkeleton` primitives for card and table placeholders; no compound `variant` prop planned | Delivered as docs recipe |
-| Form stack (`TStack as="form"`) | Already works via `TStack` with `as="form"` and native `@submit`; document as supported pattern | Planned as docs recipe |
-
----
-
-## Candidate review — Recent suggestions
-
-The recent component suggestions now map to two resolved buckets:
-
-- Promote portable primitives: `TStat` and `TSelectableList` shipped
-- Keep higher-level page assemblies as documented recipes in `Foundation/Patterns` and `Patterns/Recipes`
-
----
-
-## Milestone 3 — Routing, Cards & Inline Links
-
-Status: shipped.
-
-Address the most common friction points reported by consumer apps: native routing in navigation,
-richer card semantics, and a missing inline link primitive.
-
-| Component / Enhancement | Description |
-|---|---|
-| `TNavMenu` RouterLink support | Extend `TNavMenuItem` with optional `to` and `icon` props; render `<RouterLink>` when `to` is present, `<button>` otherwise; `vue-router` as optional peer dependency; create missing `nav-menu.yaml` contract |
-| `TCard` `title` prop + `#actions` slot | Add optional `title` prop that renders a heading inside the header area and an `#actions` slot displayed inline with the title; `#header` slot remains available as a full override; retrocompatible |
-| `TCard` `variant="inset"` | New card variant for nested sub-sections inside other cards: subtle background, no shadow, light border; update `TCardVariant` in `contracts.ts` and `card.yaml` |
-| `TLink` | New inline link component with `to` (RouterLink), `href` (native anchor), `external` (opens in new tab), and `disabled` props; applies consistent link styling using primary color tokens |
-
----
-
-## Docs & discovery improvements
-
-These items require no new components — only better documentation of existing capabilities.
-
-- **`TTimeline` `#item` slot**: improve scoped slot documentation — already supports full per-item customization via `{ item, index }`, covering badges, tags, and custom content per entry
-- **`TContainer` `size="md"`**: clarify in docs that `size="md"` (max-width ~960px) already ships — no code change needed
-- **`TStack` `as="form"`**: document that `as="form"` is a supported pattern for form layouts with native event forwarding via `@submit.prevent`
-
----
-
-## Aliases & conventions
-
-TreeUI keeps naming intentionally predictable across docs and exports:
-
-- All public names use the `T` prefix; there are no `Tree<Name>` aliases.
-- `TNavbar` / `TAppBar` and `TSteps` / `TStepper` are export aliases for the same implementation.
-- Common product terms like `Snackbar` stay documentation aliases only and do not create duplicate exports.
-
-Some common UI terms are intentionally documented as aliases to existing patterns rather than planned as separate components.
-
-| Common term | TreeUI pattern | Convention |
-|---|---|---|
-| `Snackbar` / `Notification` | Use `TToast` | Semantic alias only |
-| `Banner` | Use `TAlert` | Semantic alias only |
-| `Collapsible` / `Details` | Use `TAccordion` in single mode with `collapsible` enabled | Semantic alias only |
-| `App bar` | Use `TNavbar` or `TAppBar` | Export alias pair |
-| `Stepper` | Use `TSteps` or `TStepper` | Export alias pair |
-
----
-
-## Future
-
-- `TCarousel` for focused media and card browsing patterns
-- Data visualization primitives for dashboards, including charts and sparklines
-- Additional framework packages (`@treeui/react`, `@treeui/svelte`) reusing the same token system, naming, accessibility guidance, and design language.
-- Motion/animation token expansion.
-- Right-to-left (RTL) layout support.
-- Theme builder / visual token editor.
+`TTable` stays intentionally lean and focused on structured listing. Pagination, filters,
+toolbars, bulk actions, and data fetching stay composable outside the table, with
+`TPagination` used separately when needed.

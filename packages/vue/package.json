@@ -2,6 +2,25 @@
   "name": "@treeui/vue",
   "version": "0.24.0",
   "description": "Vue 3 component package for TreeUI.",
+  "license": "MIT",
+  "author": "TreeUI",
+  "homepage": "https://viserion77.github.io/treeui/",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Viserion77/treeui.git",
+    "directory": "packages/vue"
+  },
+  "bugs": {
+    "url": "https://github.com/Viserion77/treeui/issues"
+  },
+  "keywords": [
+    "treeui",
+    "vue",
+    "vue3",
+    "component-library",
+    "design-system",
+    "accessibility"
+  ],
   "type": "module",
   "sideEffects": [
     "**/*.css"

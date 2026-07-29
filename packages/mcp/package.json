@@ -2,7 +2,26 @@
   "name": "@treeui/mcp",
   "version": "0.7.0",
   "description": "Model Context Protocol server and AI catalog for TreeUI.",
+  "license": "MIT",
+  "author": "TreeUI",
+  "homepage": "https://viserion77.github.io/treeui/",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Viserion77/treeui.git",
+    "directory": "packages/mcp"
+  },
+  "bugs": {
+    "url": "https://github.com/Viserion77/treeui/issues"
+  },
+  "keywords": [
+    "treeui",
+    "mcp",
+    "model-context-protocol",
+    "ai",
+    "design-system"
+  ],
   "type": "module",
+  "sideEffects": false,
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",

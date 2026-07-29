@@ -125,14 +125,14 @@ const en: LandingMessages = {
   examples: {
     heading: 'See it running',
     intro:
-      'A full configurable dashboard — theme, accent color, density, and widgets — built entirely with TreeUI components. No custom UI framework code.',
+      'A full configurable dashboard — theme, accent color, density, and widgets — built with TreeUI components.',
     liveBadge: 'Live demo',
     vueTitle: 'Vue dashboard',
     vueBody:
-      'Sidebar shell, sortable tables, KPI stats, toasts, and a settings drawer — the complete component set working together.',
+      'Sidebar shell, sortable tables, KPI stats, toasts, and a settings drawer — the complete component set working together, with no custom UI framework code.',
     reactTitle: 'React dashboard',
     reactBody:
-      'The same dashboard concept built with the React primitives — Button, Input, Badge, Card — on shared tokens.',
+      'The same dashboard concept built with the React primitives — Button, Input, Badge, Card — on shared tokens, with local CSS still filling the gaps until the remaining components land.',
     go: 'Open example →',
   },
   foundation: {
@@ -241,14 +241,14 @@ const pt: LandingMessages = {
   examples: {
     heading: 'Veja funcionando',
     intro:
-      'Um dashboard completo e configurável — tema, cor de destaque, densidade e widgets — construído inteiramente com componentes TreeUI. Nenhum código de UI framework próprio.',
+      'Um dashboard completo e configurável — tema, cor de destaque, densidade e widgets — construído com componentes TreeUI.',
     liveBadge: 'Demo ao vivo',
     vueTitle: 'Dashboard Vue',
     vueBody:
-      'Shell com sidebar, tabelas ordenáveis, KPIs, toasts e um drawer de configurações — o conjunto completo de componentes trabalhando junto.',
+      'Shell com sidebar, tabelas ordenáveis, KPIs, toasts e um drawer de configurações — o conjunto completo de componentes trabalhando junto, sem nenhum código de UI framework próprio.',
     reactTitle: 'Dashboard React',
     reactBody:
-      'O mesmo conceito de dashboard construído com os primitivos React — Button, Input, Badge, Card — sobre tokens compartilhados.',
+      'O mesmo conceito de dashboard construído com os primitivos React — Button, Input, Badge, Card — sobre tokens compartilhados, ainda com CSS local preenchendo as lacunas até os componentes restantes chegarem.',
     go: 'Abrir exemplo →',
   },
   foundation: {
@@ -357,14 +357,14 @@ const es: LandingMessages = {
   examples: {
     heading: 'Míralo funcionando',
     intro:
-      'Un dashboard completo y configurable — tema, color de acento, densidad y widgets — construido íntegramente con componentes TreeUI. Sin código de UI framework propio.',
+      'Un dashboard completo y configurable — tema, color de acento, densidad y widgets — construido con componentes TreeUI.',
     liveBadge: 'Demo en vivo',
     vueTitle: 'Dashboard Vue',
     vueBody:
-      'Shell con sidebar, tablas ordenables, KPIs, toasts y un drawer de ajustes — el conjunto completo de componentes trabajando junto.',
+      'Shell con sidebar, tablas ordenables, KPIs, toasts y un drawer de ajustes — el conjunto completo de componentes trabajando junto, sin código de UI framework propio.',
     reactTitle: 'Dashboard React',
     reactBody:
-      'El mismo concepto de dashboard construido con los primitivos React — Button, Input, Badge, Card — sobre tokens compartidos.',
+      'El mismo concepto de dashboard construido con los primitivos React — Button, Input, Badge, Card — sobre tokens compartidos, todavía con CSS local cubriendo los huecos hasta que lleguen los componentes restantes.',
     go: 'Abrir ejemplo →',
   },
   foundation: {

@@ -6,7 +6,12 @@ import { buildCatalogFromRepo, getRepoRootFromPackageRoot } from '../src/catalog
 const packageRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const repoRoot = getRepoRootFromPackageRoot(packageRoot);
 const catalog = buildCatalogFromRepo(repoRoot);
-const serialized = `${JSON.stringify(catalog, null, 2)}\n`;
+
+// The serialized catalog must stay byte-for-byte stable when the contract data is
+// unchanged, otherwise every build dirties the tracked copy with nothing but a clock
+// reading. So `generatedAt` carries the source package version instead of a timestamp.
+const serializableCatalog = { ...catalog, generatedAt: catalog.packageVersion };
+const serialized = `${JSON.stringify(serializableCatalog, null, 2)}\n`;
 
 const targets = [
   path.join(repoRoot, 'docs/ai/treeui.catalog.json'),

@@ -7,7 +7,7 @@ import type {
 } from '@treeui/vue';
 
 const meta = {
-  title: 'Components/Form/FileUpload',
+  title: 'Components/Data Entry/FileUpload',
   component: TFileUpload,
   tags: ['autodocs'],
   args: {

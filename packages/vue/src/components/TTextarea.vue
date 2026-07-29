@@ -96,6 +96,7 @@ watch(
       :disabled="disabled"
       :rows="rows"
       :aria-invalid="invalid || undefined"
+      :aria-busy="loading || undefined"
       @input="onInput"
     />
     <TSpinner

@@ -24,7 +24,7 @@ feature branch → PR → CI green → review → squash-merge into main
                                 publishes to npm + tags + GitHub Releases
 ```
 
-You never edit `package.json` versions or `CHANGELOG.md` files by hand.
+You never edit `package.json` versions or `packages/*/CHANGELOG.md` files by hand.
 
 ## Repository configuration (current state)
 
@@ -71,7 +71,7 @@ change settings via UI or the GitHub API.
 
 ### Environments
 
-- `github-pages` — used by `deploy-pages` job to publish Storybook.
+- `github-pages` — used by `deploy-pages` job to publish the docs site.
 
 ## Workflows
 
@@ -86,16 +86,18 @@ Required check for branch protection. Steps:
 3. `pnpm typecheck`
 4. `pnpm test` (Vitest)
 5. `pnpm build:packages`
-6. `pnpm build:docs` (Storybook)
+6. `pnpm build:site` (landing + Vue/React Storybooks + example dashboards)
 7. `pnpm exec playwright install --with-deps chromium`
-8. `pnpm test:e2e`
-9. Uploads `storybook-static` artifact for the pages job.
+8. `pnpm test:e2e` (with `PW_SKIP_BUILD=1`, reusing the build from step 6)
+9. Uploads the `site` artifact for the pages job.
 
 ### `release` job (push to `main` only, after `validate` succeeds)
 
 1. Rebuilds all packages.
-2. Verifies that npm tarballs include the expected `dist/style*.css` and
-   `dist/index.js` files (`npm pack --dry-run`).
+2. Verifies that the `@treeui/tokens`, `@treeui/vue`, and `@treeui/mcp` tarballs
+   include the expected `dist/style*.css`, `dist/index.js`, and `dist/cli.js`
+   files (`npm pack --dry-run`). `@treeui/utils`, `@treeui/icons`, and
+   `@treeui/react` publish without a tarball check.
 3. Configures npm auth using `NPM_TOKEN`.
 4. Runs [`changesets/action@v1`](https://github.com/changesets/action):
    - If `.changeset/*.md` files exist, **opens or updates** a PR titled
@@ -109,8 +111,10 @@ Required check for branch protection. Steps:
 
 ### `upload-pages` and `deploy-pages` jobs
 
-Run on push to `main`. Deploy the built Storybook to
-<https://viserion77.github.io/treeui/>.
+Run on push to `main`. Deploy the assembled `site/` artifact to
+<https://viserion77.github.io/treeui/>: the landing app at the root, the
+Storybooks at `/vue` and `/react`, and the example dashboards at
+`/examples/dashboard-vue` and `/examples/dashboard-react`.
 
 ## Contributor workflow
 
@@ -119,16 +123,13 @@ Run on push to `main`. Deploy the built Storybook to
 git switch main && git pull
 git switch -c fix/short-description
 
-# 2. Make changes; run the same checks CI will run
-pnpm lint
-pnpm typecheck
-pnpm test
-pnpm build
-pnpm test:e2e   # optional locally; required in CI
+# 2. Make changes; run the quality gates from CONTRIBUTING.md
+#    (lint, typecheck, test, build:site; e2e optional locally, required in CI)
 
 # 3. Describe the change for the changelog
 pnpm changeset
-#   - select affected packages (the four are linked, so they release together)
+#   - select affected packages (the four UI packages are linked, so any of them
+#     bumped in the same release share a version number)
 #   - choose bump type: patch | minor | major
 #   - write a one-paragraph user-facing summary
 
@@ -171,15 +172,16 @@ squash-merge the version PR
             ↓
 release job re-runs on the merge commit
             ↓
-publishes @treeui/tokens, @treeui/utils, @treeui/icons, @treeui/vue, @treeui/mcp to npm
+publishes @treeui/tokens, @treeui/utils, @treeui/icons, @treeui/vue, @treeui/react, @treeui/mcp to npm
             ↓
 creates git tag(s) + GitHub Release(s)
 ```
 
 The four UI packages (`@treeui/tokens`, `@treeui/utils`, `@treeui/icons`,
 `@treeui/vue`) are **linked** in [.changeset/config.json](./.changeset/config.json),
-so they always release with the same version number. `@treeui/mcp` is also
-published by the same release job, but it versions independently.
+so any of them bumped in the same release share that version number — they are not
+forced to the same number when only some of them change. `@treeui/react` and
+`@treeui/mcp` are published by the same release job but version independently.
 
 ### Troubleshooting
 
@@ -191,26 +193,18 @@ published by the same release job, but it versions independently.
 | Status check `validate` not appearing in PR | Workflow not triggered (draft? path filter?) | Mark PR ready for review; CI runs on `pull_request` for all paths |
 | Merge button greyed out | Branch behind `main` or required review missing | Click "Update branch"; request review from a code owner |
 
-## Local commands cheat sheet
+## Release commands cheat sheet
+
+The pre-PR quality gates live in
+[CONTRIBUTING.md](./CONTRIBUTING.md#before-opening-a-pull-request). The
+release-specific commands are:
 
 ```bash
-pnpm install                          # install all workspace deps
-pnpm lint                             # ESLint across all packages
-pnpm typecheck                        # vue-tsc + tsc across all packages
-pnpm test                             # Vitest suites
-pnpm build                            # build packages + Storybook
-pnpm build:packages                   # build only @treeui/tokens / @treeui/utils / @treeui/icons / @treeui/vue / @treeui/mcp
-pnpm test:e2e                         # Playwright smoke tests against docs site
+pnpm build:packages                   # build the six published packages only
 pnpm changeset                        # create a changeset entry
 pnpm changeset status                 # list pending changesets
 pnpm ai:catalog                       # regenerate docs/ai/treeui.catalog.json
 pnpm mcp:start                        # run the local TreeUI MCP server
-```
-
-All commands also work inside Docker:
-
-```bash
-docker compose run --rm workspace pnpm <cmd>
 ```
 
 ## See also

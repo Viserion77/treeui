@@ -41,11 +41,13 @@ provider_props:
   position:
     type: ToastPosition
     default: bottom-right
+    note: "TToastProvider prop — where the stack is anchored."
   max:
     type: number
     default: 5
+    note: "TToastProvider prop — how many toasts stay visible at once."
 
-toast_props:
+props:
   toast:
     type: ToastItem
     required: true

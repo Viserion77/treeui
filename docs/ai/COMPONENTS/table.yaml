@@ -1,4 +1,5 @@
 component: TTable
+status: available
 package: "@treeui/vue"
 source: TTable.vue
 description: Sortable, accessible data table with column definitions and row data.

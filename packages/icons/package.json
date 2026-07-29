@@ -2,6 +2,24 @@
   "name": "@treeui/icons",
   "version": "0.18.0",
   "description": "Extensible icon registry for TreeUI, with a curated built-in catalog.",
+  "license": "MIT",
+  "author": "TreeUI",
+  "homepage": "https://viserion77.github.io/treeui/",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Viserion77/treeui.git",
+    "directory": "packages/icons"
+  },
+  "bugs": {
+    "url": "https://github.com/Viserion77/treeui/issues"
+  },
+  "keywords": [
+    "treeui",
+    "icons",
+    "svg",
+    "icon-registry",
+    "design-system"
+  ],
   "type": "module",
   "sideEffects": false,
   "main": "./dist/index.cjs",

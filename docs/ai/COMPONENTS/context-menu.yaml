@@ -4,7 +4,7 @@
 component: TContextMenu
 source_file: packages/vue/src/components/TContextMenu.vue
 since: 0.5.0
-status: stable
+status: available
 category: overlay
 description: >
   Right-click (contextmenu) menu teleported to body and positioned at the cursor.

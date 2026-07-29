@@ -4,7 +4,7 @@
 
 # TreeUI
 
-Clean components for modern Vue products.
+Clean components for modern products.
 
 TreeUI is an open source component library built on a framework-agnostic foundation. The Vue 3 package ships a comprehensive, production-oriented component set with strong accessibility defaults and token-driven theming that outlives any single framework package, while an early React package brings the same tokens and primitives to React apps.
 
@@ -16,43 +16,57 @@ All public components use the `T` prefix, such as `TButton`, `TInput`, `TDatePic
 - Accessibility-first interactions and predictable state contracts
 - Semantic tokens and themes that stay framework-agnostic
 - A compact API surface that is easier to maintain and extend
-- Docker-first local workflow for teams without a local Node setup
+- A Docker workflow for teams without a local Node setup
 
 ## Getting Started
 
-### Docker workflow
-
 ```bash
-docker compose run --rm workspace pnpm install
-docker compose up docs
+pnpm install
+pnpm dev
 ```
 
-Open [http://localhost:6006](http://localhost:6006) for documentation and component stories.
+Open [http://localhost:6006](http://localhost:6006) for the Vue Storybook.
 
-### Common commands
+Other local surfaces:
 
 ```bash
-docker compose run --rm workspace pnpm lint
-docker compose run --rm workspace pnpm typecheck
-docker compose run --rm workspace pnpm test
-docker compose run --rm workspace pnpm build
-docker compose run --rm e2e
+pnpm --filter @treeui/docs-react docs:dev   # React Storybook on :6007
+pnpm --filter @treeui/landing dev           # landing page
+pnpm example:vue:dev                        # Vue dashboard example on :6008
+pnpm example:react:dev                      # React dashboard example on :6009
+pnpm site:serve                             # assembled site on :6010
 ```
+
+Without a local Node setup, prefix any command with `docker compose run --rm workspace`
+(end-to-end tests: `docker compose run --rm e2e`), and `docker compose up docs` serves the
+Vue Storybook on port 6006. Docker covers the Vue Storybook and the CI-equivalent checks;
+the React Storybook, the landing page, and the example dashboards run through pnpm.
+
+The quality gates to run before a pull request live in
+[CONTRIBUTING.md](./CONTRIBUTING.md#before-opening-a-pull-request).
 
 ## Workspace Layout
 
 ```text
-apps/landing       Landing page that links to the per-framework docs
-apps/docs          Vue Storybook documentation and playground
-apps/docs-react    React Storybook documentation and playground
-packages/tokens    Framework-agnostic design tokens and themes
-packages/utils     Shared accessibility and interaction helpers
-packages/icons     Curated icon registry and defaults
-packages/vue       Vue 3 component package and plugin entry
-packages/react     React component package
-packages/mcp       TreeUI AI catalog and MCP server for coding agents
-tooling            Docker, ESLint, and TypeScript shared config
+apps/landing                 Landing page that links to the per-framework docs
+apps/docs                    Vue Storybook documentation and playground
+apps/docs-react              React Storybook documentation and playground
+examples/dashboard-vue       Runnable Vue dashboard example
+examples/dashboard-react     Runnable React dashboard example
+packages/tokens              Framework-agnostic design tokens and themes
+packages/utils               Shared accessibility and interaction helpers
+packages/icons               Curated icon registry and defaults
+packages/vue                 Vue 3 component package and plugin entry
+packages/react               React component package
+packages/mcp                 TreeUI AI catalog and MCP server for coding agents
+docs/ai                      Machine-oriented contracts for tools and agents
+tooling                      Docker, ESLint, and TypeScript shared config
+scripts                      Site assembly, static serving, and asset scripts
+tests                        Playwright end-to-end specs
 ```
+
+This is the one authoritative workspace map; other documents link here instead of
+repeating it.
 
 ## Documentation Map
 
@@ -60,6 +74,8 @@ tooling            Docker, ESLint, and TypeScript shared config
 - `ARCHITECTURE.md`: package boundaries and portability rules
 - `DESIGN.md`: design principles and review checklist
 - `CONTRIBUTING.md`: contributor workflow, quality gates, and release notes
+- `RELEASING.md`: CI jobs, changesets, publishing, and GitHub Pages deployment
+- `SECURITY.md`: supported versions and private vulnerability reporting
 - `AGENTS.md`: repo-level guidance for coding agents
 - `CLAUDE.md`: Claude Code-specific pointer to the same guidance
 - `.github/copilot-instructions.md`: GitHub Copilot repository instructions
@@ -67,7 +83,9 @@ tooling            Docker, ESLint, and TypeScript shared config
 - `docs/ai/`: compact, canonical contracts for tools and automation
 - `packages/mcp/`: generated catalog plus the `@treeui/mcp` server package
 
-The human-facing product docs and component playground live in Storybook under `apps/docs`.
+The human-facing product docs are the landing page in `apps/landing` plus one Storybook per
+framework (`apps/docs` for Vue, `apps/docs-react` for React). Per-package release history lives
+in `packages/*/CHANGELOG.md` and on [GitHub Releases](https://github.com/Viserion77/treeui/releases).
 
 ## AI Integrations
 
@@ -94,42 +112,14 @@ Please read [CONTRIBUTING.md](./CONTRIBUTING.md) before opening a pull request.
 
 ## CI/CD & Release Flow
 
-The project uses [Changesets](https://github.com/changesets/changesets) for automated versioning and publishing.
-
-### Pipeline
-
-```
-Pull request → CI (lint, typecheck, tests, package build, Storybook build, e2e)
-  ↓ merge to main
-Release job rebuilds and verifies npm tarballs
-  ↓
-Changesets Action creates "Version Packages" PR or publishes to npm
-  +
-Deploy Storybook to GitHub Pages
-```
-
-### Workflows
-
-| Workflow | Trigger | Purpose |
-|---|---|---|
-| **CI** | PR + push to `main` | Runs validation, builds Storybook for Pages, and rebuilds/verifies npm tarballs before publishing |
-
-### Creating a changeset
-
-After making changes, describe what changed before committing:
-
-```bash
-pnpm changeset
-# Select affected packages, bump type (patch/minor/major), and write a summary
-git add . && git commit -m "feat: your change"
-git push
-```
-
-The Changesets bot will open a **"chore: version packages"** PR. Merging it bumps versions, updates `CHANGELOG.md`, and publishes to npm automatically.
+[Changesets](https://github.com/changesets/changesets) drives versioning and publishing, and a
+single workflow (`.github/workflows/ci.yml`) validates, releases, and deploys.
+[RELEASING.md](./RELEASING.md) describes that flow end to end — CI jobs, changesets, npm
+publishing, repository settings, and troubleshooting.
 
 ### Documentation site
 
-The docs site is deployed to GitHub Pages on every push to `main`. A landing
+The site is deployed to GitHub Pages on every push to `main`. A landing
 page links to one Storybook per framework:
 
 - Home: [https://viserion77.github.io/treeui/](https://viserion77.github.io/treeui/)

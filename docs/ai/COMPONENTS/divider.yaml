@@ -1,4 +1,5 @@
 component: TDivider
+status: available
 package: "@treeui/vue"
 source: TDivider.vue
 description: >

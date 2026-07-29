@@ -2,6 +2,11 @@
  * TreeUI React component styles.
  * Token variables and themes come from @treeui/tokens; component rules below
  * reuse the same --tree-* tokens and t-* BEM classes as @treeui/vue.
+ *
+ * packages/vue/src/styles/index.css is the source of truth for every shared
+ * t-* block here: fix it there first, then port the change across. Only the
+ * components React ships (TButton, TInput, TCard, TBadge, plus the spinner
+ * TButton renders while loading) belong in this file.
  */
 @import '@treeui/tokens/styles.css';
 @import '@treeui/tokens/themes.css';
@@ -22,21 +27,24 @@ html {
   font-family: var(--tree-font-family-sans);
 }
 
+.t-visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  /* Modern equivalent of `clip`; also keeps the box from contributing paint. */
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
 .t-button,
 .t-input,
-.t-combobox,
-.t-file-upload,
-.t-checkbox,
-.t-switch,
-.t-select,
 .t-card,
-.t-badge,
-.t-alert,
-.t-empty-state,
-.t-timeline,
-.t-toast,
-.t-pagination,
-.t-tooltip__content {
+.t-badge {
   font-family: var(--tree-font-family-sans);
 }
 
@@ -106,6 +114,25 @@ html {
   height: var(--tree-size-control-lg);
   padding-inline: var(--tree-space-5);
   font-size: var(--tree-font-size-lg);
+}
+
+/* Icon-only: collapse the inline padding so the control renders as a square
+   matching its size token. The 44x44 hit area still comes from .t-button::after. */
+.t-button--icon {
+  gap: 0;
+  width: var(--tree-size-control-md);
+  min-width: var(--tree-size-control-md);
+  padding-inline: 0;
+}
+
+.t-button--sm.t-button--icon {
+  width: var(--tree-size-control-sm);
+  min-width: var(--tree-size-control-sm);
+}
+
+.t-button--lg.t-button--icon {
+  width: var(--tree-size-control-lg);
+  min-width: var(--tree-size-control-lg);
 }
 
 .t-button--solid {
@@ -376,6 +403,39 @@ html {
 .t-badge--danger {
   background: var(--tree-badge-danger-bg);
   color: var(--tree-badge-danger-text);
+}
+
+.t-spinner {
+  --tree-spinner-size: var(--tree-size-icon-md);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--tree-spinner-size);
+  height: var(--tree-spinner-size);
+  color: var(--tree-color-brand-primary);
+}
+
+.t-spinner--sm {
+  --tree-spinner-size: var(--tree-size-icon-sm);
+}
+
+.t-spinner--lg {
+  --tree-spinner-size: var(--tree-size-icon-lg);
+}
+
+.t-spinner__ring {
+  width: 100%;
+  height: 100%;
+  border: 2px solid color-mix(in srgb, currentColor 20%, transparent);
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: t-spin 0.7s linear infinite;
+}
+
+@keyframes t-spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .t-pricing-card__action .t-button {

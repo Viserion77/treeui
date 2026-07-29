@@ -2,9 +2,27 @@
   "name": "@treeui/react",
   "version": "0.3.1",
   "description": "React component package for TreeUI.",
+  "license": "MIT",
+  "author": "TreeUI",
+  "homepage": "https://viserion77.github.io/treeui/",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Viserion77/treeui.git",
+    "directory": "packages/react"
+  },
+  "bugs": {
+    "url": "https://github.com/Viserion77/treeui/issues"
+  },
+  "keywords": [
+    "treeui",
+    "react",
+    "component-library",
+    "design-system",
+    "accessibility"
+  ],
   "type": "module",
   "sideEffects": [
-    "*.css"
+    "**/*.css"
   ],
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",

@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-29T02:07:57.532Z",
+  "generatedAt": "0.23.0",
   "packageName": "@treeui/vue",
   "packageVersion": "0.23.0",
   "decisionGuides": [
@@ -749,11 +749,12 @@
     {
       "id": "token-driven",
       "title": "Token-driven clarity",
-      "summary": "No raw hex, px, or font values anywhere. Every visual decision references a --tree-* token, so light/dark and brand theming stay coherent by construction.",
+      "summary": "Zero raw colors, spacing, or type in component code. Every visual decision references a --tree-* token, so light/dark and brand theming stay coherent by construction.",
       "rules": [
-        "Zero hardcoded colors, spacing, or typography in component code.",
+        "Zero hardcoded colors, spacing, or typography in component code — verified: the stylesheet contains no raw hex value.",
         "Light and dark are first-class themes; every state passes both.",
-        "Themes switch by attribute (data-tree-theme) with no component changes."
+        "Themes switch by attribute (data-tree-theme) with no component changes.",
+        "The documented exceptions are geometry, not design values: focus-ring and hairline widths, sub-pixel motion offsets, and the 44px WCAG target constant."
       ],
       "components": [
         "TCard",
@@ -1614,6 +1615,7 @@
       "aliases": [],
       "package": "@treeui/vue",
       "category": "Data Display",
+      "status": "available",
       "description": "User avatar that renders an image when `src` is set, otherwise initials derived from `alt`, plus an optional status indicator dot.",
       "sourceFile": "packages/vue/src/components/TAvatar.vue",
       "storyFile": "apps/docs/src/stories/Avatar.stories.ts",
@@ -2051,7 +2053,7 @@
         "tabindex_minus_one_when_non_button_disabled: true",
         "icon_slot_marked_aria_hidden: true",
         "loading_spinner_is_announced: The nested TSpinner carries role=\"status\" and a visually hidden label, so the button's accessible name gains that text while loading. The text comes from `loadingLabel`, so it follows the app's locale.",
-        "icon_only_requires_an_accessible_name: With `iconOnly` there is no visible text and the icon slot is aria-hidden, so the name must come from `label` or `aria-label`. This is a documented requirement, not a runtime assertion — the package ships ESM+CJS with no dev-only build define, so there is no dev-stripped warning.",
+        "icon_only_requires_an_accessible_name: With `iconOnly` there is no visible text and the icon slot is aria-hidden, so the name must come from `label` or `aria-label`. Enforced by a dev-only console.warn — see props.label.",
         "touch_targets: 44×44px minimum via the .t-button::after overlay",
         "focus_visible: box-shadow focus ring on the root element"
       ],
@@ -2587,10 +2589,6 @@
         {
           "name": "default",
           "description": "Block content when `code` is not used. Rendered inside `<pre><code>`. The built-in copy button is not shown for slot content (nothing to copy from)."
-        },
-        {
-          "name": "actions",
-          "description": "Reserved for extra toolbar controls."
         }
       ],
       "a11y": [
@@ -2599,10 +2597,34 @@
       ],
       "behavior": [],
       "selection": {
-        "keywords": [],
-        "useWhen": [],
-        "avoidWhen": [],
-        "alternatives": []
+        "keywords": [
+          "code",
+          "log",
+          "json",
+          "arn",
+          "monospace",
+          "pre",
+          "terminal output",
+          "copy button"
+        ],
+        "useWhen": [
+          "You are showing machine text — a log tail, a JSON payload, an id or an ARN — as its own block.",
+          "The reader should be able to copy the text or scroll it without the page scrolling."
+        ],
+        "avoidWhen": [
+          "The code is a few words inside a sentence.",
+          "You need syntax highlighting or virtualization — TCodeBlock ships neither by design."
+        ],
+        "alternatives": [
+          {
+            "component": "TText",
+            "when": "The snippet is inline; use `family=\"mono\"`."
+          },
+          {
+            "component": "TMarkdownEditor",
+            "when": "The user edits rich text rather than reads a fixed block."
+          }
+        ]
       },
       "setup": {
         "required": [],
@@ -3106,10 +3128,27 @@
         "inherits_teleport_scroll_lock_and_focus_trap_from_modal: true"
       ],
       "selection": {
-        "keywords": [],
-        "useWhen": [],
-        "avoidWhen": [],
-        "alternatives": []
+        "keywords": [
+          "confirm",
+          "confirmation",
+          "are you sure",
+          "destructive action",
+          "delete prompt",
+          "yes no"
+        ],
+        "useWhen": [
+          "One decision gates one action, and the wording plus the two buttons are the whole dialog.",
+          "The action is destructive and deserves a deliberate second step."
+        ],
+        "avoidWhen": [
+          "The dialog holds a form, a list, or anything the user has to read through."
+        ],
+        "alternatives": [
+          {
+            "component": "TModal",
+            "when": "The dialog has real content or more than a confirm/cancel pair — TConfirmDialog is built on TModal."
+          }
+        ]
       },
       "setup": {
         "required": [],
@@ -3228,7 +3267,7 @@
       "aliases": [],
       "package": "@treeui/vue",
       "category": "Overlay",
-      "status": "stable",
+      "status": "available",
       "description": "Right-click (contextmenu) menu teleported to body and positioned at the cursor. The component renders no chrome of its own — the root wrapper is `display: contents` and only wraps the slotted trigger area.\n",
       "sourceFile": "packages/vue/src/components/TContextMenu.vue",
       "storyFile": "apps/docs/src/stories/ContextMenu.stories.ts",
@@ -3783,10 +3822,34 @@
         "semantics: Real <dl>/<dt>/<dd>; each item wraps its dt/dd in a <div>, which is valid grouping inside <dl>."
       ],
       "selection": {
-        "keywords": [],
-        "useWhen": [],
-        "avoidWhen": [],
-        "alternatives": []
+        "keywords": [
+          "description list",
+          "key value",
+          "label value",
+          "details panel",
+          "metadata",
+          "dl",
+          "dt",
+          "dd"
+        ],
+        "useWhen": [
+          "You are rendering label→value pairs — a details, status, or configuration panel.",
+          "Assistive tech should announce the pairing, which native <dl>/<dt>/<dd> does."
+        ],
+        "avoidWhen": [
+          "The rows are content items rather than pairs.",
+          "The data is tabular with more than one value column."
+        ],
+        "alternatives": [
+          {
+            "component": "TList",
+            "when": "The rows are content, not label/value pairs."
+          },
+          {
+            "component": "TTable",
+            "when": "There are several columns per row, or sorting."
+          }
+        ]
       },
       "setup": {
         "required": [],
@@ -3803,6 +3866,7 @@
       "aliases": [],
       "package": "@treeui/vue",
       "category": "Layout",
+      "status": "available",
       "description": "Horizontal or vertical visual separator. Renders a single native <hr> and nothing else — there is no default slot, so the \"text in the middle of a rule\" pattern (an \"OR\" divider) is NOT supported; compose that yourself from a flex row plus TText. The `label` prop is an accessible name only, never visible text. There are no size, variant, tone, or spacing props.\n",
       "sourceFile": "packages/vue/src/components/TDivider.vue",
       "storyFile": "apps/docs/src/stories/Divider.stories.ts",
@@ -4348,6 +4412,10 @@
           {
             "component": "TContextMenu",
             "when": "The menu opens from a context action."
+          },
+          {
+            "component": "TMenu",
+            "when": "The menu needs groups, link items, descriptions, or a menuitemradio."
           }
         ]
       },
@@ -4461,12 +4529,12 @@
       "aliases": [],
       "package": "@treeui/vue",
       "kind": "form",
-      "category": "Form",
+      "category": "Data Entry",
       "status": "available",
       "purpose": "Composable dropzone and file picker with browse, drag-and-drop, and Ctrl+V paste support, plus per-file upload state: progress, remaining time, thumbnails, and independent per-file retry/resume.",
       "sourceFile": "packages/vue/src/components/TFileUpload.vue",
       "storyFile": "apps/docs/src/stories/FileUpload.stories.ts",
-      "storyTitle": "Components/Form/FileUpload",
+      "storyTitle": "Components/Data Entry/FileUpload",
       "manifestFile": "docs/ai/COMPONENTS/file-upload.yaml",
       "props": [
         {
@@ -4695,10 +4763,28 @@
         "thumbnails_are_client_only: Object URLs are minted after mount and revoked on removal and unmount. SSR and the hydrating render both show the extension chip, so there is no mismatch."
       ],
       "selection": {
-        "keywords": [],
-        "useWhen": [],
-        "avoidWhen": [],
-        "alternatives": []
+        "keywords": [
+          "file upload",
+          "dropzone",
+          "drag and drop",
+          "attachment",
+          "browse files",
+          "paste image",
+          "progress"
+        ],
+        "useWhen": [
+          "The user attaches one or more files, by browsing, dragging, or pasting.",
+          "Each file needs its own progress, thumbnail, and retry."
+        ],
+        "avoidWhen": [
+          "You only need to display an already-uploaded image."
+        ],
+        "alternatives": [
+          {
+            "component": "TImage",
+            "when": "The file is already stored and only needs rendering."
+          }
+        ]
       },
       "setup": {
         "required": [],
@@ -4839,7 +4925,7 @@
       "aliases": [],
       "package": "@treeui/vue",
       "category": "Data Entry",
-      "status": "milestone-1",
+      "status": "available",
       "description": "Label + input wrapper with error and hint slots. Provides consistent layout, labelling, and validation messaging for any form control.\n",
       "sourceFile": "packages/vue/src/components/TFormField.vue",
       "storyFile": "apps/docs/src/stories/FormField.stories.ts",
@@ -5614,10 +5700,29 @@
       ],
       "behavior": [],
       "selection": {
-        "keywords": [],
-        "useWhen": [],
-        "avoidWhen": [],
-        "alternatives": []
+        "keywords": [
+          "image",
+          "img",
+          "picture",
+          "photo",
+          "thumbnail",
+          "avatar image",
+          "object-fit",
+          "lazy loading"
+        ],
+        "useWhen": [
+          "You are rendering a content image and want the library to own corners, object-fit, lazy loading, and the accessible name."
+        ],
+        "avoidWhen": [
+          "The image represents a person or an entity in a list — TAvatar handles initials and status.",
+          "You need a zoom or lightbox — compose TImage inside TModal (recipe `image-zoom`)."
+        ],
+        "alternatives": [
+          {
+            "component": "TAvatar",
+            "when": "The image identifies a user or entity, with an initials fallback."
+          }
+        ]
       },
       "setup": {
         "required": [],
@@ -6250,10 +6355,31 @@
       ],
       "behavior": [],
       "selection": {
-        "keywords": [],
-        "useWhen": [],
-        "avoidWhen": [],
-        "alternatives": []
+        "keywords": [
+          "tile",
+          "link card",
+          "app launcher",
+          "product grid",
+          "navigation card",
+          "shortcut"
+        ],
+        "useWhen": [
+          "A whole surface is one navigation target, with a leading icon, a title, and a description.",
+          "You are building an app launcher, a product grid, or a settings index."
+        ],
+        "avoidWhen": [
+          "The surface holds several independent actions — one link target is the whole point."
+        ],
+        "alternatives": [
+          {
+            "component": "TCard",
+            "when": "The surface holds content and more than one action."
+          },
+          {
+            "component": "TGrid",
+            "when": "You need the collection layout — TLinkTile owns no grid."
+          }
+        ]
       },
       "setup": {
         "required": [],
@@ -6313,10 +6439,37 @@
         "no_overflow_ownership: TList does not create, own, or collapse an actions overflow."
       ],
       "selection": {
-        "keywords": [],
-        "useWhen": [],
-        "avoidWhen": [],
-        "alternatives": []
+        "keywords": [
+          "list",
+          "rows",
+          "ul",
+          "li",
+          "feed",
+          "item list",
+          "actions per row"
+        ],
+        "useWhen": [
+          "You are rendering content rows with leading, content, meta, and action regions.",
+          "Rows carry real interactive controls (buttons, links) rather than selection semantics."
+        ],
+        "avoidWhen": [
+          "The user picks one or more rows — that needs listbox/option semantics.",
+          "The rows are label/value pairs, or tabular with several columns."
+        ],
+        "alternatives": [
+          {
+            "component": "TSelectableList",
+            "when": "Rows are selectable (role=listbox / role=option)."
+          },
+          {
+            "component": "TDescriptionList",
+            "when": "Each row is a label and its value."
+          },
+          {
+            "component": "TTable",
+            "when": "The data has columns and needs sorting."
+          }
+        ]
       },
       "setup": {
         "required": [],
@@ -6332,12 +6485,12 @@
       "name": "TMarkdownEditor",
       "aliases": [],
       "package": "@treeui/vue",
-      "category": "Form",
-      "status": "stable",
+      "category": "Data Entry",
+      "status": "available",
       "description": "A Markdown editor with an always-visible side-by-side live preview, toolbar formatting, keyboard shortcuts, and image paste/drop upload support.\n",
       "sourceFile": "packages/vue/src/components/TMarkdownEditor.vue",
       "storyFile": "apps/docs/src/stories/MarkdownEditor.stories.ts",
-      "storyTitle": "Components/Form/MarkdownEditor",
+      "storyTitle": "Components/Data Entry/MarkdownEditor",
       "manifestFile": "docs/ai/COMPONENTS/markdown-editor.yaml",
       "props": [
         {
@@ -6484,6 +6637,18 @@
           "note": "Forwarded to TPopover panel density."
         },
         {
+          "name": "width",
+          "type": "TPopoverWidth",
+          "default": "md",
+          "values": [
+            "content",
+            "sm",
+            "md",
+            "lg"
+          ],
+          "note": "Panel max-width, forwarded to TPopover — see popover.yaml props.width for the caps and the viewport clamp."
+        },
+        {
           "name": "label",
           "type": "string",
           "default": "undefined",
@@ -6528,10 +6693,37 @@
       ],
       "behavior": [],
       "selection": {
-        "keywords": [],
-        "useWhen": [],
-        "avoidWhen": [],
-        "alternatives": []
+        "keywords": [
+          "menu",
+          "action menu",
+          "user menu",
+          "account menu",
+          "workspace switcher",
+          "menu groups",
+          "menuitem"
+        ],
+        "useWhen": [
+          "The menu needs groups, link items, icon + description + meta, a destructive item, or a menuitemradio.",
+          "You are composing the menu from slots rather than an items array."
+        ],
+        "avoidWhen": [
+          "A short, data-driven list of actions is enough.",
+          "The menu opens from a context-click."
+        ],
+        "alternatives": [
+          {
+            "component": "TDropdown",
+            "when": "A plain items array covers it — TDropdown stays the lightweight action menu."
+          },
+          {
+            "component": "TContextMenu",
+            "when": "The menu opens at the cursor from a right-click."
+          },
+          {
+            "component": "TPopover",
+            "when": "The panel is rich content, not a list of actions — TMenu is built on TPopover."
+          }
+        ]
       },
       "setup": {
         "required": [],
@@ -7509,9 +7701,11 @@
       "name": "TPopover",
       "aliases": [],
       "package": "@treeui/vue",
+      "kind": "overlay",
       "category": "Overlay",
-      "status": "stable",
-      "description": "Rich floating content panel anchored to a trigger element. Opened by click, dismissed by outside click or Escape. Supports four placement sides with alignment options.\n",
+      "status": "available",
+      "purpose": "Rich floating content panel anchored to a trigger element. Opened by click, dismissed by outside click or Escape. Supports four placement sides with alignment options.\n",
+      "sourceFile": "packages/vue/src/components/TPopover.vue",
       "storyFile": "apps/docs/src/stories/Popover.stories.ts",
       "storyTitle": "Components/Overlay/Popover",
       "manifestFile": "docs/ai/COMPONENTS/popover.yaml",
@@ -7519,42 +7713,72 @@
         {
           "name": "open",
           "type": "boolean",
-          "description": "Controlled open state (v-model:open)"
+          "default": "undefined",
+          "note": "Controlled open state (v-model:open)."
         },
         {
           "name": "defaultOpen",
           "type": "boolean",
-          "description": "Initial open state for uncontrolled usage"
+          "default": "false",
+          "note": "Initial open state for uncontrolled usage."
         },
         {
           "name": "disabled",
           "type": "boolean",
-          "description": "Prevents opening"
+          "default": "false",
+          "note": "Prevents opening."
         },
         {
           "name": "side",
           "type": "'top' | 'right' | 'bottom' | 'left'",
-          "description": "Placement side relative to trigger"
+          "default": "bottom",
+          "values": [
+            "top",
+            "right",
+            "bottom",
+            "left"
+          ],
+          "note": "Placement side relative to trigger."
         },
         {
           "name": "align",
           "type": "'start' | 'center' | 'end'",
-          "description": "Alignment along the placement axis"
+          "default": "center",
+          "values": [
+            "start",
+            "center",
+            "end"
+          ],
+          "note": "Alignment along the placement axis."
         },
         {
           "name": "size",
           "type": "TSize",
-          "description": "Panel density. Scales the content padding by the shared size tokens (sm → space-3, md → space-4, lg → space-5), so compact rich panels use a prop instead of overriding `.t-popover__content`. This is the `size` axis, not a density prop — TreeUI has no density axis (see DECISIONS.md → Density). For a compact menu of actions use TDropdown, which owns role=menu semantics; use TPopover for a rich non-menu panel."
+          "default": "md",
+          "values": [
+            "sm",
+            "md",
+            "lg"
+          ],
+          "note": "Panel density. Scales the content padding by the shared size tokens (sm → space-3, md → space-4, lg → space-5), so compact rich panels use a prop instead of overriding `.t-popover__content`. This is the `size` axis, not a density prop — TreeUI has no density axis (see DECISIONS.md → Density). For a compact menu of actions use TDropdown, which owns role=menu semantics; use TPopover for a rich non-menu panel."
         },
         {
           "name": "width",
           "type": "TPopoverWidth",
-          "description": "Panel max-width. The content ALWAYS sizes to its intrinsic width (`width: max-content`), so grid/flex panels no longer collapse to the min-width; this prop caps how wide it may grow: sm → 18rem, md → 24rem (base), lg → 40rem, content → no rem cap (only the viewport clamp), for a wide rich panel such as an app-launcher grid. Width and height are always clamped to the viewport (`calc(100vw - space-8)` / `calc(100dvh - space-16)`) and the panel gets its own scroll — it never runs off-screen. Replaces `:deep(.t-popover__content)` width/overflow overrides."
+          "default": "md",
+          "values": [
+            "content",
+            "sm",
+            "md",
+            "lg"
+          ],
+          "note": "Panel max-width. The content ALWAYS sizes to its intrinsic width (`width: max-content`), so grid/flex panels no longer collapse to the min-width; this prop caps how wide it may grow: sm → 18rem, md → 24rem (base), lg → 40rem, content → no rem cap (only the viewport clamp), for a wide rich panel such as an app-launcher grid. Width and height are always clamped to the viewport (`calc(100vw - space-8)` / `calc(100dvh - space-16)`) and the panel gets its own scroll — it never runs off-screen. Replaces `:deep(.t-popover__content)` width/overflow overrides."
         },
         {
           "name": "id",
           "type": "string",
-          "description": "Custom id for the content panel"
+          "default": "undefined",
+          "note": "Custom id for the content panel."
         }
       ],
       "events": [
@@ -7625,10 +7849,12 @@
       "name": "TPricing",
       "aliases": [],
       "package": "@treeui/vue",
-      "status": "stable",
+      "category": "Data Display",
+      "status": "available",
       "description": "Grid wrapper that renders multiple PricingCard components from an array of plan objects.\n",
+      "sourceFile": "packages/vue/src/components/TPricing.vue",
       "storyFile": "apps/docs/src/stories/Pricing.stories.ts",
-      "storyTitle": "Starter",
+      "storyTitle": "Components/Data Display/Pricing",
       "manifestFile": "docs/ai/COMPONENTS/pricing.yaml",
       "props": [
         {
@@ -7691,8 +7917,9 @@
       "aliases": [],
       "package": "@treeui/vue",
       "category": "Data Display",
-      "status": "stable",
+      "status": "available",
       "description": "A card component for displaying pricing plans with title, price, features list, and call-to-action button. Supports highlighted state and badges.\n",
+      "sourceFile": "packages/vue/src/components/TPricingCard.vue",
       "storyFile": "apps/docs/src/stories/PricingCard.stories.ts",
       "storyTitle": "Components/Data Display/PricingCard",
       "manifestFile": "docs/ai/COMPONENTS/pricing.yaml",
@@ -7821,8 +8048,9 @@
       "aliases": [],
       "package": "@treeui/vue",
       "category": "Feedback",
-      "status": "draft",
+      "status": "available",
       "description": "Determinate and indeterminate progress indicator. Renders a linear bar only — there is no circular, ring, or radial variant, and no `variant`/`shape`/`type` prop. Compose one yourself if you need it.\n",
+      "sourceFile": "packages/vue/src/components/TProgress.vue",
       "storyFile": "apps/docs/src/stories/Progress.stories.ts",
       "storyTitle": "Components/Feedback/Progress",
       "manifestFile": "docs/ai/COMPONENTS/progress.yaml",
@@ -7867,10 +8095,32 @@
       ],
       "behavior": [],
       "selection": {
-        "keywords": [],
-        "useWhen": [],
-        "avoidWhen": [],
-        "alternatives": []
+        "keywords": [
+          "progress",
+          "progress bar",
+          "percentage",
+          "determinate",
+          "upload progress",
+          "completion"
+        ],
+        "useWhen": [
+          "You can express how far along the work is, as a value out of a max.",
+          "A long task should show that it is advancing rather than just that it is busy."
+        ],
+        "avoidWhen": [
+          "You cannot say how much is left — that is a spinner.",
+          "The page shape is known and the content is what is missing."
+        ],
+        "alternatives": [
+          {
+            "component": "TSpinner",
+            "when": "The wait has no measurable progress."
+          },
+          {
+            "component": "TSkeleton",
+            "when": "You know the layout and want to hold its shape while it loads."
+          }
+        ]
       },
       "setup": {
         "required": [],
@@ -7886,9 +8136,12 @@
       "aliases": [],
       "package": "@treeui/vue",
       "kind": "primitive",
+      "category": "Data Entry",
       "status": "available",
       "purpose": "Single radio option within a TRadioGroup; renders a native radio input.",
       "sourceFile": "packages/vue/src/components/TRadio.vue",
+      "storyFile": "apps/docs/src/stories/Radio.stories.ts",
+      "storyTitle": "Components/Data Entry/Radio",
       "manifestFile": "docs/ai/COMPONENTS/radio.yaml",
       "props": [
         {
@@ -8190,12 +8443,12 @@
       "aliases": [],
       "package": "@treeui/vue",
       "kind": "selection",
-      "category": "Navigation & Disclosure",
+      "category": "Navigation",
       "status": "available",
       "purpose": "Rich single-selection list for options with description and metadata.",
       "sourceFile": "packages/vue/src/components/TSelectableList.vue",
       "storyFile": "apps/docs/src/stories/SelectableList.stories.ts",
-      "storyTitle": "Components/Navigation & Disclosure/SelectableList",
+      "storyTitle": "Components/Navigation/SelectableList",
       "manifestFile": "docs/ai/COMPONENTS/selectable-list.yaml",
       "props": [
         {
@@ -8498,10 +8751,30 @@
       ],
       "behavior": [],
       "selection": {
-        "keywords": [],
-        "useWhen": [],
-        "avoidWhen": [],
-        "alternatives": []
+        "keywords": [
+          "skeleton",
+          "placeholder",
+          "shimmer",
+          "loading placeholder",
+          "content loading"
+        ],
+        "useWhen": [
+          "You know the shape of the content that is coming and want to hold its space.",
+          "The wait is long enough that an empty area would read as broken."
+        ],
+        "avoidWhen": [
+          "The layout is unknown, or the wait is a single short action."
+        ],
+        "alternatives": [
+          {
+            "component": "TSpinner",
+            "when": "There is no layout to preserve — a small busy indicator is enough."
+          },
+          {
+            "component": "TProgress",
+            "when": "The remaining work is measurable."
+          }
+        ]
       },
       "setup": {
         "required": [],
@@ -8717,10 +8990,31 @@
       ],
       "behavior": [],
       "selection": {
-        "keywords": [],
-        "useWhen": [],
-        "avoidWhen": [],
-        "alternatives": []
+        "keywords": [
+          "spinner",
+          "loading",
+          "busy",
+          "indeterminate",
+          "activity indicator"
+        ],
+        "useWhen": [
+          "Something is busy and there is no way to say how much is left.",
+          "You need a busy indicator inside another control (TButton already embeds one via `loading`)."
+        ],
+        "avoidWhen": [
+          "The page shape is known — hold it with a skeleton instead.",
+          "You can report a percentage."
+        ],
+        "alternatives": [
+          {
+            "component": "TSkeleton",
+            "when": "You can preserve the layout of the content that is loading."
+          },
+          {
+            "component": "TProgress",
+            "when": "The progress is measurable."
+          }
+        ]
       },
       "setup": {
         "required": [],
@@ -9133,12 +9427,12 @@
       ],
       "package": "@treeui/vue",
       "kind": "navigation",
-      "category": "Navigation & Disclosure",
+      "category": "Navigation",
       "status": "available",
       "purpose": "Stepper component for visualizing workflow progress, with optional interactive selection.",
       "sourceFile": "packages/vue/src/components/TSteps.vue",
       "storyFile": "apps/docs/src/stories/Steps.stories.ts",
-      "storyTitle": "Components/Navigation & Disclosure/Steps",
+      "storyTitle": "Components/Navigation/Steps",
       "manifestFile": "docs/ai/COMPONENTS/steps.yaml",
       "props": [
         {
@@ -9328,6 +9622,7 @@
       "aliases": [],
       "package": "@treeui/vue",
       "category": "Data Display",
+      "status": "available",
       "description": "Sortable, accessible data table with column definitions and row data.",
       "sourceFile": "packages/vue/src/components/TTable.vue",
       "storyFile": "apps/docs/src/stories/Table.stories.ts",
@@ -9562,6 +9857,7 @@
       "aliases": [],
       "package": "@treeui/vue",
       "category": "Data Display",
+      "status": "available",
       "description": "Removable label/chip for filters and selections.",
       "sourceFile": "packages/vue/src/components/TTag.vue",
       "storyFile": "apps/docs/src/stories/Tag.stories.ts",
@@ -9873,11 +10169,12 @@
       "aliases": [],
       "package": "@treeui/vue",
       "kind": "data_display",
+      "category": "Data Display",
       "status": "available",
       "purpose": "Vertical timeline for activity history, audits, release events, and chronological product updates.",
       "sourceFile": "packages/vue/src/components/TTimeline.vue",
       "storyFile": "apps/docs/src/stories/Timeline.stories.ts",
-      "storyTitle": "Release queued for review",
+      "storyTitle": "Components/Data Display/Timeline",
       "manifestFile": "docs/ai/COMPONENTS/timeline.yaml",
       "props": [
         {
@@ -9934,11 +10231,20 @@
       "aliases": [],
       "package": "@treeui/vue",
       "kind": "feedback",
+      "category": "Feedback",
       "status": "available",
       "purpose": "Ephemeral notification stack driven by a composable. Renders toast items inside a positioned container with auto-dismiss and manual close.",
       "sourceFile": "packages/vue/src/components/TToast.vue",
+      "storyFile": "apps/docs/src/stories/Toast.stories.ts",
+      "storyTitle": "Components/Feedback/Toast",
       "manifestFile": "docs/ai/COMPONENTS/toast.yaml",
-      "props": [],
+      "props": [
+        {
+          "name": "toast",
+          "type": "ToastItem",
+          "required": true
+        }
+      ],
       "events": [
         {
           "name": "close"
@@ -10231,12 +10537,12 @@
       "aliases": [],
       "package": "@treeui/vue",
       "kind": "selection",
-      "category": "Navigation & Disclosure",
+      "category": "Navigation",
       "status": "available",
       "purpose": "Hierarchical tree view with expansion, keyboard navigation, and single or multiple selection.",
       "sourceFile": "packages/vue/src/components/TTreeView.vue",
       "storyFile": "apps/docs/src/stories/TreeView.stories.ts",
-      "storyTitle": "Components/Navigation & Disclosure/TreeView",
+      "storyTitle": "Components/Navigation/TreeView",
       "manifestFile": "docs/ai/COMPONENTS/tree-view.yaml",
       "props": [
         {

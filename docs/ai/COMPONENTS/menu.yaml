@@ -31,6 +31,11 @@ props:
     type: TSize
     default: md
     note: "Forwarded to TPopover panel density."
+  width:
+    type: TPopoverWidth
+    default: md
+    values: [content, sm, md, lg]
+    note: "Panel max-width, forwarded to TPopover — see popover.yaml props.width for the caps and the viewport clamp."
   label:
     type: string
     default: undefined

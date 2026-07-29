@@ -1,14 +1,15 @@
 # TreeUI Architecture
 
-TreeUI separates durable design contracts from framework-specific implementation so the system can grow beyond Vue without rebuilding its foundations.
+TreeUI separates durable design contracts from framework-specific implementation so the system can grow to other frameworks without rebuilding its foundations.
 
 ## Package Responsibilities
 
-- `@treeui/tokens`: canonical token source, theme values, and generated CSS outputs
-- `@treeui/utils`: shared DOM and accessibility helpers that can stay framework-agnostic
-- `@treeui/icons`: shared icon registry and defaults
-- `@treeui/vue`: Vue components, exports, and plugin integration
-- `@treeui/docs`: Storybook docs and playground
+The full workspace map lives in [README.md](./README.md#workspace-layout). What matters for the boundary:
+
+- `@treeui/tokens` and `@treeui/utils` are framework-agnostic and dependency-free
+- `@treeui/icons` is the shared icon registry and defaults, but is Vue-coupled today — see `docs/ai/DECISIONS.md` → "Portability Boundary"
+- `@treeui/vue` and `@treeui/react` are per-framework implementations of the same contracts, tokens, and `t-*` classes
+- `@treeui/mcp` exposes those contracts to coding agents
 
 ## System Boundaries
 
@@ -20,23 +21,21 @@ The following stay framework-agnostic:
 - Interaction contracts
 - Core utilities where possible
 
-The following stay Vue-specific:
+The following live in each framework package:
 
 - Component rendering implementation
-- Slots and `v-model`
-- `emits` declarations
-- Vue refs and reactivity
+- Content projection: Vue slots, React children
+- Event declarations: Vue `emits`, React callback props
+- Framework reactivity: Vue refs, React state
 
 ## Canonical Contracts
 
-- `docs/ai/CONTRACTS.yaml`: global public API rules and shared component conventions
-- `docs/ai/TOKENS.yaml`: framework-agnostic visual contract and theme data
-- `docs/ai/COMPONENTS/*.yaml`: component-level public API manifests
+The contract layer and its load order are defined in [docs/ai/INDEX.md](./docs/ai/INDEX.md).
 
 If public behavior changes, update the matching contract file in the same change.
 
 ## Documentation Surface
 
-- Storybook is the human-facing explanation layer and playground
+- The landing page plus one Storybook per framework are the human-facing explanation layer and playground
 - `docs/ai` is the compact contract layer for automation and tooling
 - Root markdown files explain the repository structure and maintenance workflow

@@ -196,34 +196,14 @@ body {
   width: 100%;
 }
 
-/* Calibrated data-viz accents for the sessions chart. Same hue per channel in
-   both themes; each set passes CVD separation and 3:1 contrast on its surface. */
+/* Series colors come from the shipped categorical palette
+   (--tree-color-chart-1..8 in @treeui/tokens), assigned in order. That is what
+   keeps this chart identical to the Vue example and re-themed for free — the
+   palette is already CVD-validated and stepped per theme, so redefining it here
+   would only make the two demos disagree. */
 .channels {
   display: grid;
   gap: var(--tree-space-3);
-  --example-chart-1: #0969da;
-  --example-chart-2: #1a7f37;
-  --example-chart-3: #8250df;
-  --example-chart-4: #bc4c00;
-  --example-chart-5: #bf3989;
-}
-
-[data-tree-theme='dark'] .channels {
-  --example-chart-1: #4c8fe6;
-  --example-chart-2: #54a857;
-  --example-chart-3: #986ee2;
-  --example-chart-4: #b78a26;
-  --example-chart-5: #e0625a;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root:not([data-tree-theme='light']) .channels {
-    --example-chart-1: #4c8fe6;
-    --example-chart-2: #54a857;
-    --example-chart-3: #986ee2;
-    --example-chart-4: #b78a26;
-    --example-chart-5: #e0625a;
-  }
 }
 
 .channels__plot {

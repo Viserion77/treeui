@@ -1,10 +1,10 @@
 {
   "version": "2.0.0",
   "tasks": [
-    // ── Rodar localmente ────────────────────────────────────────────────
+    // ── Run locally ─────────────────────────────────────────────────────
     {
       "label": "Dev: Storybook Vue (6006)",
-      "detail": "Builda os packages e sobe o Storybook do @treeui/docs em http://localhost:6006",
+      "detail": "Builds the packages and starts the @treeui/docs Storybook at http://localhost:6006",
       "type": "shell",
       "command": "pnpm dev",
       "icon": { "id": "book", "color": "terminal.ansiGreen" },
@@ -19,7 +19,7 @@
     },
     {
       "label": "Dev: Storybook React (6007)",
-      "detail": "Sobe o Storybook do @treeui/docs-react em http://localhost:6007 (rode o build de packages antes)",
+      "detail": "Starts the @treeui/docs-react Storybook at http://localhost:6007 (build the packages first)",
       "type": "shell",
       "command": "pnpm --filter @treeui/docs-react docs:dev",
       "icon": { "id": "book", "color": "terminal.ansiCyan" },
@@ -34,7 +34,7 @@
     },
     {
       "label": "Dev: Landing",
-      "detail": "Sobe a landing page (@treeui/landing) com Vite",
+      "detail": "Starts the landing page (@treeui/landing) with Vite",
       "type": "shell",
       "command": "pnpm --filter @treeui/landing dev",
       "icon": { "id": "globe", "color": "terminal.ansiMagenta" },
@@ -48,8 +48,8 @@
       }
     },
     {
-      "label": "Dev: Exemplo Vue (6008)",
-      "detail": "Builda os packages e sobe o dashboard-vue (@treeui/example-dashboard-vue) em http://localhost:6008",
+      "label": "Dev: Example Vue (6008)",
+      "detail": "Builds the packages and starts dashboard-vue (@treeui/example-dashboard-vue) at http://localhost:6008",
       "type": "shell",
       "command": "pnpm example:vue:dev",
       "icon": { "id": "dashboard", "color": "terminal.ansiGreen" },
@@ -63,8 +63,8 @@
       }
     },
     {
-      "label": "Dev: Exemplo React (6009)",
-      "detail": "Builda os packages e sobe o dashboard-react (@treeui/example-dashboard-react) em http://localhost:6009",
+      "label": "Dev: Example React (6009)",
+      "detail": "Builds the packages and starts dashboard-react (@treeui/example-dashboard-react) at http://localhost:6009",
       "type": "shell",
       "command": "pnpm example:react:dev",
       "icon": { "id": "dashboard", "color": "terminal.ansiCyan" },
@@ -79,7 +79,7 @@
     },
     {
       "label": "Build: packages",
-      "detail": "Builda tokens → utils → icons → vue → react → mcp",
+      "detail": "Builds tokens → utils → icons → vue → react → mcp",
       "type": "shell",
       "command": "pnpm build:packages",
       "icon": { "id": "package", "color": "terminal.ansiBlue" },
@@ -87,10 +87,10 @@
       "presentation": { "panel": "shared", "clear": true }
     },
 
-    // ── Validar antes de commitar ───────────────────────────────────────
+    // ── Validate before committing ──────────────────────────────────────
     {
       "label": "Lint",
-      "detail": "ESLint com zero warnings",
+      "detail": "ESLint with zero warnings",
       "type": "shell",
       "command": "pnpm lint",
       "icon": { "id": "search", "color": "terminal.ansiYellow" },
@@ -99,7 +99,7 @@
     },
     {
       "label": "Typecheck",
-      "detail": "TypeScript strict em todos os packages e apps",
+      "detail": "TypeScript strict mode across every package and app",
       "type": "shell",
       "command": "pnpm typecheck",
       "icon": { "id": "symbol-type-parameter", "color": "terminal.ansiBlue" },
@@ -108,7 +108,7 @@
     },
     {
       "label": "Test: unit",
-      "detail": "Vitest com coverage",
+      "detail": "Vitest with coverage",
       "type": "shell",
       "command": "pnpm test",
       "icon": { "id": "beaker", "color": "terminal.ansiMagenta" },
@@ -118,7 +118,7 @@
     },
     {
       "label": "Test: e2e",
-      "detail": "Playwright — rode se mudou interação ou a11y",
+      "detail": "Playwright — run it if interaction or a11y changed",
       "type": "shell",
       "command": "pnpm test:e2e",
       "icon": { "id": "browser", "color": "terminal.ansiCyan" },
@@ -127,8 +127,8 @@
       "presentation": { "panel": "shared", "clear": true }
     },
     {
-      "label": "Build: completo",
-      "detail": "Build de packages + Storybook",
+      "label": "Build: full",
+      "detail": "Builds the packages + Storybook",
       "type": "shell",
       "command": "pnpm build",
       "icon": { "id": "tools", "color": "terminal.ansiBlue" },
@@ -136,13 +136,13 @@
       "presentation": { "panel": "shared", "clear": true }
     },
     {
-      "label": "Validar (pré-commit)",
+      "label": "Validate (pre-commit)",
       "detail": "Quality gate: lint → typecheck → test → build",
       "type": "shell",
-      "command": "echo 'Tudo verde — pode commitar!'",
+      "command": "echo 'All green — ready to commit!'",
       "icon": { "id": "verified-filled", "color": "terminal.ansiGreen" },
       "dependsOrder": "sequence",
-      "dependsOn": ["Lint", "Typecheck", "Test: unit", "Build: completo"],
+      "dependsOn": ["Lint", "Typecheck", "Test: unit", "Build: full"],
       "group": { "kind": "build", "isDefault": true },
       "problemMatcher": [],
       "presentation": { "panel": "shared" }

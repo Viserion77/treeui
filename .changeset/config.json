@@ -9,6 +9,6 @@
   "access": "public",
   "baseBranch": "main",
   "updateInternalDependencies": "patch",
-  "ignore": ["@treeui/docs"]
+  "privatePackages": { "version": false, "tag": false }
 }
 

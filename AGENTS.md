@@ -10,7 +10,7 @@ TreeUI component to use and how to wire it up.
 ## Project Overview
 
 TreeUI is a component library organized as a pnpm monorepo. It separates durable,
-framework-agnostic design contracts (tokens, utils, icons) from framework
+framework-agnostic design contracts (tokens, utils) from framework
 implementations (Vue, React) so the system can grow to other frameworks without
 rebuilding its foundations.
 
@@ -46,34 +46,20 @@ active advocate for this philosophy — not a neutral executor:
 
 ## Workspace Layout
 
-```
-packages/tokens   → @treeui/tokens   — Design tokens, themes, CSS generation (framework-agnostic)
-packages/utils    → @treeui/utils    — DOM, a11y, class-variants (tv), keyboard helpers (framework-agnostic)
-packages/icons    → @treeui/icons    — SVG icon registry
-packages/vue      → @treeui/vue      — Vue 3 components, plugin, type exports (complete component set)
-packages/react    → @treeui/react    — React components (early; basic primitives) on the same tokens/classes
-packages/mcp      → @treeui/mcp      — TreeUI AI catalog and MCP server for coding agents
-apps/docs         → @treeui/docs     — Storybook documentation and playground
-tooling/          — Shared ESLint, TypeScript, Docker configs
-docs/ai/          — Machine-oriented contracts (YAML) for the API surface
-```
+The authoritative workspace map is in [README.md](./README.md#workspace-layout) —
+eleven packages, including `apps/docs-react`, `apps/landing`, and the two
+`examples/*` dashboards that `pnpm typecheck` and CI both build. Maturity differs:
+`@treeui/vue` is the complete component set, `@treeui/react` is early (basic
+primitives on the same tokens and `t-*` classes).
 
-Build order: `tokens → utils → icons → vue → react → mcp` (then `docs`).
+Build order: `tokens → utils → icons → vue → react → mcp` (then `apps/*` and `examples/*`).
 
 ## AI Contract Layer
 
-Before making changes, load the relevant contract files in this order, and stop
-as soon as you have enough context:
-
-1. `docs/ai/INDEX.md` — load order and file map
-2. `docs/ai/CONTRACTS.yaml` — global API rules: shared props, events, slots, naming, overlay/form contracts
-3. `docs/ai/SELECTION.yaml` — component choice heuristics and alternatives
-4. `docs/ai/SETUP.yaml` — install, provider, and value-format rules for consumer apps
-5. `docs/ai/COMPONENTS/<name>.yaml` — per-component manifest (props, events, slots, a11y, behavior)
-6. `docs/ai/RECIPES.yaml` — composition guidance for multi-component features
-7. `docs/ai/practices.json` — named UX practices and which components follow them
-8. `docs/ai/TOKENS.yaml` — only if styling, spacing, motion, or theming is involved
-9. `docs/ai/DECISIONS.md` — only if rationale or migration context matters
+Load [`docs/ai/INDEX.md`](./docs/ai/INDEX.md) first — it owns the canonical load
+order and file map for the contract layer (contracts, selection, setup,
+per-component manifests, recipes, practices, tokens, standards, validation,
+decisions). Stop reading as soon as you have enough context.
 
 **If a public API changes, update the matching contract file in the same change.**
 If component-selection guidance changes, update `docs/ai/SELECTION.yaml`. If
@@ -145,8 +131,11 @@ changes, update `docs/ai/practices.json`.
 11. Update `docs/ai/SELECTION.yaml`, `docs/ai/SETUP.yaml`, or `docs/ai/RECIPES.yaml` if the new component
     affects choice, setup, or composition guidance.
 
-When mirroring a primitive into React, add it under `packages/react/src/components/` reusing the same
-`t-*` classes, and export it from `packages/react/src/index.ts`.
+Mirroring a primitive into React follows the same checklist, with these substitutions:
+component in `packages/react/src/components/`, CSS in `packages/react/src/style.css`,
+export from `packages/react/src/index.ts`, story in `apps/docs-react/src/stories/`,
+test alongside the component. Note any deliberate API divergence from Vue in
+`packages/react/README.md`.
 
 ## Component Selection & Consumer-App Setup
 
@@ -159,15 +148,19 @@ When mirroring a primitive into React, add it under `packages/react/src/componen
 
 ## Quality Gates
 
-Run before any PR:
+Run before any PR — [CONTRIBUTING.md](./CONTRIBUTING.md#before-opening-a-pull-request)
+owns this list and its Docker equivalents:
 
 ```bash
 pnpm lint          # ESLint, zero warnings
-pnpm typecheck     # TypeScript strict mode
+pnpm typecheck     # TypeScript strict mode across every workspace package
 pnpm test          # Vitest unit tests with coverage
-pnpm build         # Full build (packages + Storybook)
-pnpm test:e2e      # Playwright (if interaction/a11y changed)
+pnpm build:site    # what CI builds: packages + landing + both Storybooks + examples
+pnpm test:e2e      # Playwright; optional locally, required in CI
 ```
+
+`pnpm build` is the fast inner loop (packages + Vue Storybook only) and does not
+cover the landing page, the React Storybook, or the examples.
 
 Use Changesets for any user-facing package change: `pnpm changeset`.
 
@@ -187,9 +180,11 @@ Use Changesets for any user-facing package change: `pnpm changeset`.
 | React components | `packages/react/src/` |
 | MCP package | `packages/mcp/` |
 | Named UX practices | `docs/ai/practices.json` |
+| Contract layer index | `docs/ai/INDEX.md` |
 | Design principles | `DESIGN.md` |
 | Architecture | `ARCHITECTURE.md` |
 | Contribution guide | `CONTRIBUTING.md` |
+| Release and CI flow | `RELEASING.md` |
 
 ## Local MCP
 
@@ -211,7 +206,8 @@ In this repository, Claude Code loads the server through
 - Use the Options API or raw `<script>` without `setup`.
 - Use hardcoded colors, spacing, or font values — always use `--tree-*` tokens.
 - Reintroduce `Tree<Name>` component aliases — the public API is `T<Name>` only.
-- Introduce framework-specific code in `tokens`, `utils`, or `icons` packages.
+- Introduce framework-specific code in `tokens` or `utils`. (`icons` is Vue-coupled
+  today — see `docs/ai/DECISIONS.md` → "Portability Boundary".)
 - Skip contract file updates when the public API changes.
 - Leave `docs/ai/practices.json` stale when a component's practice conformance changes.
 - Add runtime dependencies to `@treeui/tokens` or `@treeui/utils` — they must stay dependency-free.

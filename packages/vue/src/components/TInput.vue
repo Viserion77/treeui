@@ -82,6 +82,7 @@ const onInput = (event: Event) => {
       :placeholder="placeholder"
       :disabled="disabled"
       :aria-invalid="invalid || undefined"
+      :aria-busy="loading || undefined"
       @input="onInput"
     >
     <TSpinner

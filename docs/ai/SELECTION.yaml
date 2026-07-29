@@ -236,6 +236,20 @@ component_profiles:
       - component: TSwitch
         when: "The choice is a single immediate on/off state."
 
+  TCodeBlock:
+    keywords: [code, log, json, arn, monospace, pre, terminal output, copy button]
+    use_when:
+      - "You are showing machine text — a log tail, a JSON payload, an id or an ARN — as its own block."
+      - "The reader should be able to copy the text or scroll it without the page scrolling."
+    avoid_when:
+      - "The code is a few words inside a sentence."
+      - "You need syntax highlighting or virtualization — TCodeBlock ships neither by design."
+    alternatives:
+      - component: TText
+        when: "The snippet is inline; use `family=\"mono\"`."
+      - component: TMarkdownEditor
+        when: "The user edits rich text rather than reads a fixed block."
+
   TCombobox:
     keywords: [combobox, autocomplete, searchable select, search select]
     use_when:
@@ -248,6 +262,17 @@ component_profiles:
         when: "You only need a standard dropdown without filtering."
       - component: TMultiSelect
         when: "The user must select multiple values."
+
+  TConfirmDialog:
+    keywords: [confirm, confirmation, are you sure, destructive action, delete prompt, yes no]
+    use_when:
+      - "One decision gates one action, and the wording plus the two buttons are the whole dialog."
+      - "The action is destructive and deserves a deliberate second step."
+    avoid_when:
+      - "The dialog holds a form, a list, or anything the user has to read through."
+    alternatives:
+      - component: TModal
+        when: "The dialog has real content or more than a confirm/cancel pair — TConfirmDialog is built on TModal."
 
   TContainer:
     keywords: [container, page width, centered content, shell]
@@ -296,6 +321,20 @@ component_profiles:
       - component: TDatePicker
         when: "Only the date matters."
 
+  TDescriptionList:
+    keywords: [description list, key value, label value, details panel, metadata, dl, dt, dd]
+    use_when:
+      - "You are rendering label→value pairs — a details, status, or configuration panel."
+      - "Assistive tech should announce the pairing, which native <dl>/<dt>/<dd> does."
+    avoid_when:
+      - "The rows are content items rather than pairs."
+      - "The data is tabular with more than one value column."
+    alternatives:
+      - component: TList
+        when: "The rows are content, not label/value pairs."
+      - component: TTable
+        when: "There are several columns per row, or sorting."
+
   TDonutChart:
     keywords: [donut, doughnut, pie, proportion, share, breakdown, part of whole, percentage]
     use_when:
@@ -331,6 +370,8 @@ component_profiles:
         when: "The dropdown is a form control for selecting a value."
       - component: TContextMenu
         when: "The menu opens from a context action."
+      - component: TMenu
+        when: "The menu needs groups, link items, descriptions, or a menuitemradio."
 
   TEmptyState:
     keywords: [empty state, zero state, no data]
@@ -341,6 +382,17 @@ component_profiles:
     alternatives:
       - component: TAlert
         when: "The layout already has content and only needs a message."
+
+  TFileUpload:
+    keywords: [file upload, dropzone, drag and drop, attachment, browse files, paste image, progress]
+    use_when:
+      - "The user attaches one or more files, by browsing, dragging, or pasting."
+      - "Each file needs its own progress, thumbnail, and retry."
+    avoid_when:
+      - "You only need to display an already-uploaded image."
+    alternatives:
+      - component: TImage
+        when: "The file is already stored and only needs rendering."
 
   TFlag:
     keywords: [flag, country flag, country, nationality, region, iso 3166, alpha-2]
@@ -380,6 +432,17 @@ component_profiles:
     alternatives:
       - component: TStack
         when: "A single row or column is enough."
+
+  TImage:
+    keywords: [image, img, picture, photo, thumbnail, avatar image, object-fit, lazy loading]
+    use_when:
+      - "You are rendering a content image and want the library to own corners, object-fit, lazy loading, and the accessible name."
+    avoid_when:
+      - "The image represents a person or an entity in a list — TAvatar handles initials and status."
+      - "You need a zoom or lightbox — compose TImage inside TModal (recipe `image-zoom`)."
+    alternatives:
+      - component: TAvatar
+        when: "The image identifies a user or entity, with an initials fallback."
 
   TInput:
     keywords: [input, text field, text entry, single line]
@@ -439,6 +502,35 @@ component_profiles:
       - component: TNavMenu
         when: "The links are app-section navigation in a shell or sidebar."
 
+  TLinkTile:
+    keywords: [tile, link card, app launcher, product grid, navigation card, shortcut]
+    use_when:
+      - "A whole surface is one navigation target, with a leading icon, a title, and a description."
+      - "You are building an app launcher, a product grid, or a settings index."
+    avoid_when:
+      - "The surface holds several independent actions — one link target is the whole point."
+    alternatives:
+      - component: TCard
+        when: "The surface holds content and more than one action."
+      - component: TGrid
+        when: "You need the collection layout — TLinkTile owns no grid."
+
+  TList:
+    keywords: [list, rows, ul, li, feed, item list, actions per row]
+    use_when:
+      - "You are rendering content rows with leading, content, meta, and action regions."
+      - "Rows carry real interactive controls (buttons, links) rather than selection semantics."
+    avoid_when:
+      - "The user picks one or more rows — that needs listbox/option semantics."
+      - "The rows are label/value pairs, or tabular with several columns."
+    alternatives:
+      - component: TSelectableList
+        when: "Rows are selectable (role=listbox / role=option)."
+      - component: TDescriptionList
+        when: "Each row is a label and its value."
+      - component: TTable
+        when: "The data has columns and needs sorting."
+
   TMarkdownEditor:
     keywords: [markdown, rich text, editor, preview]
     use_when:
@@ -448,6 +540,22 @@ component_profiles:
     alternatives:
       - component: TTextarea
         when: "You only need multiline plain text."
+
+  TMenu:
+    keywords: [menu, action menu, user menu, account menu, workspace switcher, menu groups, menuitem]
+    use_when:
+      - "The menu needs groups, link items, icon + description + meta, a destructive item, or a menuitemradio."
+      - "You are composing the menu from slots rather than an items array."
+    avoid_when:
+      - "A short, data-driven list of actions is enough."
+      - "The menu opens from a context-click."
+    alternatives:
+      - component: TDropdown
+        when: "A plain items array covers it — TDropdown stays the lightweight action menu."
+      - component: TContextMenu
+        when: "The menu opens at the cursor from a right-click."
+      - component: TPopover
+        when: "The panel is rich content, not a list of actions — TMenu is built on TPopover."
 
   TModal:
     keywords: [modal, dialog, blocking, focused task]
@@ -560,6 +668,20 @@ component_profiles:
       - component: TDropdown
         when: "The content is primarily a menu of actions."
 
+  TProgress:
+    keywords: [progress, progress bar, percentage, determinate, upload progress, completion]
+    use_when:
+      - "You can express how far along the work is, as a value out of a max."
+      - "A long task should show that it is advancing rather than just that it is busy."
+    avoid_when:
+      - "You cannot say how much is left — that is a spinner."
+      - "The page shape is known and the content is what is missing."
+    alternatives:
+      - component: TSpinner
+        when: "The wait has no measurable progress."
+      - component: TSkeleton
+        when: "You know the layout and want to hold its shape while it loads."
+
   TSelectableList:
     keywords: [selectable list, rich options, option list]
     use_when:
@@ -596,6 +718,19 @@ component_profiles:
       - component: TDrawer
         when: "The panel is temporary and overlays content."
 
+  TSkeleton:
+    keywords: [skeleton, placeholder, shimmer, loading placeholder, content loading]
+    use_when:
+      - "You know the shape of the content that is coming and want to hold its space."
+      - "The wait is long enough that an empty area would read as broken."
+    avoid_when:
+      - "The layout is unknown, or the wait is a single short action."
+    alternatives:
+      - component: TSpinner
+        when: "There is no layout to preserve — a small busy indicator is enough."
+      - component: TProgress
+        when: "The remaining work is measurable."
+
   TStack:
     keywords: [stack, spacing, flex column, flex row]
     use_when:
@@ -618,6 +753,20 @@ component_profiles:
         when: "The chart needs axes, a legend, or a tooltip."
       - component: TStat
         when: "A single value with a trend badge is enough."
+
+  TSpinner:
+    keywords: [spinner, loading, busy, indeterminate, activity indicator]
+    use_when:
+      - "Something is busy and there is no way to say how much is left."
+      - "You need a busy indicator inside another control (TButton already embeds one via `loading`)."
+    avoid_when:
+      - "The page shape is known — hold it with a skeleton instead."
+      - "You can report a percentage."
+    alternatives:
+      - component: TSkeleton
+        when: "You can preserve the layout of the content that is loading."
+      - component: TProgress
+        when: "The progress is measurable."
 
   TStat:
     keywords: [stat, metric, KPI, dashboard]

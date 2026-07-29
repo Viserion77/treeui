@@ -108,8 +108,9 @@ typography:
 # ═══════════════════════════════════════════════════════════════
 spacing:
   rule: >
-    Use a 4px base unit. Every margin, padding, and gap
-    must be a multiple of 4px.
+    Use a 4px base unit. The spacing tokens are all on that grid and every
+    margin, padding, and gap should come from one; a small set of optical
+    adjustments (icon gaps, badge and dot padding) sits off it deliberately.
 
   reference-scale:
     space-1:  "4px"
@@ -235,14 +236,19 @@ icons:
       Even if icon is 20px, interactive area must be at least
       44×44px for accessible tap targets.
     treeui-implementation: >
-      Components use ::after pseudo-elements to ensure 44×44px
-      minimum touch targets.
+      Standalone icon controls get an ::after pseudo-element that expands the
+      hit area to 44×44px. Densely packed inline controls are documented
+      exceptions — chip removes (.t-multi-select__tag-remove), toolbar buttons
+      (.t-md-editor__toolbar-btn), number-input steppers and the swatch grid
+      sit inside a row of neighbours, where a 44×44 overlay would swallow the
+      click on the control next to it.
 
   conformance:
     treeui-status: PASS
     notes: >
       All 5 icon sizes match the reference scale exactly.
-      Touch target rule implemented in CSS via ::after.
+      Touch target rule implemented in CSS via ::after for standalone icon
+      controls; see the exceptions listed above.
       Icons use currentColor for theming.
 
 # ═══════════════════════════════════════════════════════════════
@@ -294,18 +300,7 @@ motion:
 # 07 — BEST PRACTICES
 # ═══════════════════════════════════════════════════════════════
 best-practices:
-  do:
-    - "Use consistent spacing (4px/8px grid)"
-    - "Limit color palette to semantic tokens"
-    - "Use a type scale for hierarchy"
-    - "Document ALL component states"
-    - "Use semantic color tokens (var(--tree-*))"
-  dont:
-    - "Eyeball spacing randomly"
-    - "Use every color you like"
-    - "Use arbitrary font sizes"
-    - "Only design the happy path"
-    - "Hardcode hex values"
+  see: "docs/ai/practices.json — the single source of truth for the named TreeUI practices and which components follow them."
 
 # ═══════════════════════════════════════════════════════════════
 # 08 — OVERALL CONFORMANCE SUMMARY
@@ -328,13 +323,10 @@ conformance-summary:
     - "Full semantic token system with --tree-* prefix"
     - "Light and dark themes are both first-class"
     - "All component states documented (default, hover, active, disabled, focus, loading, invalid)"
-    - "44×44px touch targets via ::after pseudo-elements"
     - "Focus ring system with customizable color token"
     - "BEM naming convention consistently applied"
     - "Modular spacing scale on 4px grid"
     - "Complete motion token system matching reference scale"
-    - "145 component screenshots for visual regression"
-    - "43+ unit tests covering a11y and behavior"
     - "Comprehensive ARIA support across all components"
 
   extensions-beyond-reference:

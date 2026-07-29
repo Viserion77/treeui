@@ -174,7 +174,7 @@ const copyInstall = async () => {
               {{ copied ? copy.hero.copied : copy.hero.copy }}
             </TButton>
             <span
-              class="visually-hidden"
+              class="t-visually-hidden"
               role="status"
             >{{ copied ? copy.hero.copied : '' }}</span>
           </div>
@@ -441,18 +441,6 @@ a {
   color: inherit;
 }
 
-.visually-hidden {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0 0 0 0);
-  white-space: nowrap;
-  border: 0;
-}
-
 .top {
   border-bottom: var(--tree-border-width-subtle) solid var(--tree-color-border-default);
   background: var(--tree-color-bg-surface);
@@ -509,7 +497,7 @@ a {
 
 .hero h1 {
   font-size: clamp(2rem, 5vw, 3rem);
-  line-height: 1.1;
+  line-height: var(--tree-font-lineHeight-compact);
   letter-spacing: -0.03em;
   text-wrap: balance;
   margin: 0 0 var(--tree-space-4);
@@ -520,7 +508,7 @@ a {
   color: var(--tree-color-text-muted);
   max-width: 52ch;
   margin: 0 auto;
-  line-height: 1.6;
+  line-height: var(--tree-font-lineHeight-body);
 }
 
 .hero__actions {
@@ -557,13 +545,13 @@ a {
   text-decoration: none;
   color: inherit;
   transition:
-    transform 0.18s ease,
-    box-shadow 0.18s ease;
+    transform var(--tree-motion-duration-moderate) var(--tree-motion-easing-standard),
+    box-shadow var(--tree-motion-duration-moderate) var(--tree-motion-easing-standard);
 }
 
 .path:hover {
   transform: translateY(-3px);
-  box-shadow: var(--tree-shadow-lg, 0 20px 44px -28px rgba(32, 87, 212, 0.5));
+  box-shadow: var(--tree-shadow-md);
 }
 
 .path__head {
@@ -591,7 +579,7 @@ a {
 
 .path__head h2 {
   margin: 0;
-  font-size: var(--tree-font-size-xl, 1.4rem);
+  font-size: var(--tree-font-size-xl);
   letter-spacing: -0.02em;
 }
 
@@ -665,7 +653,7 @@ a {
   margin: 0;
   color: var(--tree-color-text-muted);
   font-size: var(--tree-font-size-sm);
-  line-height: 1.6;
+  line-height: var(--tree-font-lineHeight-body);
 }
 
 .practice__foot {

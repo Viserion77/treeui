@@ -50,7 +50,8 @@ an individual is officially representing the community in public spaces.
 ## Enforcement
 
 Instances of abusive, harassing, or otherwise unacceptable behavior may be
-reported to the project maintainers.
+reported to the maintainer at <jeferson.a.oficial@gmail.com>. All reports are
+reviewed and investigated privately.
 
 ## Attribution
 

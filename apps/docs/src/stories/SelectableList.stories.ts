@@ -25,7 +25,7 @@ const items = [
 ];
 
 const meta = {
-  title: 'Components/Navigation & Disclosure/SelectableList',
+  title: 'Components/Navigation/SelectableList',
   component: TSelectableList,
   parameters: {
     docs: { description: { component: practiceNote('TSelectableList') } },

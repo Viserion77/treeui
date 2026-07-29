@@ -23,9 +23,29 @@ Variant names are scoped to an axis, not shared across every component. Two comp
 
 **For a high-emphasis card, use a brand-colored border** rather than an inverted surface. If a genuinely inverted surface is needed later, it should arrive as first-class tokens (`--tree-color-bg-inverse` + a matching on-inverse text token) defined per theme, not as a runtime swap of two unrelated tokens.
 
+`tone` is scoped the same way, and for the same reason: it names a *semantic role*, and which roles a component can express depends on what it renders.
+
+| Type | Values | Why it differs |
+|---|---|---|
+| `TBadgeTone`, `TStatTone` | `neutral · success · warning · danger · info` | Status surfaces. The full status scale applies. |
+| `TTimelineTone` | `neutral · brand · success · warning · danger` | A timeline marks progress, so `brand` (current step) replaces `info`. |
+| `TLinkTileTone` | `neutral · brand · success · warning · danger · info` | A navigational tile can be either, so it carries both. |
+| `TTextTone` | `default · muted · inverse · brand` | Text tone is a *legibility* role against a surface, not a status. It shares no values with the others by design. |
+
+A component takes the narrowest union it can honestly render. Do not widen one to match another.
+
 ## Density
 
-**TreeUI has no density axis.** Spacing density is expressed through the existing `size` prop (`sm | md | lg`), which every sized component already accepts.
+**TreeUI has no density axis.** Spacing density is expressed through the existing `size` prop (`sm | md | lg`), which 50 components accept.
+
+Four components deliberately spell `size` differently, because they are not sizing a control:
+
+- `TContainer` — `sm | md | lg | xl | full`: a page width, not a control height.
+- `TText` — `xs | sm | md | lg | xl | 2xl | 3xl`: the type scale, which is longer than the control scale.
+- `TIcon` — `number | string`: a glyph edge length, usually driven by a `--tree-size-icon-*` token.
+- `TDonutChart` — `number`: a drawing dimension in a fixed-geometry SVG.
+
+Anything that renders a *control* uses `TSize`. These four do not, and forcing them onto a three-step scale would cost more than it buys.
 
 A separate density axis was considered and rejected for now. It would be a *token-layer* decision, not a component prop: a real density system needs a scoped selector (like `[data-tree-theme]`) that re-emits the spacing scale, and today `createFoundationCss` emits `:root` unconditionally while the typed theme contract is color-only. Adding a density prop per component would instead multiply every component's variant matrix for an effect `size` already delivers.
 
@@ -35,6 +55,8 @@ The example dashboards label their `size` control "Density" because that is the 
 
 - Tokens, variants, sizes, accessibility expectations, and interaction patterns stay framework-agnostic
 - Vue-specific concerns stay inside `@treeui/vue` so future framework packages do not inherit Vue vocabulary
+
+**The icon registry is Vue-coupled today.** `@treeui/icons` renders through `defineComponent`/`h` and declares a `vue` peer dependency, so despite sitting beside `tokens` and `utils` it is not framework-agnostic and `@treeui/react` cannot consume it. This is recorded rather than fixed: a React icon layer would need the SVG data and the registry lookup extracted from the Vue rendering, which is a package split, not a patch. Until that happens, treat only `tokens` and `utils` as the framework-agnostic pair.
 
 ## Locale Data and Flag Assets
 

@@ -1,17 +1,14 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite';
-import { ref } from 'vue';
 import {
   TAlert,
   TBadge,
   TButton,
   TCard,
-  TChart,
   TFormField,
   TGrid,
   TInput,
   TSelectableList,
   TStack,
-  TStat,
   TTable,
   TTag,
   TTextarea,
@@ -56,7 +53,7 @@ const meta = {
     docs: {
       description: {
         component:
-          'Docs-first composition recipes built from TreeUI primitives. These patterns stay documented instead of becoming standalone exports.',
+          'Docs-first composition recipes built from TreeUI primitives. These patterns stay documented instead of becoming standalone exports. Larger, fully interactive recipes — metric grids, tag inputs, colour fields, chart surfaces, application shells — have their own pages in the sidebar beneath this one.',
       },
     },
   },
@@ -64,19 +61,6 @@ const meta = {
 
 export default meta;
 type Story = StoryObj<Record<string, never>>;
-
-export const StatGroup: Story = {
-  render: () => ({
-    components: { TGrid, TStat },
-    template: `
-      <TGrid min-item-width="14rem">
-        <TStat label="MRR" value="$48.2k" trend="12.4%" tone="success" trend-direction="up" />
-        <TStat label="Activation" value="68%" trend="4.1%" tone="info" trend-direction="up" />
-        <TStat label="Open incidents" value="7" trend="2 urgent" tone="warning" trend-direction="neutral" />
-      </TGrid>
-    `,
-  }),
-};
 
 export const SectionHeader: Story = {
   render: () => ({
@@ -263,130 +247,6 @@ export const ActionPanel: Story = {
               <TButton variant="outline">Preview</TButton>
               <TButton>Publish</TButton>
             </div>
-          </TStack>
-        </TCard>
-      </div>
-    `,
-  }),
-};
-
-export const TagInputField: Story = {
-  render: () => ({
-    components: { TFormField, TInput, TStack, TTag },
-    setup: () => {
-      const draft = ref('');
-      const tags = ref(['treeui.dev', 'docs.treeui.dev']);
-
-      const addTag = () => {
-        const value = draft.value.trim();
-        if (!value || tags.value.includes(value)) {
-          return;
-        }
-
-        tags.value = [...tags.value, value];
-        draft.value = '';
-      };
-
-      const removeTag = (tag: string) => {
-        tags.value = tags.value.filter((item) => item !== tag);
-      };
-
-      return { addTag, draft, removeTag, tags };
-    },
-    template: `
-      <div style="max-width: 32rem;">
-        <TStack gap="var(--tree-space-3)">
-          <TFormField
-            label="Allowed domains"
-            hint="Press Enter to add each domain as a removable tag."
-          >
-            <TInput
-              aria-label="Add domain"
-              placeholder="example.com"
-              :model-value="draft"
-              @update:model-value="draft = $event"
-              @keydown.enter.prevent="addTag"
-            />
-          </TFormField>
-
-          <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
-            <TTag
-              v-for="tag in tags"
-              :key="tag"
-              removable
-              @remove="removeTag(tag)"
-            >
-              {{ tag }}
-            </TTag>
-          </div>
-        </TStack>
-      </div>
-    `,
-  }),
-};
-
-export const ColorField: Story = {
-  render: () => ({
-    components: { TFormField, TStack },
-    setup: () => ({
-      value: ref('#0969da'),
-    }),
-    template: `
-      <div style="max-width: 20rem;">
-        <TStack gap="var(--tree-space-3)">
-          <TFormField
-            label="Brand color"
-            hint="Use the native color input inside TreeUI field composition."
-          >
-            <input
-              v-model="value"
-              type="color"
-              aria-label="Brand color"
-              style="
-                width: 100%;
-                min-height: var(--tree-size-control-md);
-                padding: 0;
-                border: var(--tree-border-width-subtle) solid var(--tree-color-border-default);
-                border-radius: var(--tree-radius-md);
-                background: var(--tree-color-bg-surface);
-              "
-            >
-          </TFormField>
-
-          <span style="font-size: var(--tree-font-size-sm); color: var(--tree-color-text-muted);">
-            Selected: {{ value }}
-          </span>
-        </TStack>
-      </div>
-    `,
-  }),
-};
-
-export const ChartSurface: Story = {
-  render: () => ({
-    components: { TBadge, TCard, TChart, TStack },
-    template: `
-      <div style="max-width: 32rem;">
-        <TCard>
-          <template #header>
-            <div style="display: flex; align-items: center; justify-content: space-between; gap: 1rem;">
-              <strong>Monthly activity</strong>
-              <TBadge size="sm" variant="outline" tone="info">Chart recipe</TBadge>
-            </div>
-          </template>
-
-          <TStack gap="var(--tree-space-3)">
-            <TChart
-              type="bar"
-              :series="[{ name: 'Sessions', data: [46, 68, 56, 84, 62, 74] }]"
-              :labels="['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun']"
-              :height="180"
-              aria-label="Monthly activity bar chart"
-            />
-
-            <p style="margin: 0; color: var(--tree-color-text-muted); font-size: var(--tree-font-size-sm);">
-              Frame the native TChart in TCard + TStack — no external chart library needed.
-            </p>
           </TStack>
         </TCard>
       </div>

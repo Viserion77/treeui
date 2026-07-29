@@ -1,6 +1,6 @@
 component: TMarkdownEditor
 source_file: packages/vue/src/components/TMarkdownEditor.vue
-status: stable
+status: available
 since: 0.x.x
 description: >
   A Markdown editor with an always-visible side-by-side live preview, toolbar

@@ -447,10 +447,15 @@ onBeforeUnmount(() => {
         </li>
 
         <template v-else>
+          <!-- role="none" so the listbox owns the options directly instead of
+               the implicit listitem sitting between them. -->
           <li
             v-for="(option, index) in filteredOptions"
             :key="option.value"
+            role="none"
           >
+            <!-- The input keeps focus and points at the active option through
+                 aria-activedescendant, so options stay out of the tab order. -->
             <button
               :id="`${listboxId}-option-${option.value}`"
               type="button"
@@ -461,6 +466,7 @@ onBeforeUnmount(() => {
                 'is-disabled': option.disabled,
               }"
               role="option"
+              tabindex="-1"
               :aria-selected="isSelected(option.value)"
               :aria-disabled="option.disabled || undefined"
               :disabled="option.disabled"

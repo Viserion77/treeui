@@ -2,7 +2,7 @@
   "name": "treeui",
   "version": "0.1.0",
   "private": true,
-  "description": "Clean components for modern Vue products.",
+  "description": "Clean components for modern products.",
   "packageManager": "pnpm@9.15.0",
   "pnpm": {
     "overrides": {
@@ -11,7 +11,7 @@
     }
   },
   "scripts": {
-    "clean": "pnpm -w exec rimraf coverage playwright-report test-results apps/docs/storybook-static \"packages/*/dist\"",
+    "clean": "pnpm -w exec rimraf coverage playwright-report test-results site apps/docs/storybook-static apps/docs-react/storybook-static apps/landing/dist \"packages/*/dist\" \"examples/*/dist\"",
     "dev": "pnpm docs:dev",
     "docs:dev": "pnpm build:packages && pnpm --filter @treeui/docs docs:dev",
     "build:docs": "pnpm --filter @treeui/docs docs:build",

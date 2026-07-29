@@ -2,7 +2,7 @@
 
 React components for TreeUI, built on the same framework-agnostic `@treeui/tokens` and `t-*` BEM classes as `@treeui/vue`.
 
-> Early package. The first release ships a small set of primitives — `TButton`, `TInput`, `TBadge`, and `TCard` — and grows from there.
+> Early package. The package today ships a small set of primitives — `TButton`, `TInput`, `TBadge`, and `TCard` — and grows from there.
 
 ## Install
 
@@ -36,7 +36,7 @@ The stylesheet re-imports `@treeui/tokens/styles.css` and `@treeui/tokens/themes
 
 | Component | Notes |
 |---|---|
-| `TButton` | `variant`, `size`, `loading`, `icon`; forwards native button attributes |
+| `TButton` | `variant`, `size`, `loading` (+ `loadingLabel`), `icon`, `iconOnly` (needs `aria-label`); forwards native button attributes |
 | `TInput` | `size`, `invalid`, `prefix`, `suffix`; forwards native input attributes |
 | `TBadge` | `variant`, `size`, `tone`, `icon` |
 | `TCard` | `variant`, `size`, `header`, `footer` |

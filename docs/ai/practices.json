@@ -140,11 +140,12 @@
       "id": "token-driven",
       "title": "Token-driven clarity",
       "icon": "palette",
-      "summary": "No raw hex, px, or font values anywhere. Every visual decision references a --tree-* token, so light/dark and brand theming stay coherent by construction.",
+      "summary": "Zero raw colors, spacing, or type in component code. Every visual decision references a --tree-* token, so light/dark and brand theming stay coherent by construction.",
       "rules": [
-        "Zero hardcoded colors, spacing, or typography in component code.",
+        "Zero hardcoded colors, spacing, or typography in component code — verified: the stylesheet contains no raw hex value.",
         "Light and dark are first-class themes; every state passes both.",
-        "Themes switch by attribute (data-tree-theme) with no component changes."
+        "Themes switch by attribute (data-tree-theme) with no component changes.",
+        "The documented exceptions are geometry, not design values: focus-ring and hairline widths, sub-pixel motion offsets, and the 44px WCAG target constant."
       ],
       "components": [
         "TCard",
@@ -194,7 +195,7 @@
     "TPopover": "components-overlay-popover",
     "TProgress": "components-feedback-progress",
     "TSelect": "components-data-entry-select",
-    "TSelectableList": "components-navigation-disclosure-selectablelist",
+    "TSelectableList": "components-navigation-selectablelist",
     "TSkeleton": "components-feedback-skeleton",
     "TSpacer": "components-layout-spacer",
     "TSpinner": "components-feedback-spinner",
@@ -206,6 +207,6 @@
     "TTag": "components-data-display-tag",
     "TToastProvider": "components-feedback-toast",
     "TTooltip": "components-overlay-tooltip",
-    "TTreeView": "components-navigation-disclosure-treeview"
+    "TTreeView": "components-navigation-treeview"
   }
 }

@@ -76,7 +76,7 @@ a11y:
   tabindex_minus_one_when_non_button_disabled: true
   icon_slot_marked_aria_hidden: true
   loading_spinner_is_announced: "The nested TSpinner carries role=\"status\" and a visually hidden label, so the button's accessible name gains that text while loading. The text comes from `loadingLabel`, so it follows the app's locale."
-  icon_only_requires_an_accessible_name: "With `iconOnly` there is no visible text and the icon slot is aria-hidden, so the name must come from `label` or `aria-label`. This is a documented requirement, not a runtime assertion — the package ships ESM+CJS with no dev-only build define, so there is no dev-stripped warning."
+  icon_only_requires_an_accessible_name: "With `iconOnly` there is no visible text and the icon slot is aria-hidden, so the name must come from `label` or `aria-label`. Enforced by a dev-only console.warn — see props.label."
   touch_targets: "44×44px minimum via the .t-button::after overlay"
   focus_visible: "box-shadow focus ring on the root element"
 

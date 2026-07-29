@@ -2,7 +2,8 @@
 # Components: TPricingCard, TPricing
 
 component: PricingCard
-status: stable
+source_file: packages/vue/src/components/TPricingCard.vue
+status: available
 category: data-display
 description: >
   A card component for displaying pricing plans with title, price, features list,
@@ -119,7 +120,8 @@ a11y:
 ---
 
 component: Pricing
-status: stable
+source_file: packages/vue/src/components/TPricing.vue
+status: available
 category: data-display
 description: >
   Grid wrapper that renders multiple PricingCard components from an array

@@ -1,8 +1,10 @@
-component: TPopover
-status: stable
+name: TPopover
+source_file: packages/vue/src/components/TPopover.vue
 package: "@treeui/vue"
+kind: overlay
+status: available
 since: "0.5.0"
-description: >
+purpose: >
   Rich floating content panel anchored to a trigger element.
   Opened by click, dismissed by outside click or Escape.
   Supports four placement sides with alignment options.
@@ -13,46 +15,42 @@ anatomy:
   - t-popover__content     # floating panel (role="dialog")
 
 props:
-  - name: open
+  open:
     type: boolean
-    optional: true
-    description: Controlled open state (v-model:open)
-
-  - name: defaultOpen
-    type: boolean
-    default: false
-    description: Initial open state for uncontrolled usage
-
-  - name: disabled
+    default: undefined
+    note: "Controlled open state (v-model:open)."
+  defaultOpen:
     type: boolean
     default: false
-    description: Prevents opening
-
-  - name: side
+    note: "Initial open state for uncontrolled usage."
+  disabled:
+    type: boolean
+    default: false
+    note: "Prevents opening."
+  side:
     type: "'top' | 'right' | 'bottom' | 'left'"
-    default: "'bottom'"
-    description: Placement side relative to trigger
-
-  - name: align
+    default: bottom
+    values: [top, right, bottom, left]
+    note: "Placement side relative to trigger."
+  align:
     type: "'start' | 'center' | 'end'"
-    default: "'center'"
-    description: Alignment along the placement axis
-
-  - name: size
+    default: center
+    values: [start, center, end]
+    note: "Alignment along the placement axis."
+  size:
     type: TSize
-    default: "'md'"
-    description: "Panel density. Scales the content padding by the shared size tokens (sm → space-3, md → space-4, lg → space-5), so compact rich panels use a prop instead of overriding `.t-popover__content`. This is the `size` axis, not a density prop — TreeUI has no density axis (see DECISIONS.md → Density). For a compact menu of actions use TDropdown, which owns role=menu semantics; use TPopover for a rich non-menu panel."
-
-  - name: width
+    default: md
+    values: [sm, md, lg]
+    note: "Panel density. Scales the content padding by the shared size tokens (sm → space-3, md → space-4, lg → space-5), so compact rich panels use a prop instead of overriding `.t-popover__content`. This is the `size` axis, not a density prop — TreeUI has no density axis (see DECISIONS.md → Density). For a compact menu of actions use TDropdown, which owns role=menu semantics; use TPopover for a rich non-menu panel."
+  width:
     type: TPopoverWidth
-    default: "'md'"
+    default: md
     values: [content, sm, md, lg]
-    description: "Panel max-width. The content ALWAYS sizes to its intrinsic width (`width: max-content`), so grid/flex panels no longer collapse to the min-width; this prop caps how wide it may grow: sm → 18rem, md → 24rem (base), lg → 40rem, content → no rem cap (only the viewport clamp), for a wide rich panel such as an app-launcher grid. Width and height are always clamped to the viewport (`calc(100vw - space-8)` / `calc(100dvh - space-16)`) and the panel gets its own scroll — it never runs off-screen. Replaces `:deep(.t-popover__content)` width/overflow overrides."
-
-  - name: id
+    note: "Panel max-width. The content ALWAYS sizes to its intrinsic width (`width: max-content`), so grid/flex panels no longer collapse to the min-width; this prop caps how wide it may grow: sm → 18rem, md → 24rem (base), lg → 40rem, content → no rem cap (only the viewport clamp), for a wide rich panel such as an app-launcher grid. Width and height are always clamped to the viewport (`calc(100vw - space-8)` / `calc(100dvh - space-16)`) and the panel gets its own scroll — it never runs off-screen. Replaces `:deep(.t-popover__content)` width/overflow overrides."
+  id:
     type: string
-    optional: true
-    description: Custom id for the content panel
+    default: undefined
+    note: "Custom id for the content panel."
 
 events:
   - name: update:open

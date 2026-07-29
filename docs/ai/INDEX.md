@@ -23,8 +23,7 @@ Load files in this order and stop as soon as you have enough context:
 7. `docs/ai/practices.json` when practice conformance, UX guidance, or advocacy matters
 8. `docs/ai/TOKENS.yaml` only if visual, spacing, motion, or theming details matter
 9. `docs/ai/STANDARDS.yaml` for design-system conformance rules
-10. `docs/ai/VALIDATION.yaml` for acceptance-criteria auditing
-11. `docs/ai/DECISIONS.md` only if rationale matters
+10. `docs/ai/DECISIONS.md` only if rationale matters
 
 ## Canonical Files
 
@@ -34,7 +33,7 @@ Load files in this order and stop as soon as you have enough context:
 - `RECIPES.yaml`: cross-component composition guidance
 - `TOKENS.yaml`: framework-agnostic visual contract and theme values
 - `STANDARDS.yaml`: design-system conformance rules (colors, typography, spacing, motion, icons)
-- `VALIDATION.yaml`: per-component acceptance criteria (naming, CSS, states, a11y, docs)
+- `VALIDATION.yaml`: the acceptance-criteria definitions (naming, structure, CSS, states, a11y, docs) a component review cites by id
 - `COMPONENTS/*.yaml`: component-level public API manifests
 - `practices.json`: named UX practices, the philosophy statement, and per-component conformance; rendered by the landing page, the Storybook `Foundation/Practices` page, and per-story practice notes
 - `DECISIONS.md`: rationale behind the contract shape

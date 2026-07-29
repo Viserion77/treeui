@@ -24,6 +24,22 @@ export const Solid: Story = { args: { variant: 'solid' } };
 export const Outline: Story = { args: { variant: 'outline' } };
 export const Loading: Story = { args: { loading: true } };
 
+/**
+ * `iconOnly` drops the visible label and renders a square control matching the
+ * size token, so the button needs an explicit `aria-label` for its name.
+ */
+export const IconOnly: Story = {
+  args: {
+    iconOnly: true,
+    'aria-label': 'Add teammate',
+    icon: (
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+        <path d="M12 5v14M5 12h14" strokeLinecap="round" />
+      </svg>
+    ),
+  },
+};
+
 export const Variants: Story = {
   render: (args) => (
     <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>

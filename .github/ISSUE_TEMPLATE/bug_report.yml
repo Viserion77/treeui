@@ -22,11 +22,14 @@ body:
     attributes:
       label: Package
       options:
-        - @treeui/vue
-        - @treeui/tokens
-        - @treeui/utils
-        - docs
-        - other
+        - '@treeui/vue'
+        - '@treeui/react'
+        - '@treeui/tokens'
+        - '@treeui/utils'
+        - '@treeui/icons'
+        - '@treeui/mcp'
+        - 'docs / storybook'
+        - 'other'
     validations:
       required: true
 

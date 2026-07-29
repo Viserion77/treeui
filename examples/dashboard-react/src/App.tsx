@@ -271,7 +271,7 @@ export function App() {
                               className="channels__seg"
                               style={{
                                 flexGrow: value,
-                                background: `var(--example-chart-${index + 1})`,
+                                background: `var(--tree-color-chart-${index + 1})`,
                               }}
                               title={`${channelNames[index]}: ${value}k sessions`}
                             />
@@ -289,7 +289,7 @@ export function App() {
                 <ul className="channels__legend">
                   {channelNames.map((name, index) => (
                     <li key={name}>
-                      <i style={{ background: `var(--example-chart-${index + 1})` }} />
+                      <i style={{ background: `var(--tree-color-chart-${index + 1})` }} />
                       {name}
                     </li>
                   ))}

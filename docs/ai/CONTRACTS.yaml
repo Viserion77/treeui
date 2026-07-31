@@ -10,7 +10,7 @@ source_component_filename_prefix: "T"
 # Maintenance: must stay 1:1 with the `export { default as ... }` lines in
 # packages/vue/src/components/index.ts. Verify with:
 #   grep -oP '^export \{ default as \K\w+' packages/vue/src/components/index.ts | sort
-primary_exports_count: 88
+primary_exports_count: 90
 primary_exports:
   - TAccordion
   - TAccordionItem
@@ -49,6 +49,7 @@ primary_exports:
   - TImage
   - TInput
   - TKbd
+  - TKeyValueEditor
   - TLanguageSelect
   - TLink
   - TLinkTile
@@ -92,6 +93,7 @@ primary_exports:
   - TTable
   - TTabs
   - TTag
+  - TTagInput
   - TText
   - TTextarea
   - TTimeline

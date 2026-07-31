@@ -3,10 +3,11 @@ import { computed } from 'vue';
 
 const _treeTextSizes = [
   'xs', 'sm', 'md', 'lg', 'xl', '2xl', '3xl', '4xl', '5xl',
-  // Responsive marketing steps: `display` (hero) clamps 3xl→5xl; `overline`
+  // Responsive marketing steps: `display` (hero) clamps 3xl→5xl; `title`
+  // (section heading) clamps xl→4xl and always stays below `display`; `overline`
   // (eyebrow) is a closed style — small, semibold, uppercase, wide tracking —
   // that leaves colour to the `tone` axis.
-  'display', 'overline',
+  'display', 'title', 'overline',
 ] as const;
 const _treeTextTones = ['default', 'muted', 'inverse', 'brand'] as const;
 const _treeTextWeights = ['regular', 'medium', 'semibold', 'bold'] as const;

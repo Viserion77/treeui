@@ -12,8 +12,16 @@ describe('weekStartForLocale', () => {
     expect(weekStartForLocale('en-GB')).toBe(1);
   });
 
-  it('falls back to Monday for a nonsense locale', () => {
+  it('falls back to Monday by default for a nonsense locale', () => {
     expect(weekStartForLocale('zz-nonsense-tag')).toBe(1);
+  });
+
+  it('honours a caller-supplied fallback when week info is unavailable', () => {
+    // A Sunday-first product passes 0 so an unknown tag never silently
+    // becomes Monday (TREEUX-016).
+    expect(weekStartForLocale('zz-nonsense-tag', 0)).toBe(0);
+    // A valid locale still wins over the fallback.
+    expect(weekStartForLocale('es-ES', 0)).toBe(1);
   });
 });
 
@@ -66,6 +74,20 @@ describe('placeInDay', () => {
       { hourHeight: 48, minHeight: 16 },
     );
     expect(height).toBe(16);
+  });
+
+  it('never lets a floored short event overflow the day near midnight', () => {
+    // Percent-of-day units: a 3-minute event at 23:55 with a 15-minute floor
+    // used to return top 99.65% + height 1.04% = 100.69%, spilling below the
+    // column (TREEUX-016). It must shrink so top + height stays within the day.
+    const hourHeight = 100 / 24;
+    const { top, height } = placeInDay(
+      { start: at(2026, 7, 15, 23, 55), end: at(2026, 7, 15, 23, 58) },
+      at(2026, 7, 15),
+      { hourHeight, minHeight: 15 * (hourHeight / 60) },
+    );
+    expect(top + height).toBeLessThanOrEqual(100 + 1e-9);
+    expect(height).toBeGreaterThan(0);
   });
 });
 

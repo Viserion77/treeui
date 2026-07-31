@@ -1,7 +1,7 @@
 {
-  "generatedAt": "0.24.0",
+  "generatedAt": "0.25.0",
   "packageName": "@treeui/vue",
-  "packageVersion": "0.24.0",
+  "packageVersion": "0.25.0",
   "decisionGuides": [
     {
       "id": "single-choice",
@@ -97,6 +97,40 @@
           "when": [
             "Multi-selection must work across a hierarchy.",
             "Set `selectionMode=\"multiple\"`."
+          ],
+          "notes": []
+        },
+        {
+          "use": "TTagInput",
+          "when": [
+            "The values are arbitrary free strings the user types, not a fixed option set.",
+            "There is no list to pick from (use TMultiSelect/TCombobox when there is)."
+          ],
+          "notes": [
+            "`v-model` is `string[]`; Enter/comma add, Backspace removes the last, duplicates dedupe silently."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "edit-key-value-map",
+      "question": "Edit a map of key/value pairs",
+      "options": [
+        {
+          "use": "TKeyValueEditor",
+          "when": [
+            "The user edits a `Record<string, string>` (config map, colour tokens, env vars).",
+            "Rows must be addable/removable with per-row key validation."
+          ],
+          "notes": [
+            "Editing, not display. For read-only key/value display use TDescriptionList.",
+            "A write-only/sensitive mode (value never read back) is a closed contract on the queue, not yet shipped."
+          ]
+        },
+        {
+          "use": "TDescriptionList",
+          "when": [
+            "The pairs are read-only display, not editable."
           ],
           "notes": []
         }
@@ -651,7 +685,9 @@
         "TSelectableList",
         "TCard",
         "TLinkTile",
-        "TMenu"
+        "TMenu",
+        "TTagInput",
+        "TKeyValueEditor"
       ]
     },
     {
@@ -699,7 +735,9 @@
         "TBadge",
         "TTag",
         "TCard",
-        "TModal"
+        "TModal",
+        "TTagInput",
+        "TKeyValueEditor"
       ]
     },
     {
@@ -768,7 +806,9 @@
         "TMenu",
         "TList",
         "TDescriptionList",
-        "TImage"
+        "TImage",
+        "TTagInput",
+        "TKeyValueEditor"
       ]
     }
   ],
@@ -5905,6 +5945,92 @@
       "practices": []
     },
     {
+      "name": "TKeyValueEditor",
+      "aliases": [],
+      "package": "@treeui/vue",
+      "kind": "form",
+      "category": "Data Entry",
+      "status": "available",
+      "purpose": "Edit a Record<string, string> as add/removable key/value rows with per-row validation. An editor (distinct from TDescriptionList, which only displays).",
+      "sourceFile": "packages/vue/src/components/TKeyValueEditor.vue",
+      "storyFile": "apps/docs/src/stories/KeyValueEditor.stories.ts",
+      "storyTitle": "Components/Data Entry/KeyValueEditor",
+      "manifestFile": "docs/ai/COMPONENTS/key-value-editor.yaml",
+      "props": [
+        {
+          "name": "modelValue",
+          "type": "Record<string, string>",
+          "default": "{}",
+          "note": "The edited map. Full value round-trips (non-sensitive mode)."
+        },
+        {
+          "name": "size",
+          "type": "TSize",
+          "default": "md",
+          "values": [
+            "sm",
+            "md",
+            "lg"
+          ]
+        },
+        {
+          "name": "disabled",
+          "type": "boolean",
+          "default": "false"
+        },
+        {
+          "name": "invalid",
+          "type": "boolean",
+          "default": "false",
+          "note": "Marks the whole control invalid (e.g. mirrors a TFormField summary error)."
+        },
+        {
+          "name": "labels",
+          "type": "TKeyValueEditorLabels",
+          "default": "{}",
+          "note": "Localizable copy merged over English defaults: key, value, add, remove, emptyKey, duplicateKey."
+        }
+      ],
+      "events": [
+        {
+          "name": "update:modelValue"
+        },
+        {
+          "name": "validity-change: emits { valid: boolean; errors: string[] } — deduped, localized messages to feed a TFormField summary."
+        }
+      ],
+      "slots": [],
+      "a11y": [
+        "per_row_key_aria_invalid: true",
+        "row_error_linked_by_aria_describedby: true",
+        "remove_button_has_accessible_name: true"
+      ],
+      "behavior": [
+        "rows_add_and_remove: true",
+        "inline_per_row_validation: true",
+        "empty_key_flagged_only_when_value_present: true",
+        "duplicate_key_flagged_on_later_occurrence: true",
+        "invalid_rows_blocked_from_commit_without_blocking_typing: true",
+        "aggregated_errors_via_validity_change_event: true"
+      ],
+      "selection": {
+        "keywords": [],
+        "useWhen": [],
+        "avoidWhen": [],
+        "alternatives": []
+      },
+      "setup": {
+        "required": [],
+        "notes": []
+      },
+      "recipes": [],
+      "practices": [
+        "interaction-feedback",
+        "predictable-api",
+        "token-driven"
+      ]
+    },
+    {
       "name": "TLanguageSelect",
       "aliases": [],
       "package": "@treeui/vue",
@@ -9938,6 +10064,103 @@
       ]
     },
     {
+      "name": "TTagInput",
+      "aliases": [],
+      "package": "@treeui/vue",
+      "kind": "form",
+      "category": "Data Entry",
+      "status": "available",
+      "purpose": "Edit a list of free-text strings as addable/removable chips (e.g. a service list). Free input, not selection from a fixed option set — use TMultiSelect/TCombobox for that.",
+      "sourceFile": "packages/vue/src/components/TTagInput.vue",
+      "storyFile": "apps/docs/src/stories/TagInput.stories.ts",
+      "storyTitle": "Components/Data Entry/TagInput",
+      "manifestFile": "docs/ai/COMPONENTS/tag-input.yaml",
+      "props": [
+        {
+          "name": "modelValue",
+          "type": "string[]",
+          "default": "[]",
+          "note": "The tags. Arbitrary strings, in order."
+        },
+        {
+          "name": "size",
+          "type": "TSize",
+          "default": "md",
+          "values": [
+            "sm",
+            "md",
+            "lg"
+          ]
+        },
+        {
+          "name": "width",
+          "type": "TFieldWidth",
+          "default": "full",
+          "values": [
+            "xs",
+            "sm",
+            "md",
+            "lg",
+            "xl",
+            "full"
+          ]
+        },
+        {
+          "name": "disabled",
+          "type": "boolean",
+          "default": "false"
+        },
+        {
+          "name": "invalid",
+          "type": "boolean",
+          "default": "false"
+        },
+        {
+          "name": "placeholder",
+          "type": "string",
+          "default": "",
+          "note": "Shown only while there are no tags."
+        }
+      ],
+      "events": [
+        {
+          "name": "update:modelValue"
+        }
+      ],
+      "slots": [],
+      "a11y": [
+        "chips_are_ttag_removable: true",
+        "aria_invalid_when_invalid: true",
+        "keyboard_enter_or_comma_adds: true",
+        "keyboard_backspace_removes_last: true"
+      ],
+      "behavior": [
+        "values_are_free_strings: true",
+        "enter_and_comma_confirm_current_tag: true",
+        "pasted_comma_separated_string_splits_into_tags: true",
+        "trims_and_dedupes_silently: true",
+        "empty_after_trim_ignored: true",
+        "no_autocomplete_or_suggestions: true",
+        "reuses_ttag_for_chips: true"
+      ],
+      "selection": {
+        "keywords": [],
+        "useWhen": [],
+        "avoidWhen": [],
+        "alternatives": []
+      },
+      "setup": {
+        "required": [],
+        "notes": []
+      },
+      "recipes": [],
+      "practices": [
+        "interaction-feedback",
+        "predictable-api",
+        "token-driven"
+      ]
+    },
+    {
       "name": "TText",
       "aliases": [],
       "package": "@treeui/vue",
@@ -9971,9 +10194,10 @@
             "4xl",
             "5xl",
             "display",
+            "title",
             "overline"
           ],
-          "note": "xs–5xl map to --tree-font-size-*. `display` is a responsive hero step (clamp 3xl→5xl, compact line-height, tight tracking). `overline` is a closed eyebrow style (xs, semibold, uppercase, wide tracking) that leaves colour to `tone`. Omitted = inherit."
+          "note": "xs–5xl map to --tree-font-size-*. `display` is a responsive hero step (clamp 3xl→5xl, compact line-height, tight tracking). `title` is a responsive section-heading step (clamp xl→4xl, tight line-height and tracking) that stays below `display` at every width, so a section heading never out-sizes the hero. `overline` is a closed eyebrow style (xs, semibold, uppercase, wide tracking) that leaves colour to `tone`. Omitted = inherit."
         },
         {
           "name": "tone",

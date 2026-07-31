@@ -13,9 +13,13 @@ const meta = {
     truncate: false,
   },
   argTypes: {
-    size: { control: 'select', options: ['xs', 'sm', 'md', 'lg', 'xl', '2xl', '3xl'] },
+    size: {
+      control: 'select',
+      options: ['xs', 'sm', 'md', 'lg', 'xl', '2xl', '3xl', '4xl', '5xl', 'display', 'title', 'overline'],
+    },
     tone: { control: 'select', options: ['default', 'muted', 'inverse', 'brand'] },
     weight: { control: 'select', options: ['regular', 'medium', 'semibold', 'bold'] },
+    measure: { control: 'select', options: [undefined, 'lead', 'prose'] },
     truncate: { control: 'boolean' },
   },
 } satisfies Meta<typeof TText>;
@@ -35,10 +39,35 @@ export const Playground: Story = {
 export const Sizes: Story = {
   render: () => ({
     components: { TText },
-    setup: () => ({ sizes: ['xs', 'sm', 'md', 'lg', 'xl', '2xl', '3xl'] }),
+    setup: () => ({ sizes: ['xs', 'sm', 'md', 'lg', 'xl', '2xl', '3xl', '4xl', '5xl'] }),
     template: `
       <div style="display: grid; gap: 0.5rem;">
         <TText v-for="s in sizes" :key="s" :size="s">Aa — size {{ s }}</TText>
+      </div>
+    `,
+  }),
+};
+
+export const MarketingTypography: Story = {
+  render: () => ({
+    components: { TText },
+    template: `
+      <div style="display: grid; gap: 1.5rem;">
+        <div style="display: grid; gap: 0.5rem;">
+          <TText size="overline" tone="brand">Foundation</TText>
+          <TText as="h1" size="display">Ship clarity by default</TText>
+          <TText as="p" measure="lead" tone="muted">
+            A responsive hero step that scales with the viewport — no clamp() in the consumer.
+          </TText>
+        </div>
+        <div style="display: grid; gap: 0.5rem;">
+          <TText as="h2" size="title">A section heading</TText>
+          <TText as="p" measure="prose">
+            The title step clamps xl→4xl and stays below display at every width, so a section
+            heading never out-sizes the hero on a narrow screen. Reading measure caps the line
+            length in ch for legibility.
+          </TText>
+        </div>
       </div>
     `,
   }),

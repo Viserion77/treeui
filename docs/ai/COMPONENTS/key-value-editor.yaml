@@ -1,0 +1,60 @@
+name: TKeyValueEditor
+source_file: packages/vue/src/components/TKeyValueEditor.vue
+package: "@treeui/vue"
+kind: form
+status: available
+purpose: "Edit a Record<string, string> as add/removable key/value rows with per-row validation. An editor (distinct from TDescriptionList, which only displays)."
+
+notes: >
+  Phase 1 (non-sensitive) is shipped: the full value round-trips through v-model.
+  A write-only/sensitive phase 2 (value never reaches the client; modelValue is
+  Record<string, { set: boolean }> with set-value/clear-value events) is a closed
+  contract on the queue and NOT yet implemented — do not assume it exists.
+
+props:
+  modelValue:
+    type: "Record<string, string>"
+    default: "{}"
+    note: "The edited map. Full value round-trips (non-sensitive mode)."
+  size:
+    type: TSize
+    default: md
+    values: [sm, md, lg]
+  disabled:
+    type: boolean
+    default: false
+  invalid:
+    type: boolean
+    default: false
+    note: "Marks the whole control invalid (e.g. mirrors a TFormField summary error)."
+  labels:
+    type: TKeyValueEditorLabels
+    default: "{}"
+    note: "Localizable copy merged over English defaults: key, value, add, remove, emptyKey, duplicateKey."
+
+events:
+  - update:modelValue
+  - "validity-change: emits { valid: boolean; errors: string[] } — deduped, localized messages to feed a TFormField summary."
+
+a11y:
+  per_row_key_aria_invalid: true
+  row_error_linked_by_aria_describedby: true
+  remove_button_has_accessible_name: true
+
+behavior:
+  rows_add_and_remove: true
+  inline_per_row_validation: true
+  empty_key_flagged_only_when_value_present: true
+  duplicate_key_flagged_on_later_occurrence: true
+  invalid_rows_blocked_from_commit_without_blocking_typing: true
+  aggregated_errors_via_validity_change_event: true
+
+example: |
+  <TFormField label="Brand colors" :error="summary">
+    <TKeyValueEditor
+      :model-value="colors"
+      :labels="{ key: 'Token', value: 'Hex' }"
+      @update:model-value="colors = $event"
+      @validity-change="summary = $event.valid ? '' : $event.errors.join(' ')"
+    />
+  </TFormField>

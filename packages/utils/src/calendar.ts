@@ -12,11 +12,16 @@ const MS_PER_MINUTE = 60_000;
 /**
  * The first day of the week for a locale, as a JS `getDay()` value
  * (0 = Sunday … 6 = Saturday). Uses the platform's own locale database via
- * `Intl.Locale.prototype.getWeekInfo` (native, not a bundled dataset). On
- * engines without it, falls back to Monday — the ISO/ international default —
- * so consumers that need another start pass `weekStartsOn` explicitly.
+ * `Intl.Locale.prototype.getWeekInfo` (native, not a bundled dataset).
+ *
+ * When the engine can't report it (no `getWeekInfo`/`weekInfo`, or an invalid
+ * tag), the library does **not** silently pick a day for you — it returns
+ * `fallback`, which the caller owns. This matters on a platform whose source
+ * locale starts the week on Sunday: a hard-wired Monday default would flip
+ * `pt-BR` to Monday on an older runtime, silently. `fallback` defaults to `1`
+ * (Monday, the ISO/international default); pass `0` for a Sunday-first product.
  */
-export const weekStartForLocale = (locale: string): number => {
+export const weekStartForLocale = (locale: string, fallback = 1): number => {
   try {
     const info = (
       new Intl.Locale(locale) as Intl.Locale & {
@@ -28,9 +33,9 @@ export const weekStartForLocale = (locale: string): number => {
     // Intl reports 1 = Monday … 7 = Sunday; map Sunday (7) to JS's 0.
     if (typeof firstDay === 'number') return firstDay === 7 ? 0 : firstDay;
   } catch {
-    // Invalid locale tag — fall through to the default.
+    // Invalid locale tag — fall through to the caller's fallback.
   }
-  return 1;
+  return fallback;
 };
 
 /**
@@ -62,6 +67,11 @@ export const getMonthMatrix = (anchor: Date, weekStartsOn = 0): Date[][] => {
  * Start/end are clamped to the day (so an event crossing midnight fills to the
  * edge), and the height honours `minHeight`. Returns offsets in the same unit
  * as `hourHeight`.
+ *
+ * `minHeight` never pushes a block past the day's end: a short event near
+ * midnight is floored to the minimum only up to the remaining space, then
+ * shrinks so `top + height` stays within the day. Otherwise a 3-minute event at
+ * 23:55 would floor to the minimum and spill below the column.
  */
 export const placeInDay = (
   item: { start: Date; end: Date },
@@ -76,6 +86,7 @@ export const placeInDay = (
   const clampedEnd = Math.min(item.end.getTime(), dayEnd.getTime());
 
   const pxPerMinute = hourHeight / 60;
+  const dayHeight = MINUTES_PER_DAY * pxPerMinute;
   const startMinutes = (clampedStart - dayStart.getTime()) / MS_PER_MINUTE;
   const endMinutes = Math.min(
     MINUTES_PER_DAY,
@@ -83,7 +94,12 @@ export const placeInDay = (
   );
 
   const top = Math.max(0, startMinutes) * pxPerMinute;
-  const height = Math.max(minHeight, Math.max(0, endMinutes - startMinutes) * pxPerMinute);
+  // Floor to `minHeight`, but never overflow the day: clamp the height to the
+  // space left below `top` so a floored block shrinks instead of spilling.
+  const height = Math.min(
+    Math.max(minHeight, Math.max(0, endMinutes - startMinutes) * pxPerMinute),
+    Math.max(0, dayHeight - top),
+  );
   return { top, height };
 };
 

@@ -13,8 +13,8 @@ props:
   size:
     type: TTextSize
     default: undefined
-    values: [xs, sm, md, lg, xl, 2xl, 3xl, 4xl, 5xl, display, overline]
-    note: "xs–5xl map to --tree-font-size-*. `display` is a responsive hero step (clamp 3xl→5xl, compact line-height, tight tracking). `overline` is a closed eyebrow style (xs, semibold, uppercase, wide tracking) that leaves colour to `tone`. Omitted = inherit."
+    values: [xs, sm, md, lg, xl, 2xl, 3xl, 4xl, 5xl, display, title, overline]
+    note: "xs–5xl map to --tree-font-size-*. `display` is a responsive hero step (clamp 3xl→5xl, compact line-height, tight tracking). `title` is a responsive section-heading step (clamp xl→4xl, tight line-height and tracking) that stays below `display` at every width, so a section heading never out-sizes the hero. `overline` is a closed eyebrow style (xs, semibold, uppercase, wide tracking) that leaves colour to `tone`. Omitted = inherit."
   tone:
     type: TTextTone
     default: default

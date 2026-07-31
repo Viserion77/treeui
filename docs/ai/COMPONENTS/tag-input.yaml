@@ -1,0 +1,60 @@
+name: TTagInput
+source_file: packages/vue/src/components/TTagInput.vue
+package: "@treeui/vue"
+kind: form
+status: available
+purpose: "Edit a list of free-text strings as addable/removable chips (e.g. a service list). Free input, not selection from a fixed option set — use TMultiSelect/TCombobox for that."
+
+props:
+  modelValue:
+    type: "string[]"
+    default: "[]"
+    note: "The tags. Arbitrary strings, in order."
+  size:
+    type: TSize
+    default: md
+    values: [sm, md, lg]
+  width:
+    type: TFieldWidth
+    default: full
+    values: [xs, sm, md, lg, xl, full]
+  disabled:
+    type: boolean
+    default: false
+  invalid:
+    type: boolean
+    default: false
+  placeholder:
+    type: string
+    default: ""
+    note: "Shown only while there are no tags."
+
+events:
+  - update:modelValue
+
+exposed:
+  - "focus(): focuses the text field."
+
+a11y:
+  chips_are_ttag_removable: true
+  aria_invalid_when_invalid: true
+  keyboard_enter_or_comma_adds: true
+  keyboard_backspace_removes_last: true
+
+behavior:
+  values_are_free_strings: true
+  enter_and_comma_confirm_current_tag: true
+  pasted_comma_separated_string_splits_into_tags: true
+  trims_and_dedupes_silently: true
+  empty_after_trim_ignored: true
+  no_autocomplete_or_suggestions: true
+  reuses_ttag_for_chips: true
+
+example: |
+  <TFormField label="LocalStack services">
+    <TTagInput
+      :model-value="services"
+      placeholder="Add a service…"
+      @update:model-value="services = $event"
+    />
+  </TFormField>

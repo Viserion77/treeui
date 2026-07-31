@@ -71,6 +71,8 @@ import TPricing from './TPricing.vue';
 import TMarkdownEditor from './TMarkdownEditor.vue';
 import TIcon from './TIcon.vue';
 import TImage from './TImage.vue';
+import TTagInput from './TTagInput.vue';
+import TKeyValueEditor from './TKeyValueEditor.vue';
 import TChart from './TChart.vue';
 import TSparkline from './TSparkline.vue';
 import TDonutChart from './TDonutChart.vue';
@@ -5760,6 +5762,10 @@ describe('TREEUX 024/025/029 — TText marketing typography', () => {
     expect(mount(TText, { props: { size: '5xl' } }).classes()).toContain('t-text--size-5xl');
   });
 
+  it('exposes a responsive title step for section headings (024)', () => {
+    expect(mount(TText, { props: { as: 'h2', size: 'title' } }).classes()).toContain('t-text--size-title');
+  });
+
   it('overline is a size that leaves tone independent (025)', () => {
     const wrapper = mount(TText, { props: { size: 'overline', tone: 'brand' } });
     expect(wrapper.classes()).toContain('t-text--size-overline');
@@ -5771,5 +5777,117 @@ describe('TREEUX 024/025/029 — TText marketing typography', () => {
     expect(mount(TText, { props: { as: 'p', measure: 'lead' } }).classes()).toContain('t-text--measure-lead');
     expect(mount(TText, { props: { as: 'p', measure: 'prose' } }).classes()).toContain('t-text--measure-prose');
     expect(mount(TText).classes().join(' ')).not.toContain('t-text--measure');
+  });
+});
+
+describe('TREEUX-001 — TTagInput (LSS)', () => {
+  it('renders a removable chip per tag', () => {
+    const wrapper = mount(TTagInput, { props: { modelValue: ['a', 'b'] } });
+    expect(wrapper.findAll('.t-tag-input__tag')).toHaveLength(2);
+    expect(wrapper.text()).toContain('a');
+    expect(wrapper.text()).toContain('b');
+  });
+
+  it('adds a tag on Enter, trimmed', async () => {
+    const wrapper = mount(TTagInput, { props: { modelValue: ['a'] } });
+    const input = wrapper.get('input');
+    await input.setValue('  b  ');
+    await input.trigger('keydown', { key: 'Enter' });
+    expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual([['a', 'b']]);
+  });
+
+  it('adds a tag on comma and ignores silent duplicates', async () => {
+    const wrapper = mount(TTagInput, { props: { modelValue: ['a'] } });
+    const input = wrapper.get('input');
+    await input.setValue('a');
+    await input.trigger('keydown', { key: ',' });
+    // 'a' already present → dedupe, no emit
+    expect(wrapper.emitted('update:modelValue')).toBeUndefined();
+    await input.setValue('c');
+    await input.trigger('keydown', { key: ',' });
+    expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual([['a', 'c']]);
+  });
+
+  it('splits a pasted comma-separated string into tags', async () => {
+    const wrapper = mount(TTagInput, { props: { modelValue: [] } });
+    const input = wrapper.get('input');
+    await input.setValue('dynamodb, sqs, sns');
+    // complete segments commit; the trailing fragment stays in the field
+    expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual([['dynamodb', 'sqs']]);
+    expect((input.element as HTMLInputElement).value).toBe('sns');
+  });
+
+  it('removes the last tag on Backspace when the field is empty', async () => {
+    const wrapper = mount(TTagInput, { props: { modelValue: ['a', 'b'] } });
+    const input = wrapper.get('input');
+    await input.trigger('keydown', { key: 'Backspace' });
+    expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual([['a']]);
+  });
+
+  it('does not add empty or whitespace-only tags', async () => {
+    const wrapper = mount(TTagInput, { props: { modelValue: ['a'] } });
+    const input = wrapper.get('input');
+    await input.setValue('   ');
+    await input.trigger('keydown', { key: 'Enter' });
+    expect(wrapper.emitted('update:modelValue')).toBeUndefined();
+  });
+
+  it('marks aria-invalid when invalid', () => {
+    const wrapper = mount(TTagInput, { props: { modelValue: [], invalid: true } });
+    expect(wrapper.get('input').attributes('aria-invalid')).toBe('true');
+  });
+});
+
+describe('TREEUX-002 — TKeyValueEditor (LSS, phase 1)', () => {
+  it('renders a row per entry with key and value', () => {
+    const wrapper = mount(TKeyValueEditor, { props: { modelValue: { a: '1', b: '2' } } });
+    expect(wrapper.findAll('.t-key-value-editor__row')).toHaveLength(2);
+    const keys = wrapper.findAll('.t-key-value-editor__key').map((i) => (i.element as HTMLInputElement).value);
+    expect(keys).toEqual(['a', 'b']);
+  });
+
+  it('adds a row and commits a completed pair', async () => {
+    const wrapper = mount(TKeyValueEditor, { props: { modelValue: {} } });
+    await wrapper.get('.t-key-value-editor__add').trigger('click');
+    await wrapper.get('.t-key-value-editor__key').setValue('color');
+    await wrapper.get('.t-key-value-editor__value').setValue('#fff');
+    expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual([{ color: '#fff' }]);
+  });
+
+  it('flags a duplicate key and blocks it from the committed value', async () => {
+    const wrapper = mount(TKeyValueEditor, { props: { modelValue: { a: '1' } } });
+    await wrapper.get('.t-key-value-editor__add').trigger('click');
+    const keyInputs = wrapper.findAll('.t-key-value-editor__key');
+    await keyInputs[1].setValue('a');
+    await wrapper.findAll('.t-key-value-editor__value')[1].setValue('2');
+    // second row is a duplicate → invalid, not committed; 'a' keeps its first value
+    expect(wrapper.findAll('.t-key-value-editor__row')[1].classes()).toContain('is-invalid');
+    expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual([{ a: '1' }]);
+    const validity = wrapper.emitted('validity-change')?.at(-1) as [{ valid: boolean }];
+    expect(validity[0].valid).toBe(false);
+  });
+
+  it('flags a value with a missing key but leaves a blank row unflagged', async () => {
+    const wrapper = mount(TKeyValueEditor, { props: { modelValue: {} } });
+    await wrapper.get('.t-key-value-editor__add').trigger('click');
+    // blank row: no error yet
+    expect(wrapper.get('.t-key-value-editor__row').classes()).not.toContain('is-invalid');
+    // give it a value but no key → empty-key error, blocked from commit
+    await wrapper.get('.t-key-value-editor__value').setValue('orphan');
+    expect(wrapper.get('.t-key-value-editor__row').classes()).toContain('is-invalid');
+    expect(wrapper.get('.t-key-value-editor__key').attributes('aria-invalid')).toBe('true');
+  });
+
+  it('removes a row and re-emits the map without it', async () => {
+    const wrapper = mount(TKeyValueEditor, { props: { modelValue: { a: '1', b: '2' } } });
+    await wrapper.findAll('.t-key-value-editor__remove')[0].trigger('click');
+    expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual([{ b: '2' }]);
+  });
+
+  it('uses localizable labels', () => {
+    const wrapper = mount(TKeyValueEditor, {
+      props: { modelValue: {}, labels: { add: 'Adicionar linha' } },
+    });
+    expect(wrapper.get('.t-key-value-editor__add').text()).toContain('Adicionar linha');
   });
 });

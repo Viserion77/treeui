@@ -37,7 +37,9 @@
         "TSelectableList",
         "TCard",
         "TLinkTile",
-        "TMenu"
+        "TMenu",
+        "TTagInput",
+        "TKeyValueEditor"
       ]
     },
     {
@@ -87,7 +89,9 @@
         "TBadge",
         "TTag",
         "TCard",
-        "TModal"
+        "TModal",
+        "TTagInput",
+        "TKeyValueEditor"
       ]
     },
     {
@@ -159,7 +163,9 @@
         "TMenu",
         "TList",
         "TDescriptionList",
-        "TImage"
+        "TImage",
+        "TTagInput",
+        "TKeyValueEditor"
       ]
     }
   ],
@@ -183,6 +189,7 @@
     "TGrid": "components-layout-grid",
     "TImage": "components-data-display-image",
     "TInput": "components-data-entry-input",
+    "TKeyValueEditor": "components-data-entry-keyvalueeditor",
     "TLink": "components-navigation-link",
     "TLinkTile": "components-navigation-linktile",
     "TList": "components-data-display-list",
@@ -205,6 +212,7 @@
     "TTable": "components-data-display-table",
     "TTabs": "components-navigation-tabs",
     "TTag": "components-data-display-tag",
+    "TTagInput": "components-data-entry-taginput",
     "TToastProvider": "components-feedback-toast",
     "TTooltip": "components-overlay-tooltip",
     "TTreeView": "components-navigation-treeview"

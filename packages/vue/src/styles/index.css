@@ -6571,6 +6571,15 @@ a.t-brand-lockup:focus-visible {
   letter-spacing: var(--tree-font-tracking-tight);
 }
 
+/* Title: a section-heading step that scales with the viewport (clamp xl→4xl).
+   Deliberately caps below `display` at every width so a section heading never
+   out-sizes the page's hero on a narrow screen. */
+.t-text--size-title {
+  font-size: clamp(var(--tree-font-size-xl), 4vw, var(--tree-font-size-4xl));
+  line-height: var(--tree-font-lineHeight-tight);
+  letter-spacing: var(--tree-font-tracking-tight);
+}
+
 /* Overline / eyebrow: closed style. Sets size, weight, case and tracking but
    NOT colour — the tone axis still governs it (brand on a site, muted on an LP). */
 .t-text--size-overline {
@@ -8150,4 +8159,221 @@ body:has(.t-app-shell) {
   padding: var(--tree-space-2) var(--tree-space-3);
   font-size: var(--tree-font-size-sm);
   color: var(--tree-color-text-muted);
+}
+
+/* ------------------------------------------------------------------ *
+ * TTagInput (TREEUX-001) — free-string chips with an inline text field.
+ * Reuses TTag for the chips; the control is the same bordered field
+ * surface as the other form controls, with the focus glow on the box.
+ * ------------------------------------------------------------------ */
+.t-tag-input {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--tree-space-2);
+  width: 100%;
+  min-inline-size: 0;
+  min-height: var(--tree-size-control-md);
+  padding: var(--tree-space-1) var(--tree-space-2);
+  border: var(--tree-border-width-subtle) solid var(--tree-color-border-default);
+  border-radius: var(--tree-radius-md);
+  background: var(--tree-color-bg-surface);
+  color: var(--tree-color-text-primary);
+  font-family: var(--tree-font-family-sans);
+  cursor: text;
+  transition:
+    border-color var(--tree-motion-duration-fast) var(--tree-motion-easing-standard),
+    box-shadow var(--tree-motion-duration-fast) var(--tree-motion-easing-standard);
+}
+
+.t-tag-input:focus-within {
+  border-color: var(--tree-color-brand-primary);
+  box-shadow: 0 0 0 var(--tree-focus-ring-width) var(--tree-color-focus-ring);
+}
+
+.t-tag-input.is-invalid {
+  border-color: var(--tree-color-status-error);
+}
+
+.t-tag-input.is-invalid:focus-within {
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--tree-color-status-error) 20%, transparent);
+}
+
+.t-tag-input.is-disabled {
+  opacity: 0.68;
+  cursor: not-allowed;
+}
+
+.t-tag-input--sm {
+  min-height: var(--tree-size-control-sm);
+}
+
+.t-tag-input--lg {
+  min-height: var(--tree-size-control-lg);
+}
+
+.t-tag-input__field {
+  flex: 1;
+  min-inline-size: 6ch;
+  padding: var(--tree-space-1) 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  outline: none;
+}
+
+.t-tag-input__field:disabled {
+  cursor: not-allowed;
+}
+
+/* ------------------------------------------------------------------ *
+ * TKeyValueEditor (TREEUX-002) — rows of key/value inputs with per-row
+ * validation. Non-sensitive mode: the full value round-trips.
+ * ------------------------------------------------------------------ */
+.t-key-value-editor {
+  display: flex;
+  flex-direction: column;
+  gap: var(--tree-space-2);
+  width: 100%;
+  min-inline-size: 0;
+  font-family: var(--tree-font-family-sans);
+}
+
+.t-key-value-editor__rows {
+  display: flex;
+  flex-direction: column;
+  gap: var(--tree-space-2);
+}
+
+.t-key-value-editor__fields {
+  display: flex;
+  align-items: center;
+  gap: var(--tree-space-2);
+}
+
+.t-key-value-editor__key,
+.t-key-value-editor__value {
+  flex: 1;
+  min-inline-size: 0;
+  min-height: var(--tree-size-control-md);
+  padding: 0 var(--tree-space-3);
+  border: var(--tree-border-width-subtle) solid var(--tree-color-border-default);
+  border-radius: var(--tree-radius-md);
+  background: var(--tree-color-bg-surface);
+  color: var(--tree-color-text-primary);
+  font: inherit;
+  transition:
+    border-color var(--tree-motion-duration-fast) var(--tree-motion-easing-standard),
+    box-shadow var(--tree-motion-duration-fast) var(--tree-motion-easing-standard);
+}
+
+.t-key-value-editor__key {
+  flex-basis: 40%;
+  font-family: var(--tree-font-family-mono);
+}
+
+.t-key-value-editor__key:focus-visible,
+.t-key-value-editor__value:focus-visible {
+  outline: none;
+  border-color: var(--tree-color-brand-primary);
+  box-shadow: 0 0 0 var(--tree-focus-ring-width) var(--tree-color-focus-ring);
+}
+
+.t-key-value-editor--sm .t-key-value-editor__key,
+.t-key-value-editor--sm .t-key-value-editor__value {
+  min-height: var(--tree-size-control-sm);
+}
+
+.t-key-value-editor--lg .t-key-value-editor__key,
+.t-key-value-editor--lg .t-key-value-editor__value {
+  min-height: var(--tree-size-control-lg);
+}
+
+.t-key-value-editor__row.is-invalid .t-key-value-editor__key {
+  border-color: var(--tree-color-status-error);
+}
+
+.t-key-value-editor__row.is-invalid .t-key-value-editor__key:focus-visible {
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--tree-color-status-error) 20%, transparent);
+}
+
+.t-key-value-editor__remove {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  inline-size: var(--tree-size-control-md);
+  block-size: var(--tree-size-control-md);
+  padding: 0;
+  border: var(--tree-border-width-subtle) solid transparent;
+  border-radius: var(--tree-radius-md);
+  background: transparent;
+  color: var(--tree-color-text-muted);
+  cursor: pointer;
+  transition:
+    background var(--tree-motion-duration-fast) var(--tree-motion-easing-standard),
+    color var(--tree-motion-duration-fast) var(--tree-motion-easing-standard);
+}
+
+.t-key-value-editor__remove:hover:not(:disabled) {
+  background: var(--tree-color-bg-subtle);
+  color: var(--tree-color-text-primary);
+}
+
+.t-key-value-editor__remove:focus-visible {
+  outline: none;
+  border-color: var(--tree-color-brand-primary);
+  box-shadow: 0 0 0 var(--tree-focus-ring-width) var(--tree-color-focus-ring);
+}
+
+.t-key-value-editor__remove:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.t-key-value-editor__row-error {
+  margin: var(--tree-space-1) 0 0;
+  color: var(--tree-color-status-error);
+  font-size: var(--tree-font-size-sm);
+  line-height: var(--tree-font-lineHeight-tight);
+}
+
+.t-key-value-editor__add {
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  gap: var(--tree-space-1);
+  min-height: var(--tree-size-control-sm);
+  padding: 0 var(--tree-space-3);
+  border: var(--tree-border-width-subtle) solid var(--tree-color-border-default);
+  border-radius: var(--tree-radius-md);
+  background: var(--tree-color-bg-surface);
+  color: var(--tree-color-text-primary);
+  font: inherit;
+  font-size: var(--tree-font-size-sm);
+  font-weight: var(--tree-font-weight-medium);
+  cursor: pointer;
+  transition:
+    background var(--tree-motion-duration-fast) var(--tree-motion-easing-standard),
+    border-color var(--tree-motion-duration-fast) var(--tree-motion-easing-standard);
+}
+
+.t-key-value-editor__add:hover:not(:disabled) {
+  background: var(--tree-color-bg-subtle);
+}
+
+.t-key-value-editor__add:focus-visible {
+  outline: none;
+  border-color: var(--tree-color-brand-primary);
+  box-shadow: 0 0 0 var(--tree-focus-ring-width) var(--tree-color-focus-ring);
+}
+
+.t-key-value-editor__add:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.t-key-value-editor.is-disabled {
+  opacity: 0.68;
 }

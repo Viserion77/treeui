@@ -58,6 +58,26 @@ decision_guides:
         when:
           - "Multi-selection must work across a hierarchy."
           - "Set `selectionMode=\"multiple\"`."
+      - use: TTagInput
+        when:
+          - "The values are arbitrary free strings the user types, not a fixed option set."
+          - "There is no list to pick from (use TMultiSelect/TCombobox when there is)."
+        notes:
+          - "`v-model` is `string[]`; Enter/comma add, Backspace removes the last, duplicates dedupe silently."
+
+  - id: edit-key-value-map
+    question: "Edit a map of key/value pairs"
+    options:
+      - use: TKeyValueEditor
+        when:
+          - "The user edits a `Record<string, string>` (config map, colour tokens, env vars)."
+          - "Rows must be addable/removable with per-row key validation."
+        notes:
+          - "Editing, not display. For read-only key/value display use TDescriptionList."
+          - "A write-only/sensitive mode (value never read back) is a closed contract on the queue, not yet shipped."
+      - use: TDescriptionList
+        when:
+          - "The pairs are read-only display, not editable."
 
   - id: overlay-choice
     question: "Show contextual or blocking UI above the page"

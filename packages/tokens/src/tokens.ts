@@ -32,6 +32,11 @@ export const treeTokens = {
       body: '1.6',
       relaxed: '1.65',
     },
+    tracking: {
+      tight: '-0.02em',
+      normal: '0em',
+      wide: '0.08em',
+    },
   },
   space: {
     0: '0',

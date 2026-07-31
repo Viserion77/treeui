@@ -6556,6 +6556,39 @@ a.t-brand-lockup:focus-visible {
 .t-text--size-3xl {
   font-size: var(--tree-font-size-3xl);
 }
+.t-text--size-4xl {
+  font-size: var(--tree-font-size-4xl);
+}
+.t-text--size-5xl {
+  font-size: var(--tree-font-size-5xl);
+}
+
+/* Display: a hero step that scales with the viewport (no clamp() in the
+   consumer), with compact leading and tight tracking. */
+.t-text--size-display {
+  font-size: clamp(var(--tree-font-size-3xl), 5vw, var(--tree-font-size-5xl));
+  line-height: var(--tree-font-lineHeight-compact);
+  letter-spacing: var(--tree-font-tracking-tight);
+}
+
+/* Overline / eyebrow: closed style. Sets size, weight, case and tracking but
+   NOT colour — the tone axis still governs it (brand on a site, muted on an LP). */
+.t-text--size-overline {
+  font-size: var(--tree-font-size-xs);
+  font-weight: var(--tree-font-weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: var(--tree-font-tracking-wide);
+}
+
+/* Reading measure — cap the line length in ch and render block so it applies. */
+.t-text--measure-lead {
+  display: block;
+  max-inline-size: 58ch;
+}
+.t-text--measure-prose {
+  display: block;
+  max-inline-size: 68ch;
+}
 
 .t-text--muted {
   color: var(--tree-color-text-muted);
@@ -8044,8 +8077,23 @@ body:has(.t-app-shell) {
   flex: 0 1 auto;
 }
 
+/* icon-only: the value is visually hidden (still the accessible name), so the
+   trigger collapses to a square matching its size — like a TButton icon-only. */
 .t-language-select--icon-only .t-language-select__trigger {
-  padding-inline: var(--tree-space-2);
+  inline-size: var(--tree-size-control-md);
+  min-inline-size: var(--tree-size-control-md);
+  padding-inline: 0;
+  justify-content: center;
+}
+
+.t-language-select--icon-only.t-language-select--sm .t-language-select__trigger {
+  inline-size: var(--tree-size-control-sm);
+  min-inline-size: var(--tree-size-control-sm);
+}
+
+.t-language-select--icon-only.t-language-select--lg .t-language-select__trigger {
+  inline-size: var(--tree-size-control-lg);
+  min-inline-size: var(--tree-size-control-lg);
 }
 
 .t-language-select--switcher .t-language-select__listbox {

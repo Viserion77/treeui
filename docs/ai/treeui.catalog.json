@@ -1,7 +1,7 @@
 {
-  "generatedAt": "0.23.0",
+  "generatedAt": "0.24.0",
   "packageName": "@treeui/vue",
-  "packageVersion": "0.23.0",
+  "packageVersion": "0.24.0",
   "decisionGuides": [
     {
       "id": "single-choice",
@@ -9967,9 +9967,13 @@
             "lg",
             "xl",
             "2xl",
-            "3xl"
+            "3xl",
+            "4xl",
+            "5xl",
+            "display",
+            "overline"
           ],
-          "note": "Maps to --tree-font-size-*. Omitted = inherit."
+          "note": "xs–5xl map to --tree-font-size-*. `display` is a responsive hero step (clamp 3xl→5xl, compact line-height, tight tracking). `overline` is a closed eyebrow style (xs, semibold, uppercase, wide tracking) that leaves colour to `tone`. Omitted = inherit."
         },
         {
           "name": "tone",
@@ -10015,6 +10019,16 @@
           "type": "boolean",
           "default": "false",
           "note": "Render authored line breaks and blank lines as written (`white-space: pre-wrap`) while still wrapping long lines. Use for plain-text output such as AI responses, so consumers never need a local `white-space: pre-wrap` class. Mutually exclusive with `truncate`, which needs `nowrap`; when both are set `truncate` wins and no `is-pre-wrap` class is emitted."
+        },
+        {
+          "name": "measure",
+          "type": "TTextMeasure",
+          "default": "undefined",
+          "values": [
+            "lead",
+            "prose"
+          ],
+          "note": "Reading measure — a max-width in `ch` for legibility, rendered block so it applies. `lead` (~58ch, hero subtitle) and `prose` (~68ch, body). Closed axis so every surface caps at the same width without inventing a `ch` value (parallels treeFieldWidths for form controls)."
         }
       ],
       "events": [],
@@ -10824,6 +10838,27 @@
       "cssVar": "--tree-font-lineHeight-relaxed",
       "path": "font.lineHeight.relaxed",
       "value": "1.65",
+      "category": "font",
+      "description": "Typography token: font family, size, weight, or line height."
+    },
+    {
+      "cssVar": "--tree-font-tracking-tight",
+      "path": "font.tracking.tight",
+      "value": "-0.02em",
+      "category": "font",
+      "description": "Typography token: font family, size, weight, or line height."
+    },
+    {
+      "cssVar": "--tree-font-tracking-normal",
+      "path": "font.tracking.normal",
+      "value": "0em",
+      "category": "font",
+      "description": "Typography token: font family, size, weight, or line height."
+    },
+    {
+      "cssVar": "--tree-font-tracking-wide",
+      "path": "font.tracking.wide",
+      "value": "0.08em",
       "category": "font",
       "description": "Typography token: font family, size, weight, or line height."
     },

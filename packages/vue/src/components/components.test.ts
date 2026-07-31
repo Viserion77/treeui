@@ -2535,14 +2535,19 @@ describe('@treeui/vue', () => {
     });
 
     expect(wrapper.classes()).toContain('t-language-select--icon-only');
-    expect(wrapper.find('.t-language-select__value').exists()).toBe(false);
+    // TREEUX-026: the value is kept in the DOM (accessible name) but visually
+    // hidden so it takes no space — not removed.
+    const value = wrapper.find('.t-language-select__value');
+    expect(value.exists()).toBe(true);
+    expect(value.classes()).toContain('t-visually-hidden');
     // Losing the visible text must not lose the accessible name.
     expect(wrapper.get('button').attributes('aria-label')).toBe('Page language');
   });
 
-  it('keeps the language name in an icon-only switcher when the option has no flag', () => {
-    // Without a flag there is nothing left to state the current value, so
-    // iconOnly has to give the name back rather than render a blank trigger.
+  it('hides the visible name in an icon-only switcher even without a flag (TREEUX-026)', () => {
+    // Previously the name stayed VISIBLE without a flag (the bug 026 fixed) —
+    // icon-only must collapse to a square regardless, keeping the name only as
+    // the accessible name.
     const wrapper = mount(TLanguageSelect, {
       props: {
         modelValue: 'eo',
@@ -2553,7 +2558,9 @@ describe('@treeui/vue', () => {
       attrs: { 'aria-label': 'Page language' },
     });
 
-    expect(wrapper.get('.t-language-select__value').text()).toBe('Esperanto');
+    const value = wrapper.get('.t-language-select__value');
+    expect(value.classes()).toContain('t-visually-hidden');
+    expect(value.text()).toBe('Esperanto');
   });
 
   it('jumps to the first and last enabled language with Home and End', async () => {
@@ -5716,5 +5723,53 @@ describe('TREEUX-017 — TImage', () => {
     expect(img.classes()).toContain('t-image--radius-pill');
     expect(img.attributes('loading')).toBe('eager');
     expect(img.attributes('style')).toContain('aspect-ratio');
+  });
+});
+
+describe('TREEUX-026 — TLanguageSelect icon-only hides the value name', () => {
+  const options = [
+    { label: 'English (US)', value: 'en' },
+    { label: 'Português (Brasil)', value: 'pt' },
+  ];
+
+  it('visually hides the value (kept as accessible name) when switcher + icon-only', () => {
+    const wrapper = mount(TLanguageSelect, {
+      props: { variant: 'switcher', iconOnly: true, modelValue: 'pt', options },
+    });
+    expect(wrapper.classes()).toContain('t-language-select--icon-only');
+    const value = wrapper.find('.t-language-select__value');
+    // still in the DOM (accessible name) but visually hidden (no layout space)
+    expect(value.exists()).toBe(true);
+    expect(value.classes()).toContain('t-visually-hidden');
+    expect(value.text()).toBe('Português (Brasil)');
+  });
+
+  it('keeps the value visible when not icon-only', () => {
+    const wrapper = mount(TLanguageSelect, {
+      props: { variant: 'switcher', modelValue: 'pt', options },
+    });
+    const value = wrapper.find('.t-language-select__value');
+    expect(value.classes()).not.toContain('t-visually-hidden');
+  });
+});
+
+describe('TREEUX 024/025/029 — TText marketing typography', () => {
+  it('exposes display and 4xl/5xl sizes (024)', () => {
+    expect(mount(TText, { props: { size: 'display' } }).classes()).toContain('t-text--size-display');
+    expect(mount(TText, { props: { size: '4xl' } }).classes()).toContain('t-text--size-4xl');
+    expect(mount(TText, { props: { size: '5xl' } }).classes()).toContain('t-text--size-5xl');
+  });
+
+  it('overline is a size that leaves tone independent (025)', () => {
+    const wrapper = mount(TText, { props: { size: 'overline', tone: 'brand' } });
+    expect(wrapper.classes()).toContain('t-text--size-overline');
+    // tone stays its own axis (brand here; muted on a product LP)
+    expect(wrapper.classes()).toContain('t-text--brand');
+  });
+
+  it('applies a reading measure (029)', () => {
+    expect(mount(TText, { props: { as: 'p', measure: 'lead' } }).classes()).toContain('t-text--measure-lead');
+    expect(mount(TText, { props: { as: 'p', measure: 'prose' } }).classes()).toContain('t-text--measure-prose');
+    expect(mount(TText).classes().join(' ')).not.toContain('t-text--measure');
   });
 });

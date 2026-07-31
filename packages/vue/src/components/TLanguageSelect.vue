@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { createId, isActivationKey, isEscapeKey } from '@treeui/utils';
-import { computed, nextTick, onBeforeUnmount, ref, toRef, useAttrs, watch } from 'vue';
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, toRef, useAttrs, watch } from 'vue';
 import { useControllableOpen } from '../composables/useControllableOpen';
 import type { TFieldWidth, TSize } from '../types/contracts';
 import TFlag from './TFlag.vue';
@@ -167,11 +167,10 @@ const selectedOption = computed(() =>
 
 const selectedLabel = computed(() => selectedOption.value?.label ?? '');
 
-// iconOnly leans on the flag to carry the current value. With no flag to show it
-// would leave the trigger stating nothing at all, so the name comes back.
-const showValue = computed(
-  () => !(isSwitcher.value && props.iconOnly) || !selectedOption.value?.code,
-);
+// In `switcher` + `iconOnly` the visible name is dropped so the trigger is a
+// compact square (TREEUX-026). The label is not removed — it is visually hidden,
+// so it stays the trigger's accessible name whether or not a flag is present.
+const valueHidden = computed(() => isSwitcher.value && props.iconOnly);
 
 const enabledOptions = computed(() =>
   props.options.filter((o) => !o.disabled),
@@ -311,17 +310,25 @@ const onDocumentPointerDown = (event: PointerEvent) => {
 
 const hasSelection = computed(() => props.modelValue !== '');
 
-// immediate, so a listbox that is already open on mount (`defaultOpen`, or a
-// controlled `open` that starts true) still dismisses on outside click and still
-// measures its drop direction.
-watch(isOpen, (value) => {
+const bindOpenState = (value: boolean) => {
   if (value) {
     document.addEventListener('pointerdown', onDocumentPointerDown);
     onOpened();
   } else {
     document.removeEventListener('pointerdown', onDocumentPointerDown);
   }
-}, { immediate: true });
+};
+
+watch(isOpen, bindOpenState);
+
+// A listbox already open on mount (`defaultOpen`, or a controlled `open` that
+// starts true) still needs the outside-click listener and drop-direction
+// measurement — but on the CLIENT only. This ran in an `immediate` watcher
+// before, which touches `document` during setup and crashed SSR (TREEUX-028);
+// onMounted never runs on the server, so the same effect is now SSR-safe.
+onMounted(() => {
+  if (isOpen.value) bindOpenState(true);
+});
 
 // Options can shrink underneath an open listbox. Leaving focusedIndex past the
 // end would strand moveFocus(), which only ever walks outward from it.
@@ -384,8 +391,8 @@ onBeforeUnmount(() => {
         :size="size"
       />
       <span
-        v-if="showValue"
         class="t-language-select__value"
+        :class="{ 't-visually-hidden': valueHidden }"
         :data-placeholder="!hasSelection ? true : undefined"
       >
         {{ selectedLabel || placeholder }}

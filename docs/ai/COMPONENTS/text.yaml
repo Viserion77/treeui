@@ -13,8 +13,8 @@ props:
   size:
     type: TTextSize
     default: undefined
-    values: [xs, sm, md, lg, xl, 2xl, 3xl]
-    note: "Maps to --tree-font-size-*. Omitted = inherit."
+    values: [xs, sm, md, lg, xl, 2xl, 3xl, 4xl, 5xl, display, overline]
+    note: "xs–5xl map to --tree-font-size-*. `display` is a responsive hero step (clamp 3xl→5xl, compact line-height, tight tracking). `overline` is a closed eyebrow style (xs, semibold, uppercase, wide tracking) that leaves colour to `tone`. Omitted = inherit."
   tone:
     type: TTextTone
     default: default
@@ -37,6 +37,11 @@ props:
     type: boolean
     default: false
     note: "Render authored line breaks and blank lines as written (`white-space: pre-wrap`) while still wrapping long lines. Use for plain-text output such as AI responses, so consumers never need a local `white-space: pre-wrap` class. Mutually exclusive with `truncate`, which needs `nowrap`; when both are set `truncate` wins and no `is-pre-wrap` class is emitted."
+  measure:
+    type: TTextMeasure
+    default: undefined
+    values: [lead, prose]
+    note: "Reading measure — a max-width in `ch` for legibility, rendered block so it applies. `lead` (~58ch, hero subtitle) and `prose` (~68ch, body). Closed axis so every surface caps at the same width without inventing a `ch` value (parallels treeFieldWidths for form controls)."
 
 slots:
   - default

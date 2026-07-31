@@ -77,7 +77,7 @@ export { default as TSplit } from './TSplit.vue';
 export { default as TSpacer } from './TSpacer.vue';
 export { default as TKbd } from './TKbd.vue';
 export { default as TText } from './TText.vue';
-export type { TTextSize, TTextTone, TTextWeight, TTextFamily } from './TText.vue';
+export type { TTextSize, TTextTone, TTextWeight, TTextFamily, TTextMeasure } from './TText.vue';
 export { default as TTreeView } from './TTreeView.vue';
 export type { TTreeViewNode, TTreeViewSelectionMode } from './tree-view';
 export { default as TSteps } from './TSteps.vue';

@@ -166,6 +166,9 @@ emitted_variables:
       --tree-font-lineHeight-base: "1.5"
       --tree-font-lineHeight-body: "1.6"
       --tree-font-lineHeight-relaxed: "1.65"
+      --tree-font-tracking-tight: "-0.02em"
+      --tree-font-tracking-normal: "0em"
+      --tree-font-tracking-wide: "0.08em"
       # space
       --tree-space-0: "0"
       --tree-space-1: "0.25rem"

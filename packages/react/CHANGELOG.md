@@ -1,5 +1,12 @@
 # @treeui/react
 
+## 0.3.4
+
+### Patch Changes
+
+- Updated dependencies [ddbbf86]
+  - @treeui/tokens@0.27.0
+
 ## 0.3.3
 
 ### Patch Changes

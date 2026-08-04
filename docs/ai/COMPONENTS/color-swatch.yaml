@@ -35,6 +35,18 @@ props:
     type: boolean
     default: false
     note: "Sets the native `disabled` attribute on every preset button and on the custom input, so the group stops emitting and drops out of the Tab order. Not reflected on the wrapper, and there is no `is-disabled` class."
+  readonly:
+    type: boolean
+    default: false
+    note: >
+      Show the colours as evidence rather than as a choice — a brand manual, a
+      palette table, a legend. Each option renders as an inert
+      `<span class="t-color-swatch__chip" role="img">` named by its `label`: not
+      focusable, not clickable, no `is-selected` state, no events. `modelValue`
+      is ignored and the custom input is not rendered even with `allowCustom`.
+      The chip border steps up to `--tree-color-border-strong` because half of
+      these chips ARE background colours, and in their own theme a weak border
+      makes the chip vanish into the page.
 
 events:
   - "update:modelValue"
@@ -62,18 +74,22 @@ behavior:
   custom_input_rendered_only_when_allow_custom: true
   custom_input_emits_on_input_not_change: true
   fully_controlled_no_internal_selection_state: true
+  readonly_renders_inert_chips_not_buttons: true
+  readonly_suppresses_custom_input: true
 
 css_classes:
   block: t-color-swatch
   elements:
     - t-color-swatch__option
     - t-color-swatch__custom
+    - t-color-swatch__chip
   modifiers:
     - t-color-swatch--sm
     - t-color-swatch--md
     - t-color-swatch--lg
   states:
     - is-selected
+    - is-readonly
 
 notes:
   - "`<input type=\"color\">` accepts only a full 7-character `#rrggbb` value; browsers coerce anything else — shorthand `#fff`, `rgb()`, named colours, `undefined` — to `#000000`. Keep `modelValue` and every `options[].value` in that form so the custom input mirrors the current selection."

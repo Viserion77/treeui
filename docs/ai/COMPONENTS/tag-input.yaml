@@ -28,6 +28,13 @@ props:
     type: string
     default: ""
     note: "Shown only while there are no tags."
+  removeLabel:
+    type: string
+    default: Remove
+    note: >
+      Accessible name for each chip's remove button, forwarded to the underlying
+      TTag. Localizable copy — the library ships an English default only as a
+      fallback.
 
 events:
   - update:modelValue

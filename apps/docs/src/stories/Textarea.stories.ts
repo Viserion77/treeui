@@ -108,3 +108,50 @@ export const Sizes: Story = {
     `,
   }),
 };
+
+export const AutoGrowWithCeiling: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Without a ceiling `autoGrow` grows forever and a composer eventually pushes the conversation off screen. `maxRows` stops the growth at N lines and the field starts scrolling internally instead, with the border and focus ring of the component standing still.',
+      },
+    },
+  },
+  render: () => ({
+    components: { TTextarea },
+    setup: () => ({
+      unbounded: ref('Type several lines here — this one keeps growing.'),
+      bounded: ref('Type several lines here — this one stops at four rows.'),
+    }),
+    template: `
+      <div style="display: grid; gap: 1.5rem; max-width: 420px;">
+        <div>
+          <p style="margin: 0 0 0.5rem; font-size: var(--tree-font-size-sm); color: var(--tree-color-text-muted);">
+            auto-grow, no ceiling
+          </p>
+          <TTextarea
+            aria-label="Unbounded"
+            :rows="1"
+            auto-grow
+            :model-value="unbounded"
+            @update:model-value="unbounded = $event"
+          />
+        </div>
+        <div>
+          <p style="margin: 0 0 0.5rem; font-size: var(--tree-font-size-sm); color: var(--tree-color-text-muted);">
+            auto-grow with :max-rows="4"
+          </p>
+          <TTextarea
+            aria-label="Bounded"
+            :rows="1"
+            auto-grow
+            :max-rows="4"
+            :model-value="bounded"
+            @update:model-value="bounded = $event"
+          />
+        </div>
+      </div>
+    `,
+  }),
+};

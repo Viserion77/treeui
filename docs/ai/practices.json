@@ -68,7 +68,9 @@
         "TLinkTile",
         "TMenu",
         "TPopover",
-        "TImage"
+        "TImage",
+        "TSkipLink",
+        "TAppShell"
       ]
     },
     {
@@ -91,7 +93,10 @@
         "TCard",
         "TModal",
         "TTagInput",
-        "TKeyValueEditor"
+        "TKeyValueEditor",
+        "TSection",
+        "THero",
+        "TPageSurface"
       ]
     },
     {
@@ -137,7 +142,12 @@
         "TFormField",
         "TBrandLockup",
         "TList",
-        "TDescriptionList"
+        "TDescriptionList",
+        "TSection",
+        "THero",
+        "TPageSurface",
+        "TShow",
+        "THide"
       ]
     },
     {
@@ -165,13 +175,18 @@
         "TDescriptionList",
         "TImage",
         "TTagInput",
-        "TKeyValueEditor"
+        "TKeyValueEditor",
+        "TSection",
+        "THero",
+        "TPageSurface",
+        "TColorSwatch"
       ]
     }
   ],
   "components": {
     "TAccordion": "components-data-display-accordion",
     "TAlert": "components-feedback-alert",
+    "TAppShell": "components-layout-appshell",
     "TBadge": "components-data-display-badge",
     "TBrandLockup": "components-navigation-brandlockup",
     "TButton": "components-actions-button",
@@ -179,6 +194,7 @@
     "TChart": "components-data-display-chart",
     "TCheckbox": "components-data-entry-checkbox",
     "TCodeBlock": "components-data-display-codeblock",
+    "TColorSwatch": "components-data-entry-colorswatch",
     "TConfirmDialog": "components-overlay-confirmdialog",
     "TContainer": "components-layout-container",
     "TDescriptionList": "components-data-display-descriptionlist",
@@ -187,6 +203,8 @@
     "TEmptyState": "components-feedback-emptystate",
     "TFormField": "components-data-entry-formfield",
     "TGrid": "components-layout-grid",
+    "THero": "components-layout-hero",
+    "THide": "components-layout-hide",
     "TImage": "components-data-display-image",
     "TInput": "components-data-entry-input",
     "TKeyValueEditor": "components-data-entry-keyvalueeditor",
@@ -198,12 +216,16 @@
     "TNavbar": "components-layout-navbar",
     "TPage": "components-layout-page",
     "TPageHeader": "components-layout-pageheader",
+    "TPageSurface": "components-layout-pagesurface",
     "TPagination": "components-navigation-pagination",
     "TPopover": "components-overlay-popover",
     "TProgress": "components-feedback-progress",
+    "TSection": "components-layout-section",
     "TSelect": "components-data-entry-select",
     "TSelectableList": "components-navigation-selectablelist",
+    "TShow": "components-layout-show",
     "TSkeleton": "components-feedback-skeleton",
+    "TSkipLink": "components-navigation-skiplink",
     "TSpacer": "components-layout-spacer",
     "TSpinner": "components-feedback-spinner",
     "TSplit": "components-layout-split",

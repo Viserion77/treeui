@@ -36,6 +36,16 @@ props:
   autoGrow:
     type: boolean
     default: false
+  maxRows:
+    type: number
+    default: undefined
+    note: >
+      Ceiling for `autoGrow`, in lines. Without it a composer grows forever and
+      pushes the conversation off screen. At the cap the field starts scrolling
+      internally (`overflow-y: auto` on the `<textarea>`) instead of growing,
+      and the component's border and focus ring stop moving. Measured from the
+      field's resolved line-height plus its vertical padding and border, so the
+      cap follows `size` and the theme. Ignored when `autoGrow` is off.
 
 events:
   - update:modelValue
@@ -52,5 +62,16 @@ behavior:
   update_payload_type: string
   loading_does_not_disable_by_itself: true
   auto_grow_resizes_on_input: true
+  auto_grow_also_resizes_on_mount: true
+  auto_grow_stops_at_max_rows_and_scrolls: true
+  auto_grow_works_uncontrolled: true
 
-example: '<TTextarea aria-label="Notes" :model-value="notes" @update:model-value="notes = $event" />'
+example: |
+  <TTextarea
+    aria-label="Message"
+    :rows="1"
+    auto-grow
+    :max-rows="6"
+    :model-value="draft"
+    @update:model-value="draft = $event"
+  />

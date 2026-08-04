@@ -180,15 +180,49 @@ recipes:
   - id: tag-input
     name: "Tag input field"
     use_when:
-      - "A form needs freeform tag entry such as domains, labels, or emails."
+      - "A form needs freeform tag entry such as domains, labels, or service names."
     compose:
       - TFormField
-      - TInput
-      - TTag
-      - TStack
+      - TTagInput
     notes:
-      - "Keep the draft value in app state and add a tag on Enter or separator keys."
-      - "Use removable `TTag` items below or inside the field wrapper."
+      - "`TTagInput` is the component — do NOT hand-roll TInput + TTag any more. `v-model` is `string[]`; Enter and comma confirm, Backspace on an empty field removes the last, values are trimmed and deduped silently."
+      - "Wrap it in `TFormField` for the label, hint and error."
+      - "For selection from a fixed option set, use `TMultiSelect`/`TCombobox` instead — `TTagInput` is free input."
+
+  - id: marketing-page
+    name: "Marketing / anonymous page"
+    use_when:
+      - "The screen has no app shell: a public site, a product landing page, a login or locked screen."
+      - "A page is a stack of sections with alternating bands and a hero at the top."
+    compose:
+      - TPageSurface
+      - THero
+      - TSection
+      - TContainer
+      - TText
+      - TSkipLink
+    notes:
+      - "`TPageSurface` is the outermost element: it zeroes the user-agent body margin (which `body:has(.t-app-shell)` only handles for shell screens) and, with `overlay`, becomes the viewport scroll host for a landing rendered over a mounted SPA."
+      - "`THero` for the one band with a layer behind the copy; `TSection` for every other band. Both nest a `TContainer` for the reading column, so do not wrap them in one."
+      - "Type comes from `TText`: `size=\"display\"` for the hero, `size=\"title\"` for section headings, `size=\"overline\"` for eyebrows, `measure=\"lead\"`/`\"prose\"` for the reading width. No `clamp()` in product CSS."
+      - "Declare the accent once on the surface or the section (`accent=\"success\"`); `TTag tone=\"accent\"`, the hero glow and `--tree-shadow-accent` all follow. Closed axis — pick a tone, never a hex."
+      - "Put a `TSkipLink` first, before the site header."
+
+  - id: responsive-navigation
+    name: "Navigation that switches composition by width"
+    use_when:
+      - "Wide screens should show inline navigation and narrow screens a drawer."
+      - "The page is pre-rendered or crawled, so both branches must exist in the served HTML."
+    compose:
+      - TShow
+      - THide
+      - TNavMenu
+      - TDrawer
+    notes:
+      - "Render both branches and let CSS choose: `<TShow at=\"lg\">` for the inline nav, `<THide at=\"lg\">` for the trigger plus `TDrawer`."
+      - "Do NOT reach for a `matchMedia` composable here — there is no `window` while the HTML is written, so the server has to guess a viewport and a crawler reads only one of the two navigations."
+      - "Do NOT hardcode the breakpoint pixel either: `@media (min-width: var(--tree-breakpoint-lg))` is invalid CSS, which is exactly why this belongs to the library."
+      - "Both branches are in the DOM — never give both the same element `id`."
 
   - id: data-listing
     name: "Data table with paging"

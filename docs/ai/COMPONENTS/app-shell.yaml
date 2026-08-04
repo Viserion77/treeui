@@ -98,6 +98,15 @@ props:
     type: string
     default: Sidebar
     note: "aria-label applied to both the desktop <aside> and the drawer <aside>."
+  skipLinkLabel:
+    type: string
+    default: undefined
+    note: >
+      Renders a TSkipLink as the shell's first focusable element, pointing at
+      the shell's own `<main>` (which gets a generated id, is made focusable and
+      has its stray focus ring suppressed). Opt-in only because the label is
+      user-facing copy and the library ships none — supply the localized string
+      and the wiring is the shell's. Omitted, no skip link is rendered.
 
 events:
   - name: update:collapsed

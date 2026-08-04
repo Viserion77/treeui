@@ -39,6 +39,24 @@ props:
       Disables all items. OR-ed with each item's own disabled prop, so an item is
       disabled when either is true. Provided to items as a computed ref, so
       flipping it after mount updates every item.
+  variant:
+    type: TAccordionVariant
+    default: "'default'"
+    values: [default, quiet]
+    description: >
+      `quiet` gives the disclosure the weight of a note attached to one item
+      rather than of a document section: the trigger sizes to its content
+      instead of spanning the reading column (no `width: 100%`), the item's
+      bottom rule disappears, and the panel is smaller. Styling only — the
+      keyboard model, `aria-expanded`/`aria-controls` and the 44x44 hit target
+      on `.t-accordion__trigger::after` are unchanged. It looks small; it is not
+      small to hit.
+  rail:
+    type: boolean
+    default: false
+    description: >
+      Indent the panel behind a vertical rule, to say "this belongs to the item
+      above it". Only meaningful with `variant="quiet"`.
   collapsible:
     type: boolean
     default: false

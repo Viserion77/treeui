@@ -453,6 +453,34 @@ component_profiles:
       - component: TStack
         when: "A single row or column is enough."
 
+  THero:
+    keywords: [hero, banner, landing, marketing, backdrop, glow, above the fold]
+    use_when:
+      - "A section needs a decorative layer BEHIND the copy — art, a canvas, an image."
+      - "You want the library to own the box (stacking context, clip, hero padding) while the product supplies the art."
+    avoid_when:
+      - "The section has no layer behind it — TSection already gives the rhythm and the band."
+    alternatives:
+      - component: TSection
+        when: "Plain marketing section: rhythm plus an optional band, no backdrop."
+      - component: TPageHeader
+        when: "An in-app page title with actions, not a marketing hero."
+    notes:
+      - "The `#backdrop` layer is `pointer-events: none`, so a click on the CTA never dies in the decoration."
+      - "`glow` is the only decoration the library draws — a radial halo in the accent in scope."
+
+  THide:
+    keywords: [responsive, breakpoint, hide, mobile only, desktop only, media query]
+    use_when:
+      - "One branch of a layout should disappear at or below a breakpoint."
+    avoid_when:
+      - "You need the value of the breakpoint in JavaScript — this is a rendering wrapper, not a query."
+    alternatives:
+      - component: TShow
+        when: "It reads better as 'show at lg' than as 'hide below lg'."
+    notes:
+      - "See TShow — same mechanism, inverted."
+
   TImage:
     keywords: [image, img, picture, photo, thumbnail, avatar image, object-fit, lazy loading]
     use_when:
@@ -666,6 +694,22 @@ component_profiles:
       - component: TNavbar
         when: "You need a top application bar, not a per-page title block."
 
+  TPageSurface:
+    keywords: [landing, login, anonymous, full screen, no shell, scroll host, body margin, overlay page]
+    use_when:
+      - "The screen has NO TAppShell — a landing page, a login or locked screen, a public status page."
+      - "A full-screen page is rendered over a mounted SPA and must be the scroll host (`overlay`), so the screen behind stops scrolling along."
+    avoid_when:
+      - "The screen is inside an app shell — TAppShell already owns the viewport and the body margin."
+    alternatives:
+      - component: TAppShell
+        when: "The screen is an authenticated application view with header and side navigation."
+      - component: TPage
+        when: "You only need a centered content column with block padding inside an existing surface."
+    notes:
+      - "Zeroes the user-agent body margin the same depth-agnostic way TAppShell does, so a sticky header touches the viewport edge."
+      - "The solution to a shell-less screen is NOT 'mount the shell'."
+
   TPagination:
     keywords: [pagination, pages, list navigation]
     use_when:
@@ -702,6 +746,24 @@ component_profiles:
       - component: TSkeleton
         when: "You know the layout and want to hold its shape while it loads."
 
+  TSection:
+    keywords: [section, marketing, landing, rhythm, band, banded, vertical spacing, full bleed]
+    use_when:
+      - "A page is a stack of sections and each one repeats the same two decisions: vertical rhythm and an alternating background band."
+      - "You are about to wrap a TContainer in a `<div class=\"banded\">` to get a full-bleed background."
+    avoid_when:
+      - "You only need the width constraint — TContainer alone is enough."
+    alternatives:
+      - component: TContainer
+        when: "Width and horizontal padding only, no block rhythm and no band."
+      - component: TPage
+        when: "An in-app page region rather than a marketing section."
+      - component: THero
+        when: "The section has a decorative layer behind the copy."
+    notes:
+      - "The band is full-bleed without `100vw` or a negative margin — both overflow once Windows paints a scrollbar."
+      - "Carries the closed `accent` axis, inherited by the whole subtree."
+
   TSelectableList:
     keywords: [selectable list, rich options, option list]
     use_when:
@@ -728,6 +790,21 @@ component_profiles:
       - component: TMultiSelect
         when: "Multiple values are required."
 
+  TShow:
+    keywords: [responsive, breakpoint, show, mobile, desktop, media query, matchMedia, SSR, prerender]
+    use_when:
+      - "Two compositions must be chosen by viewport width — inline navigation OR a TDrawer, two columns OR a stack."
+      - "The page is pre-rendered or crawled, so both branches have to exist in the served HTML."
+    avoid_when:
+      - "You need the breakpoint as a reactive value in script — this renders both branches and lets CSS choose."
+    alternatives:
+      - component: THide
+        when: "It reads better as 'hide below lg' than as 'show at lg'."
+    notes:
+      - "Pure CSS, no JS: `matchMedia` has no `window` while the HTML is written, so a JS answer makes the server guess a viewport and a crawler read only one navigation."
+      - "A consumer genuinely cannot write this: `@media (min-width: var(--tree-breakpoint-lg))` is invalid, so the pixel would be hardcoded and drift."
+      - "`at` and `below` combine into a band."
+
   TSidebar:
     keywords: [sidebar, app shell, collapsible nav rail]
     use_when:
@@ -750,6 +827,20 @@ component_profiles:
         when: "There is no layout to preserve — a small busy indicator is enough."
       - component: TProgress
         when: "The remaining work is measurable."
+
+  TSkipLink:
+    keywords: [skip link, skip to content, bypass blocks, keyboard, a11y, WCAG 2.4.1]
+    use_when:
+      - "A page has navigation before its main content and a keyboard user needs to jump past it."
+    avoid_when:
+      - "You want to hide something permanently — that is `.t-visually-hidden`."
+    alternatives:
+      - component: TAppShell
+        when: "The screen already uses the shell: pass `skipLinkLabel` and the shell wires the link and the target for you."
+    notes:
+      - "It is the one control that must be hidden and visible at the same time, so `.t-visually-hidden` is the wrong tool — it would hide the link from the sighted keyboard user it exists for."
+      - "The label is product copy; the library ships no user-facing text."
+      - "Marks its target focusable and suppresses the stray focus ring, so no loose `#content:focus { outline: none }` is needed."
 
   TStack:
     keywords: [stack, spacing, flex column, flex row]

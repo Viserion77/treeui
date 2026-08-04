@@ -5,18 +5,43 @@ import TIcon from './TIcon.vue';
 
 export type TTagVariant = 'solid' | 'outline' | 'soft';
 
+const _treeTagTones = [
+  'neutral',
+  'brand',
+  'accent',
+  'success',
+  'warning',
+  'danger',
+  'info',
+] as const;
+
+export type TTagTone = (typeof _treeTagTones)[number];
+
 const props = withDefaults(
   defineProps<{
     variant?: TTagVariant;
+    /**
+     * Colour axis, orthogonal to `variant`. Closed set — never a free colour,
+     * the same policy TLinkTile's `tone` states. `accent` reads the surface
+     * accent (`--tree-color-accent-*`), which defaults to the secondary brand
+     * accent and follows a `TSection`/`THero`/`TPageSurface` that declares one.
+     * Omitted, the tag keeps the pre-tone look: brand `solid`, neutral
+     * `outline` and `soft`.
+     */
+    tone?: TTagTone;
     size?: TSize;
     removable?: boolean;
     disabled?: boolean;
+    /** Accessible name for the remove button. Localizable copy. */
+    removeLabel?: string;
   }>(),
   {
     variant: 'soft',
+    tone: undefined,
     size: 'md',
     removable: false,
     disabled: false,
+    removeLabel: 'Remove',
   },
 );
 
@@ -28,6 +53,7 @@ const classes = computed(() => [
   't-tag',
   `t-tag--${props.variant}`,
   `t-tag--${props.size}`,
+  props.tone ? `t-tag--tone-${props.tone}` : '',
   props.disabled ? 'is-disabled' : '',
 ]);
 
@@ -54,7 +80,7 @@ function handleRemove() {
       type="button"
       class="t-tag__remove"
       :disabled="disabled"
-      aria-label="Remove"
+      :aria-label="removeLabel"
       @click="handleRemove"
     >
       <TIcon

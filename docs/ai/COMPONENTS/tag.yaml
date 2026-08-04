@@ -9,6 +9,17 @@ props:
     type: TTagVariant
     default: soft
     values: [solid, outline, soft]
+  tone:
+    type: TTagTone
+    default: undefined
+    values: [neutral, brand, accent, success, warning, danger, info]
+    description: >
+      Colour axis, orthogonal to `variant`. Closed set — never a free colour,
+      the same policy TLinkTile's `tone` states. `accent` reads the surface
+      accent (`--tree-color-accent-*`), which defaults to the secondary brand
+      accent and follows a TSection/THero/TPageSurface that declares one.
+      Omitted, the tag keeps the pre-tone look: brand `solid`, neutral
+      `outline` and `soft` — so `tone` is purely additive.
   size:
     type: TSize
     default: md
@@ -21,6 +32,12 @@ props:
     type: boolean
     default: false
     description: Disables interaction and dims the tag.
+  removeLabel:
+    type: string
+    default: Remove
+    description: >
+      Accessible name for the remove button. Localizable copy — the previous
+      hardcoded English string could not be translated by a consumer.
 
 events:
   remove:
@@ -32,7 +49,23 @@ slots:
   icon:
     description: Optional leading icon.
 
+types:
+  TTagVariant: "'solid' | 'outline' | 'soft'"
+  TTagTone: "'neutral' | 'brand' | 'accent' | 'success' | 'warning' | 'danger' | 'info'"
+
+css:
+  block: t-tag
+  modifiers:
+    - "t-tag--solid | t-tag--outline | t-tag--soft"
+    - "t-tag--sm | t-tag--md | t-tag--lg"
+    - "t-tag--tone-<tone> (only when `tone` is set)"
+  custom_properties:
+    note: >
+      The tone modifiers remap five variables the variant rules read —
+      `--tree-tag-fg`, `--tree-tag-surface`, `--tree-tag-solid`,
+      `--tree-tag-on-solid`, `--tree-tag-border` — the same shape TBadge uses.
+
 accessibility:
-  remove_button: Has aria-label="Remove" and is keyboard-focusable.
+  remove_button: Named by `removeLabel` (default "Remove") and keyboard-focusable.
   disabled_state: Applied via is-disabled class and native disabled on remove button.
   icon: Marked aria-hidden="true".

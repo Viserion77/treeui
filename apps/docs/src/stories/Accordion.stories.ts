@@ -17,6 +17,8 @@ const meta = {
   },
   argTypes: {
     type: { control: 'select', options: ['single', 'multiple'] },
+    variant: { control: 'select', options: ['default', 'quiet'] },
+    rail: { control: 'boolean' },
     collapsible: { control: 'boolean' },
     disabled: { control: 'boolean' },
   },
@@ -289,6 +291,50 @@ export const DisabledAll: Story = {
             Individual items can still be disabled on their own instead.
           </TAccordionItem>
         </TAccordion>
+      </div>
+    `,
+  }),
+};
+
+export const Quiet: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'A detail attached to one item of content — a machine trail under a chat bubble, a "why this result" note — needs the weight of a note, not of a document section. `variant="quiet"` sizes the trigger to its content instead of the reading column, drops the item rule and shrinks the panel; `rail` indents the panel behind a vertical rule to say "this belongs to the item above it". The keyboard model, `aria-expanded`/`aria-controls` and the 44x44 hit target are unchanged — it looks small, it is not small to hit.',
+      },
+    },
+  },
+  render: () => ({
+    components: { TAccordion, TAccordionItem },
+    template: `
+      <div style="display: grid; gap: 2rem; max-width: 34rem;">
+        <div>
+          <p style="margin: 0 0 0.5rem;">Sure — here is the summary you asked for.</p>
+          <TAccordion variant="quiet" collapsible>
+            <TAccordionItem value="trail">
+              <template #trigger>Show reasoning</template>
+              <ol style="margin: 0; padding-inline-start: 1.25rem;">
+                <li>Searched the workspace</li>
+                <li>Read 3 documents</li>
+                <li>Drafted the summary</li>
+              </ol>
+            </TAccordionItem>
+          </TAccordion>
+        </div>
+
+        <div>
+          <p style="margin: 0 0 0.5rem;">Same disclosure, with the rail.</p>
+          <TAccordion variant="quiet" rail collapsible>
+            <TAccordionItem value="trail">
+              <template #trigger>Show reasoning</template>
+              <ol style="margin: 0; padding-inline-start: 1.25rem;">
+                <li>Searched the workspace</li>
+                <li>Read 3 documents</li>
+              </ol>
+            </TAccordionItem>
+          </TAccordion>
+        </div>
       </div>
     `,
   }),

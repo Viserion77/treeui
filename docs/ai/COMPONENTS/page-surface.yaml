@@ -1,0 +1,65 @@
+name: TPageSurface
+source_file: packages/vue/src/components/TPageSurface.vue
+package: "@treeui/vue"
+kind: layout
+status: available
+purpose: >
+  Page-level surface for screens with NO app shell — a landing page, a login or
+  locked screen, a public status page. Closes the two things the library
+  previously only solved inside TAppShell: the user-agent body margin, and which
+  element is the scroll host.
+
+props:
+  as:
+    type: string
+    default: div
+    note: "`main` when the surface IS the page's main region."
+  overlay:
+    type: boolean
+    default: false
+    note: >
+      Take the viewport (`position: fixed; inset: 0; overflow-y: auto`) and
+      become the scroll host, for a screen rendered OVER a mounted SPA. Scroll
+      chaining is contained, so reaching the end does not move the screen
+      behind. Without it the surface is a normal `min-block-size: 100dvh` block
+      and the document scrolls.
+  accent:
+    type: TAccent
+    default: "unset"
+    values: [brand, neutral, success, warning, danger, info]
+
+slots:
+  - default
+
+body_margin:
+  rule: "`body:has(.t-page-surface) { margin: 0 }`"
+  why: >
+    The stylesheet already zeroes the margin for `body:has(.t-app-shell)`. On a
+    shell-less screen that 8px comes back and a sticky header stops touching the
+    viewport edge. Same depth-agnostic `:has()` for the same reason — apps mount
+    through wrappers (`body > #app > .app > .t-page-surface`).
+  not: "The answer to a shell-less screen is never 'mount the shell'."
+
+typography:
+  note: >
+    The surface does NOT set a font family: the stylesheet already sets
+    `html { font-family: var(--tree-font-family-sans) }`, which covers unstyled
+    prose and teleported overlays alike. It sets background and text colour only.
+
+css:
+  block: t-page-surface
+  states: [is-overlay]
+  z_index: "`--tree-z-overlay` in overlay mode — above app chrome, below modals and toasts."
+  accent_classes: "t-accent--<tone>"
+
+a11y:
+  - "Structural; pass `as=\"main\"` (or nest a `<main>`) so the page has a main landmark."
+  - "In overlay mode the surface covers the app behind it visually but does not hide it from assistive tech — apply `inert`/`aria-hidden` on the app root if it must be unreachable."
+
+example: |
+  <TPageSurface overlay accent="info">
+    <THero glow>
+      <TText as="h1" size="display">Sign in to continue</TText>
+    </THero>
+    <TSection banded>…</TSection>
+  </TPageSurface>

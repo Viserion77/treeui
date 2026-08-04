@@ -20,6 +20,7 @@ import {
 } from 'vue';
 import { useControllableOpen } from '../composables/useControllableOpen';
 import type { TSidebarSide } from './TSidebar.vue';
+import TSkipLink from './TSkipLink.vue';
 import { treeSidebarInjectionKey } from './sidebar';
 
 defineOptions({
@@ -65,6 +66,13 @@ const props = withDefaults(
     sidebarLabel?: string;
     collapseLabel?: string;
     expandLabel?: string;
+    /**
+     * Render a skip link as the first focusable element, pointing at the shell's
+     * `<main>`. The shell wires the target; the copy is the product's, so the
+     * link only appears once a label is supplied — the library does not invent
+     * user-facing text (see TSkipLink for a standalone one).
+     */
+    skipLinkLabel?: string;
   }>(),
   {
     as: 'div',
@@ -90,6 +98,7 @@ const props = withDefaults(
     sidebarLabel: 'Sidebar',
     collapseLabel: 'Collapse sidebar',
     expandLabel: 'Expand sidebar',
+    skipLinkLabel: undefined,
   },
 );
 
@@ -137,6 +146,7 @@ defineSlots<{
 
 const attrs = useAttrs();
 const sidebarId = createId('t-app-shell-sidebar');
+const mainId = createId('t-app-shell-main');
 
 const { value: isCollapsed, setValue: setCollapsed } = useControllableOpen(
   toRef(props, 'collapsed'),
@@ -467,6 +477,13 @@ const slotProps = computed<AppShellSlotProps>(() => ({
     :style="rootStyle"
     :data-mobile="isMobile ? 'true' : 'false'"
   >
+    <TSkipLink
+      v-if="skipLinkLabel"
+      :href="`#${mainId}`"
+    >
+      {{ skipLinkLabel }}
+    </TSkipLink>
+
     <header
       class="t-app-shell__header"
       :class="{
@@ -577,7 +594,10 @@ const slotProps = computed<AppShellSlotProps>(() => ({
       </div>
     </aside>
 
-    <main class="t-app-shell__main">
+    <main
+      :id="mainId"
+      class="t-app-shell__main"
+    >
       <slot
         :mobile="isMobile"
         :collapsed="effectiveCollapsed"

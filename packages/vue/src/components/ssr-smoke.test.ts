@@ -20,6 +20,12 @@ import {
   TModal,
   TDrawer,
   TTooltip,
+  TPageSurface,
+  TSection,
+  THero,
+  TShow,
+  THide,
+  TSkipLink,
 } from './index';
 
 const cases: Array<{ name: string; component: Component; props?: Record<string, unknown> }> = [
@@ -33,6 +39,15 @@ const cases: Array<{ name: string; component: Component; props?: Record<string, 
   { name: 'TModal', component: TModal, props: { open: false } },
   { name: 'TDrawer', component: TDrawer, props: { open: false } },
   { name: 'TTooltip', component: TTooltip },
+  // The marketing surface (TREEUX-030…036) exists for pre-rendered pages, so
+  // rendering on the server is the point, not an edge case. TSkipLink resolves
+  // its target in `onMounted` precisely so it never reaches for `document` here.
+  { name: 'TPageSurface', component: TPageSurface },
+  { name: 'TSection', component: TSection },
+  { name: 'THero', component: THero, props: { glow: true } },
+  { name: 'TShow', component: TShow, props: { at: 'lg' } },
+  { name: 'THide', component: THide, props: { below: 'lg' } },
+  { name: 'TSkipLink', component: TSkipLink, props: { href: '#content' } },
 ];
 
 describe('SSR smoke — components render to string without a DOM (TREEUX-028)', () => {

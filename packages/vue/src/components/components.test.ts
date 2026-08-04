@@ -72,6 +72,12 @@ import TMarkdownEditor from './TMarkdownEditor.vue';
 import TIcon from './TIcon.vue';
 import TImage from './TImage.vue';
 import TTagInput from './TTagInput.vue';
+import TSection from './TSection.vue';
+import THero from './THero.vue';
+import TPageSurface from './TPageSurface.vue';
+import TShow from './TShow.vue';
+import THide from './THide.vue';
+import TSkipLink from './TSkipLink.vue';
 import TKeyValueEditor from './TKeyValueEditor.vue';
 import TChart from './TChart.vue';
 import TSparkline from './TSparkline.vue';
@@ -5889,5 +5895,302 @@ describe('TREEUX-002 — TKeyValueEditor (LSS, phase 1)', () => {
       props: { modelValue: {}, labels: { add: 'Adicionar linha' } },
     });
     expect(wrapper.get('.t-key-value-editor__add').text()).toContain('Adicionar linha');
+  });
+});
+
+describe('TREEUX-027 — TTag tone axis (S7)', () => {
+  it('keeps the pre-tone classes when no tone is passed', () => {
+    const wrapper = mount(TTag, { props: { variant: 'solid' } });
+    expect(wrapper.classes()).toContain('t-tag--solid');
+    expect(wrapper.classes().some((c) => c.startsWith('t-tag--tone-'))).toBe(false);
+  });
+
+  it.each(['neutral', 'brand', 'accent', 'success', 'warning', 'danger', 'info'] as const)(
+    'applies the %s tone modifier alongside the variant',
+    (tone) => {
+      const wrapper = mount(TTag, { props: { tone, variant: 'soft' } });
+      expect(wrapper.classes()).toContain(`t-tag--tone-${tone}`);
+      expect(wrapper.classes()).toContain('t-tag--soft');
+    },
+  );
+
+  it('takes a localizable remove label', () => {
+    const wrapper = mount(TTag, { props: { removable: true, removeLabel: 'Remover' } });
+    expect(wrapper.get('.t-tag__remove').attributes('aria-label')).toBe('Remover');
+  });
+});
+
+describe('TREEUX-030 — TSection (S7)', () => {
+  it('renders a section with the default rhythm and an inner container', () => {
+    const wrapper = mount(TSection, { slots: { default: 'Body' } });
+    expect(wrapper.element.tagName).toBe('SECTION');
+    expect(wrapper.classes()).toContain('t-section--default');
+    expect(wrapper.find('.t-section__inner.t-container').exists()).toBe(true);
+    expect(wrapper.text()).toContain('Body');
+  });
+
+  it.each(['tight', 'default', 'loose'] as const)('applies the %s rhythm', (rhythm) => {
+    expect(mount(TSection, { props: { rhythm } }).classes()).toContain(`t-section--${rhythm}`);
+  });
+
+  it('bands the surface and forwards the container size', () => {
+    const wrapper = mount(TSection, { props: { banded: true, container: 'xl' } });
+    expect(wrapper.classes()).toContain('is-banded');
+    expect(wrapper.find('.t-section__inner').classes()).toContain('t-container--xl');
+  });
+
+  it('drops the container when container="none"', () => {
+    const wrapper = mount(TSection, { props: { container: 'none' }, slots: { default: 'Body' } });
+    expect(wrapper.find('.t-section__inner').exists()).toBe(false);
+    expect(wrapper.text()).toContain('Body');
+  });
+
+  it('declares the accent axis for its subtree', () => {
+    expect(mount(TSection, { props: { accent: 'success' } }).classes()).toContain(
+      't-accent--success',
+    );
+  });
+});
+
+describe('TREEUX-031 — THero (S7)', () => {
+  it('renders the copy above an aria-hidden backdrop layer', () => {
+    const wrapper = mount(THero, {
+      slots: { default: 'Headline', backdrop: '<canvas />' },
+    });
+    const backdrop = wrapper.get('.t-hero__backdrop');
+    expect(backdrop.attributes('aria-hidden')).toBe('true');
+    expect(backdrop.find('canvas').exists()).toBe(true);
+    expect(wrapper.get('.t-hero__inner').text()).toContain('Headline');
+  });
+
+  it('omits the backdrop layer when nothing is slotted into it', () => {
+    expect(mount(THero).find('.t-hero__backdrop').exists()).toBe(false);
+  });
+
+  it('adds the glow layer only when asked, and marks it decorative', () => {
+    expect(mount(THero).find('.t-hero__glow').exists()).toBe(false);
+    const glow = mount(THero, { props: { glow: true } }).get('.t-hero__glow');
+    expect(glow.attributes('aria-hidden')).toBe('true');
+  });
+
+  it('follows the accent axis', () => {
+    expect(mount(THero, { props: { accent: 'info' } }).classes()).toContain('t-accent--info');
+  });
+});
+
+describe('TREEUX-032 — TPageSurface (S7)', () => {
+  it('renders a page surface that is not the scroll host by default', () => {
+    const wrapper = mount(TPageSurface, { slots: { default: 'Landing' } });
+    expect(wrapper.classes()).toContain('t-page-surface');
+    expect(wrapper.classes()).not.toContain('is-overlay');
+    expect(wrapper.text()).toContain('Landing');
+  });
+
+  it('becomes the viewport scroll host in overlay mode', () => {
+    expect(mount(TPageSurface, { props: { overlay: true } }).classes()).toContain('is-overlay');
+  });
+
+  it('renders the element asked for and declares the accent', () => {
+    const wrapper = mount(TPageSurface, { props: { as: 'main', accent: 'warning' } });
+    expect(wrapper.element.tagName).toBe('MAIN');
+    expect(wrapper.classes()).toContain('t-accent--warning');
+  });
+});
+
+describe('TREEUX-033 — TShow / THide (S7)', () => {
+  it('renders its children on the server side of the contract — always in the DOM', () => {
+    const wrapper = mount(TShow, { props: { at: 'lg' }, slots: { default: 'Wide nav' } });
+    expect(wrapper.text()).toContain('Wide nav');
+    expect(wrapper.classes()).toEqual(['t-show', 't-show--at-lg']);
+  });
+
+  it('supports a band when both bounds are given', () => {
+    const wrapper = mount(TShow, { props: { at: 'sm', below: 'lg' } });
+    expect(wrapper.classes()).toContain('t-show--at-sm');
+    expect(wrapper.classes()).toContain('t-show--below-lg');
+  });
+
+  it('is a no-op wrapper with no bound', () => {
+    expect(mount(TShow).classes()).toEqual(['t-show']);
+  });
+
+  it('THide mirrors the modifiers', () => {
+    const wrapper = mount(THide, { props: { below: 'md' }, slots: { default: 'Desktop only' } });
+    expect(wrapper.classes()).toEqual(['t-hide', 't-hide--below-md']);
+    expect(wrapper.text()).toContain('Desktop only');
+  });
+});
+
+describe('TREEUX-036 — TSkipLink (S7)', () => {
+  it('renders an anchor to the target with the product copy', () => {
+    const wrapper = mount(TSkipLink, {
+      props: { href: '#content' },
+      slots: { default: 'Pular para o conteúdo' },
+    });
+    expect(wrapper.element.tagName).toBe('A');
+    expect(wrapper.attributes('href')).toBe('#content');
+    expect(wrapper.text()).toBe('Pular para o conteúdo');
+  });
+
+  it('makes the target focusable and suppresses its focus ring', async () => {
+    const target = document.createElement('main');
+    target.id = 'content';
+    document.body.appendChild(target);
+
+    const wrapper = mount(TSkipLink, { props: { href: '#content' }, attachTo: document.body });
+    await nextTick();
+    expect(target.getAttribute('tabindex')).toBe('-1');
+    expect(target.hasAttribute('data-tree-skip-target')).toBe(true);
+
+    await wrapper.trigger('click');
+    expect(document.activeElement).toBe(target);
+
+    wrapper.unmount();
+    expect(target.hasAttribute('tabindex')).toBe(false);
+    expect(target.hasAttribute('data-tree-skip-target')).toBe(false);
+    target.remove();
+  });
+
+  it('leaves an existing tabindex on the target alone', async () => {
+    const target = document.createElement('div');
+    target.id = 'app-content';
+    target.setAttribute('tabindex', '0');
+    document.body.appendChild(target);
+
+    const wrapper = mount(TSkipLink, { props: { href: '#app-content' } });
+    await nextTick();
+    wrapper.unmount();
+    expect(target.getAttribute('tabindex')).toBe('0');
+    target.remove();
+  });
+
+  it('TAppShell renders the skip link only when the product supplies the copy', async () => {
+    expect(mount(TAppShell).find('.t-skip-link').exists()).toBe(false);
+
+    const wrapper = mount(TAppShell, { props: { skipLinkLabel: 'Skip to content' } });
+    await nextTick();
+    const link = wrapper.get('.t-skip-link');
+    expect(link.text()).toBe('Skip to content');
+    expect(link.attributes('href')).toBe(`#${wrapper.get('main').attributes('id')}`);
+  });
+});
+
+describe('TREEUX-038 — TColorSwatch readonly (S7)', () => {
+  const options = [
+    { label: 'Ink', value: '#1f2328' },
+    { label: 'Paper', value: '#ffffff' },
+  ];
+
+  it('renders inert chips instead of buttons', () => {
+    const wrapper = mount(TColorSwatch, { props: { options, readonly: true, allowCustom: true } });
+    expect(wrapper.findAll('button')).toHaveLength(0);
+    expect(wrapper.find('input[type="color"]').exists()).toBe(false);
+
+    const chips = wrapper.findAll('.t-color-swatch__chip');
+    expect(chips).toHaveLength(2);
+    expect(chips[0].attributes('role')).toBe('img');
+    expect(chips[0].attributes('aria-label')).toBe('Ink');
+    expect(wrapper.classes()).toContain('is-readonly');
+  });
+
+  it('still works as a picker when readonly is off', async () => {
+    const wrapper = mount(TColorSwatch, { props: { options } });
+    expect(wrapper.findAll('.t-color-swatch__chip')).toHaveLength(0);
+    await wrapper.findAll('.t-color-swatch__option')[1].trigger('click');
+    expect(wrapper.emitted('update:modelValue')?.[0]).toEqual(['#ffffff']);
+  });
+});
+
+describe('TREEUX-020 — TTextarea maxRows (S7)', () => {
+  const stubScrollHeight = (el: HTMLTextAreaElement, value: number) => {
+    Object.defineProperty(el, 'scrollHeight', { configurable: true, get: () => value });
+  };
+
+  it('grows without a ceiling when maxRows is absent', async () => {
+    const wrapper = mount(TTextarea, { props: { autoGrow: true, modelValue: '' } });
+    const el = wrapper.get('textarea').element as HTMLTextAreaElement;
+    stubScrollHeight(el, 900);
+    await wrapper.setProps({ modelValue: 'a lot of text' });
+    await nextTick();
+    expect(el.style.height).toBe('900px');
+    expect(el.style.overflowY).toBe('');
+  });
+
+  it('stops at the cap and scrolls internally instead', async () => {
+    const wrapper = mount(TTextarea, { props: { autoGrow: true, maxRows: 4, modelValue: '' } });
+    const el = wrapper.get('textarea').element as HTMLTextAreaElement;
+    stubScrollHeight(el, 900);
+    await wrapper.setProps({ modelValue: 'a lot of text' });
+    await nextTick();
+
+    const capped = Number.parseFloat(el.style.height);
+    expect(capped).toBeGreaterThan(0);
+    expect(capped).toBeLessThan(900);
+    expect(el.style.overflowY).toBe('auto');
+  });
+
+  it('goes back to growing when the content fits under the cap', async () => {
+    const wrapper = mount(TTextarea, { props: { autoGrow: true, maxRows: 4, modelValue: '' } });
+    const el = wrapper.get('textarea').element as HTMLTextAreaElement;
+    stubScrollHeight(el, 30);
+    await wrapper.setProps({ modelValue: 'short' });
+    await nextTick();
+    expect(el.style.height).toBe('30px');
+    expect(el.style.overflowY).toBe('hidden');
+  });
+
+  it('leaves the field alone when autoGrow is off', async () => {
+    const wrapper = mount(TTextarea, { props: { maxRows: 2, modelValue: '' } });
+    const el = wrapper.get('textarea').element as HTMLTextAreaElement;
+    stubScrollHeight(el, 900);
+    await wrapper.setProps({ modelValue: 'a lot of text' });
+    await nextTick();
+    expect(el.style.height).toBe('');
+  });
+});
+
+describe('TREEUX-023 — quiet accordion (S7)', () => {
+  const mountAccordion = (props: Record<string, unknown>) =>
+    mount(TAccordion, {
+      props,
+      slots: {
+        default: `<TAccordionItem value="trail"><template #trigger>Trail</template>Steps</TAccordionItem>`,
+      },
+      global: { components: { TAccordionItem } },
+    });
+
+  it('is unchanged by default', () => {
+    const wrapper = mountAccordion({});
+    expect(wrapper.classes()).toEqual(['t-accordion']);
+  });
+
+  it('drops to note weight with variant="quiet"', () => {
+    const wrapper = mountAccordion({ variant: 'quiet' });
+    expect(wrapper.classes()).toContain('t-accordion--quiet');
+    expect(wrapper.classes()).not.toContain('has-rail');
+  });
+
+  it('adds the rail when asked', () => {
+    expect(mountAccordion({ variant: 'quiet', rail: true }).classes()).toContain('has-rail');
+  });
+
+  it('keeps the disclosure semantics of the default variant', async () => {
+    const wrapper = mountAccordion({ variant: 'quiet' });
+    const trigger = wrapper.get('.t-accordion__trigger');
+    expect(trigger.attributes('aria-expanded')).toBe('false');
+    expect(trigger.attributes('aria-controls')).toBeTruthy();
+    await trigger.trigger('click');
+    expect(wrapper.get('.t-accordion__trigger').attributes('aria-expanded')).toBe('true');
+  });
+});
+
+describe('TREEUX-001 — TTagInput localizable chip copy (LSS)', () => {
+  it('forwards a localized remove label to every chip', () => {
+    const wrapper = mount(TTagInput, {
+      props: { modelValue: ['dynamodb', 'sqs'], removeLabel: 'Remover' },
+    });
+    const buttons = wrapper.findAll('.t-tag__remove');
+    expect(buttons).toHaveLength(2);
+    expect(buttons.every((b) => b.attributes('aria-label') === 'Remover')).toBe(true);
   });
 });

@@ -500,17 +500,59 @@
       "id": "tag-input",
       "name": "Tag input field",
       "useWhen": [
-        "A form needs freeform tag entry such as domains, labels, or emails."
+        "A form needs freeform tag entry such as domains, labels, or service names."
       ],
       "compose": [
         "TFormField",
-        "TInput",
-        "TTag",
-        "TStack"
+        "TTagInput"
       ],
       "notes": [
-        "Keep the draft value in app state and add a tag on Enter or separator keys.",
-        "Use removable `TTag` items below or inside the field wrapper."
+        "`TTagInput` is the component — do NOT hand-roll TInput + TTag any more. `v-model` is `string[]`; Enter and comma confirm, Backspace on an empty field removes the last, values are trimmed and deduped silently.",
+        "Wrap it in `TFormField` for the label, hint and error.",
+        "For selection from a fixed option set, use `TMultiSelect`/`TCombobox` instead — `TTagInput` is free input."
+      ]
+    },
+    {
+      "id": "marketing-page",
+      "name": "Marketing / anonymous page",
+      "useWhen": [
+        "The screen has no app shell: a public site, a product landing page, a login or locked screen.",
+        "A page is a stack of sections with alternating bands and a hero at the top."
+      ],
+      "compose": [
+        "TPageSurface",
+        "THero",
+        "TSection",
+        "TContainer",
+        "TText",
+        "TSkipLink"
+      ],
+      "notes": [
+        "`TPageSurface` is the outermost element: it zeroes the user-agent body margin (which `body:has(.t-app-shell)` only handles for shell screens) and, with `overlay`, becomes the viewport scroll host for a landing rendered over a mounted SPA.",
+        "`THero` for the one band with a layer behind the copy; `TSection` for every other band. Both nest a `TContainer` for the reading column, so do not wrap them in one.",
+        "Type comes from `TText`: `size=\"display\"` for the hero, `size=\"title\"` for section headings, `size=\"overline\"` for eyebrows, `measure=\"lead\"`/`\"prose\"` for the reading width. No `clamp()` in product CSS.",
+        "Declare the accent once on the surface or the section (`accent=\"success\"`); `TTag tone=\"accent\"`, the hero glow and `--tree-shadow-accent` all follow. Closed axis — pick a tone, never a hex.",
+        "Put a `TSkipLink` first, before the site header."
+      ]
+    },
+    {
+      "id": "responsive-navigation",
+      "name": "Navigation that switches composition by width",
+      "useWhen": [
+        "Wide screens should show inline navigation and narrow screens a drawer.",
+        "The page is pre-rendered or crawled, so both branches must exist in the served HTML."
+      ],
+      "compose": [
+        "TShow",
+        "THide",
+        "TNavMenu",
+        "TDrawer"
+      ],
+      "notes": [
+        "Render both branches and let CSS choose: `<TShow at=\"lg\">` for the inline nav, `<THide at=\"lg\">` for the trigger plus `TDrawer`.",
+        "Do NOT reach for a `matchMedia` composable here — there is no `window` while the HTML is written, so the server has to guess a viewport and a crawler reads only one of the two navigations.",
+        "Do NOT hardcode the breakpoint pixel either: `@media (min-width: var(--tree-breakpoint-lg))` is invalid CSS, which is exactly why this belongs to the library.",
+        "Both branches are in the DOM — never give both the same element `id`."
       ]
     },
     {
@@ -715,7 +757,9 @@
         "TLinkTile",
         "TMenu",
         "TPopover",
-        "TImage"
+        "TImage",
+        "TSkipLink",
+        "TAppShell"
       ]
     },
     {
@@ -737,7 +781,10 @@
         "TCard",
         "TModal",
         "TTagInput",
-        "TKeyValueEditor"
+        "TKeyValueEditor",
+        "TSection",
+        "THero",
+        "TPageSurface"
       ]
     },
     {
@@ -781,7 +828,12 @@
         "TFormField",
         "TBrandLockup",
         "TList",
-        "TDescriptionList"
+        "TDescriptionList",
+        "TSection",
+        "THero",
+        "TPageSurface",
+        "TShow",
+        "THide"
       ]
     },
     {
@@ -808,7 +860,11 @@
         "TDescriptionList",
         "TImage",
         "TTagInput",
-        "TKeyValueEditor"
+        "TKeyValueEditor",
+        "TSection",
+        "THero",
+        "TPageSurface",
+        "TColorSwatch"
       ]
     }
   ],
@@ -1107,6 +1163,22 @@
           "type": "boolean",
           "default": "false",
           "description": "Disables all items. OR-ed with each item's own disabled prop, so an item is disabled when either is true. Provided to items as a computed ref, so flipping it after mount updates every item.\n"
+        },
+        {
+          "name": "variant",
+          "type": "TAccordionVariant",
+          "default": "'default'",
+          "values": [
+            "default",
+            "quiet"
+          ],
+          "description": "`quiet` gives the disclosure the weight of a note attached to one item rather than of a document section: the trigger sizes to its content instead of spanning the reading column (no `width: 100%`), the item's bottom rule disappears, and the panel is smaller. Styling only — the keyboard model, `aria-expanded`/`aria-controls` and the 44x44 hit target on `.t-accordion__trigger::after` are unchanged. It looks small; it is not small to hit.\n"
+        },
+        {
+          "name": "rail",
+          "type": "boolean",
+          "default": "false",
+          "description": "Indent the panel behind a vertical rule, to say \"this belongs to the item above it\". Only meaningful with `variant=\"quiet\"`.\n"
         },
         {
           "name": "collapsible",
@@ -1461,6 +1533,12 @@
           "type": "string",
           "default": "Sidebar",
           "note": "aria-label applied to both the desktop <aside> and the drawer <aside>."
+        },
+        {
+          "name": "skipLinkLabel",
+          "type": "string",
+          "default": "undefined",
+          "note": "Renders a TSkipLink as the shell's first focusable element, pointing at the shell's own `<main>` (which gets a generated id, is made focusable and has its stray focus ring suppressed). Opt-in only because the label is user-facing copy and the library ships none — supply the localized string and the wiring is the shell's. Omitted, no skip link is rendered.\n"
         }
       ],
       "events": [
@@ -1648,7 +1726,9 @@
         "app-shell",
         "brand-lockup"
       ],
-      "practices": []
+      "practices": [
+        "accessible-by-default"
+      ]
     },
     {
       "name": "TAvatar",
@@ -2735,6 +2815,12 @@
           "type": "boolean",
           "default": "false",
           "note": "Sets the native `disabled` attribute on every preset button and on the custom input, so the group stops emitting and drops out of the Tab order. Not reflected on the wrapper, and there is no `is-disabled` class."
+        },
+        {
+          "name": "readonly",
+          "type": "boolean",
+          "default": "false",
+          "note": "Show the colours as evidence rather than as a choice — a brand manual, a palette table, a legend. Each option renders as an inert `<span class=\"t-color-swatch__chip\" role=\"img\">` named by its `label`: not focusable, not clickable, no `is-selected` state, no events. `modelValue` is ignored and the custom input is not rendered even with `allowCustom`. The chip border steps up to `--tree-color-border-strong` because half of these chips ARE background colours, and in their own theme a weak border makes the chip vanish into the page.\n"
         }
       ],
       "events": [
@@ -2758,7 +2844,9 @@
         "selection_match_is_case_insensitive: true",
         "custom_input_rendered_only_when_allow_custom: true",
         "custom_input_emits_on_input_not_change: true",
-        "fully_controlled_no_internal_selection_state: true"
+        "fully_controlled_no_internal_selection_state: true",
+        "readonly_renders_inert_chips_not_buttons: true",
+        "readonly_suppresses_custom_input: true"
       ],
       "selection": {
         "keywords": [],
@@ -2771,7 +2859,9 @@
         "notes": []
       },
       "recipes": [],
-      "practices": []
+      "practices": [
+        "token-driven"
+      ]
     },
     {
       "name": "TCombobox",
@@ -3296,7 +3386,8 @@
         "notes": []
       },
       "recipes": [
-        "sidebar-shell"
+        "sidebar-shell",
+        "marketing-page"
       ],
       "practices": [
         "content-alignment"
@@ -4295,7 +4386,9 @@
         "required": [],
         "notes": []
       },
-      "recipes": [],
+      "recipes": [
+        "responsive-navigation"
+      ],
       "practices": [
         "accessible-by-default"
       ]
@@ -5200,6 +5293,192 @@
       ]
     },
     {
+      "name": "THero",
+      "aliases": [],
+      "package": "@treeui/vue",
+      "kind": "layout",
+      "category": "Layout",
+      "status": "available",
+      "purpose": "The one section with a layer behind the copy. The library owns the box — stacking context, the clip that keeps an oversized decoration inside the band, hero-scale padding, and a backdrop that can never intercept a pointer. The art itself stays with the product.\n",
+      "sourceFile": "packages/vue/src/components/THero.vue",
+      "storyFile": "apps/docs/src/stories/Hero.stories.ts",
+      "storyTitle": "Components/Layout/Hero",
+      "manifestFile": "docs/ai/COMPONENTS/hero.yaml",
+      "props": [
+        {
+          "name": "as",
+          "type": "string",
+          "default": "section"
+        },
+        {
+          "name": "glow",
+          "type": "boolean",
+          "default": "false",
+          "note": "Radial halo derived from the accent in scope (`color-mix` of `--tree-color-accent-primary`). The only part of a hero backdrop that is 100% tokens; everything else belongs in `#backdrop`.\n"
+        },
+        {
+          "name": "container",
+          "type": "TContainerSize | 'none'",
+          "default": "lg"
+        },
+        {
+          "name": "padded",
+          "type": "boolean",
+          "default": "true"
+        },
+        {
+          "name": "accent",
+          "type": "TAccent",
+          "default": "unset",
+          "values": [
+            "brand",
+            "neutral",
+            "success",
+            "warning",
+            "danger",
+            "info"
+          ]
+        }
+      ],
+      "events": [],
+      "slots": [
+        {
+          "name": "default",
+          "description": "The hero copy. Rendered above the backdrop, inside `.t-hero__inner`."
+        },
+        {
+          "name": "backdrop",
+          "description": "Decoration behind the copy — art, canvas, image. Clipped to the band and never interactive.\n"
+        }
+      ],
+      "a11y": [
+        "Structural; the heading level comes from the content (`TText as=\"h1\"`).",
+        "The backdrop is decorative by contract — marked `aria-hidden` by the component."
+      ],
+      "behavior": [],
+      "selection": {
+        "keywords": [
+          "hero",
+          "banner",
+          "landing",
+          "marketing",
+          "backdrop",
+          "glow",
+          "above the fold"
+        ],
+        "useWhen": [
+          "A section needs a decorative layer BEHIND the copy — art, a canvas, an image.",
+          "You want the library to own the box (stacking context, clip, hero padding) while the product supplies the art."
+        ],
+        "avoidWhen": [
+          "The section has no layer behind it — TSection already gives the rhythm and the band."
+        ],
+        "alternatives": [
+          {
+            "component": "TSection",
+            "when": "Plain marketing section: rhythm plus an optional band, no backdrop."
+          },
+          {
+            "component": "TPageHeader",
+            "when": "An in-app page title with actions, not a marketing hero."
+          }
+        ]
+      },
+      "setup": {
+        "required": [],
+        "notes": []
+      },
+      "recipes": [
+        "marketing-page"
+      ],
+      "practices": [
+        "predictable-api",
+        "content-alignment",
+        "token-driven"
+      ]
+    },
+    {
+      "name": "THide",
+      "aliases": [],
+      "package": "@treeui/vue",
+      "kind": "layout",
+      "category": "Layout",
+      "status": "available",
+      "purpose": "The inverse of TShow: hide a branch at or below a breakpoint, in pure CSS. Same mechanism, written from the other side — pick whichever reads better at the call site.\n",
+      "sourceFile": "packages/vue/src/components/THide.vue",
+      "storyFile": "apps/docs/src/stories/Hide.stories.ts",
+      "storyTitle": "Components/Layout/Hide",
+      "manifestFile": "docs/ai/COMPONENTS/show-hide.yaml",
+      "props": [
+        {
+          "name": "as",
+          "type": "string",
+          "default": "div",
+          "note": "The wrapper's own box is removed (`display: contents`)."
+        },
+        {
+          "name": "at",
+          "type": "TBreakpoint",
+          "default": "unset",
+          "values": [
+            "sm",
+            "md",
+            "lg",
+            "xl"
+          ],
+          "note": "Hidden from this breakpoint up. `THide at=\"lg\"` equals `TShow below=\"lg\"`."
+        },
+        {
+          "name": "below",
+          "type": "TBreakpoint",
+          "default": "unset",
+          "values": [
+            "sm",
+            "md",
+            "lg",
+            "xl"
+          ],
+          "note": "Hidden below this breakpoint. `THide below=\"lg\"` equals `TShow at=\"lg\"`."
+        }
+      ],
+      "events": [],
+      "slots": [],
+      "a11y": [],
+      "behavior": [],
+      "selection": {
+        "keywords": [
+          "responsive",
+          "breakpoint",
+          "hide",
+          "mobile only",
+          "desktop only",
+          "media query"
+        ],
+        "useWhen": [
+          "One branch of a layout should disappear at or below a breakpoint."
+        ],
+        "avoidWhen": [
+          "You need the value of the breakpoint in JavaScript — this is a rendering wrapper, not a query."
+        ],
+        "alternatives": [
+          {
+            "component": "TShow",
+            "when": "It reads better as 'show at lg' than as 'hide below lg'."
+          }
+        ]
+      },
+      "setup": {
+        "required": [],
+        "notes": []
+      },
+      "recipes": [
+        "responsive-navigation"
+      ],
+      "practices": [
+        "content-alignment"
+      ]
+    },
+    {
       "name": "TIcon",
       "aliases": [],
       "package": "@treeui/vue",
@@ -5898,8 +6177,7 @@
         "notes": []
       },
       "recipes": [
-        "form-field-input",
-        "tag-input"
+        "form-field-input"
       ],
       "practices": [
         "interaction-feedback",
@@ -7402,7 +7680,8 @@
       "recipes": [
         "app-shell",
         "sidebar-shell",
-        "nav-menu-icons"
+        "nav-menu-icons",
+        "responsive-navigation"
       ],
       "practices": []
     },
@@ -7705,6 +7984,98 @@
       "recipes": [],
       "practices": [
         "content-alignment"
+      ]
+    },
+    {
+      "name": "TPageSurface",
+      "aliases": [],
+      "package": "@treeui/vue",
+      "kind": "layout",
+      "category": "Layout",
+      "status": "available",
+      "purpose": "Page-level surface for screens with NO app shell — a landing page, a login or locked screen, a public status page. Closes the two things the library previously only solved inside TAppShell: the user-agent body margin, and which element is the scroll host.\n",
+      "sourceFile": "packages/vue/src/components/TPageSurface.vue",
+      "storyFile": "apps/docs/src/stories/PageSurface.stories.ts",
+      "storyTitle": "Components/Layout/PageSurface",
+      "manifestFile": "docs/ai/COMPONENTS/page-surface.yaml",
+      "props": [
+        {
+          "name": "as",
+          "type": "string",
+          "default": "div",
+          "note": "`main` when the surface IS the page's main region."
+        },
+        {
+          "name": "overlay",
+          "type": "boolean",
+          "default": "false",
+          "note": "Take the viewport (`position: fixed; inset: 0; overflow-y: auto`) and become the scroll host, for a screen rendered OVER a mounted SPA. Scroll chaining is contained, so reaching the end does not move the screen behind. Without it the surface is a normal `min-block-size: 100dvh` block and the document scrolls.\n"
+        },
+        {
+          "name": "accent",
+          "type": "TAccent",
+          "default": "unset",
+          "values": [
+            "brand",
+            "neutral",
+            "success",
+            "warning",
+            "danger",
+            "info"
+          ]
+        }
+      ],
+      "events": [],
+      "slots": [
+        {
+          "name": "default"
+        }
+      ],
+      "a11y": [
+        "Structural; pass `as=\"main\"` (or nest a `<main>`) so the page has a main landmark.",
+        "In overlay mode the surface covers the app behind it visually but does not hide it from assistive tech — apply `inert`/`aria-hidden` on the app root if it must be unreachable."
+      ],
+      "behavior": [],
+      "selection": {
+        "keywords": [
+          "landing",
+          "login",
+          "anonymous",
+          "full screen",
+          "no shell",
+          "scroll host",
+          "body margin",
+          "overlay page"
+        ],
+        "useWhen": [
+          "The screen has NO TAppShell — a landing page, a login or locked screen, a public status page.",
+          "A full-screen page is rendered over a mounted SPA and must be the scroll host (`overlay`), so the screen behind stops scrolling along."
+        ],
+        "avoidWhen": [
+          "The screen is inside an app shell — TAppShell already owns the viewport and the body margin."
+        ],
+        "alternatives": [
+          {
+            "component": "TAppShell",
+            "when": "The screen is an authenticated application view with header and side navigation."
+          },
+          {
+            "component": "TPage",
+            "when": "You only need a centered content column with block padding inside an existing surface."
+          }
+        ]
+      },
+      "setup": {
+        "required": [],
+        "notes": []
+      },
+      "recipes": [
+        "marketing-page"
+      ],
+      "practices": [
+        "predictable-api",
+        "content-alignment",
+        "token-driven"
       ]
     },
     {
@@ -8406,6 +8777,126 @@
       "practices": []
     },
     {
+      "name": "TSection",
+      "aliases": [],
+      "package": "@treeui/vue",
+      "kind": "layout",
+      "category": "Layout",
+      "status": "available",
+      "purpose": "Page section: responsive vertical rhythm plus an optional full-bleed background band, with the reading column delegated to a nested TContainer. Replaces the `<div class=\"banded\"><TContainer>…</TContainer></div>` pairing a marketing page otherwise repeats per section.\n",
+      "sourceFile": "packages/vue/src/components/TSection.vue",
+      "storyFile": "apps/docs/src/stories/Section.stories.ts",
+      "storyTitle": "Components/Layout/Section",
+      "manifestFile": "docs/ai/COMPONENTS/section.yaml",
+      "props": [
+        {
+          "name": "as",
+          "type": "string",
+          "default": "section",
+          "note": "Use `header`, `footer` or `aside` where the semantics call for it."
+        },
+        {
+          "name": "rhythm",
+          "type": "TSectionRhythm",
+          "default": "default",
+          "values": [
+            "tight",
+            "default",
+            "loose"
+          ],
+          "note": "Responsive `padding-block`, one clamp per step — not a fixed value: tight `clamp(space-5, 3vw, space-8)`, default `clamp(space-8, 6vw, space-12)`, loose `clamp(space-12, 9vw, space-16)`.\n"
+        },
+        {
+          "name": "banded",
+          "type": "boolean",
+          "default": "false",
+          "note": "Paints `--tree-color-bg-subtle` across the section, to separate consecutive sections without a rule.\n"
+        },
+        {
+          "name": "container",
+          "type": "TContainerSize | 'none'",
+          "default": "lg",
+          "note": "Size of the inner TContainer. `none` drops the container and places the children straight into the band, for a section that manages its own column.\n"
+        },
+        {
+          "name": "padded",
+          "type": "boolean",
+          "default": "true",
+          "note": "Forwarded to the inner TContainer as its horizontal padding."
+        },
+        {
+          "name": "accent",
+          "type": "TAccent",
+          "default": "unset",
+          "values": [
+            "brand",
+            "neutral",
+            "success",
+            "warning",
+            "danger",
+            "info"
+          ],
+          "note": "Declares the accent for this subtree by remapping `--tree-color-accent-*`. Closed axis — see CONTRACTS.yaml → shared_props.accent.\n"
+        }
+      ],
+      "events": [],
+      "slots": [
+        {
+          "name": "default"
+        }
+      ],
+      "a11y": [
+        "Structural only; semantics come from `as` and the child content.",
+        "Renders a `<section>` by default — give it an accessible name (`aria-label`/`aria-labelledby`) when the page has several."
+      ],
+      "behavior": [],
+      "selection": {
+        "keywords": [
+          "section",
+          "marketing",
+          "landing",
+          "rhythm",
+          "band",
+          "banded",
+          "vertical spacing",
+          "full bleed"
+        ],
+        "useWhen": [
+          "A page is a stack of sections and each one repeats the same two decisions: vertical rhythm and an alternating background band.",
+          "You are about to wrap a TContainer in a `<div class=\"banded\">` to get a full-bleed background."
+        ],
+        "avoidWhen": [
+          "You only need the width constraint — TContainer alone is enough."
+        ],
+        "alternatives": [
+          {
+            "component": "TContainer",
+            "when": "Width and horizontal padding only, no block rhythm and no band."
+          },
+          {
+            "component": "TPage",
+            "when": "An in-app page region rather than a marketing section."
+          },
+          {
+            "component": "THero",
+            "when": "The section has a decorative layer behind the copy."
+          }
+        ]
+      },
+      "setup": {
+        "required": [],
+        "notes": []
+      },
+      "recipes": [
+        "marketing-page"
+      ],
+      "practices": [
+        "predictable-api",
+        "content-alignment",
+        "token-driven"
+      ]
+    },
+    {
       "name": "TSelect",
       "aliases": [],
       "package": "@treeui/vue",
@@ -8677,6 +9168,94 @@
       ]
     },
     {
+      "name": "TShow",
+      "aliases": [],
+      "package": "@treeui/vue",
+      "kind": "layout",
+      "category": "Layout",
+      "status": "available",
+      "purpose": "Breakpoint visibility in pure CSS. Both branches render; only CSS decides which one is visible, so a pre-rendered or crawled page keeps every link.\n",
+      "sourceFile": "packages/vue/src/components/TShow.vue",
+      "storyFile": "apps/docs/src/stories/Show.stories.ts",
+      "storyTitle": "Components/Layout/Show",
+      "manifestFile": "docs/ai/COMPONENTS/show-hide.yaml",
+      "props": [
+        {
+          "name": "as",
+          "type": "string",
+          "default": "div",
+          "note": "The wrapper's own box is removed (`display: contents`), so children stay direct participants in the parent's flex or grid."
+        },
+        {
+          "name": "at",
+          "type": "TBreakpoint",
+          "default": "unset",
+          "values": [
+            "sm",
+            "md",
+            "lg",
+            "xl"
+          ],
+          "note": "Visible from this breakpoint up."
+        },
+        {
+          "name": "below",
+          "type": "TBreakpoint",
+          "default": "unset",
+          "values": [
+            "sm",
+            "md",
+            "lg",
+            "xl"
+          ],
+          "note": "Visible below this breakpoint."
+        }
+      ],
+      "events": [],
+      "slots": [],
+      "a11y": [
+        "A hidden branch is `display: none`, so it is removed from the accessibility tree as well as from paint — not merely invisible.",
+        "Both branches exist in the DOM: never put a unique `id` (or a duplicated form control name) in both."
+      ],
+      "behavior": [],
+      "selection": {
+        "keywords": [
+          "responsive",
+          "breakpoint",
+          "show",
+          "mobile",
+          "desktop",
+          "media query",
+          "matchMedia",
+          "SSR",
+          "prerender"
+        ],
+        "useWhen": [
+          "Two compositions must be chosen by viewport width — inline navigation OR a TDrawer, two columns OR a stack.",
+          "The page is pre-rendered or crawled, so both branches have to exist in the served HTML."
+        ],
+        "avoidWhen": [
+          "You need the breakpoint as a reactive value in script — this renders both branches and lets CSS choose."
+        ],
+        "alternatives": [
+          {
+            "component": "THide",
+            "when": "It reads better as 'hide below lg' than as 'show at lg'."
+          }
+        ]
+      },
+      "setup": {
+        "required": [],
+        "notes": []
+      },
+      "recipes": [
+        "responsive-navigation"
+      ],
+      "practices": [
+        "content-alignment"
+      ]
+    },
+    {
       "name": "TSidebar",
       "aliases": [],
       "package": "@treeui/vue",
@@ -8909,6 +9488,73 @@
       "recipes": [],
       "practices": [
         "state-clarity"
+      ]
+    },
+    {
+      "name": "TSkipLink",
+      "aliases": [],
+      "package": "@treeui/vue",
+      "kind": "navigation",
+      "category": "Navigation",
+      "status": "available",
+      "purpose": "\"Skip to content\" — the first focusable element of a page with navigation, and the one control that has to be hidden and visible at the same time. WCAG 2.4.1 (Bypass Blocks).\n",
+      "sourceFile": "packages/vue/src/components/TSkipLink.vue",
+      "storyFile": "apps/docs/src/stories/SkipLink.stories.ts",
+      "storyTitle": "Components/Navigation/SkipLink",
+      "manifestFile": "docs/ai/COMPONENTS/skip-link.yaml",
+      "props": [
+        {
+          "name": "href",
+          "type": "string",
+          "default": "#content",
+          "note": "Fragment pointing at the region to skip to. Must match the target element's `id`."
+        }
+      ],
+      "events": [],
+      "slots": [
+        {
+          "name": "default",
+          "description": "The label. Product copy, localized by the application — the library ships no user-facing text."
+        }
+      ],
+      "a11y": [
+        "Native `<a href=\"#id\">` — no role, no ARIA needed.",
+        "Reveals on `:focus-visible` with the standard focus ring, at overlay z-index so nothing covers it.",
+        "Hit area is `--tree-size-control-lg` (48px) tall, above the 44px target floor.",
+        "The label must say where it goes; the library does not supply one."
+      ],
+      "behavior": [],
+      "selection": {
+        "keywords": [
+          "skip link",
+          "skip to content",
+          "bypass blocks",
+          "keyboard",
+          "a11y",
+          "WCAG 2.4.1"
+        ],
+        "useWhen": [
+          "A page has navigation before its main content and a keyboard user needs to jump past it."
+        ],
+        "avoidWhen": [
+          "You want to hide something permanently — that is `.t-visually-hidden`."
+        ],
+        "alternatives": [
+          {
+            "component": "TAppShell",
+            "when": "The screen already uses the shell: pass `skipLinkLabel` and the shell wires the link and the target for you."
+          }
+        ]
+      },
+      "setup": {
+        "required": [],
+        "notes": []
+      },
+      "recipes": [
+        "marketing-page"
+      ],
+      "practices": [
+        "accessible-by-default"
       ]
     },
     {
@@ -9340,7 +9986,6 @@
       },
       "recipes": [
         "brand-lockup",
-        "tag-input",
         "data-listing",
         "chart-surface"
       ],
@@ -10001,6 +10646,21 @@
           ]
         },
         {
+          "name": "tone",
+          "type": "TTagTone",
+          "default": "undefined",
+          "values": [
+            "neutral",
+            "brand",
+            "accent",
+            "success",
+            "warning",
+            "danger",
+            "info"
+          ],
+          "description": "Colour axis, orthogonal to `variant`. Closed set — never a free colour, the same policy TLinkTile's `tone` states. `accent` reads the surface accent (`--tree-color-accent-*`), which defaults to the secondary brand accent and follows a TSection/THero/TPageSurface that declares one. Omitted, the tag keeps the pre-tone look: brand `solid`, neutral `outline` and `soft` — so `tone` is purely additive.\n"
+        },
+        {
           "name": "size",
           "type": "TSize",
           "default": "md",
@@ -10021,6 +10681,12 @@
           "type": "boolean",
           "default": "false",
           "description": "Disables interaction and dims the tag."
+        },
+        {
+          "name": "removeLabel",
+          "type": "string",
+          "default": "Remove",
+          "description": "Accessible name for the remove button. Localizable copy — the previous hardcoded English string could not be translated by a consumer.\n"
         }
       ],
       "events": [
@@ -10040,7 +10706,7 @@
         }
       ],
       "a11y": [
-        "remove_button: Has aria-label=\"Remove\" and is keyboard-focusable.",
+        "remove_button: Named by `removeLabel` (default \"Remove\") and keyboard-focusable.",
         "disabled_state: Applied via is-disabled class and native disabled on remove button.",
         "icon: Marked aria-hidden=\"true\"."
       ],
@@ -10055,9 +10721,7 @@
         "required": [],
         "notes": []
       },
-      "recipes": [
-        "tag-input"
-      ],
+      "recipes": [],
       "practices": [
         "predictable-api",
         "token-driven"
@@ -10120,6 +10784,12 @@
           "type": "string",
           "default": "",
           "note": "Shown only while there are no tags."
+        },
+        {
+          "name": "removeLabel",
+          "type": "string",
+          "default": "Remove",
+          "note": "Accessible name for each chip's remove button, forwarded to the underlying TTag. Localizable copy — the library ships an English default only as a fallback.\n"
         }
       ],
       "events": [
@@ -10153,7 +10823,9 @@
         "required": [],
         "notes": []
       },
-      "recipes": [],
+      "recipes": [
+        "tag-input"
+      ],
       "practices": [
         "interaction-feedback",
         "predictable-api",
@@ -10280,7 +10952,8 @@
         "notes": []
       },
       "recipes": [
-        "brand-lockup"
+        "brand-lockup",
+        "marketing-page"
       ],
       "practices": []
     },
@@ -10355,6 +11028,12 @@
           "name": "autoGrow",
           "type": "boolean",
           "default": "false"
+        },
+        {
+          "name": "maxRows",
+          "type": "number",
+          "default": "undefined",
+          "note": "Ceiling for `autoGrow`, in lines. Without it a composer grows forever and pushes the conversation off screen. At the cap the field starts scrolling internally (`overflow-y: auto` on the `<textarea>`) instead of growing, and the component's border and focus ring stop moving. Measured from the field's resolved line-height plus its vertical padding and border, so the cap follows `size` and the theme. Ignored when `autoGrow` is off.\n"
         }
       ],
       "events": [
@@ -10370,7 +11049,10 @@
       "behavior": [
         "update_payload_type: string",
         "loading_does_not_disable_by_itself: true",
-        "auto_grow_resizes_on_input: true"
+        "auto_grow_resizes_on_input: true",
+        "auto_grow_also_resizes_on_mount: true",
+        "auto_grow_stops_at_max_rows_and_scrolls: true",
+        "auto_grow_works_uncontrolled: true"
       ],
       "selection": {
         "keywords": [
@@ -11206,6 +11888,27 @@
       "description": "Elevation shadow."
     },
     {
+      "cssVar": "--tree-shadow-lg",
+      "path": "shadow.lg",
+      "value": "0 24px 48px -24px rgba(15, 23, 42, 0.22)",
+      "category": "shadow",
+      "description": "Elevation shadow."
+    },
+    {
+      "cssVar": "--tree-shadow-xl",
+      "path": "shadow.xl",
+      "value": "0 40px 80px -32px rgba(15, 23, 42, 0.28)",
+      "category": "shadow",
+      "description": "Elevation shadow."
+    },
+    {
+      "cssVar": "--tree-shadow-accent",
+      "path": "shadow.accent",
+      "value": "0 24px 48px -32px color-mix(in srgb, var(--tree-color-accent-primary) 60%, transparent)",
+      "category": "shadow",
+      "description": "Elevation shadow."
+    },
+    {
       "cssVar": "--tree-gradient-brand",
       "path": "gradient.brand",
       "value": "linear-gradient(135deg, var(--tree-color-brand-primary), var(--tree-color-brand-hover))",
@@ -11601,6 +12304,50 @@
       "themeValues": {
         "light": "#ffffff",
         "dark": "#0a1a2f"
+      }
+    },
+    {
+      "cssVar": "--tree-color-accent-primary",
+      "path": "color.accent.primary",
+      "value": "#794dcb",
+      "category": "color",
+      "description": "Themed semantic color, resolved per [data-tree-theme].",
+      "themeValues": {
+        "light": "#794dcb",
+        "dark": "#ad8bed"
+      }
+    },
+    {
+      "cssVar": "--tree-color-accent-hover",
+      "path": "color.accent.hover",
+      "value": "#633fa6",
+      "category": "color",
+      "description": "Themed semantic color, resolved per [data-tree-theme].",
+      "themeValues": {
+        "light": "#633fa6",
+        "dark": "#ba9df0"
+      }
+    },
+    {
+      "cssVar": "--tree-color-accent-soft",
+      "path": "color.accent.soft",
+      "value": "#efeaf9",
+      "category": "color",
+      "description": "Themed semantic color, resolved per [data-tree-theme].",
+      "themeValues": {
+        "light": "#efeaf9",
+        "dark": "#332e4a"
+      }
+    },
+    {
+      "cssVar": "--tree-color-accent-contrast",
+      "path": "color.accent.contrast",
+      "value": "#ffffff",
+      "category": "color",
+      "description": "Themed semantic color, resolved per [data-tree-theme].",
+      "themeValues": {
+        "light": "#ffffff",
+        "dark": "#1c2128"
       }
     },
     {

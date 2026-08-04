@@ -1,0 +1,109 @@
+# Two documents: TShow and THide are one mechanism written from opposite sides.
+# The shared rationale lives on TShow; THide points at it rather than repeating.
+name: TShow
+source_file: packages/vue/src/components/TShow.vue
+package: "@treeui/vue"
+kind: layout
+status: available
+purpose: >
+  Breakpoint visibility in pure CSS. Both branches render; only CSS decides
+  which one is visible, so a pre-rendered or crawled page keeps every link.
+
+props:
+  as:
+    type: string
+    default: div
+    note: "The wrapper's own box is removed (`display: contents`), so children stay direct participants in the parent's flex or grid."
+  at:
+    type: TBreakpoint
+    default: "unset"
+    values: [sm, md, lg, xl]
+    note: "Visible from this breakpoint up."
+  below:
+    type: TBreakpoint
+    default: "unset"
+    values: [sm, md, lg, xl]
+    note: "Visible below this breakpoint."
+
+combining:
+  note: >
+    `at` and `below` combine into a band — `<TShow at="sm" below="lg">` is
+    visible from sm up to (not including) lg. Neither prop set is a no-op
+    wrapper.
+
+why_not_javascript:
+  - "`matchMedia` has no `window` while the HTML is written, so a JS answer forces the server to guess a viewport and a crawler reads one navigation instead of both."
+  - >
+    A consumer genuinely cannot write the CSS version:
+    `@media (min-width: var(--tree-breakpoint-lg))` is invalid — media queries
+    are evaluated before the cascade exists — so the pixel gets hardcoded in
+    every app and drifts from the library.
+  - "`packages/vue/src/styles/breakpoints.test.ts` fails the build if the stylesheet literals ever drift from `treeTokens.breakpoint`."
+
+breakpoints:
+  sm: "640px"
+  md: "768px"
+  lg: "1024px"
+  xl: "1280px"
+  source: "@treeui/tokens → treeTokens.breakpoint (`--tree-breakpoint-*`)"
+
+types:
+  TBreakpoint: "'sm' | 'md' | 'lg' | 'xl'"
+
+css:
+  blocks: [t-show, t-hide]
+  modifiers:
+    - "t-show--at-<bp> / t-show--below-<bp>"
+    - "t-hide--at-<bp> / t-hide--below-<bp>"
+  mechanism: "Visible = `display: contents`; hidden = `display: none` inside the matching media query."
+
+a11y:
+  - "A hidden branch is `display: none`, so it is removed from the accessibility tree as well as from paint — not merely invisible."
+  - "Both branches exist in the DOM: never put a unique `id` (or a duplicated form control name) in both."
+
+example: |
+  <TShow at="lg">
+    <TNavMenu :items="items" />
+  </TShow>
+  <THide at="lg">
+    <TButton icon-only @click="open = true"><TIcon name="menu" /></TButton>
+    <TDrawer v-model:open="open"><TNavMenu :items="items" /></TDrawer>
+  </THide>
+
+---
+name: THide
+source_file: packages/vue/src/components/THide.vue
+package: "@treeui/vue"
+kind: layout
+status: available
+purpose: >
+  The inverse of TShow: hide a branch at or below a breakpoint, in pure CSS.
+  Same mechanism, written from the other side — pick whichever reads better at
+  the call site.
+
+props:
+  as:
+    type: string
+    default: div
+    note: "The wrapper's own box is removed (`display: contents`)."
+  at:
+    type: TBreakpoint
+    default: "unset"
+    values: [sm, md, lg, xl]
+    note: "Hidden from this breakpoint up. `THide at=\"lg\"` equals `TShow below=\"lg\"`."
+  below:
+    type: TBreakpoint
+    default: "unset"
+    values: [sm, md, lg, xl]
+    note: "Hidden below this breakpoint. `THide below=\"lg\"` equals `TShow at=\"lg\"`."
+
+see_also: TShow — the shared rationale, breakpoint table and a11y notes.
+
+css:
+  block: t-hide
+  modifiers: ["t-hide--at-<bp>", "t-hide--below-<bp>"]
+
+example: |
+  <THide at="lg">
+    <TButton icon-only @click="open = true"><TIcon name="menu" /></TButton>
+  </THide>

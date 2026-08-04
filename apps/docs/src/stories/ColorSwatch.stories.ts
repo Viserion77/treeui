@@ -83,3 +83,39 @@ export const Disabled: Story = {
     `,
   }),
 };
+
+export const ReadOnly: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'A brand manual or a palette table shows colour as evidence, not as a choice. `readonly` renders inert `role="img"` chips — not focusable, not clickable, no selected state — and steps the border up to `--tree-color-border-strong`, because half of these chips ARE background colours and in their own theme a weak border makes the chip vanish into the page.',
+      },
+    },
+  },
+  render: () => ({
+    components: { TColorSwatch },
+    template: `
+      <div style="display: grid; gap: 1rem;">
+        <TColorSwatch
+          readonly
+          label="Light theme surfaces"
+          :options="[
+            { label: 'bg-primary', value: '#f6f8fa' },
+            { label: 'bg-surface', value: '#ffffff' },
+            { label: 'bg-subtle', value: '#eff2f5' },
+          ]"
+        />
+        <TColorSwatch
+          readonly
+          label="Dark theme surfaces"
+          :options="[
+            { label: 'bg-primary', value: '#1c2128' },
+            { label: 'bg-surface', value: '#22272e' },
+            { label: 'bg-subtle', value: '#2d333b' },
+          ]"
+        />
+      </div>
+    `,
+  }),
+};

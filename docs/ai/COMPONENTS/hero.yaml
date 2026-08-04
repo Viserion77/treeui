@@ -1,0 +1,68 @@
+name: THero
+source_file: packages/vue/src/components/THero.vue
+package: "@treeui/vue"
+kind: layout
+status: available
+purpose: >
+  The one section with a layer behind the copy. The library owns the box —
+  stacking context, the clip that keeps an oversized decoration inside the band,
+  hero-scale padding, and a backdrop that can never intercept a pointer. The art
+  itself stays with the product.
+
+props:
+  as:
+    type: string
+    default: section
+  glow:
+    type: boolean
+    default: false
+    note: >
+      Radial halo derived from the accent in scope
+      (`color-mix` of `--tree-color-accent-primary`). The only part of a hero
+      backdrop that is 100% tokens; everything else belongs in `#backdrop`.
+  container:
+    type: "TContainerSize | 'none'"
+    default: lg
+  padded:
+    type: boolean
+    default: true
+  accent:
+    type: TAccent
+    default: "unset"
+    values: [brand, neutral, success, warning, danger, info]
+
+slots:
+  default:
+    description: "The hero copy. Rendered above the backdrop, inside `.t-hero__inner`."
+  backdrop:
+    description: >
+      Decoration behind the copy — art, canvas, image. Clipped to the band and
+      never interactive.
+
+guarantees:
+  stacking_context: "`position: relative` + `isolation: isolate`; the copy sits at z-index 1, the decoration at 0."
+  clip: "`overflow: hidden`, because an aura or a canvas is deliberately larger than the band."
+  pointer: >
+    Both decoration layers are `pointer-events: none`. Without it a click on the
+    CTA dies in the ornament — the single most common hero bug.
+  decorative: "Both layers are `aria-hidden`; no information may live only in the backdrop."
+  ssr: "Renders on the server; a canvas in the slot must come alive in `onMounted`, never at import."
+
+css:
+  block: t-hero
+  elements: [t-hero__glow, t-hero__backdrop, t-hero__inner]
+  accent_classes: "t-accent--<tone>"
+
+a11y:
+  - "Structural; the heading level comes from the content (`TText as=\"h1\"`)."
+  - "The backdrop is decorative by contract — marked `aria-hidden` by the component."
+
+example: |
+  <THero glow accent="brand">
+    <template #backdrop>
+      <HeroWave />
+    </template>
+    <TText as="h1" size="display">Ship the interface, not the CSS</TText>
+    <TText measure="lead">One system for every product surface.</TText>
+    <TButton variant="brand">Get started</TButton>
+  </THero>

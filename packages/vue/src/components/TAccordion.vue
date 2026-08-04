@@ -2,6 +2,10 @@
 import { computed, provide, reactive } from 'vue';
 import { type AccordionType, accordionInjectionKey } from './accordion';
 
+const _treeAccordionVariants = ['default', 'quiet'] as const;
+
+export type TAccordionVariant = (typeof _treeAccordionVariants)[number];
+
 const props = withDefaults(
   defineProps<{
     type?: AccordionType;
@@ -9,6 +13,19 @@ const props = withDefaults(
     defaultValue?: string | string[];
     disabled?: boolean;
     collapsible?: boolean;
+    /**
+     * `quiet` gives the disclosure the weight of a note attached to one item
+     * rather than of a document section: the trigger sizes to its content
+     * instead of spanning the reading column, the item rule disappears, and the
+     * panel is smaller. The 44×44 hit target is unchanged — it looks small, it
+     * is not small to hit.
+     */
+    variant?: TAccordionVariant;
+    /**
+     * Indent the panel behind a vertical rule, to say "this belongs to the item
+     * above it". Only meaningful with `variant="quiet"`.
+     */
+    rail?: boolean;
   }>(),
   {
     type: 'single',
@@ -16,6 +33,8 @@ const props = withDefaults(
     defaultValue: undefined,
     disabled: false,
     collapsible: false,
+    variant: 'default',
+    rail: false,
   },
 );
 
@@ -140,6 +159,12 @@ function focusLast() {
   if (enabled.length) triggerMap.get(enabled[enabled.length - 1])?.focus();
 }
 
+const rootClasses = computed(() => [
+  't-accordion',
+  props.variant !== 'default' ? `t-accordion--${props.variant}` : null,
+  { 'has-rail': props.rail },
+]);
+
 provide(accordionInjectionKey, {
   type: computed(() => props.type),
   disabled: computed(() => props.disabled),
@@ -156,7 +181,7 @@ provide(accordionInjectionKey, {
 </script>
 
 <template>
-  <div class="t-accordion">
+  <div :class="rootClasses">
     <slot />
   </div>
 </template>

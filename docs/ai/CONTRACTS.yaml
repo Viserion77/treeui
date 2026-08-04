@@ -10,7 +10,7 @@ source_component_filename_prefix: "T"
 # Maintenance: must stay 1:1 with the `export { default as ... }` lines in
 # packages/vue/src/components/index.ts. Verify with:
 #   grep -oP '^export \{ default as \K\w+' packages/vue/src/components/index.ts | sort
-primary_exports_count: 90
+primary_exports_count: 96
 primary_exports:
   - TAccordion
   - TAccordionItem
@@ -45,6 +45,8 @@ primary_exports:
   - TFlag
   - TFormField
   - TGrid
+  - THero
+  - THide
   - TIcon
   - TImage
   - TInput
@@ -66,6 +68,7 @@ primary_exports:
   - TNumberInput
   - TPage
   - TPageHeader
+  - TPageSurface
   - TPagination
   - TPopover
   - TPricing
@@ -73,10 +76,13 @@ primary_exports:
   - TProgress
   - TRadio
   - TRadioGroup
+  - TSection
   - TSelect
   - TSelectableList
+  - TShow
   - TSidebar
   - TSkeleton
+  - TSkipLink
   - TSpacer
   - TSparkline
   - TSpinner
@@ -143,6 +149,25 @@ layout_capabilities_already_shipping:
     purpose: "Max-width constraint and horizontal page padding."
   TPage:
     purpose: "Page region: width constraint plus block padding and vertical rhythm."
+  TSection:
+    purpose: >
+      Marketing/page section: responsive vertical rhythm plus an optional
+      full-bleed band, with the reading column delegated to a nested TContainer.
+      Use instead of wrapping a TContainer in a hand-written `<div class="banded">`.
+  THero:
+    purpose: >
+      The one section with a layer behind the copy: stacking context, clip,
+      hero-scale padding, and a non-interactive `#backdrop` slot.
+  TPageSurface:
+    purpose: >
+      Page-level surface for screens with NO app shell (landing, login, public
+      status). Zeroes the user-agent body margin and, with `overlay`, takes the
+      viewport and becomes the scroll host.
+  TShow_THide:
+    purpose: >
+      Breakpoint visibility in pure CSS — both branches render, so a
+      pre-rendered page keeps every link. Reach for these before a `matchMedia`
+      composable; a media query cannot read `--tree-breakpoint-*`.
 
 shared_sizes:
   values: [sm, md, lg]
@@ -171,9 +196,23 @@ shared_props:
   tone:
     note: >-
       Status tone, not an action variant. The accepted values differ per
-      component (TBadge/TStat omit `brand`, TTimeline omits `info`, and TText's
-      `tone` is a text-color role: default | muted | inverse | brand).
-      See DECISIONS.md → "Variant Vocabulary".
+      component (TBadge/TStat omit `brand`, TTimeline omits `info`, TTag adds
+      `accent`, and TText's `tone` is a text-color role:
+      default | muted | inverse | brand). See DECISIONS.md → "Variant Vocabulary".
+  accent:
+    type: TAccent
+    values: [brand, neutral, success, warning, danger, info]
+    default: "unset — the secondary brand accent from @treeui/tokens"
+    used_by: [TSection, THero, TPageSurface]
+    note: >-
+      The surface accent axis: a closed set a surface declares once and its
+      whole subtree inherits through `--tree-color-accent-primary` /
+      `-hover` / `-soft` / `-contrast`. Anything that reads those follows —
+      `TTag tone="accent"`, the `THero glow` halo, `--tree-shadow-accent`.
+      Never a free colour: a product picks a tone, not a hex, which is the same
+      policy TLinkTile's `tone` states. Left unset, the accent is the secondary
+      brand accent the tokens ship (a measured light/dark pair, AA on every
+      background and on its own soft tint).
   size:
     values: [sm, md, lg]
   width:

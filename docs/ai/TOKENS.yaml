@@ -95,6 +95,21 @@ semantic_color_roles:
       hover: "Hover/active step of the accent."
       soft: "Low-emphasis accent tint used as a background."
       contrast: "Text color that is legible ON `brand-primary`."
+  accent:
+    roles: [primary, hover, soft, contrast]
+    semantics:
+      primary: "The secondary brand accent — the closed accent axis (TREEUX-027/034)."
+      hover: "Hover/active step of the accent."
+      soft: "Low-emphasis accent tint used as a background."
+      contrast: "Text color that is legible ON `accent-primary`."
+    note: >-
+      Same ramp shape as `brand`, so the two are interchangeable in a theme.
+      These four variables are what the surface `accent` axis REMAPS: a
+      `TSection`/`THero`/`TPageSurface` with `accent="success"` rewrites them
+      for its whole subtree, and everything that reads them follows
+      (`TTag tone="accent"`, the THero glow, `--tree-shadow-accent`). Left
+      alone, they are the secondary brand pair the tokens ship — measured AA on
+      every background and on their own soft tint (`accent.test.ts`).
   status:
     roles: [success, warning, error, info]
     note: "`error`, not `danger` — see `variant_to_token_mapping`."
@@ -189,6 +204,9 @@ emitted_variables:
       --tree-shadow-xs: "0 1px 2px rgba(15, 23, 42, 0.06)"
       --tree-shadow-sm: "0 6px 18px rgba(15, 23, 42, 0.08)"
       --tree-shadow-md: "0 14px 34px rgba(15, 23, 42, 0.12)"
+      --tree-shadow-lg: "0 24px 48px -24px rgba(15, 23, 42, 0.22)"
+      --tree-shadow-xl: "0 40px 80px -32px rgba(15, 23, 42, 0.28)"
+      --tree-shadow-accent: "0 24px 48px -32px color-mix(in srgb, var(--tree-color-accent-primary) 60%, transparent)"
       # gradient
       --tree-gradient-brand: "linear-gradient(135deg, var(--tree-color-brand-primary), var(--tree-color-brand-hover))"
       # border
@@ -327,6 +345,14 @@ shadow:
   xs: "0 1px 2px rgba(15, 23, 42, 0.06)"
   sm: "0 6px 18px rgba(15, 23, 42, 0.08)"
   md: "0 14px 34px rgba(15, 23, 42, 0.12)"
+  lg: "0 24px 48px -24px rgba(15, 23, 42, 0.22)"
+  xl: "0 40px 80px -32px rgba(15, 23, 42, 0.28)"
+  accent: "0 24px 48px -32px color-mix(in srgb, var(--tree-color-accent-primary) 60%, transparent)"
+  note: >-
+    `lg`/`xl` are the marketing-scale steps — a large, soft lift for a hero card
+    or a banded section, where `md` reads flat. `accent` is the same elevation
+    tinted by whatever accent is in scope, so a surface's glow follows its
+    accent instead of being written by hand per landing page.
 
 gradient:
   brand: "linear-gradient(135deg, var(--tree-color-brand-primary), var(--tree-color-brand-hover))"
@@ -411,6 +437,11 @@ theme_values:
         hover: "#0550ae"
         soft: "#ddf4ff"
         contrast: "#ffffff"
+      accent:
+        primary: "#794dcb"
+        hover: "#633fa6"
+        soft: "#efeaf9"
+        contrast: "#ffffff"
       status:
         success: "#1a7f37"
         warning: "#9a6700"
@@ -445,6 +476,11 @@ theme_values:
         hover: "#6cabf7"
         soft: "#1a3453"
         contrast: "#0a1a2f"
+      accent:
+        primary: "#ad8bed"
+        hover: "#ba9df0"
+        soft: "#332e4a"
+        contrast: "#1c2128"
       status:
         success: "#57ab5a"
         warning: "#c69026"

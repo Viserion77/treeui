@@ -17,6 +17,8 @@ const props = withDefaults(
     disabled?: boolean;
     invalid?: boolean;
     placeholder?: string;
+    /** Accessible name for each chip's remove button. Localizable copy. */
+    removeLabel?: string;
   }>(),
   {
     modelValue: () => [],
@@ -25,6 +27,7 @@ const props = withDefaults(
     disabled: false,
     invalid: false,
     placeholder: '',
+    removeLabel: 'Remove',
   },
 );
 
@@ -129,6 +132,7 @@ defineExpose({ focus: focusInput });
       :size="size === 'lg' ? 'md' : 'sm'"
       :removable="!disabled"
       :disabled="disabled"
+      :remove-label="removeLabel"
       @remove="removeAt(index)"
     >
       {{ tag }}

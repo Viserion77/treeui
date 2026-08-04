@@ -1,0 +1,63 @@
+name: TSkipLink
+source_file: packages/vue/src/components/TSkipLink.vue
+package: "@treeui/vue"
+kind: navigation
+status: available
+purpose: >
+  "Skip to content" — the first focusable element of a page with navigation, and
+  the one control that has to be hidden and visible at the same time. WCAG 2.4.1
+  (Bypass Blocks).
+
+props:
+  href:
+    type: string
+    default: "#content"
+    note: "Fragment pointing at the region to skip to. Must match the target element's `id`."
+
+slots:
+  default:
+    description: "The label. Product copy, localized by the application — the library ships no user-facing text."
+
+why_not_visually_hidden:
+  note: >
+    `.t-visually-hidden` hides an element forever. A permanently invisible skip
+    link is useless to exactly the person it exists for: the sighted keyboard
+    user. So the link parks off-screen with a `transform` and rides back in on
+    `:focus-visible`, at `--tree-z-overlay` and with the standard focus ring.
+
+target_handling:
+  note: >
+    On mount the component resolves `href` and prepares the target: it adds
+    `tabindex="-1"` if the element has none (so it can accept programmatic
+    focus) and marks it `data-tree-skip-target`, which drives the stylesheet
+    rule that suppresses the focus ring on that element. Both are reverted on
+    unmount, and an existing `tabindex` is left alone. This is what removes the
+    loose `#content:focus { outline: none }` from consumer stylesheets.
+  ssr: "Client-only (`onMounted`) — the link itself still renders on the server."
+  click: "Focuses the target explicitly, because some browsers move the visual viewport on a fragment jump without moving focus."
+
+app_shell:
+  note: >
+    TAppShell has the same hole and closes it with `skipLinkLabel`: pass the
+    copy and the shell renders this component pointing at its own `<main>`. It
+    is opt-in only because the label is the product's, not the library's.
+
+css:
+  block: t-skip-link
+  target_rule: "[data-tree-skip-target]:focus { outline: none }"
+  reduced_motion: "The reveal transition is dropped under `prefers-reduced-motion: reduce`."
+
+a11y:
+  - "Native `<a href=\"#id\">` — no role, no ARIA needed."
+  - "Reveals on `:focus-visible` with the standard focus ring, at overlay z-index so nothing covers it."
+  - "Hit area is `--tree-size-control-lg` (48px) tall, above the 44px target floor."
+  - "The label must say where it goes; the library does not supply one."
+
+example: |
+  <!-- standalone, on a shell-less page -->
+  <TSkipLink href="#content">Pular para o conteúdo</TSkipLink>
+  <SiteHeader />
+  <main id="content">…</main>
+
+  <!-- inside the shell -->
+  <TAppShell skip-link-label="Pular para o conteúdo">…</TAppShell>

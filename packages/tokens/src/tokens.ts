@@ -60,6 +60,16 @@ export const treeTokens = {
     xs: '0 1px 2px rgba(15, 23, 42, 0.06)',
     sm: '0 6px 18px rgba(15, 23, 42, 0.08)',
     md: '0 14px 34px rgba(15, 23, 42, 0.12)',
+    // Marketing-scale elevation: a large, soft lift for a hero card or a banded
+    // section, where `md` reads flat. Same neutral shadow colour as the smaller
+    // steps, so the whole scale stays one family.
+    lg: '0 24px 48px -24px rgba(15, 23, 42, 0.22)',
+    xl: '0 40px 80px -32px rgba(15, 23, 42, 0.28)',
+    // Elevation tinted by whatever accent is in scope (see `--tree-color-accent-*`
+    // and the `accent` prop on TSection/THero/TPageSurface), so a surface's glow
+    // follows its accent instead of being written by hand per landing page.
+    accent:
+      '0 24px 48px -32px color-mix(in srgb, var(--tree-color-accent-primary) 60%, transparent)',
   },
   // Brand gradient for high-emphasis surfaces (e.g. the primary CTA).
   // References the theme brand vars so it follows light/dark automatically;
@@ -157,6 +167,18 @@ export const treeThemes = {
         soft: '#ddf4ff',
         contrast: '#ffffff',
       },
+      // Secondary brand accent — a closed axis, never a free colour. It is what
+      // `TTag tone="accent"` paints with, and the default value of the surface
+      // `accent` axis (TSection/THero/TPageSurface), which remaps these four
+      // variables when a product wants a status hue instead. Derived with
+      // `deriveBrandRamp` from #8957e5 so the accent stays legible as text on
+      // its own soft tint (measured 4.77:1) and on every background.
+      accent: {
+        primary: '#794dcb',
+        hover: '#633fa6',
+        soft: '#efeaf9',
+        contrast: '#ffffff',
+      },
       status: {
         success: '#1a7f37',
         warning: '#9a6700',
@@ -202,6 +224,16 @@ export const treeThemes = {
         hover: '#6cabf7',
         soft: '#1a3453',
         contrast: '#0a1a2f',
+      },
+      // Dark pair of the secondary accent (same #8957e5 seed, stepped for the
+      // dark surface). Measured 5.93:1 on bg-primary, 4.67:1 on bg-subtle and
+      // 4.72:1 on its own soft tint — AA on every background, and above what
+      // the dark brand pair itself clears. `accent.test.ts` holds that bar.
+      accent: {
+        primary: '#ad8bed',
+        hover: '#ba9df0',
+        soft: '#332e4a',
+        contrast: '#1c2128',
       },
       status: {
         success: '#57ab5a',

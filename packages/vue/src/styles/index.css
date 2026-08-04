@@ -4088,6 +4088,42 @@ a.t-brand-lockup:focus-visible {
   cursor: not-allowed;
 }
 
+/* Quiet variant (TREEUX-023) — the weight of a note attached to one item, not
+   of a document section. The trigger shrinks to its content instead of spanning
+   the reading column, the item rule disappears, and the panel indents to say
+   "this belongs to the thing above it". The 44×44 hit area on
+   `.t-accordion__trigger::after` is deliberately untouched: the control looks
+   small, it is not small to hit. */
+.t-accordion--quiet {
+  width: auto;
+}
+
+.t-accordion--quiet .t-accordion__item {
+  border-bottom: none;
+}
+
+.t-accordion--quiet .t-accordion__trigger {
+  width: auto;
+  gap: var(--tree-space-1);
+  min-height: var(--tree-size-control-sm);
+  padding: var(--tree-space-1) var(--tree-space-2);
+  border-radius: var(--tree-radius-sm);
+  color: var(--tree-color-text-muted);
+  font-size: var(--tree-font-size-sm);
+  font-weight: var(--tree-font-weight-regular);
+}
+
+.t-accordion--quiet .t-accordion__panel {
+  padding: var(--tree-space-2) 0 var(--tree-space-3);
+  font-size: var(--tree-font-size-sm);
+}
+
+.t-accordion--quiet.has-rail .t-accordion__panel {
+  margin-inline-start: var(--tree-space-2);
+  padding-inline-start: var(--tree-space-3);
+  border-inline-start: var(--tree-border-width-subtle) solid var(--tree-color-border-default);
+}
+
 /* ─── Breadcrumb ─── */
 
 .t-breadcrumb {
@@ -4424,6 +4460,16 @@ a.t-brand-lockup:focus-visible {
 /* ── Tag / Chip ── */
 
 .t-tag {
+  /* Tone axis (TREEUX-027). The defaults reproduce the pre-tone tag exactly —
+     brand solid, neutral outline and soft — so `tone` is purely additive. Each
+     `t-tag--tone-*` block below remaps these five variables and the three
+     variant rules read them, the same shape TBadge already uses. Closed axis:
+     never a free colour. */
+  --tree-tag-fg: var(--tree-color-text-primary);
+  --tree-tag-surface: var(--tree-color-bg-subtle);
+  --tree-tag-solid: var(--tree-color-brand-primary);
+  --tree-tag-on-solid: var(--tree-color-brand-contrast);
+  --tree-tag-border: var(--tree-color-border-default);
   display: inline-flex;
   align-items: center;
   gap: var(--tree-space-1);
@@ -4456,21 +4502,80 @@ a.t-brand-lockup:focus-visible {
 }
 
 .t-tag--solid {
-  background: var(--tree-color-brand-primary);
-  color: var(--tree-color-brand-contrast);
+  background: var(--tree-tag-solid);
+  color: var(--tree-tag-on-solid);
   border: var(--tree-border-width-subtle) solid transparent;
 }
 
 .t-tag--outline {
   background: transparent;
-  color: var(--tree-color-text-primary);
-  border: var(--tree-border-width-subtle) solid var(--tree-color-border-default);
+  color: var(--tree-tag-fg);
+  border: var(--tree-border-width-subtle) solid var(--tree-tag-border);
 }
 
 .t-tag--soft {
-  background: var(--tree-color-bg-subtle);
-  color: var(--tree-color-text-primary);
+  background: var(--tree-tag-surface);
+  color: var(--tree-tag-fg);
   border: var(--tree-border-width-subtle) solid transparent;
+}
+
+.t-tag--tone-neutral {
+  --tree-tag-fg: var(--tree-color-text-primary);
+  --tree-tag-surface: var(--tree-color-bg-subtle);
+  --tree-tag-solid: var(--tree-color-text-primary);
+  --tree-tag-on-solid: var(--tree-color-text-inverse);
+  --tree-tag-border: var(--tree-color-border-default);
+}
+
+.t-tag--tone-brand {
+  --tree-tag-fg: var(--tree-color-brand-primary);
+  --tree-tag-surface: var(--tree-color-brand-soft);
+  --tree-tag-solid: var(--tree-color-brand-primary);
+  --tree-tag-on-solid: var(--tree-color-brand-contrast);
+  --tree-tag-border: color-mix(in srgb, var(--tree-color-brand-primary) 36%, var(--tree-color-border-default));
+}
+
+/* Reads the accent axis rather than a fixed colour, so a tag inside a
+   `TSection accent="success"` follows that surface (TREEUX-034). Unset, the
+   axis is the secondary brand accent from @treeui/tokens. */
+.t-tag--tone-accent {
+  --tree-tag-fg: var(--tree-color-accent-primary);
+  --tree-tag-surface: var(--tree-color-accent-soft);
+  --tree-tag-solid: var(--tree-color-accent-primary);
+  --tree-tag-on-solid: var(--tree-color-accent-contrast);
+  --tree-tag-border: color-mix(in srgb, var(--tree-color-accent-primary) 36%, var(--tree-color-border-default));
+}
+
+.t-tag--tone-success {
+  --tree-tag-fg: var(--tree-color-status-success);
+  --tree-tag-surface: color-mix(in srgb, var(--tree-color-status-success) 14%, var(--tree-color-bg-surface));
+  --tree-tag-solid: var(--tree-color-status-success);
+  --tree-tag-on-solid: var(--tree-color-text-inverse);
+  --tree-tag-border: color-mix(in srgb, var(--tree-color-status-success) 36%, var(--tree-color-border-default));
+}
+
+.t-tag--tone-warning {
+  --tree-tag-fg: var(--tree-color-status-warning);
+  --tree-tag-surface: color-mix(in srgb, var(--tree-color-status-warning) 14%, var(--tree-color-bg-surface));
+  --tree-tag-solid: var(--tree-color-status-warning);
+  --tree-tag-on-solid: var(--tree-color-text-inverse);
+  --tree-tag-border: color-mix(in srgb, var(--tree-color-status-warning) 36%, var(--tree-color-border-default));
+}
+
+.t-tag--tone-danger {
+  --tree-tag-fg: var(--tree-color-status-error);
+  --tree-tag-surface: color-mix(in srgb, var(--tree-color-status-error) 14%, var(--tree-color-bg-surface));
+  --tree-tag-solid: var(--tree-color-status-error);
+  --tree-tag-on-solid: var(--tree-color-text-inverse);
+  --tree-tag-border: color-mix(in srgb, var(--tree-color-status-error) 36%, var(--tree-color-border-default));
+}
+
+.t-tag--tone-info {
+  --tree-tag-fg: var(--tree-color-status-info);
+  --tree-tag-surface: color-mix(in srgb, var(--tree-color-status-info) 14%, var(--tree-color-bg-surface));
+  --tree-tag-solid: var(--tree-color-status-info);
+  --tree-tag-on-solid: var(--tree-color-text-inverse);
+  --tree-tag-border: color-mix(in srgb, var(--tree-color-status-info) 36%, var(--tree-color-border-default));
 }
 
 .t-tag.is-disabled {
@@ -6505,6 +6610,17 @@ a.t-brand-lockup:focus-visible {
   cursor: not-allowed;
 }
 
+/* Read-only chip (TREEUX-038) — colour as evidence, not as a choice: inert,
+   not focusable, no selected state. The border is `border-strong`, not
+   `border-default`, because half of these chips ARE background colours and in
+   their own theme a weak border makes the chip vanish into the page. */
+.t-color-swatch__chip {
+  inline-size: var(--tree-color-swatch-size);
+  block-size: var(--tree-color-swatch-size);
+  border: var(--tree-border-width-subtle) solid var(--tree-color-border-strong);
+  border-radius: var(--tree-radius-pill);
+}
+
 /* ── Spacer ───────────────────────────────────────────── */
 
 .t-spacer {
@@ -8376,4 +8492,279 @@ body:has(.t-app-shell) {
 
 .t-key-value-editor.is-disabled {
   opacity: 0.68;
+}
+
+/* ------------------------------------------------------------------ *
+ * Accent axis (TREEUX-034) — a closed accent a surface can declare and
+ * every descendant inherits. `--tree-color-accent-*` ships from
+ * @treeui/tokens as the secondary brand accent; `t-accent--<tone>`
+ * remaps the four variables to one of the closed tones, and anything
+ * that reads them follows: `TTag tone="accent"`, the THero glow, and
+ * `--tree-shadow-accent`. The vocabulary is the one TLinkTile already
+ * declares — never a free colour, so a product picks a tone, not a hex.
+ * ------------------------------------------------------------------ */
+.t-accent--brand {
+  --tree-color-accent-primary: var(--tree-color-brand-primary);
+  --tree-color-accent-hover: var(--tree-color-brand-hover);
+  --tree-color-accent-soft: var(--tree-color-brand-soft);
+  --tree-color-accent-contrast: var(--tree-color-brand-contrast);
+}
+
+.t-accent--neutral {
+  --tree-color-accent-primary: var(--tree-color-text-primary);
+  --tree-color-accent-hover: var(--tree-color-text-primary);
+  --tree-color-accent-soft: var(--tree-color-bg-subtle);
+  --tree-color-accent-contrast: var(--tree-color-text-inverse);
+}
+
+.t-accent--success {
+  --tree-color-accent-primary: var(--tree-color-status-success);
+  --tree-color-accent-hover: var(--tree-color-status-success);
+  --tree-color-accent-soft: color-mix(in srgb, var(--tree-color-status-success) 14%, var(--tree-color-bg-surface));
+  --tree-color-accent-contrast: var(--tree-color-text-inverse);
+}
+
+.t-accent--warning {
+  --tree-color-accent-primary: var(--tree-color-status-warning);
+  --tree-color-accent-hover: var(--tree-color-status-warning);
+  --tree-color-accent-soft: color-mix(in srgb, var(--tree-color-status-warning) 14%, var(--tree-color-bg-surface));
+  --tree-color-accent-contrast: var(--tree-color-text-inverse);
+}
+
+.t-accent--danger {
+  --tree-color-accent-primary: var(--tree-color-status-error);
+  --tree-color-accent-hover: var(--tree-color-status-error);
+  --tree-color-accent-soft: color-mix(in srgb, var(--tree-color-status-error) 14%, var(--tree-color-bg-surface));
+  --tree-color-accent-contrast: var(--tree-color-text-inverse);
+}
+
+.t-accent--info {
+  --tree-color-accent-primary: var(--tree-color-status-info);
+  --tree-color-accent-hover: var(--tree-color-status-info);
+  --tree-color-accent-soft: color-mix(in srgb, var(--tree-color-status-info) 14%, var(--tree-color-bg-surface));
+  --tree-color-accent-contrast: var(--tree-color-text-inverse);
+}
+
+/* ------------------------------------------------------------------ *
+ * TSection (TREEUX-030) — vertical rhythm plus an optional banded
+ * background. The band is full-bleed for free: the section spans its
+ * parent and carries the background, while the reading column is a
+ * TContainer nested inside it. Nothing needs 100vw or a negative
+ * margin — both of which overflow once Windows paints a scrollbar.
+ * ------------------------------------------------------------------ */
+.t-section {
+  --tree-section-rhythm: clamp(var(--tree-space-8), 6vw, var(--tree-space-12));
+  display: block;
+  inline-size: 100%;
+  padding-block: var(--tree-section-rhythm);
+}
+
+.t-section--tight {
+  --tree-section-rhythm: clamp(var(--tree-space-5), 3vw, var(--tree-space-8));
+}
+
+.t-section--default {
+  --tree-section-rhythm: clamp(var(--tree-space-8), 6vw, var(--tree-space-12));
+}
+
+.t-section--loose {
+  --tree-section-rhythm: clamp(var(--tree-space-12), 9vw, var(--tree-space-16));
+}
+
+.t-section.is-banded {
+  background: var(--tree-color-bg-subtle);
+}
+
+/* ------------------------------------------------------------------ *
+ * THero (TREEUX-031) — the one section with a layer behind the copy.
+ * The library owns the box: stacking context, the clip that keeps an
+ * oversized decoration inside the band, hero-scale padding, and
+ * `pointer-events: none` on the backdrop so a click on the CTA never
+ * dies in the ornament. The art itself stays with the product.
+ * ------------------------------------------------------------------ */
+.t-hero {
+  position: relative;
+  isolation: isolate;
+  display: block;
+  inline-size: 100%;
+  padding-block: clamp(var(--tree-space-12), 10vw, var(--tree-space-16));
+  overflow: hidden;
+}
+
+.t-hero__backdrop,
+.t-hero__glow {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* The only part of the decoration that is 100% tokens: a halo in whatever
+   accent is in scope (see the accent axis above). */
+.t-hero__glow {
+  background: radial-gradient(
+    60% 60% at 50% 0%,
+    color-mix(in srgb, var(--tree-color-accent-primary) 26%, transparent),
+    transparent 70%
+  );
+}
+
+.t-hero__inner {
+  position: relative;
+  z-index: 1;
+}
+
+/* ------------------------------------------------------------------ *
+ * TPageSurface (TREEUX-032) — the page-level surface for screens with
+ * no app shell (landing, login, public status).
+ * ------------------------------------------------------------------ */
+
+/* The shell already zeroes the user-agent body margin via
+   `body:has(.t-app-shell)`; without a shell that 8px comes back and a sticky
+   header stops touching the viewport edge. Same depth-agnostic `:has()` for the
+   same reason — apps mount through wrappers. */
+body:has(.t-page-surface) {
+  margin: 0;
+}
+
+.t-page-surface {
+  display: flow-root;
+  inline-size: 100%;
+  min-block-size: 100vh;
+  min-block-size: 100dvh;
+  background: var(--tree-color-bg-primary);
+  color: var(--tree-color-text-primary);
+}
+
+/* Overlay mode: the surface takes the viewport and declares itself the scroll
+   host, so a landing rendered over a mounted SPA scrolls itself instead of
+   dragging the screen behind it. `overscroll-behavior: contain` stops the
+   scroll chaining that made the page underneath move at the ends. */
+.t-page-surface.is-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: var(--tree-z-overlay);
+  min-block-size: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+/* ------------------------------------------------------------------ *
+ * TShow / THide (TREEUX-033) — breakpoint visibility in pure CSS, so
+ * both branches render on the server and a crawler reads every link.
+ * A media query cannot resolve a custom property (it is evaluated
+ * before the cascade exists), so the breakpoints are written out as
+ * literals here; `breakpoints.test.ts` fails the build if they ever
+ * drift from `treeTokens.breakpoint`.
+ *
+ * `display: contents` on the visible branch means the wrapper adds no
+ * box of its own — the children stay direct participants in the
+ * parent's flex or grid, which is what makes this a drop-in wrapper.
+ * ------------------------------------------------------------------ */
+.t-show,
+.t-hide {
+  display: contents;
+}
+
+@media (max-width: 639.98px) {
+  .t-show--at-sm,
+  .t-hide--below-sm {
+    display: none;
+  }
+}
+
+@media (min-width: 640px) {
+  .t-show--below-sm,
+  .t-hide--at-sm {
+    display: none;
+  }
+}
+
+@media (max-width: 767.98px) {
+  .t-show--at-md,
+  .t-hide--below-md {
+    display: none;
+  }
+}
+
+@media (min-width: 768px) {
+  .t-show--below-md,
+  .t-hide--at-md {
+    display: none;
+  }
+}
+
+@media (max-width: 1023.98px) {
+  .t-show--at-lg,
+  .t-hide--below-lg {
+    display: none;
+  }
+}
+
+@media (min-width: 1024px) {
+  .t-show--below-lg,
+  .t-hide--at-lg {
+    display: none;
+  }
+}
+
+@media (max-width: 1279.98px) {
+  .t-show--at-xl,
+  .t-hide--below-xl {
+    display: none;
+  }
+}
+
+@media (min-width: 1280px) {
+  .t-show--below-xl,
+  .t-hide--at-xl {
+    display: none;
+  }
+}
+
+/* ------------------------------------------------------------------ *
+ * TSkipLink (TREEUX-036) — the one control that has to be hidden and
+ * visible at the same time. `.t-visually-hidden` hides it forever,
+ * which defeats the sighted keyboard user it exists for, so it parks
+ * off-screen with a transform and rides back in on focus.
+ * ------------------------------------------------------------------ */
+.t-skip-link {
+  position: fixed;
+  inset-block-start: var(--tree-space-2);
+  inset-inline-start: var(--tree-space-2);
+  z-index: var(--tree-z-overlay);
+  display: inline-flex;
+  align-items: center;
+  min-block-size: var(--tree-size-control-lg);
+  padding-inline: var(--tree-space-4);
+  border-radius: var(--tree-radius-md);
+  background: var(--tree-color-bg-surface);
+  color: var(--tree-color-brand-primary);
+  box-shadow: var(--tree-shadow-md);
+  font-family: var(--tree-font-family-sans);
+  font-size: var(--tree-font-size-sm);
+  font-weight: var(--tree-font-weight-medium);
+  text-decoration: none;
+  transform: translateY(calc(-100% - var(--tree-space-4)));
+  transition: transform var(--tree-motion-duration-fast) var(--tree-motion-easing-standard);
+}
+
+.t-skip-link:focus-visible {
+  outline: none;
+  transform: translateY(0);
+  box-shadow:
+    var(--tree-shadow-md),
+    0 0 0 var(--tree-focus-ring-width) var(--tree-color-focus-ring);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .t-skip-link {
+    transition: none;
+  }
+}
+
+/* TSkipLink marks its target so the ring that follows a programmatic focus
+   does not read as a stray outline around the whole main region. */
+[data-tree-skip-target]:focus {
+  outline: none;
 }

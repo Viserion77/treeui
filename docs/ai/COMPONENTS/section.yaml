@@ -1,0 +1,87 @@
+name: TSection
+source_file: packages/vue/src/components/TSection.vue
+package: "@treeui/vue"
+kind: layout
+status: available
+purpose: >
+  Page section: responsive vertical rhythm plus an optional full-bleed
+  background band, with the reading column delegated to a nested TContainer.
+  Replaces the `<div class="banded"><TContainer>…</TContainer></div>` pairing a
+  marketing page otherwise repeats per section.
+
+props:
+  as:
+    type: string
+    default: section
+    note: "Use `header`, `footer` or `aside` where the semantics call for it."
+  rhythm:
+    type: TSectionRhythm
+    default: default
+    values: [tight, default, loose]
+    note: >
+      Responsive `padding-block`, one clamp per step — not a fixed value:
+      tight `clamp(space-5, 3vw, space-8)`, default `clamp(space-8, 6vw, space-12)`,
+      loose `clamp(space-12, 9vw, space-16)`.
+  banded:
+    type: boolean
+    default: false
+    note: >
+      Paints `--tree-color-bg-subtle` across the section, to separate
+      consecutive sections without a rule.
+  container:
+    type: "TContainerSize | 'none'"
+    default: lg
+    note: >
+      Size of the inner TContainer. `none` drops the container and places the
+      children straight into the band, for a section that manages its own column.
+  padded:
+    type: boolean
+    default: true
+    note: "Forwarded to the inner TContainer as its horizontal padding."
+  accent:
+    type: TAccent
+    default: "unset"
+    values: [brand, neutral, success, warning, danger, info]
+    note: >
+      Declares the accent for this subtree by remapping `--tree-color-accent-*`.
+      Closed axis — see CONTRACTS.yaml → shared_props.accent.
+
+slots:
+  - default
+
+full_bleed:
+  how: >
+    The band is full-bleed because the section spans its parent and carries the
+    background itself, while the column is the nested TContainer.
+  never: >
+    Do NOT reach for `100vw` or a negative margin to widen a band — both
+    overflow horizontally as soon as the platform paints a classic scrollbar.
+  requires: >
+    The section's parent must be full-width (TPageSurface, `body`, or the app
+    shell's content region). Nested inside a TContainer, the band stops at that
+    container's max-width.
+
+types:
+  TSectionRhythm: "'tight' | 'default' | 'loose'"
+
+css:
+  block: t-section
+  modifiers: [t-section--tight, t-section--default, t-section--loose]
+  states: [is-banded]
+  custom_properties:
+    --tree-section-rhythm: "The resolved padding-block clamp for the active rhythm step."
+  accent_classes: "t-accent--<tone> — the shared accent-axis utility, also used by THero and TPageSurface."
+
+a11y:
+  - "Structural only; semantics come from `as` and the child content."
+  - "Renders a `<section>` by default — give it an accessible name (`aria-label`/`aria-labelledby`) when the page has several."
+
+example: |
+  <TPageSurface>
+    <TSection rhythm="loose">
+      <TText as="h2" size="title">Why TreeUI</TText>
+    </TSection>
+    <TSection banded accent="success">
+      <TText as="h2" size="title">Built for teams</TText>
+    </TSection>
+  </TPageSurface>

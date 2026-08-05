@@ -1,5 +1,136 @@
 # @treeui/vue
 
+## 0.28.0
+
+### Minor Changes
+
+- ec31a47: Fixes for the two components the LSS dashboard rejected in validation.
+
+  **`TKeyValueEditor` — data loss under the idiomatic binding.** The watcher that
+  rebuilt the rows from `modelValue` compared by REFERENCE, and a parent holding
+  the map in `reactive()`/`ref()` hands back a proxy that is never `===` the raw
+  object the editor emitted. The guard therefore failed on every keystroke and
+  rebuilt the rows from the COMMITTED record — which by contract omits the row
+  being edited — so clearing a key deleted that row and its value. The comparison
+  is now by content, and row ids of surviving keys are reused, so an external
+  change patches inputs instead of remounting them and stealing the caret.
+
+  Three more, found in the same review:
+
+  - `validity-change` is emitted **on mount** and whenever `modelValue` changes
+    from outside, not only on keystroke. A `Record` can arrive invalid (`{"": "x"}`
+    is a legitimate `Record<string, string>`), and after an external reset the rows
+    could render clean while the consumer's aggregated summary still said invalid.
+    Repeat emissions of an unchanged validity are suppressed.
+  - `invalid` is no longer inert: it draws an error rail and sets `aria-invalid` on
+    the now-`role="group"` root. It previously applied a class with no rule behind
+    it.
+  - An incoming `id` lands on the first key input instead of the wrapper `div`, so
+    a `TFormField` label names a real control.
+
+  **`TTagInput` — three ways a value could vanish.**
+
+  - **`allowDuplicates`** — dedupe is right for a set of names and wrong for an
+    ordered argument list, where `--param a --param b` is meaningful. The emit
+    guard also compared array lengths, so a dropped duplicate emitted nothing while
+    the field cleared anyway: typed value, no chip, no event.
+  - **`separator`** (`string | string[] | null`) — the comma was a fixed separator
+    with no escape, so `--param=tags=a,b` silently became two arguments. `null`
+    makes Enter the only confirm.
+  - **`commitOnBlur`** (default `true`) — typing the last value and clicking Save
+    dropped it with no warning. `commit()` is exposed for an explicit flush.
+  - Pasting a lone separator no longer strands the text in the field.
+
+- ec31a47: Labelling, identity and navigation in forms (TREEUX-007, 008, 009).
+
+  - **`TFormField` generates the control id** and provides it to the TreeUI
+    control nested inside, so `<label for>` and the control cannot drift.
+    Inventing and repeating the id by hand was a silent failure mode: forget one
+    half and nothing warns — the label simply names nothing. `htmlFor` still wins,
+    and the error/hint paragraphs now carry ids that reach the control through
+    `aria-describedby`. The default slot receives `{ id, describedBy }` for a
+    control that cannot inject the context. `invalid`/`disabled`/`required` are
+    deliberately NOT propagated.
+  - **`TCheckbox label`** — it was the only control labelled by slot alone, so a
+    consumer reaching for the prop got a checkbox with no accessible name at all.
+  - **`TDropdown` items take `icon` and `selected`** — a selected item becomes a
+    `menuitemradio` with `aria-checked` instead of a slot that can paint the state
+    but not say it.
+  - **`TButton to`** — renders a RouterLink wearing the button's skin, so a CTA
+    that navigates keeps ctrl/middle-click, "open in new tab" and the status-bar
+    URL, with the accessible role `link`. The alternatives were `<a><button>`
+    (invalid markup, two tab stops) and `as="a" :href` (leaves the SPA). A
+    disabled button stays a `<button>`, since there is no `disabled` on `<a>`.
+  - **`GlobalComponents` typing** — `@treeui/vue` now augments Vue's
+    `GlobalComponents` with exactly what `TreeUIPlugin` registers, so `vue-tsc`
+    fails on a prop that does not exist. Previously such a prop became an entry in
+    `$attrs` and, on a component with `inheritAttrs: false`, landed on an inner
+    element as an invalid HTML attribute and disappeared: one consumer audit found
+    six of them across 19 call sites — a checkbox with no accessible name, a
+    destructive button in the default colour, translated copy that never
+    rendered — with no warning in dev, in build, or in `vue-tsc`.
+
+- ec31a47: The axes both consumers were hand-rolling in local CSS, and two user-agent boxes
+  that leaked through `as` (TREEUX-005, 043–050).
+
+  **`TText`**
+
+  - **Status tones** — `danger | success | warning | info`, reading
+    `--tree-color-status-*`. A sentence that IS the state (the error line under a
+    field, the green "connected") is not a `TAlert` (a box with an icon and the
+    weight of an announcement) and not a `TBadge`/`TTag` (a pill, when the datum is
+    prose), so the only way to say "this failed" in text was local CSS: 60
+    declarations across 42 files in one consumer.
+  - **`wrap`** (`anywhere | break-word`) — an id, ARN or API key is one long word
+    with no break opportunity, and `truncate` is the wrong answer when the string
+    IS what the reader came to copy. `anywhere` also sets `min-inline-size: 0`,
+    without which a flex or grid child never breaks.
+  - **`size="subtitle"`** — a third responsive step under `title`, on a gentler
+    slope (2.5vw against 4vw). Two steps sharing a slope render identically below
+    the smaller one's cap, so a page with a hero and a section could not express
+    two levels on a phone; a lower ceiling alone does not fix that.
+  - **`measure="headline"`** (~20ch) and **`balance`** (`text-wrap: balance`).
+
+  **Type scale** — `--tree-font-size-2xl` repeated `xl` verbatim (both
+  `1.375rem`), which made every `clamp(xl … 2xl)` a constant and left a hole
+  between 1.375 and 1.75rem. `2xl` is now `1.5rem`; `xl` is unchanged. A unit test
+  keeps the scale strictly increasing.
+
+  **User-agent boxes behind `as`**
+
+  - `as="ul"/"ol"/"menu"` on **`TStack`/`TGrid`/`TSplit`/`TContainer`** cancels the
+    marker, indent and block margin — the most repeated rule in one consumer's
+    repo, 43 resets across 37 files — and restores `role="list"`, which
+    `list-style: none` removes in Safari.
+  - `as="button"` on **`TCard`** restores font, width and text alignment. Measured
+    on the same card in a 900px parent: 134.75px / 13.33px / centre as a button
+    against 900px / 16px / start as a div. Scoped to the element, so a card as
+    `<a>` or `<div>` is untouched.
+
+  **Also**
+
+  - **`TTag density="compact"`** — keeps the type of its `size` step and derives
+    the height from padding instead of the control step, for a static label beside
+    a heading (40px → ~26px without shrinking the type).
+  - **`TAccordionItem headingLevel`** (`2–6 | false`) — the hardcoded `<h3>` put a
+    heading in the document outline per disclosure; 20 rounds of a conversation
+    became 20 headings. `variant="quiet"` now defaults to no heading wrapper.
+  - **`TEmptyState frame`** (`block | fill | inline`) — the geometry of the frame,
+    a separate question from the size of the message inside it.
+  - **`TColorSwatch shape`/`block`** — a square, container-width plate for a brand
+    manual, where the colour is the subject rather than a control.
+  - **`TLink family`/`size`** and **`TTextarea family`** — the same `sans | mono`
+    vocabulary as `TText`, which retires the last local typography class.
+  - The `#icon` slot of **`TTag`/`TBadge`** now provides the component's scale, so
+    a slotted `TIcon` with no `size` stops entering at the 20px default and lining
+    up taller than the text beside it. An explicit `size` still wins.
+  - New **`skip-forward`** icon: transport, not navigation.
+
+### Patch Changes
+
+- Updated dependencies [ec31a47]
+  - @treeui/tokens@0.28.0
+
 ## 0.27.0
 
 ### Minor Changes

@@ -12,9 +12,27 @@
 // Checking only the first would let the library "fix" the noise by allowing
 // everything, which is the failure mode this whole item exists to avoid.
 import { execFileSync } from 'node:child_process';
+import { existsSync, readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
 const here = fileURLToPath(new URL('.', import.meta.url));
+
+// The fixtures import `@treeui/vue` from `dist`, not from `src`, because that is
+// what a consumer installs — checking the source would not exercise the emitted
+// declarations, and the last defect this gate covers was precisely one that
+// existed in the source and never reached the tarball. So the built package is a
+// precondition, not something to build from here: building it in isolation fails
+// without its own dependencies' `dist` (the stylesheet `@import`s
+// `@treeui/tokens/styles.css`).
+const entry = fileURLToPath(new URL('../../packages/vue/dist/index.d.ts', import.meta.url));
+
+if (!existsSync(entry)) {
+  console.error(
+    '\n[strict-templates] packages/vue/dist is missing.\n' +
+      'This check reads the BUILT package. Run `pnpm build:packages` first.\n',
+  );
+  process.exit(1);
+}
 
 const run = (project) => {
   try {
@@ -30,6 +48,22 @@ const run = (project) => {
       .filter((line) => line.includes('error TS'));
   }
 };
+
+// The augmentation only takes effect once TypeScript LOADS the module that
+// declares it, and a bare side-effect import is elided from the emitted
+// declarations — which is exactly how it once shipped in `dist/` referenced by
+// nothing, and inert. Asserted here because this is the first gate that sees a
+// built package.
+const declarations = readFileSync(entry, 'utf8');
+
+if (!declarations.includes("from './global-components'")) {
+  console.error(
+    '\n[strict-templates] dist/index.d.ts does not reference ./global-components.\n' +
+      'The GlobalComponents augmentation ships but never loads, so every prop check ' +
+      'silently disappears for consumers.\n',
+  );
+  process.exit(1);
+}
 
 const legitimate = run('tsconfig.json');
 const wrong = run('tsconfig.bad.json');

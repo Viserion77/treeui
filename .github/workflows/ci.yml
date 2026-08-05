@@ -44,6 +44,11 @@ jobs:
       - name: Build packages
         run: pnpm build:packages
 
+      # After the build on purpose: the fixtures import the BUILT package, which
+      # is what a consumer installs, and where the defect this gate covers lived.
+      - name: Typecheck consumer templates (strictTemplates)
+        run: pnpm typecheck:strict-templates
+
       - name: Build docs site (landing + Vue + React Storybooks)
         run: pnpm build:site
 

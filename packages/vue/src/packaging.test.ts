@@ -7,19 +7,20 @@
 // the augmentation never reached a single consumer. Nothing else in the gates
 // covers that: the source typechecks, the tests pass, the file is in the
 // tarball, and it is inert (TREEUX-008).
-import { existsSync, readFileSync } from 'node:fs';
+import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 
 const source = readFileSync(fileURLToPath(new URL('./index.ts', import.meta.url)), 'utf8');
-const distEntry = fileURLToPath(new URL('../dist/index.d.ts', import.meta.url));
 
 describe('the global-components augmentation is reachable from the entry point', () => {
   it('is re-exported from the barrel, not merely imported for side effects', () => {
     expect(source).toMatch(/export type \{[^}]*\} from '\.\/global-components';/s);
   });
 
-  it.runIf(existsSync(distEntry))('survives into the published declarations', () => {
-    expect(readFileSync(distEntry, 'utf8')).toContain("from './global-components'");
-  });
+  // The other half — that the re-export survives into the EMITTED `index.d.ts` —
+  // is asserted by `tooling/strict-templates/check.mjs`, which runs after the
+  // build. Conditioning it on `dist` existing here would have made it skip in CI
+  // (unit tests run before `build:packages`), i.e. silently never run in the one
+  // place it matters.
 });

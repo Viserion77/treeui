@@ -6,6 +6,7 @@ import type { TFieldWidth, TSize } from '../types/contracts';
 import TFlag from './TFlag.vue';
 import TIcon from './TIcon.vue';
 import TSpinner from './TSpinner.vue';
+import type { TModelModifiers } from './form-field';
 
 defineOptions({
   inheritAttrs: false,
@@ -52,8 +53,9 @@ const props = withDefaults(
     /** Forwarded to every nested TFlag. Set once here to self-host flag assets. */
     flagBaseUrl?: string;
     emptyText?: string;
-  }>(),
+  } & TModelModifiers>(),
   {
+    modelModifiers: () => ({}),
     modelValue: '',
     options: () => [],
     open: undefined,

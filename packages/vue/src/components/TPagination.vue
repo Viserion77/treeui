@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import type { TSize } from '../types/contracts';
+import type { TModelModifiers } from './form-field';
 
 const props = withDefaults(
   defineProps<{
@@ -16,8 +17,9 @@ const props = withDefaults(
     disabled?: boolean;
     /** Accessible label for the nav element */
     label?: string;
-  }>(),
+  } & TModelModifiers>(),
   {
+    modelModifiers: () => ({}),
     modelValue: 1,
     siblings: 1,
     size: 'md',

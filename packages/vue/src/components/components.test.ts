@@ -27,6 +27,7 @@ import TSpinner from './TSpinner.vue';
 import TTooltip from './TTooltip.vue';
 import TRadio from './TRadio.vue';
 import TRadioGroup from './TRadioGroup.vue';
+import TToggleGroup from './TToggleGroup.vue';
 import TSelect from './TSelect.vue';
 import TFlag from './TFlag.vue';
 import TLanguageSelect from './TLanguageSelect.vue';
@@ -80,6 +81,14 @@ import TPageSurface from './TPageSurface.vue';
 import TShow from './TShow.vue';
 import THide from './THide.vue';
 import TSkipLink from './TSkipLink.vue';
+import TPane from './TPane.vue';
+import TDropVeil from './TDropVeil.vue';
+import TSpanLanes from './TSpanLanes.vue';
+import TAudioPlayer from './TAudioPlayer.vue';
+import TVoiceRecorder from './TVoiceRecorder.vue';
+import TCalendar from './TCalendar.vue';
+import TCalendarMonthGrid from './TCalendarMonthGrid.vue';
+import TCalendarTimeGrid from './TCalendarTimeGrid.vue';
 import TKeyValueEditor from './TKeyValueEditor.vue';
 import TChart from './TChart.vue';
 import TSparkline from './TSparkline.vue';
@@ -6587,5 +6596,520 @@ describe('TREEUX-009 — labelling and identity in form controls (LSS)', () => {
     const item = wrapper.get('.t-dropdown__item');
     expect(item.attributes('role')).toBe('menuitem');
     expect(item.attributes('aria-checked')).toBeUndefined();
+  });
+});
+
+describe('TREEUX-012 — TFormField only points `for` at something that exists (LSS)', () => {
+  it('labels a control that carries the id', () => {
+    const wrapper = mount(TFormField, {
+      props: { label: 'Chave' },
+      slots: { default: '<TInput />' },
+      global: { components: { TInput } },
+    });
+    expect(wrapper.get('label').attributes('for')).toBe(wrapper.get('input').attributes('id'));
+  });
+
+  it('labels a TSelect, which can carry the id on its trigger button', () => {
+    const wrapper = mount(TFormField, {
+      props: { label: 'Regiao' },
+      slots: { default: '<TSelect :options="[]" />' },
+      global: { components: { TSelect } },
+    });
+    expect(wrapper.get('label').attributes('for')).toBe(wrapper.get('button').attributes('id'));
+  });
+
+  it.each([
+    ['TRadioGroup', '<TRadioGroup />', TRadioGroup],
+    ['TToggleGroup', '<TToggleGroup :options="[]" />', TToggleGroup],
+  ])('drops `for` for %s and names it with aria-labelledby instead', async (_name, template, component) => {
+    const wrapper = mount(TFormField, {
+      props: { label: 'Modo' },
+      slots: { default: template },
+      global: { components: { [_name]: component } },
+    });
+    await nextTick();
+
+    const label = wrapper.get('label');
+    // The label must not point at an id nothing carries.
+    expect(label.attributes('for')).toBeUndefined();
+    // …and the group is still named, through the label's own id.
+    const group = wrapper.get('[role="radiogroup"], [role="group"]');
+    expect(group.attributes('aria-labelledby')).toBe(label.attributes('id'));
+  });
+
+  it('still honours an explicit htmlFor, which the field cannot verify', () => {
+    const wrapper = mount(TFormField, {
+      props: { label: 'Livre', htmlFor: 'outside' },
+      slots: { default: '<TRadioGroup />' },
+      global: { components: { TRadioGroup } },
+    });
+    expect(wrapper.get('label').attributes('for')).toBe('outside');
+  });
+});
+
+describe('TREEUX-008 — tone axis on TButton (LSS)', () => {
+  it('leaves the button untouched without a tone', () => {
+    const wrapper = mount(TButton, { props: { variant: 'ghost' } });
+    expect(wrapper.classes()).toContain('t-button--ghost');
+    expect(wrapper.classes()).not.toContain('has-tone');
+  });
+
+  it('composes a quiet destructive button, which `variant="danger"` cannot', () => {
+    const wrapper = mount(TButton, { props: { variant: 'ghost', tone: 'danger' } });
+    expect(wrapper.classes()).toContain('t-button--ghost');
+    expect(wrapper.classes()).toContain('t-button--tone-danger');
+    expect(wrapper.classes()).toContain('has-tone');
+  });
+
+  it('warns in dev that variant="danger" is deprecated', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    mount(TButton, { props: { variant: 'danger' } });
+    expect(warn).toHaveBeenCalledWith(expect.stringContaining('variant="danger"'));
+    warn.mockRestore();
+  });
+});
+
+describe('TREEUX-013 — TTagInput exposes the pending draft (LSS)', () => {
+  it('emits update:draft as the user types, so a dirty count can see it', async () => {
+    const wrapper = mount(TTagInput, { props: { modelValue: [] } });
+    await wrapper.get('.t-tag-input__field').setValue('sqs');
+    expect(wrapper.emitted('update:draft')?.at(-1)?.[0]).toBe('sqs');
+  });
+
+  it('clears the draft signal once the value is confirmed', async () => {
+    const wrapper = mount(TTagInput, { props: { modelValue: [] } });
+    const field = wrapper.get('.t-tag-input__field');
+    await field.setValue('sqs');
+    await field.trigger('keydown', { key: 'Enter' });
+    expect(wrapper.emitted('update:draft')?.at(-1)?.[0]).toBe('');
+  });
+
+  it('can keep a value that is only whitespace', async () => {
+    const wrapper = mount(TTagInput, { props: { modelValue: [], trim: false } });
+    const field = wrapper.get('.t-tag-input__field');
+    await field.setValue(' ');
+    await field.trigger('keydown', { key: 'Enter' });
+    expect(wrapper.emitted('update:modelValue')?.at(-1)?.[0]).toEqual([' ']);
+  });
+});
+
+describe('TREEUX-014 — TDropdown custom trigger and icon gutter (LSS)', () => {
+  it('hands the slotted trigger the ARIA the built-in one carries', () => {
+    const wrapper = mount(TDropdown, {
+      props: { defaultOpen: true, items: [{ label: 'A', value: 'a' }] },
+      slots: {
+        trigger: `<template #trigger="{ triggerProps }"><button v-bind="triggerProps">⋮</button></template>`,
+      },
+    });
+
+    const trigger = wrapper.get('.t-dropdown__trigger-wrapper button');
+    expect(trigger.attributes('aria-haspopup')).toBe('menu');
+    expect(trigger.attributes('aria-expanded')).toBe('true');
+    expect(trigger.attributes('aria-controls')).toBeTruthy();
+  });
+
+  it('reserves the icon gutter for every item once any item has an icon', () => {
+    const wrapper = mount(TDropdown, {
+      props: {
+        defaultOpen: true,
+        label: 'Menu',
+        items: [
+          { label: 'Com icone', value: 'a', icon: 'globe' },
+          { label: 'Sem icone', value: 'b' },
+        ],
+      },
+    });
+    // Both rows get the gutter, so the labels line up instead of going ragged.
+    expect(wrapper.findAll('.t-dropdown__item-icon')).toHaveLength(2);
+  });
+
+  it('renders no gutter when no item has an icon', () => {
+    const wrapper = mount(TDropdown, {
+      props: { defaultOpen: true, label: 'Menu', items: [{ label: 'A', value: 'a' }] },
+    });
+    expect(wrapper.findAll('.t-dropdown__item-icon')).toHaveLength(0);
+  });
+});
+
+describe('TREEUX-041 — TPane (S7)', () => {
+  it('anchors header and footer and scrolls only the middle', () => {
+    const wrapper = mount(TPane, {
+      slots: { header: 'Head', default: 'Body', footer: 'Composer' },
+    });
+    expect(wrapper.classes()).toContain('t-pane');
+    expect(wrapper.get('.t-pane__header').text()).toBe('Head');
+    expect(wrapper.get('.t-pane__body').text()).toBe('Body');
+    expect(wrapper.get('.t-pane__footer').text()).toBe('Composer');
+  });
+
+  it('renders no header or footer chrome when the slots are empty', () => {
+    const wrapper = mount(TPane, { slots: { default: 'Body' } });
+    expect(wrapper.find('.t-pane__header').exists()).toBe(false);
+    expect(wrapper.find('.t-pane__footer').exists()).toBe(false);
+  });
+});
+
+describe('TREEUX-022/040 — TDropVeil (S7)', () => {
+  it('renders nothing until a drag is over the target', () => {
+    expect(mount(TDropVeil).find('.t-drop-veil').exists()).toBe(false);
+  });
+
+  it('never intercepts the pointer, or it would swallow its own drop', () => {
+    const wrapper = mount(TDropVeil, { props: { active: true, label: 'Solte aqui' } });
+    const veil = wrapper.get('.t-drop-veil');
+    expect(veil.attributes('aria-hidden')).toBe('true');
+    expect(veil.text()).toContain('Solte aqui');
+  });
+
+  it('covers the viewport in page scope and the region otherwise', () => {
+    expect(mount(TDropVeil, { props: { active: true } }).get('.t-drop-veil').classes()).toContain(
+      't-drop-veil--page',
+    );
+    expect(
+      mount(TDropVeil, { props: { active: true, scope: 'region' } })
+        .get('.t-drop-veil')
+        .classes(),
+    ).toContain('t-drop-veil--region');
+  });
+});
+
+describe('TREEUX-021 — TFileUpload trigger variant and localizable rejections (S7)', () => {
+  it('renders the slot as the only control, with no dropzone and no extra tab stop', () => {
+    const wrapper = mount(TFileUpload, {
+      props: { variant: 'trigger' },
+      slots: { default: '<button type="button" class="clip">clip</button>' },
+    });
+    expect(wrapper.find('.t-file-upload__dropzone').exists()).toBe(false);
+    expect(wrapper.find('[role="button"]').exists()).toBe(false);
+    expect(wrapper.find('.clip').exists()).toBe(true);
+  });
+
+  it('keeps the dropzone by default, where the drop area IS the interface', () => {
+    expect(mount(TFileUpload).find('.t-file-upload__dropzone').exists()).toBe(true);
+  });
+
+  it('builds rejection copy from the consumer labels instead of English prose', async () => {
+    const wrapper = mount(TFileUpload, {
+      props: {
+        accept: 'image/*',
+        rejectionLabels: {
+          'file-invalid-type': ({ name }) => `${name} não é um tipo aceito.`,
+        },
+      },
+    });
+
+    const input = wrapper.get('input[type="file"]').element as HTMLInputElement;
+    const file = new File(['x'], 'notes.txt', { type: 'text/plain' });
+    Object.defineProperty(input, 'files', { value: [file], configurable: true });
+    await wrapper.get('input[type="file"]').trigger('change');
+
+    expect(wrapper.emitted('files-rejected')?.[0]?.[0]).toMatchObject([
+      { message: 'notes.txt não é um tipo aceito.' },
+    ]);
+  });
+});
+
+describe('TREEUX-002 fase 2 — TKeyValueEditor write-only mode (LSS)', () => {
+  const secrets = { API_KEY: { set: true }, DEBUG: { set: false } };
+
+  it('shows key and state, and never a value input for an existing secret', () => {
+    const wrapper = mount(TKeyValueEditor, { props: { mode: 'secret', secrets } });
+    expect(wrapper.findAll('.t-key-value-editor__secret-key').map((n) => n.text())).toEqual([
+      'API_KEY',
+      'DEBUG',
+    ]);
+    // The value never reaches the client, so there is nothing to read.
+    expect(wrapper.find('input[type="password"]').exists()).toBe(false);
+    expect(wrapper.findAll('.t-key-value-editor__secret-state')[0].attributes('data-set')).toBe(
+      'true',
+    );
+  });
+
+  it('emits set-value on replace, and does NOT touch the key set', async () => {
+    const wrapper = mount(TKeyValueEditor, { props: { mode: 'secret', secrets } });
+    await wrapper.findAll('.t-key-value-editor__add')[0].trigger('click'); // Replace
+    await wrapper.get('input[type="password"]').setValue('novo-segredo');
+    await wrapper.findAll('.t-key-value-editor__add')[0].trigger('click'); // Save
+
+    expect(wrapper.emitted('set-value')?.[0]).toEqual(['API_KEY', 'novo-segredo']);
+    // Replacing a value changes neither which keys exist nor whether they are set.
+    expect(wrapper.emitted('update:secrets')).toBeUndefined();
+  });
+
+  it('emits clear-value and flips the key to unset', async () => {
+    const wrapper = mount(TKeyValueEditor, { props: { mode: 'secret', secrets } });
+    const buttons = wrapper.findAll('.t-key-value-editor__add');
+    await buttons[1].trigger('click'); // Clear, on the row that is set
+    expect(wrapper.emitted('clear-value')?.[0]).toEqual(['API_KEY']);
+    expect(wrapper.emitted('update:secrets')?.[0]?.[0]).toMatchObject({ API_KEY: { set: false } });
+  });
+
+  it('adds and removes keys through update:secrets', async () => {
+    const wrapper = mount(TKeyValueEditor, { props: { mode: 'secret', secrets: {} } });
+    await wrapper.get('.t-key-value-editor__key').setValue('NOVA');
+    await wrapper.findAll('.t-key-value-editor__add').at(-1)!.trigger('click');
+    expect(wrapper.emitted('update:secrets')?.[0]?.[0]).toEqual({ NOVA: { set: false } });
+  });
+
+  it('leaves the value mode untouched', () => {
+    const wrapper = mount(TKeyValueEditor, { props: { modelValue: { a: '1' } } });
+    expect(wrapper.find('.t-key-value-editor__secret-key').exists()).toBe(false);
+    expect(wrapper.findAll('.t-key-value-editor__key')).toHaveLength(1);
+  });
+});
+
+describe('TREEUX-003 — TSpanLanes (LSS)', () => {
+  const rows = [
+    { label: 'auth', spans: [{ start: 0, end: 500 }, { start: 800, end: 1000, tone: 'danger' as const }] },
+  ];
+
+  it('places every span inside the window', () => {
+    const wrapper = mount(TSpanLanes, { props: { rows, from: 0, to: 1000, label: 'Carga' } });
+    const spans = wrapper.findAll('.t-span-lanes__span');
+    expect(spans).toHaveLength(2);
+    expect(spans[0].attributes('style')).toContain('inset-inline-start: 0%');
+    expect(spans[1].classes()).toContain('t-span-lanes__span--danger');
+  });
+
+  it('floors a tiny span to a visible width without spilling past the window', () => {
+    const wrapper = mount(TSpanLanes, {
+      props: { rows: [{ label: 'x', spans: [{ start: 999, end: 999.5 }] }], from: 0, to: 1000 },
+    });
+    const style = wrapper.get('.t-span-lanes__span').attributes('style') ?? '';
+    // 99.9% + the floored width must not exceed 100%.
+    const start = Number(/inset-inline-start:\s*([\d.]+)%/.exec(style)?.[1]);
+    const size = Number(/inline-size:\s*([\d.]+)%/.exec(style)?.[1]);
+    expect(start + size).toBeLessThanOrEqual(100.001);
+  });
+
+  it('names each lane, so the picture is not the only signal', () => {
+    const wrapper = mount(TSpanLanes, {
+      props: { rows: [{ label: 'auth', spans: [], description: 'auth: 12 invocações, 1 falhou' }], from: 0, to: 1 },
+    });
+    expect(wrapper.get('.t-span-lanes__track').attributes('aria-label')).toBe(
+      'auth: 12 invocações, 1 falhou',
+    );
+  });
+});
+
+describe('TREEUX-019 — media primitives (S7)', () => {
+  it('TAudioPlayer names play and pause, and never fetches on its own', () => {
+    const wrapper = mount(TAudioPlayer, {
+      props: { src: 'blob:x', playLabel: 'Tocar', pauseLabel: 'Pausar', preload: 'none' },
+    });
+    expect(wrapper.get('.t-audio-player__toggle').attributes('aria-label')).toBe('Tocar');
+    expect(wrapper.get('audio').attributes('preload')).toBe('none');
+    expect(wrapper.get('.t-audio-player__time').text()).toBe('0:00');
+  });
+
+  it('TAudioPlayer disables seek until a duration is known', () => {
+    const wrapper = mount(TAudioPlayer, { props: { src: 'blob:x' } });
+    expect(wrapper.get('.t-audio-player__seek').attributes('disabled')).toBeDefined();
+  });
+
+  it.each([
+    ['idle', '.t-voice-recorder__control'],
+    ['recording', '.t-voice-recorder__pulse'],
+  ] as const)('TVoiceRecorder renders the %s state', (state, selector) => {
+    const wrapper = mount(TVoiceRecorder, { props: { state } });
+    expect(wrapper.find(selector).exists()).toBe(true);
+  });
+
+  it('TVoiceRecorder shows mm:ss and announces the cap once', async () => {
+    const wrapper = mount(TVoiceRecorder, {
+      props: { state: 'recording', elapsed: 65, maxDuration: 60 },
+    });
+    expect(wrapper.get('.t-voice-recorder__timer').text()).toContain('1:05');
+    await wrapper.setProps({ elapsed: 70 });
+    expect(wrapper.emitted('cap-reached')).toHaveLength(1);
+  });
+
+  it('TVoiceRecorder shows the preview slot instead of the timer once stopped', () => {
+    const wrapper = mount(TVoiceRecorder, {
+      props: { state: 'preview' },
+      slots: { preview: '<span class="chip">audio</span>' },
+    });
+    expect(wrapper.find('.chip').exists()).toBe(true);
+    expect(wrapper.find('.t-voice-recorder__pulse').exists()).toBe(false);
+  });
+});
+
+describe('TREEUX-016 b/c/d — calendar (S7)', () => {
+  const anchor = new Date(2026, 1, 15); // February 2026
+  const items = [
+    { id: 'a', start: new Date(2026, 1, 15, 9, 0), end: new Date(2026, 1, 15, 10, 0) },
+    { id: 'b', start: new Date(2026, 1, 15, 9, 30), end: new Date(2026, 1, 15, 10, 30) },
+  ];
+
+  it('draws exactly the matrix getMonthMatrix returns — whole weeks, 7 columns', () => {
+    const wrapper = mount(TCalendarMonthGrid, { props: { anchor, weekStartsOn: 0 } });
+    const cells = wrapper.findAll('.t-calendar-month__cell');
+    expect(cells.length % 7).toBe(0);
+    expect(cells.length).toBeGreaterThanOrEqual(28);
+  });
+
+  it('includes the spill days of the adjacent months, marked as outside', () => {
+    // January 2026 starts on a Thursday, so the first row spills into December.
+    // (February 2026 happens to fill four whole weeks exactly — a month with no
+    // spill is precisely the wrong fixture for this.)
+    const wrapper = mount(TCalendarMonthGrid, {
+      props: { anchor: new Date(2026, 0, 15), weekStartsOn: 0 },
+    });
+    expect(wrapper.findAll('.t-calendar-month__cell.is-outside').length).toBeGreaterThan(0);
+  });
+
+  it('marks only today, and emits the clicked day', async () => {
+    const wrapper = mount(TCalendarMonthGrid, { props: { anchor, today: anchor } });
+    expect(wrapper.findAll('.t-calendar-month__cell.is-today')).toHaveLength(1);
+    await wrapper.findAll('.t-calendar-month__cell')[0].trigger('click');
+    expect(wrapper.emitted('select-day')?.[0]?.[0]).toBeInstanceOf(Date);
+  });
+
+  it('places overlapping events side by side instead of on top of each other', () => {
+    const wrapper = mount(TCalendarTimeGrid, {
+      props: { days: [new Date(2026, 1, 15)], items, hourHeight: 48 },
+    });
+    const events = wrapper.findAll('.t-calendar-time__event');
+    expect(events).toHaveLength(2);
+    const widths = events.map((e) => /inline-size:\s*([\d.]+)%/.exec(e.attributes('style') ?? '')?.[1]);
+    expect(widths).toEqual(['50', '50']);
+    const starts = events.map(
+      (e) => /inset-inline-start:\s*([\d.]+)%/.exec(e.attributes('style') ?? '')?.[1],
+    );
+    expect(new Set(starts).size).toBe(2);
+  });
+
+  it('shows the now marker only in the column of the current day', () => {
+    const wrapper = mount(TCalendarTimeGrid, {
+      props: {
+        days: [new Date(2026, 1, 15), new Date(2026, 1, 16)],
+        now: new Date(2026, 1, 15, 12, 0),
+      },
+    });
+    expect(wrapper.findAll('.t-calendar-time__now')).toHaveLength(1);
+  });
+
+  it('separates the all-day band from the timed grid', () => {
+    const wrapper = mount(TCalendarTimeGrid, {
+      props: {
+        days: [new Date(2026, 1, 15)],
+        items: [
+          { id: 'x', start: new Date(2026, 1, 15), end: new Date(2026, 1, 16), allDay: true },
+        ],
+      },
+    });
+    expect(wrapper.findAll('.t-calendar-time__all-day-item')).toHaveLength(1);
+    expect(wrapper.findAll('.t-calendar-time__event')).toHaveLength(0);
+  });
+
+  it.each([
+    ['month', '.t-calendar-month'],
+    ['week', '.t-calendar-time'],
+    ['workweek', '.t-calendar-time'],
+    ['day', '.t-calendar-time'],
+  ] as const)('TCalendar renders the %s view', (view, selector) => {
+    const wrapper = mount(TCalendar, { props: { view, anchor, items } });
+    expect(wrapper.find(selector).exists()).toBe(true);
+  });
+
+  it('TCalendar gives workweek five columns and day one', () => {
+    const workweek = mount(TCalendar, { props: { view: 'workweek', anchor } });
+    expect(workweek.findAll('.t-calendar-time__column')).toHaveLength(5);
+    const day = mount(TCalendar, { props: { view: 'day', anchor } });
+    expect(day.findAll('.t-calendar-time__column')).toHaveLength(1);
+  });
+
+  it('derives the week start from the locale when it is not given', () => {
+    // pt-BR starts on Sunday, es-ES on Monday — the CLDR answer, not a table.
+    const ptBr = mount(TCalendar, { props: { view: 'week', anchor, locale: 'pt-BR' } });
+    const esEs = mount(TCalendar, { props: { view: 'week', anchor, locale: 'es-ES' } });
+    expect(ptBr.findAll('.t-calendar-time__column')).toHaveLength(7);
+    expect(esEs.findAll('.t-calendar-time__column')).toHaveLength(7);
+    expect(ptBr.html()).not.toBe(esEs.html());
+  });
+});
+
+describe('TREEUX-004 — TTable row activation and detail (LSS)', () => {
+  const columns = [
+    { key: 'name', label: 'Name' },
+    { key: 'actions', label: '' },
+  ];
+  const rows = [{ name: 'orders', id: 'o1' }];
+
+  it('makes the row a real link when it navigates', () => {
+    const wrapper = mount(TTable, {
+      props: {
+        columns,
+        rows,
+        rowKey: 'id',
+        rowHref: (row) => `/dynamo/${row.name}`,
+        rowLabel: (row) => `Abrir ${row.name}`,
+      },
+    });
+    const link = wrapper.get('.t-table__row-link');
+    expect(link.element.tagName).toBe('A');
+    expect(link.attributes('href')).toBe('/dynamo/orders');
+    expect(link.attributes('aria-label')).toBe('Abrir orders');
+    expect(wrapper.get('.t-table__row.is-linked').exists()).toBe(true);
+  });
+
+  it('makes the row a button when the activation is not navigation', async () => {
+    const wrapper = mount(TTable, { props: { columns, rows, rowKey: 'id', rowActivatable: true } });
+    const row = wrapper.get('.t-table__row.is-activatable');
+    expect(row.attributes('role')).toBe('button');
+    expect(row.attributes('tabindex')).toBe('0');
+    expect(wrapper.find('.t-table__row-link').exists()).toBe(false);
+
+    await row.trigger('click');
+    expect(wrapper.emitted('row-activate')?.[0]?.[1]).toBe(0);
+
+    await row.trigger('keydown', { key: 'Enter' });
+    expect(wrapper.emitted('row-activate')).toHaveLength(2);
+  });
+
+  it('warns when both modes are requested, since a row cannot be both', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    mount(TTable, {
+      props: { columns, rows, rowHref: () => '/x', rowLabel: () => 'x', rowActivatable: true },
+    });
+    expect(warn).toHaveBeenCalledWith(expect.stringContaining('mutually exclusive'));
+    warn.mockRestore();
+  });
+
+  it('renders the detail adjacent to its own row, not below the table', () => {
+    const wrapper = mount(TTable, {
+      props: { columns, rows, rowKey: 'id', expandedRow: 'o1' },
+      slots: { detail: '<span class="detail">payload</span>' },
+    });
+
+    const allRows = wrapper.findAll('tbody tr');
+    expect(allRows[0].classes()).toContain('t-table__row');
+    expect(allRows[1].classes()).toContain('t-table__row--detail');
+    expect(allRows[1].find('.detail').exists()).toBe(true);
+    expect(allRows[0].attributes('aria-expanded')).toBe('true');
+    expect(allRows[0].attributes('aria-controls')).toBe(allRows[1].attributes('id'));
+  });
+
+  it('renders no detail row when nothing is expanded', () => {
+    const wrapper = mount(TTable, {
+      props: { columns, rows, rowKey: 'id', expandedRow: null },
+      slots: { detail: '<span class="detail">payload</span>' },
+    });
+    expect(wrapper.find('.t-table__row--detail').exists()).toBe(false);
+  });
+});
+
+describe('TREEUX-046/048 — follow-ups from the 0.28 validation (S7)', () => {
+  it('caps the FRAME with frame="narrow", which `fill` and `inline` do not', () => {
+    expect(mount(TEmptyState, { props: { frame: 'narrow' } }).classes()).toContain(
+      't-empty-state--frame-narrow',
+    );
+  });
+
+  it('draws the tone ring on a soft tag, so `--tree-tag-border` stops being computed and dropped', () => {
+    // Route (i), chosen by the consumer while the tone axis still had two users.
+    const wrapper = mount(TTag, { props: { variant: 'soft', tone: 'accent' } });
+    expect(wrapper.classes()).toContain('t-tag--soft');
+    expect(wrapper.classes()).toContain('t-tag--tone-accent');
   });
 });

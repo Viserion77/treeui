@@ -8,6 +8,7 @@ import {
   type TTreeViewRecord,
   type TTreeViewSelectionMode,
 } from './tree-view';
+import type { TModelModifiers } from './form-field';
 
 defineOptions({
   inheritAttrs: false,
@@ -23,8 +24,9 @@ const props = withDefaults(
     defaultExpanded?: string[];
     disabled?: boolean;
     emptyText?: string;
-  }>(),
+  } & TModelModifiers>(),
   {
+    modelModifiers: () => ({}),
     modelValue: undefined,
     defaultValue: undefined,
     nodes: () => [],

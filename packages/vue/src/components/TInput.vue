@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, useAttrs } from 'vue';
-import { useFormFieldIdentity } from './form-field';
+import { useFormFieldIdentity, type TModelModifiers } from './form-field';
 import type { TFieldWidth, TSize } from '../types/contracts';
 import TSpinner from './TSpinner.vue';
 
@@ -19,8 +19,11 @@ const props = withDefaults(
     invalid?: boolean;
     type?: string;
     placeholder?: string;
-  }>(),
+    /** Native `readonly`: the value is shown and selectable but not editable. */
+    readonly?: boolean;
+  } & TModelModifiers>(),
   {
+    modelModifiers: () => ({}),
     modelValue: '',
     size: 'md',
     width: 'full',
@@ -29,6 +32,7 @@ const props = withDefaults(
     invalid: false,
     type: 'text',
     placeholder: '',
+    readonly: false,
   },
 );
 
@@ -92,6 +96,7 @@ const onInput = (event: Event) => {
       :value="stringValue"
       :placeholder="placeholder"
       :disabled="disabled"
+      :readonly="readonly || undefined"
       :aria-invalid="invalid || undefined"
       :aria-busy="loading || undefined"
       @input="onInput"

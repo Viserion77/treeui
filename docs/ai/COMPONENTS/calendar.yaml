@@ -1,0 +1,43 @@
+name: TCalendar
+source_file: packages/vue/src/components/TCalendar.vue
+package: "@treeui/vue"
+kind: data-display
+status: available
+purpose: >
+  Full-screen calendar with four views. A thin wrapper: `month` is
+  TCalendarMonthGrid, the other three are TCalendarTimeGrid with a different set
+  of day columns. What it adds is the window arithmetic, so "what does workweek
+  mean" is answered once.
+
+props:
+  view: { type: TCalendarView, default: month, values: [month, week, workweek, day] }
+  anchor: { type: Date, note: "Any date inside the window to show." }
+  items: { type: "TCalendarItem[]", default: "[]" }
+  weekStartsOn:
+    type: number
+    default: "undefined — derived from `locale` via CLDR"
+    note: "0 = Sunday. Pass it explicitly when the product has a rule of its own."
+  locale: { type: string, default: en }
+  today: { type: Date, note: "Overrides 'today', so a screenshot test stays stable." }
+  hourHeight: { type: number, default: 48 }
+  scrollTo: { type: number, default: 7, note: "Hour the time grid scrolls to on mount." }
+  labels: { type: TCalendarLabels, note: "Accessible names. The library ships no user-facing copy." }
+
+events: [select-day, select-slot, select-allday, select-event]
+slots: [event, all-day-item, day-cell]
+
+types:
+  TCalendarItem: "{ id: string; start: Date; end: Date; allDay?: boolean }"
+  TCalendarView: "'month' | 'week' | 'workweek' | 'day'"
+
+domain_agnostic:
+  note: >
+    An item is an id and an interval. The library never fetches, never knows the
+    product's entity, and renders content only through the slots.
+
+i18n:
+  render_time_intl: >
+    Every `Intl` call happens at RENDER time, memoised per locale — never at
+    module scope. A formatter frozen at import freezes the language of the first
+    page load, which is the bug both consumers' ADR exists to prevent.
+  week_start: "From `Intl.Locale.getWeekInfo()` (CLDR), with `weekStartsOn` as the override."

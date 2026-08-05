@@ -7,6 +7,7 @@ import {
   niceScale,
   type ChartPoint,
 } from '@treeui/utils';
+import type { ChartInterpolation } from '@treeui/utils';
 
 export type TChartType = 'line' | 'area' | 'bar';
 
@@ -36,7 +37,16 @@ const props = withDefaults(
     /** Plot height in px (width is fluid). */
     height?: number;
     /** Smooth (curved) line/area. */
+    /** @deprecated Use `interpolation`. `smooth: true` maps to `"smooth"`. */
     smooth?: boolean;
+    /**
+     * How consecutive points are joined. `linear` and `smooth` INTERPOLATE
+     * between samples, which is wrong for a quantity that holds its value
+     * across a bucket — concurrency, queue depth, a flag over time: a curve, or
+     * even a diagonal, draws a state that never existed. `step` holds each
+     * value until the next sample and then jumps (TREEUX-003).
+     */
+    interpolation?: ChartInterpolation;
     /**
      * Stack bar series on top of each other instead of grouping side by side.
      * Negative values are clamped to 0 in stacked mode (grouped mode renders them).
@@ -75,6 +85,7 @@ const props = withDefaults(
     labels: () => [],
     height: 260,
     smooth: false,
+    interpolation: undefined,
     stacked: false,
     showGrid: true,
     showLegend: undefined,
@@ -90,6 +101,11 @@ const props = withDefaults(
     loading: false,
     ariaLabel: undefined,
   },
+);
+
+// `smooth` predates the axis; keep it working and let `interpolation` win.
+const resolvedInterpolation = computed<ChartInterpolation>(
+  () => props.interpolation ?? (props.smooth ? 'smooth' : 'linear'),
 );
 
 const emit = defineEmits<{
@@ -234,8 +250,8 @@ const linePaths = computed(() =>
         }));
         return {
           color: colorFor(seriesIndex, series),
-          line: buildLinePath(points, props.smooth),
-          area: props.type === 'area' ? buildAreaPath(points, plot.value.bottom, props.smooth) : '',
+          line: buildLinePath(points, resolvedInterpolation.value),
+          area: props.type === 'area' ? buildAreaPath(points, plot.value.bottom, resolvedInterpolation.value) : '',
           points,
         };
       }),

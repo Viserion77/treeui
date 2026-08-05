@@ -1,13 +1,26 @@
 <script setup lang="ts">
 import { computed, getCurrentInstance, useAttrs, watchEffect, type Component } from 'vue';
 import { tv } from '@treeui/utils';
-import type { TSize, TVariant } from '../types/contracts';
+import type { TActionTone, TSize, TVariant } from '../types/contracts';
 import TSpinner from './TSpinner.vue';
 
 const props = withDefaults(
   defineProps<{
     as?: string;
+    /**
+     * Shape of the button. `danger` is DEPRECATED — it is a colour trapped in
+     * the shape scale, so it can only ever be a filled red button. Use
+     * `variant="solid" tone="danger"`, which composes with `outline`, `ghost`
+     * and `soft` too.
+     */
     variant?: TVariant | 'brand';
+    /**
+     * Colour axis, orthogonal to `variant` — the same closed vocabulary TTag
+     * uses. On `solid` it fills; on `outline` and `ghost` it only inks the
+     * label and the border, which is how a destructive action sits in a row of
+     * quiet ones without outweighing it.
+     */
+    tone?: TActionTone;
     size?: TSize;
     disabled?: boolean;
     loading?: boolean;
@@ -47,6 +60,7 @@ const props = withDefaults(
   {
     as: 'button',
     variant: 'solid',
+    tone: undefined,
     size: 'md',
     disabled: false,
     loading: false,
@@ -68,6 +82,15 @@ const emit = defineEmits<{
 const buttonClass = tv({
   base: 't-button',
   variants: {
+    tone: {
+      neutral: 't-button--tone-neutral',
+      brand: 't-button--tone-brand',
+      accent: 't-button--tone-accent',
+      success: 't-button--tone-success',
+      warning: 't-button--tone-warning',
+      danger: 't-button--tone-danger',
+      info: 't-button--tone-info',
+    },
     variant: {
       solid: 't-button--solid',
       outline: 't-button--outline',
@@ -131,6 +154,13 @@ if (process.env.NODE_ENV !== 'production') {
         '[TButton] `iconOnly` needs an accessible name — pass the `label` prop (or `aria-label`).',
       );
     }
+
+    if (props.variant === 'danger') {
+      console.warn(
+        '[TButton] `variant="danger"` is deprecated: it puts a colour in the shape scale, ' +
+          'so it cannot be combined with outline/ghost/soft. Use `variant="solid" tone="danger"`.',
+      );
+    }
   });
 }
 
@@ -140,9 +170,11 @@ const isIconHidden = computed(() => props.loading && props.hideIconWhileLoading)
 
 const classes = computed(() =>
   buttonClass({
+    tone: props.tone,
     variant: props.variant,
     size: props.size,
     class: {
+      'has-tone': Boolean(props.tone),
       'is-loading': props.loading,
       'is-disabled': isDisabled.value,
       't-button--block': props.block,

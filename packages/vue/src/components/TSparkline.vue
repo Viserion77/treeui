@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { buildAreaPath, buildLinePath, linearScale, type ChartPoint } from '@treeui/utils';
+import type { ChartInterpolation } from '@treeui/utils';
 
 type TSparklineType = 'line' | 'area' | 'bar';
 
@@ -17,7 +18,16 @@ const props = withDefaults(
     /** Intrinsic height in px. */
     height?: number;
     /** Smooth (curved) line/area instead of straight segments. */
+    /** @deprecated Use `interpolation`. `smooth: true` maps to `"smooth"`. */
     smooth?: boolean;
+    /**
+     * How consecutive points are joined. `linear` and `smooth` INTERPOLATE
+     * between samples, which is wrong for a quantity that holds its value
+     * across a bucket — concurrency, queue depth, a flag over time: a curve, or
+     * even a diagonal, draws a state that never existed. `step` holds each
+     * value until the next sample and then jumps (TREEUX-003).
+     */
+    interpolation?: ChartInterpolation;
     /** Line thickness in px (line/area only). */
     strokeWidth?: number;
     /** Force the low end of the value domain (defaults to the data min). */
@@ -36,12 +46,18 @@ const props = withDefaults(
     width: 120,
     height: 32,
     smooth: false,
+    interpolation: undefined,
     strokeWidth: 2,
     min: undefined,
     max: undefined,
     showLastPoint: false,
     ariaLabel: undefined,
   },
+);
+
+// `smooth` predates the axis; keep it working and let `interpolation` win.
+const resolvedInterpolation = computed<ChartInterpolation>(
+  () => props.interpolation ?? (props.smooth ? 'smooth' : 'linear'),
 );
 
 // Inset so strokes and markers never clip against the SVG edge.
@@ -65,9 +81,9 @@ const points = computed<ChartPoint[]>(() => {
   return values.map((value, index) => ({ x: x(index), y: y(value) }));
 });
 
-const linePath = computed(() => buildLinePath(points.value, props.smooth));
+const linePath = computed(() => buildLinePath(points.value, resolvedInterpolation.value));
 const areaPath = computed(() =>
-  buildAreaPath(points.value, props.height - inset.value, props.smooth),
+  buildAreaPath(points.value, props.height - inset.value, resolvedInterpolation.value),
 );
 
 const bars = computed(() => {

@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { computed, ref, useAttrs } from 'vue';
+import { computed, getCurrentInstance, ref, useAttrs, watchEffect, type Component } from 'vue';
 import type { TIconName } from '@treeui/icons';
+import { createId, isActivationKey } from '@treeui/utils';
 import type { TSize } from '../types/contracts';
 import TIcon from './TIcon.vue';
 
@@ -52,6 +53,31 @@ const props = withDefaults(
      * status cell or visually hidden text conveying the same meaning.
      */
     rowState?: (row: Record<string, unknown>, index: number) => TTableRowState;
+    /**
+     * The row NAVIGATES: a real `href` per row. The anchor lives in the first
+     * cell and is stretched over the whole row, so ctrl/middle-click, "open in
+     * new tab" and the status-bar URL all work and the accessible role is
+     * `link`. A `<tr>` cannot BE an `<a>` — its only permitted content is
+     * `<td>`/`<th>`, and the parser moves anything else out of the table — so
+     * the stretched link is the only shape that keeps the grid intact.
+     * Mutually exclusive with `rowTo` and `@row-activate` (TREEUX-004).
+     */
+    rowHref?: (row: Record<string, unknown>, index: number) => string | undefined;
+    /** Same as `rowHref`, resolved through the app's RouterLink. */
+    rowTo?: (row: Record<string, unknown>, index: number) => string | undefined;
+    /**
+     * Accessible name for the row link, per row. Required with `rowHref`/
+     * `rowTo`: "open" repeated N times names nothing.
+     */
+    rowLabel?: (row: Record<string, unknown>, index: number) => string;
+    /**
+     * The row ACTIVATES something that is not a route — a modal, a selection.
+     * The `<tr>` becomes a focusable `role="button"`. Use this only when there
+     * is no URL: it deliberately does not pretend to be a link.
+     */
+    rowActivatable?: boolean;
+    /** Key of the row whose detail panel is open, matched against `rowKey`. */
+    expandedRow?: string | number | null;
   }>(),
   {
     size: 'md',
@@ -59,14 +85,68 @@ const props = withDefaults(
     caption: undefined,
     rowKey: undefined,
     rowState: undefined,
+    rowHref: undefined,
+    rowTo: undefined,
+    rowLabel: undefined,
+    rowActivatable: false,
+    expandedRow: null,
   },
 );
 
 const emit = defineEmits<{
   (e: 'sort', state: TTableSortState): void;
+  /** The row was activated without navigating — see `rowActivatable`. */
+  (e: 'row-activate', row: Record<string, unknown>, index: number): void;
 }>();
 
+const tableId = createId('t-table');
+const instance = getCurrentInstance();
+
+const routerLink = computed<Component | null>(
+  () => (instance?.appContext.components.RouterLink as Component | undefined) ?? null,
+);
+
+// The three modes are mutually exclusive on purpose. One consumer audit found
+// four screens that had each invented their own row activation, and the
+// contortion a screen chose had NO correlation with whether it navigated — so
+// the API has to make the distinction, not offer two equivalent ways out.
+const linksRows = computed(() => Boolean(props.rowHref || props.rowTo));
+
+if (process.env.NODE_ENV !== 'production') {
+  watchEffect(() => {
+    if (linksRows.value && props.rowActivatable) {
+      console.warn(
+        '[TTable] `rowHref`/`rowTo` and `rowActivatable` are mutually exclusive: a row either ' +
+          'navigates (a link, with ctrl/middle-click and a URL) or it does not (a button).',
+      );
+    }
+    if (linksRows.value && !props.rowLabel) {
+      console.warn(
+        '[TTable] `rowHref`/`rowTo` needs `rowLabel` — a row link with no accessible name is ' +
+          'announced as the row text, repeated for every row.',
+      );
+    }
+  });
+}
+
+const rowTarget = (row: Record<string, unknown>, index: number) =>
+  props.rowTo?.(row, index) ?? props.rowHref?.(row, index);
+
+const onRowActivate = (row: Record<string, unknown>, index: number, event: KeyboardEvent) => {
+  if (!isActivationKey(event)) return;
+  event.preventDefault();
+  emit('row-activate', row, index);
+};
+
+const isExpanded = (row: Record<string, unknown>, index: number) =>
+  props.expandedRow != null && resolveRowKey(row, index) === props.expandedRow;
+
+const detailId = (row: Record<string, unknown>, index: number) =>
+  `${tableId}-detail-${resolveRowKey(row, index)}`;
+
 defineSlots<{
+  /** Detail panel for the expanded row, rendered as an adjacent `<tr>`. */
+  detail?: (props: { row: Record<string, unknown>; index: number }) => void;
   [key: `cell-${string}`]: (props: { row: Record<string, unknown>; value: unknown }) => void;
   [key: `header-${string}`]: (props: { column: TTableColumn }) => void;
   empty: () => void;
@@ -237,27 +317,90 @@ const tableAttrs = computed(() => {
             </slot>
           </td>
         </tr>
-        <tr
+        <template
           v-for="(row, index) in sortedRows"
           :key="resolveRowKey(row, index)"
-          class="t-table__row"
-          :class="rowStateClass(row, index)"
         >
-          <td
-            v-for="column in columns"
-            :key="column.key"
-            class="t-table__cell"
-            :class="column.align ? `t-table__cell--${column.align}` : ''"
+          <tr
+            class="t-table__row"
+            :class="[
+              rowStateClass(row, index),
+              {
+                'is-linked': linksRows,
+                'is-activatable': rowActivatable && !linksRows,
+                'is-expanded': isExpanded(row, index),
+              },
+            ]"
+            :role="rowActivatable && !linksRows ? 'button' : undefined"
+            :tabindex="rowActivatable && !linksRows ? 0 : undefined"
+            :aria-expanded="$slots.detail ? isExpanded(row, index) : undefined"
+            :aria-controls="$slots.detail && isExpanded(row, index) ? detailId(row, index) : undefined"
+            @click="rowActivatable && !linksRows ? emit('row-activate', row, index) : undefined"
+            @keydown="rowActivatable && !linksRows ? onRowActivate(row, index, $event) : undefined"
           >
-            <slot
-              :name="`cell-${column.key}`"
-              :row="row"
-              :value="row[column.key]"
+            <td
+              v-for="(column, columnIndex) in columns"
+              :key="column.key"
+              class="t-table__cell"
+              :class="column.align ? `t-table__cell--${column.align}` : ''"
             >
-              {{ row[column.key] ?? '' }}
-            </slot>
-          </td>
-        </tr>
+              <!--
+                The stretched link lives in the FIRST cell and covers the row
+                through a pseudo-element. Any cell after it raises itself above
+                that layer (see `.t-table__cell + .t-table__cell`), so a delete
+                button in the actions column stays clickable — leaving that to
+                the consumer would have every one of them rediscover it.
+              -->
+              <component
+                :is="rowTo !== undefined && routerLink ? routerLink : 'a'"
+                v-if="columnIndex === 0 && linksRows && rowTarget(row, index)"
+                class="t-table__row-link"
+                v-bind="rowTo !== undefined && routerLink
+                  ? { to: rowTarget(row, index) }
+                  : { href: rowTarget(row, index) }"
+                :aria-label="rowLabel?.(row, index)"
+              >
+                <slot
+                  :name="`cell-${column.key}`"
+                  :row="row"
+                  :value="row[column.key]"
+                >
+                  {{ row[column.key] ?? '' }}
+                </slot>
+              </component>
+              <slot
+                v-else
+                :name="`cell-${column.key}`"
+                :row="row"
+                :value="row[column.key]"
+              >
+                {{ row[column.key] ?? '' }}
+              </slot>
+            </td>
+          </tr>
+
+          <!--
+            The detail is a `<tr>` ADJACENT to its own row, not a sibling of the
+            whole table: stacking every expanded detail below the table breaks
+            the visual relationship with the row that produced it.
+          -->
+          <tr
+            v-if="$slots.detail && isExpanded(row, index)"
+            :id="detailId(row, index)"
+            class="t-table__row t-table__row--detail"
+          >
+            <td
+              :colspan="columns.length"
+              class="t-table__cell t-table__cell--detail"
+            >
+              <slot
+                name="detail"
+                :row="row"
+                :index="index"
+              />
+            </td>
+          </tr>
+        </template>
       </tbody>
     </table>
   </div>

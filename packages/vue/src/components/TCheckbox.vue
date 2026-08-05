@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, useAttrs, watch } from 'vue';
 import type { TSize } from '../types/contracts';
-import { useFormFieldIdentity } from './form-field';
+import { useFormFieldIdentity, type TModelModifiers } from './form-field';
 
 defineOptions({
   inheritAttrs: false,
@@ -22,8 +22,9 @@ const props = withDefaults(
      * all. The `default` slot still wins when both are given.
      */
     label?: string;
-  }>(),
+  } & TModelModifiers>(),
   {
+    modelModifiers: () => ({}),
     modelValue: false,
     size: 'md',
     disabled: false,

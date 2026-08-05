@@ -71,8 +71,16 @@ table.t-visually-hidden {
 }
 
 .t-button {
-  --tree-button-bg: var(--tree-color-brand-primary);
-  --tree-button-text: var(--tree-color-brand-contrast);
+  /* Tone axis (TREEUX-008). The variants read an accent triple instead of
+     hard-coding the brand, so "destructive" composes with every variant —
+     `variant="danger"` could only ever be a filled red button, and a quiet
+     destructive action in a row of ghost buttons had no way to be expressed.
+     Unset, the triple is the brand and every variant renders exactly as before. */
+  --tree-button-accent: var(--tree-color-brand-primary);
+  --tree-button-accent-soft: var(--tree-color-brand-soft);
+  --tree-button-accent-contrast: var(--tree-color-brand-contrast);
+  --tree-button-bg: var(--tree-button-accent);
+  --tree-button-text: var(--tree-button-accent-contrast);
   --tree-button-border: transparent;
   --tree-button-shadow: transparent;
   position: relative;
@@ -171,8 +179,8 @@ table.t-visually-hidden {
 }
 
 .t-button--solid {
-  --tree-button-bg: var(--tree-color-brand-primary);
-  --tree-button-text: var(--tree-color-brand-contrast);
+  --tree-button-bg: var(--tree-button-accent);
+  --tree-button-text: var(--tree-button-accent-contrast);
 }
 
 .t-button--outline {
@@ -187,13 +195,69 @@ table.t-visually-hidden {
 }
 
 .t-button--soft {
-  --tree-button-bg: var(--tree-color-brand-soft);
-  --tree-button-text: var(--tree-color-brand-primary);
+  --tree-button-bg: var(--tree-button-accent-soft);
+  --tree-button-text: var(--tree-button-accent);
 }
 
+/* Deprecated in favour of `variant="solid" tone="danger"`, which composes.
+   Kept working, and kept identical, until the next major. */
 .t-button--danger {
   --tree-button-bg: var(--tree-color-status-error);
   --tree-button-text: var(--tree-color-brand-contrast);
+}
+
+/* Tone only changes the ink on the quiet variants — a ghost or outline button
+   in a row of neutral ones says "destructive" with its label, not with a filled
+   red block that outweighs the action. */
+.t-button.has-tone.t-button--outline {
+  --tree-button-text: var(--tree-button-accent);
+  --tree-button-border: color-mix(in srgb, var(--tree-button-accent) 36%, var(--tree-color-border-default));
+}
+
+.t-button.has-tone.t-button--ghost {
+  --tree-button-text: var(--tree-button-accent);
+}
+
+.t-button--tone-neutral {
+  --tree-button-accent: var(--tree-color-text-primary);
+  --tree-button-accent-soft: var(--tree-color-bg-subtle);
+  --tree-button-accent-contrast: var(--tree-color-text-inverse);
+}
+
+.t-button--tone-brand {
+  --tree-button-accent: var(--tree-color-brand-primary);
+  --tree-button-accent-soft: var(--tree-color-brand-soft);
+  --tree-button-accent-contrast: var(--tree-color-brand-contrast);
+}
+
+.t-button--tone-accent {
+  --tree-button-accent: var(--tree-color-accent-primary);
+  --tree-button-accent-soft: var(--tree-color-accent-soft);
+  --tree-button-accent-contrast: var(--tree-color-accent-contrast);
+}
+
+.t-button--tone-success {
+  --tree-button-accent: var(--tree-color-status-success);
+  --tree-button-accent-soft: color-mix(in srgb, var(--tree-color-status-success) 14%, var(--tree-color-bg-surface));
+  --tree-button-accent-contrast: var(--tree-color-text-inverse);
+}
+
+.t-button--tone-warning {
+  --tree-button-accent: var(--tree-color-status-warning);
+  --tree-button-accent-soft: color-mix(in srgb, var(--tree-color-status-warning) 14%, var(--tree-color-bg-surface));
+  --tree-button-accent-contrast: var(--tree-color-text-inverse);
+}
+
+.t-button--tone-danger {
+  --tree-button-accent: var(--tree-color-status-error);
+  --tree-button-accent-soft: color-mix(in srgb, var(--tree-color-status-error) 14%, var(--tree-color-bg-surface));
+  --tree-button-accent-contrast: var(--tree-color-text-inverse);
+}
+
+.t-button--tone-info {
+  --tree-button-accent: var(--tree-color-status-info);
+  --tree-button-accent-soft: color-mix(in srgb, var(--tree-color-status-info) 14%, var(--tree-color-bg-surface));
+  --tree-button-accent-contrast: var(--tree-color-text-inverse);
 }
 
 .t-button--brand {
@@ -1848,6 +1912,15 @@ a.t-brand-lockup:focus-visible {
 .t-empty-state--frame-inline {
   width: auto;
   justify-self: start;
+}
+
+/* `narrow` caps the FRAME, not the message (TREEUX-046). The library already
+   capped the inner content, but the dashed box still took the whole column, and
+   in a 900px panel that reads as an enormous empty box. 26rem is the step the
+   consumer's 28 identical `max-width: 420px` wrappers converge on. */
+.t-empty-state--frame-narrow {
+  width: min(100%, 26rem);
+  margin-inline: auto;
 }
 
 .t-empty-state--sm {
@@ -3821,9 +3894,15 @@ a.t-brand-lockup:focus-visible {
 }
 
 /* An item with an icon or a selected mark still lays out as one row
-   (TREEUX-009). */
+   (TREEUX-009). The gutter is RESERVED for every item as soon as ANY item has
+   an icon (TREEUX-014): without a fixed width the labels of the icon-less items
+   slide left and the menu reads as two ragged columns. */
 .t-dropdown__item-icon {
+  display: inline-flex;
   flex: none;
+  align-items: center;
+  justify-content: center;
+  inline-size: var(--tree-size-icon-md);
 }
 
 .t-dropdown__item-label {
@@ -4586,10 +4665,18 @@ a.t-brand-lockup:focus-visible {
   border: var(--tree-border-width-subtle) solid var(--tree-tag-border);
 }
 
+/* `soft` draws the tone's ring (TREEUX-048 b). Without it `--tree-tag-border`
+   was computed and then thrown away in the one variant a label badge actually
+   uses. Changed while the tone axis had two consumers, both of whom asked for
+   it — a border on an existing look is not a change that can be made later. */
 .t-tag--soft {
   background: var(--tree-tag-surface);
   color: var(--tree-tag-fg);
   border: var(--tree-border-width-subtle) solid transparent;
+}
+
+.t-tag--soft[class*='t-tag--tone-'] {
+  border-color: color-mix(in srgb, var(--tree-tag-fg) 40%, transparent);
 }
 
 .t-tag--tone-neutral {
@@ -8988,4 +9075,543 @@ body:has(.t-page-surface) {
    does not read as a stray outline around the whole main region. */
 [data-tree-skip-target]:focus {
   outline: none;
+}
+
+/* ------------------------------------------------------------------ *
+ * TPane (TREEUX-041) — fill the parent, scroll only the middle.
+ *
+ * `min-block-size: 0` on the body is the line nobody gets right: without it a
+ * flex child refuses to shrink below its content, so the middle never scrolls
+ * and the footer is pushed off the bottom of the screen. Deliberately no
+ * `position: fixed` — it would compete with the scroll `.t-app-shell__main`
+ * already owns, and overriding that selector is off-limits for consumers.
+ * ------------------------------------------------------------------ */
+.t-pane {
+  display: flex;
+  flex-direction: column;
+  block-size: 100%;
+  min-block-size: 0;
+}
+
+.t-pane__header,
+.t-pane__footer {
+  flex: none;
+}
+
+.t-pane__body {
+  flex: 1 1 auto;
+  min-block-size: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.t-pane.is-padded .t-pane__body {
+  padding: var(--tree-space-4);
+}
+
+/* ------------------------------------------------------------------ *
+ * TDropVeil (TREEUX-022 / TREEUX-040) — the "let go here" surface.
+ *
+ * `pointer-events: none` is load-bearing: a veil that accepts the pointer
+ * swallows the very `drop` it exists to announce.
+ * ------------------------------------------------------------------ */
+.t-drop-veil {
+  position: absolute;
+  inset: 0;
+  z-index: var(--tree-z-overlay);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  border: var(--tree-border-width-strong) dashed var(--tree-color-brand-primary);
+  border-radius: var(--tree-radius-lg);
+  background: color-mix(in srgb, var(--tree-color-brand-soft) 72%, transparent);
+}
+
+.t-drop-veil--page {
+  position: fixed;
+  border-radius: 0;
+}
+
+.t-drop-veil__label {
+  padding: var(--tree-space-3) var(--tree-space-5);
+  border-radius: var(--tree-radius-md);
+  background: var(--tree-color-bg-surface);
+  box-shadow: var(--tree-shadow-md);
+  color: var(--tree-color-text-primary);
+  font-family: var(--tree-font-family-sans);
+  font-size: var(--tree-font-size-md);
+  font-weight: var(--tree-font-weight-medium);
+}
+
+/* ------------------------------------------------------------------ *
+ * TFileUpload trigger variant (TREEUX-021).
+ *
+ * The dropzone widget is `width: 100%` with a padded dashed box, which is right
+ * where the drop area IS the interface and wrong in a composer: measured at
+ * 1440x900 it took the whole row and left the text field 26px wide. `trigger`
+ * drops the box entirely and lets the slotted control be the control.
+ * ------------------------------------------------------------------ */
+.t-file-upload--trigger {
+  display: inline-flex;
+  width: auto;
+}
+
+.t-file-upload__trigger {
+  display: inline-flex;
+  align-items: center;
+}
+
+/* Write-only rows (TREEUX-002 phase 2): the key is text, not a field, because
+   renaming a secret is a delete plus a create, not an edit. */
+.t-key-value-editor__secret-key {
+  flex: 1 1 40%;
+  min-inline-size: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: var(--tree-font-family-mono);
+  font-size: var(--tree-font-size-sm);
+  color: var(--tree-color-text-primary);
+}
+
+.t-key-value-editor__secret-state {
+  flex: 1 1 auto;
+  color: var(--tree-color-text-muted);
+  font-size: var(--tree-font-size-sm);
+}
+
+.t-key-value-editor__secret-state[data-set='true'] {
+  color: var(--tree-color-status-success);
+}
+
+/* ------------------------------------------------------------------ *
+ * TTable row activation (TREEUX-004).
+ *
+ * A `<tr>` cannot be an `<a>` — its only permitted content is `<td>`/`<th>`,
+ * and the parser hoists anything else out of the table — so the link lives in
+ * the first cell and is stretched over the row by a pseudo-element. Every cell
+ * after the first raises itself above that layer, so a control in the actions
+ * column stays clickable; leaving that to the consumer would have each of them
+ * rediscover the same z-index.
+ * ------------------------------------------------------------------ */
+.t-table__row.is-linked,
+.t-table__row.is-activatable {
+  position: relative;
+  cursor: pointer;
+}
+
+.t-table__row.is-linked:hover,
+.t-table__row.is-activatable:hover {
+  background: var(--tree-color-bg-subtle);
+}
+
+.t-table__row.is-activatable:focus-visible {
+  outline: none;
+  box-shadow: inset 0 0 0 2px var(--tree-color-focus-ring);
+}
+
+.t-table__row-link {
+  color: inherit;
+  text-decoration: none;
+}
+
+.t-table__row-link::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+.t-table__row-link:focus-visible::after {
+  box-shadow: inset 0 0 0 2px var(--tree-color-focus-ring);
+}
+
+.t-table__row.is-linked .t-table__cell {
+  position: relative;
+}
+
+.t-table__row.is-linked .t-table__cell + .t-table__cell {
+  z-index: 1;
+}
+
+.t-table__row--detail > .t-table__cell--detail {
+  padding: var(--tree-space-4);
+  background: var(--tree-color-bg-subtle);
+}
+
+/* ------------------------------------------------------------------ *
+ * TSpanLanes (TREEUX-003) — one lane per subject on a shared time axis.
+ *
+ * The lane label takes a fixed reading column so the tracks line up; the track
+ * is the positioning context every span is placed against. Colours come from
+ * the status tokens, and a `marker` slot exists because failure encoded by
+ * colour alone is unreadable at ΔE 4.4 under deuteranopia.
+ * ------------------------------------------------------------------ */
+.t-span-lanes {
+  display: flex;
+  flex-direction: column;
+  gap: var(--tree-space-1);
+  inline-size: 100%;
+  font-family: var(--tree-font-family-sans);
+}
+
+.t-span-lanes__lane {
+  display: flex;
+  align-items: center;
+  gap: var(--tree-space-3);
+  min-block-size: var(--tree-span-lane-height, 20px);
+}
+
+.t-span-lanes__label {
+  flex: none;
+  inline-size: 9rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--tree-color-text-muted);
+  font-size: var(--tree-font-size-sm);
+}
+
+.t-span-lanes__track {
+  position: relative;
+  flex: 1 1 auto;
+  block-size: var(--tree-span-lane-height, 20px);
+  border-radius: var(--tree-radius-sm);
+  background: var(--tree-color-bg-subtle);
+}
+
+.t-span-lanes__span {
+  position: absolute;
+  inset-block: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--tree-radius-sm);
+  background: var(--tree-color-chart-1);
+}
+
+.t-span-lanes__span--danger {
+  background: var(--tree-color-status-error);
+}
+
+.t-span-lanes__span--success {
+  background: var(--tree-color-status-success);
+}
+
+.t-span-lanes__span--warning {
+  background: var(--tree-color-status-warning);
+}
+
+.t-span-lanes__span--info {
+  background: var(--tree-color-status-info);
+}
+
+/* ------------------------------------------------------------------ *
+ * TAudioPlayer / TVoiceRecorder (TREEUX-019).
+ *
+ * The pulse is frozen under `prefers-reduced-motion` by default, not as an
+ * opt-in: a recording indicator runs for as long as someone is talking, which
+ * is exactly the kind of never-ending animation that makes people ill.
+ * ------------------------------------------------------------------ */
+.t-audio-player {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--tree-space-2);
+  max-inline-size: 100%;
+  min-block-size: var(--tree-size-control-md);
+  padding-inline: var(--tree-space-2);
+  border: var(--tree-border-width-subtle) solid var(--tree-color-border-default);
+  border-radius: var(--tree-radius-pill);
+  background: var(--tree-color-bg-surface);
+  color: var(--tree-color-text-primary);
+  font-family: var(--tree-font-family-sans);
+}
+
+.t-audio-player--sm {
+  min-block-size: var(--tree-size-control-sm);
+}
+
+.t-audio-player--lg {
+  min-block-size: var(--tree-size-control-lg);
+}
+
+.t-audio-player.is-disabled {
+  opacity: 0.65;
+}
+
+.t-audio-player__toggle,
+.t-voice-recorder__control {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  inline-size: var(--tree-size-control-sm);
+  block-size: var(--tree-size-control-sm);
+  padding: 0;
+  border: none;
+  border-radius: var(--tree-radius-pill);
+  background: var(--tree-color-brand-soft);
+  color: var(--tree-color-brand-primary);
+  cursor: pointer;
+}
+
+.t-audio-player__toggle:focus-visible,
+.t-voice-recorder__control:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 var(--tree-focus-ring-width) var(--tree-color-focus-ring);
+}
+
+.t-audio-player__toggle:disabled,
+.t-voice-recorder__control:disabled {
+  cursor: not-allowed;
+}
+
+.t-audio-player__seek {
+  flex: 1 1 6rem;
+  min-inline-size: 4rem;
+  accent-color: var(--tree-color-brand-primary);
+}
+
+.t-audio-player__time,
+.t-voice-recorder__timer {
+  flex: none;
+  color: var(--tree-color-text-muted);
+  font-size: var(--tree-font-size-sm);
+  font-variant-numeric: tabular-nums;
+}
+
+.t-voice-recorder {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--tree-space-2);
+  font-family: var(--tree-font-family-sans);
+}
+
+.t-voice-recorder__status {
+  color: var(--tree-color-text-muted);
+  font-size: var(--tree-font-size-sm);
+}
+
+.t-voice-recorder__pulse {
+  inline-size: 0.5rem;
+  block-size: 0.5rem;
+  border-radius: var(--tree-radius-pill);
+  background: var(--tree-color-status-error);
+  animation: t-voice-recorder-pulse 1.4s var(--tree-motion-easing-easeInOut) infinite;
+}
+
+@keyframes t-voice-recorder-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .t-voice-recorder__pulse {
+    animation: none;
+  }
+}
+
+/* ------------------------------------------------------------------ *
+ * Calendar surface (TREEUX-016 b/c/d).
+ *
+ * Every vertical measurement derives from `--tree-calendar-hour-height`, which
+ * the component sets from its `hourHeight` prop — the same number the maths in
+ * @treeui/utils is given, so the drawn grid and the computed placement can
+ * never disagree.
+ * ------------------------------------------------------------------ */
+.t-calendar,
+.t-calendar-month,
+.t-calendar-time {
+  display: flex;
+  flex-direction: column;
+  min-block-size: 0;
+  inline-size: 100%;
+  font-family: var(--tree-font-family-sans);
+}
+
+.t-calendar-month__header,
+.t-calendar-month__grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+}
+
+.t-calendar-month__weekday {
+  padding: var(--tree-space-2);
+  color: var(--tree-color-text-muted);
+  font-size: var(--tree-font-size-sm);
+  text-align: center;
+}
+
+.t-calendar-month__grid {
+  flex: 1 1 auto;
+  min-block-size: 0;
+  border-block-start: var(--tree-border-width-subtle) solid var(--tree-color-border-default);
+  border-inline-start: var(--tree-border-width-subtle) solid var(--tree-color-border-default);
+}
+
+.t-calendar-month__cell {
+  display: flex;
+  flex-direction: column;
+  gap: var(--tree-space-1);
+  min-block-size: 6rem;
+  padding: var(--tree-space-1);
+  border-block-end: var(--tree-border-width-subtle) solid var(--tree-color-border-default);
+  border-inline-end: var(--tree-border-width-subtle) solid var(--tree-color-border-default);
+  background: var(--tree-color-bg-surface);
+  text-align: start;
+  cursor: pointer;
+}
+
+.t-calendar-month__cell:focus-visible {
+  outline: none;
+  box-shadow: inset 0 0 0 2px var(--tree-color-focus-ring);
+}
+
+/* Leading/trailing days of the adjacent months are context, not content. */
+.t-calendar-month__cell.is-outside {
+  background: var(--tree-color-bg-subtle);
+  color: var(--tree-color-text-muted);
+}
+
+.t-calendar-month__cell.is-today .t-calendar-month__day-number {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-inline-size: 1.5rem;
+  block-size: 1.5rem;
+  border-radius: var(--tree-radius-pill);
+  background: var(--tree-color-brand-primary);
+  color: var(--tree-color-brand-contrast);
+}
+
+.t-calendar-month__day-number {
+  font-size: var(--tree-font-size-sm);
+  font-weight: var(--tree-font-weight-medium);
+}
+
+.t-calendar-month__events {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-block-size: 0;
+  overflow: hidden;
+}
+
+.t-calendar-month__event,
+.t-calendar-time__all-day-item {
+  display: block;
+  inline-size: 100%;
+  padding: 2px var(--tree-space-1);
+  border: none;
+  border-radius: var(--tree-radius-sm);
+  background: var(--tree-color-brand-soft);
+  color: var(--tree-color-brand-primary);
+  font: inherit;
+  font-size: var(--tree-font-size-xs);
+  text-align: start;
+  cursor: pointer;
+}
+
+/* One fixed gutter for the hour ruler, then one equal column per day. Expressed
+   with `grid-auto-flow: column` rather than a `repeat()` count, because the
+   number of columns is data (1 for day, 5 for workweek, 7 for week) and a
+   custom property cannot be a `repeat()` count. */
+.t-calendar-time__header,
+.t-calendar-time__all-day,
+.t-calendar-time__body {
+  display: grid;
+  grid-template-columns: 4rem;
+  grid-auto-columns: minmax(0, 1fr);
+  grid-auto-flow: column;
+}
+
+.t-calendar-time__day-header {
+  padding: var(--tree-space-2);
+  color: var(--tree-color-text-muted);
+  font-size: var(--tree-font-size-sm);
+  text-align: center;
+}
+
+.t-calendar-time__day-header.is-today {
+  color: var(--tree-color-brand-primary);
+  font-weight: var(--tree-font-weight-semibold);
+}
+
+.t-calendar-time__all-day-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-block-size: 2rem;
+  padding: 2px;
+  border-inline-start: var(--tree-border-width-subtle) solid var(--tree-color-border-default);
+  cursor: pointer;
+}
+
+.t-calendar-time__scroll {
+  flex: 1 1 auto;
+  min-block-size: 0;
+  overflow-y: auto;
+}
+
+.t-calendar-time__ruler {
+  display: flex;
+  flex-direction: column;
+}
+
+.t-calendar-time__hour {
+  block-size: var(--tree-calendar-hour-height, 48px);
+  padding-inline-end: var(--tree-space-2);
+  color: var(--tree-color-text-muted);
+  font-size: var(--tree-font-size-xs);
+  text-align: end;
+  /* Sits on the line rather than inside the band it labels. */
+  transform: translateY(-0.5em);
+}
+
+.t-calendar-time__column {
+  position: relative;
+  border-inline-start: var(--tree-border-width-subtle) solid var(--tree-color-border-default);
+}
+
+.t-calendar-time__line {
+  display: block;
+  block-size: var(--tree-calendar-hour-height, 48px);
+  border-block-end: var(--tree-border-width-subtle) solid var(--tree-color-border-default);
+}
+
+.t-calendar-time__event {
+  position: absolute;
+  z-index: 1;
+  overflow: hidden;
+  padding: 2px var(--tree-space-1);
+  border: var(--tree-border-width-subtle) solid var(--tree-color-bg-surface);
+  border-radius: var(--tree-radius-sm);
+  background: var(--tree-color-brand-soft);
+  color: var(--tree-color-brand-primary);
+  font: inherit;
+  font-size: var(--tree-font-size-xs);
+  text-align: start;
+  cursor: pointer;
+}
+
+/* Above the events, because "now" is the one thing that must stay readable. */
+.t-calendar-time__now {
+  position: absolute;
+  z-index: 2;
+  inset-inline: 0;
+  block-size: 0;
+  border-block-start: var(--tree-border-width-strong) solid var(--tree-color-status-error);
+  pointer-events: none;
+}
+
+.t-calendar-time__now::before {
+  content: '';
+  position: absolute;
+  inset-block-start: -4px;
+  inset-inline-start: -4px;
+  inline-size: 8px;
+  block-size: 8px;
+  border-radius: var(--tree-radius-pill);
+  background: var(--tree-color-status-error);
 }

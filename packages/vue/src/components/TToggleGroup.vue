@@ -2,6 +2,7 @@
 import { createId, getNextEnabledIndex, isActivationKey } from '@treeui/utils';
 import { computed, nextTick, ref, useAttrs, watch, type ComponentPublicInstance } from 'vue';
 import type { TSize } from '../types/contracts';
+import { useFormFieldGroup, type TModelModifiers } from './form-field';
 
 defineOptions({
   inheritAttrs: false,
@@ -27,7 +28,7 @@ const props = withDefaults(
     size?: TSize;
     variant?: TToggleGroupVariant;
     disabled?: boolean;
-  }>(),
+  } & TModelModifiers>(),
   {
     modelValue: undefined,
     options: () => [],
@@ -35,6 +36,7 @@ const props = withDefaults(
     size: 'md',
     variant: 'outline',
     disabled: false,
+    modelModifiers: () => ({}),
   },
 );
 
@@ -87,8 +89,18 @@ const rootClasses = computed(() => [
 
 const rootStyle = computed(() => attrs.style);
 
+// Like TRadioGroup: no single labellable element, so the TFormField id stays
+// unclaimed and the group names itself with the label's id (TREEUX-012).
+const { labelledBy, describedBy } = useFormFieldGroup(attrs);
+
 const rootAttrs = computed(() => {
-  const { class: _class, style: _style, ...rest } = attrs;
+  const {
+    class: _class,
+    style: _style,
+    'aria-labelledby': _labelledBy,
+    'aria-describedby': _describedBy,
+    ...rest
+  } = attrs;
   return rest;
 });
 
@@ -220,6 +232,8 @@ watch(
     :class="rootClasses"
     :style="rootStyle"
     :role="selectionMode === 'single' ? 'radiogroup' : 'group'"
+    :aria-labelledby="labelledBy"
+    :aria-describedby="describedBy"
   >
     <button
       v-for="(option, index) in options"

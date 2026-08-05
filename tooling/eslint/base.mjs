@@ -15,6 +15,10 @@ export default [
       'playwright-report/**',
       'test-results/**',
       '.claude/**',
+      // Type-check fixture: its whole job is to be read by vue-tsc under
+      // `strictTemplates`, so it is written the way a consumer writes a
+      // template, not the way this repo formats one.
+      'tooling/strict-templates/**',
     ],
   },
   js.configs.recommended,

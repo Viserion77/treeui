@@ -18,10 +18,20 @@ export const treeFieldWidths = ['xs', 'sm', 'md', 'lg', 'xl', 'full'] as const;
 export const treeAccents = ['brand', 'neutral', 'success', 'warning', 'danger', 'info'] as const;
 /** Breakpoint names shared with `--tree-breakpoint-*` in `@treeui/tokens`. */
 export const treeBreakpoints = ['sm', 'md', 'lg', 'xl'] as const;
+/**
+ * Colour axis for action surfaces (TButton, TConfirmDialog), orthogonal to
+ * `variant` — the same closed vocabulary TTag uses. Splitting colour out of the
+ * shape scale is what makes a quiet destructive action expressible:
+ * `variant="danger"` could only ever be a filled red button.
+ */
+export const treeActionTones = [
+  'neutral', 'brand', 'accent', 'success', 'warning', 'danger', 'info',
+] as const;
 
 export type TSize = (typeof treeSizes)[number];
 export type TAccent = (typeof treeAccents)[number];
 export type TBreakpoint = (typeof treeBreakpoints)[number];
+export type TActionTone = (typeof treeActionTones)[number];
 export type TFieldWidth = (typeof treeFieldWidths)[number];
 export type TVariant = (typeof treeVariants)[number];
 export type TCardVariant = (typeof treeCardVariants)[number];

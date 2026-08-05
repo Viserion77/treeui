@@ -1,0 +1,22 @@
+name: TDropVeil
+source_file: packages/vue/src/components/TDropVeil.vue
+package: "@treeui/vue"
+kind: feedback
+status: available
+purpose: "The 'let go here' surface for a drop target. Pair with `useDrop`."
+
+props:
+  active: { type: boolean, default: false, note: "Bind `useDrop().isOver`." }
+  scope:
+    type: "'page' | 'region'"
+    default: page
+    note: "`page` covers the viewport above the app chrome; `region` fills the nearest positioned ancestor."
+  label: { type: string, default: undefined, note: "Product copy, so it is localizable." }
+
+critical:
+  pointer_events: >
+    The veil is `pointer-events: none`. A veil that accepts the pointer swallows
+    the very `drop` it exists to announce, and the drag ends nowhere.
+  aria_hidden: >
+    Marked `aria-hidden`: it announces nothing a screen-reader user can act on.
+    The drop target itself carries the accessible name.

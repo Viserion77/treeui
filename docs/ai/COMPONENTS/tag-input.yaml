@@ -58,13 +58,29 @@ props:
       Confirm the pending draft when the field loses focus. On by default because
       typing the last value and clicking Save otherwise dropped it with no
       warning — a defect independent of any one product.
+  trim:
+    type: boolean
+    default: true
+    note: >
+      Trim each value and drop empty ones. Turn it off where a leading or
+      trailing space is meaningful — with it off, the text still pending in the
+      field keeps its spaces too.
 
 events:
   - update:modelValue
+  - name: "update:draft"
+    payload: "[value: string]"
+    description: >
+      The pending, unconfirmed text (`v-model:draft`). A form that enables Save
+      from a dirty count cannot see the draft otherwise, and `commitOnBlur` does
+      not help there: clicking a DISABLED Save fires no mousedown, so the field
+      never blurs and the user is left staring at a greyed-out button with the
+      value in front of them.
 
 exposed:
   - "focus(): focuses the text field."
   - "commit(): flushes the pending draft, for a form that turns commitOnBlur off."
+  - "hasDraft: computed boolean, the imperative counterpart of `update:draft`."
 
 a11y:
   chips_are_ttag_removable: true

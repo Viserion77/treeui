@@ -4,6 +4,7 @@ import { computed, onBeforeUnmount, ref, toRef, useAttrs, watch } from 'vue';
 import { useControllableOpen } from '../composables/useControllableOpen';
 import type { TSize } from '../types/contracts';
 import TSpinner from './TSpinner.vue';
+import type { TModelModifiers } from './form-field';
 
 defineOptions({
   inheritAttrs: false,
@@ -29,8 +30,9 @@ const props = withDefaults(
     invalid?: boolean;
     placeholder?: string;
     emptyText?: string;
-  }>(),
+  } & TModelModifiers>(),
   {
+    modelModifiers: () => ({}),
     modelValue: '',
     options: () => [],
     open: undefined,

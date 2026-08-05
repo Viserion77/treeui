@@ -4,6 +4,7 @@ import { computed, provide, reactive, ref, toRef, watch } from 'vue';
 import type { TSize } from '../types/contracts';
 import type { TabsActivationMode } from './tabs-context';
 import { TABS_INJECTION_KEY } from './tabs-context';
+import type { TModelModifiers } from './form-field';
 
 const props = withDefaults(
   defineProps<{
@@ -12,8 +13,9 @@ const props = withDefaults(
     size?: TSize;
     activationMode?: TabsActivationMode;
     disabled?: boolean;
-  }>(),
+  } & TModelModifiers>(),
   {
+    modelModifiers: () => ({}),
     modelValue: undefined,
     defaultValue: '',
     size: 'md',

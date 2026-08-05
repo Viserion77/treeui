@@ -1,0 +1,37 @@
+name: TPane
+source_file: packages/vue/src/components/TPane.vue
+package: "@treeui/vue"
+kind: layout
+status: available
+purpose: >
+  Docked pane: fill the parent's height, scroll only the middle, keep a header
+  and a footer anchored. The shape every operational surface needs and every one
+  of them re-wrote.
+
+props:
+  as: { type: string, default: section }
+  padded:
+    type: boolean
+    default: true
+    note: "Padding inside the SCROLLING region only, so a sticky bar sits flush."
+
+slots:
+  header: { description: "Pinned to the top; never scrolls." }
+  default: { description: "The scrolling region." }
+  footer: { description: "Pinned to the bottom — a composer, an action bar." }
+
+why_a_component:
+  note: >
+    The recipe is four lines and one of them is `min-block-size: 0` on the
+    scrolling child. Without it a flex child refuses to shrink below its content,
+    the middle never scrolls, and the footer is pushed off the bottom of the
+    screen — and nobody gets it right the first time.
+  not_the_same_as:
+    TStack_fill_parent: "gives `min-block-size: 100%`, the opposite of what a scroll container needs."
+    TPage: "a document that scrolls as a whole."
+  never: >
+    No `position: fixed`. It would compete with the scroll `.t-app-shell__main`
+    already owns, and that selector is off-limits to consumers.
+
+a11y:
+  - "Structural. The regions carry no roles of their own — put the semantics in the content."

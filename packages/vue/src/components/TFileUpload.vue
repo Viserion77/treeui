@@ -4,6 +4,7 @@ import { computed, onBeforeUnmount, onMounted, ref, useAttrs, watch } from 'vue'
 import type { TSize } from '../types/contracts';
 import TProgress from './TProgress.vue';
 import TSpinner from './TSpinner.vue';
+import type { TModelModifiers } from './form-field';
 
 defineOptions({
   inheritAttrs: false,
@@ -19,6 +20,26 @@ export interface TFileUploadRejection {
   reason: TFileUploadRejectionReason;
   message: string;
 }
+
+export type TFileUploadVariant = 'dropzone' | 'trigger';
+
+/** Everything a rejection message can interpolate, so a translation can reorder it. */
+export interface TFileUploadRejectionContext {
+  /** Name of the rejected file. */
+  name: string;
+  /** `maxFileSize`, already formatted for reading. */
+  size: string;
+  /** `maxFiles` in effect. */
+  max: number;
+}
+
+/**
+ * One function per reason, so the message is built in the consumer's locale
+ * with its own word order — a format string would not survive translation.
+ */
+export type TFileUploadRejectionLabels = Partial<
+  Record<TFileUploadRejectionReason, (context: TFileUploadRejectionContext) => string>
+>;
 
 export type TFileUploadStatus =
   | 'pending'
@@ -166,8 +187,25 @@ const props = withDefaults(
     resumeLabel?: (percent: number) => string;
     remainingTimeFormat?: (remainingMs: number) => string;
     statusLabels?: Partial<Record<TFileUploadStatus, string>>;
-  }>(),
+    /**
+     * `dropzone` (default) is the full widget, for a surface where the drop
+     * area IS the interface. `trigger` renders the default slot as the ONLY
+     * control — no dashed box, no `role="button"` wrapper, no second tab stop —
+     * for a chat composer that needs one discreet paperclip. The hidden
+     * `<input type="file">` stays inside either way.
+     */
+    variant?: TFileUploadVariant;
+    /**
+     * Localizable rejection copy. The messages were English prose baked into
+     * the component and rendered regardless of `showFileList`, so a pt-BR app
+     * showed English on screen — and the only escape was passing `accept=""` so
+     * the widget never formed an opinion, which also threw away the file
+     * dialog's filter.
+     */
+    rejectionLabels?: TFileUploadRejectionLabels;
+  } & TModelModifiers>(),
   {
+    modelModifiers: () => ({}),
     modelValue: () => [],
     size: 'md',
     disabled: false,
@@ -211,6 +249,8 @@ const props = withDefaults(
       return `About ${Math.round(minutes / 60)}h left`;
     },
     statusLabels: () => ({}),
+    variant: 'dropzone',
+    rejectionLabels: undefined,
   },
 );
 
@@ -264,6 +304,7 @@ const effectiveMaxFiles = computed(() => {
 const rootClasses = computed(() => [
   't-file-upload',
   `t-file-upload--${props.size}`,
+  props.variant !== 'dropzone' ? `t-file-upload--${props.variant}` : null,
   {
     'is-disabled': isDisabled.value,
     'is-invalid': props.invalid,
@@ -500,15 +541,24 @@ const buildRejectionMessage = (
   file: File,
   reason: TFileUploadRejectionReason,
 ) => {
+  const context = {
+    name: file.name,
+    size: formatFileSize(props.maxFileSize ?? 0),
+    max: effectiveMaxFiles.value,
+  };
+
+  const label = props.rejectionLabels?.[reason];
+  if (label) return label(context);
+
   switch (reason) {
     case 'file-invalid-type':
-      return `${file.name} is not an accepted file type.`;
+      return `${context.name} is not an accepted file type.`;
     case 'file-too-large':
-      return `${file.name} exceeds the ${formatFileSize(props.maxFileSize ?? 0)} limit.`;
+      return `${context.name} exceeds the ${context.size} limit.`;
     case 'too-many-files':
-      return `You can only add up to ${effectiveMaxFiles.value} file${effectiveMaxFiles.value === 1 ? '' : 's'}.`;
+      return `You can only add up to ${context.max} file${context.max === 1 ? '' : 's'}.`;
     default:
-      return `${file.name} could not be added.`;
+      return `${context.name} could not be added.`;
   }
 };
 
@@ -999,7 +1049,29 @@ onBeforeUnmount(() => {
       @change="onInputChange"
     >
 
+    <!--
+      `trigger`: the slot IS the control. No dashed box, no `role="button"`
+      wrapper around it, and therefore no nested interactive and no second tab
+      stop — a composer's paperclip is already a TButton. Measured in a real
+      composer at 1440x900, the dropzone widget ate the row and left the text
+      field 26px wide (TREEUX-021).
+    -->
     <div
+      v-if="variant === 'trigger'"
+      class="t-file-upload__trigger"
+      @click="openFileDialog"
+    >
+      <slot
+        :files="modelValue"
+        :is-drag-active="isDragActive"
+        :is-drag-reject="isDragReject"
+        :open-file-dialog="openFileDialog"
+        :clear-files="clearFiles"
+      />
+    </div>
+
+    <div
+      v-else
       class="t-file-upload__dropzone"
       :aria-busy="loading || undefined"
       :aria-controls="showFileList && hasFiles ? filesId : undefined"

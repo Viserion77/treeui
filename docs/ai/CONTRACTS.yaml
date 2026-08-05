@@ -10,19 +10,23 @@ source_component_filename_prefix: "T"
 # Maintenance: must stay 1:1 with the `export { default as ... }` lines in
 # packages/vue/src/components/index.ts. Verify with:
 #   grep -oP '^export \{ default as \K\w+' packages/vue/src/components/index.ts | sort
-primary_exports_count: 96
+primary_exports_count: 104
 primary_exports:
   - TAccordion
   - TAccordionItem
   - TAlert
   - TAppBar
   - TAppShell
+  - TAudioPlayer
   - TAvatar
   - TBadge
   - TBrandLockup
   - TBreadcrumb
   - TBreadcrumbItem
   - TButton
+  - TCalendar
+  - TCalendarMonthGrid
+  - TCalendarTimeGrid
   - TCard
   - TChart
   - TCheckbox
@@ -39,6 +43,7 @@ primary_exports:
   - TDivider
   - TDonutChart
   - TDrawer
+  - TDropVeil
   - TDropdown
   - TEmptyState
   - TFileUpload
@@ -70,6 +75,7 @@ primary_exports:
   - TPageHeader
   - TPageSurface
   - TPagination
+  - TPane
   - TPopover
   - TPricing
   - TPricingCard
@@ -84,6 +90,7 @@ primary_exports:
   - TSkeleton
   - TSkipLink
   - TSpacer
+  - TSpanLanes
   - TSparkline
   - TSpinner
   - TSplit
@@ -108,6 +115,7 @@ primary_exports:
   - TToggleGroup
   - TTooltip
   - TTreeView
+  - TVoiceRecorder
 
 manifest_status:
   values: [available]
@@ -143,6 +151,31 @@ global_component_typing:
     instead of installing the plugin is also told they resolve globally. That
     direction fails loudly at runtime ("Failed to resolve component"); the
     direction it fixes failed silently.
+  requires: >-
+    `vueCompilerOptions.strictTemplates: true` in the CONSUMER's tsconfig. That
+    switch is what turns an unknown prop into an error; without it the
+    augmentation only fixes component RESOLUTION. Turning it on used to cost 87
+    false positives from legitimate code, which is why the passthrough surface
+    below exists.
+  passthrough_surface:
+    declared_in: "packages/vue/src/global-components.ts (ComponentCustomProps)"
+    members: "AriaAttributes (all aria-*, role), id, title, tabindex, data-*, on*"
+    note: >-
+      Attributes any component may receive on top of its own props, because the
+      library forwards `$attrs` to an inner element by design. Naming a TTable
+      with `aria-label` was a compile error under strictTemplates, and "remove
+      the accessible name to satisfy the type checker" is not an acceptable
+      instruction. Deliberately narrow: a prop that does not exist is still an
+      error, which is the whole point.
+    also: >-
+      Every v-model component declares `modelModifiers`, so `v-model.trim` type-
+      checks — and so the prop stops falling through to an inner element as an
+      invalid DOM attribute, which is what it did while undeclared.
+    gate: >-
+      `pnpm typecheck:strict-templates` builds the package and checks two
+      fixtures: a consumer-style template that MUST compile, and a known-bad one
+      whose six dead props MUST still error. Checking only the first would let a
+      future change "fix" the noise by allowing everything.
 
 layout_capabilities_already_shipping:
   note: >
@@ -219,13 +252,22 @@ shared_props:
       inverse | brand — EXTENDED with the four status tones, since a sentence
       that is the state is neither an alert box nor a pill).
       See DECISIONS.md → "Variant Vocabulary".
-    not_universal: >-
-      `tone` is NOT on every component with a destructive state: TButton and
-      TLink express it through `variant` (`danger` is a member of the shared
-      action scale) and TConfirmDialog through `confirmVariant`. Reaching for
-      `tone` on those is the single most common wrong guess; `GlobalComponents`
-      typing (see `global_component_typing`) now turns it into a compile error
-      instead of a silent no-op.
+    action_tone:
+      type: TActionTone
+      values: [neutral, brand, accent, success, warning, danger, info]
+      used_by: [TButton, TTag]
+      note: >-
+        Colour on an ACTION surface, orthogonal to `variant`. This is the axis
+        that makes a quiet destructive control expressible: `variant="danger"`
+        is a colour trapped in the shape scale, so it could only ever be a
+        filled red button. On `solid` the tone fills; on `outline`/`ghost` it
+        inks only the label and border.
+      migration: >-
+        `TButton variant="danger"` is deprecated in favour of
+        `variant="solid" tone="danger"`. It still works and still renders
+        identically; dev builds warn. TLink keeps `danger` in `variant` for now,
+        and TConfirmDialog keeps `confirmVariant` — both forward to a TButton,
+        so the tone reaches them through it.
   accent:
     type: TAccent
     values: [brand, neutral, success, warning, danger, info]

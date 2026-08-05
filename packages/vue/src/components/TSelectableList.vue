@@ -2,6 +2,7 @@
 import { createId, getNextEnabledIndex, isActivationKey } from '@treeui/utils';
 import { computed, nextTick, ref, useAttrs, watch, type ComponentPublicInstance } from 'vue';
 import type { TSize } from '../types/contracts';
+import type { TModelModifiers } from './form-field';
 
 defineOptions({
   inheritAttrs: false,
@@ -23,8 +24,9 @@ const props = withDefaults(
     size?: TSize;
     disabled?: boolean;
     emptyText?: string;
-  }>(),
+  } & TModelModifiers>(),
   {
+    modelModifiers: () => ({}),
     modelValue: undefined,
     defaultValue: '',
     items: () => [],

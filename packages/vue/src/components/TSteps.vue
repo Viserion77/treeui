@@ -2,6 +2,7 @@
 import { getTreeIcon, treeIconDefaults } from '@treeui/icons';
 import { computed, ref, useAttrs, watch } from 'vue';
 import type { TSize } from '../types/contracts';
+import type { TModelModifiers } from './form-field';
 
 defineOptions({
   inheritAttrs: false,
@@ -32,8 +33,9 @@ const props = withDefaults(
     size?: TSize;
     orientation?: TStepOrientation;
     interactive?: boolean;
-  }>(),
+  } & TModelModifiers>(),
   {
+    modelModifiers: () => ({}),
     modelValue: undefined,
     defaultValue: '',
     items: () => [],

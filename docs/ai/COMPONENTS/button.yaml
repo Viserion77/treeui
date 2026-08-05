@@ -6,6 +6,16 @@ status: available
 purpose: "Clickable action trigger with variants, sizes, optional polymorphism, and loading state."
 
 props:
+  tone:
+    type: TActionTone
+    default: undefined
+    values: [neutral, brand, accent, success, warning, danger, info]
+    note: >
+      Colour axis, orthogonal to `variant` — the same closed vocabulary TTag
+      uses. On `solid` it fills; on `outline` and `ghost` it inks only the label
+      and the border, which is how a destructive action sits in a row of quiet
+      ones without outweighing it. Unset, every variant renders exactly as
+      before.
   to:
     type: "string | RouteLocationRaw"
     default: undefined
@@ -131,3 +141,14 @@ example: |
   <TButton icon-only label="Excluir" variant="ghost">
     <template #icon><TIcon name="trash-2" /></template>
   </TButton>
+
+deprecations:
+  variant_danger:
+    since: "0.29.0"
+    replacement: 'variant="solid" tone="danger"'
+    why: >
+      `danger` is a colour trapped in the SHAPE scale, so it can only ever be a
+      filled red button — "destructive, but not the primary action of this row"
+      was inexpressible, and two consumer screens independently wrote
+      `variant="ghost" tone="danger"` with the prop dead before anyone noticed.
+      Still works and still renders identically; warns in dev builds only.

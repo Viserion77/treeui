@@ -1,7 +1,7 @@
 {
-  "generatedAt": "0.27.0",
+  "generatedAt": "0.28.0",
   "packageName": "@treeui/vue",
-  "packageVersion": "0.27.0",
+  "packageVersion": "0.28.0",
   "decisionGuides": [
     {
       "id": "single-choice",
@@ -1741,6 +1741,80 @@
       ]
     },
     {
+      "name": "TAudioPlayer",
+      "aliases": [],
+      "package": "@treeui/vue",
+      "kind": "media",
+      "status": "available",
+      "purpose": "Compact audio chip: play/pause, duration and seek, for a voice message in a chat.",
+      "sourceFile": "packages/vue/src/components/TAudioPlayer.vue",
+      "manifestFile": "docs/ai/COMPONENTS/audio-player.yaml",
+      "props": [
+        {
+          "name": "src",
+          "type": "string",
+          "note": "Agnostic — the component fetches nothing."
+        },
+        {
+          "name": "size",
+          "type": "TSize",
+          "default": "md"
+        },
+        {
+          "name": "disabled",
+          "type": "boolean",
+          "default": "false"
+        },
+        {
+          "name": "playLabel",
+          "type": "string",
+          "default": "Play",
+          "note": "Product copy."
+        },
+        {
+          "name": "pauseLabel",
+          "type": "string",
+          "default": "Pause"
+        },
+        {
+          "name": "seekLabel",
+          "type": "string",
+          "default": "Seek"
+        },
+        {
+          "name": "preload",
+          "type": "'none' | 'metadata' | 'auto'",
+          "default": "metadata"
+        }
+      ],
+      "events": [
+        {
+          "name": "play"
+        },
+        {
+          "name": "pause"
+        },
+        {
+          "name": "ended"
+        }
+      ],
+      "slots": [],
+      "a11y": [],
+      "behavior": [],
+      "selection": {
+        "keywords": [],
+        "useWhen": [],
+        "avoidWhen": [],
+        "alternatives": []
+      },
+      "setup": {
+        "required": [],
+        "notes": []
+      },
+      "recipes": [],
+      "practices": []
+    },
+    {
       "name": "TAvatar",
       "aliases": [],
       "package": "@treeui/vue",
@@ -2075,6 +2149,21 @@
       "manifestFile": "docs/ai/COMPONENTS/button.yaml",
       "props": [
         {
+          "name": "tone",
+          "type": "TActionTone",
+          "default": "undefined",
+          "values": [
+            "neutral",
+            "brand",
+            "accent",
+            "success",
+            "warning",
+            "danger",
+            "info"
+          ],
+          "note": "Colour axis, orthogonal to `variant` — the same closed vocabulary TTag uses. On `solid` it fills; on `outline` and `ghost` it inks only the label and the border, which is how a destructive action sits in a row of quiet ones without outweighing it. Unset, every variant renders exactly as before.\n"
+        },
+        {
           "name": "to",
           "type": "string | RouteLocationRaw",
           "default": "undefined",
@@ -2219,6 +2308,269 @@
         "accessible-by-default",
         "predictable-api"
       ]
+    },
+    {
+      "name": "TCalendar",
+      "aliases": [],
+      "package": "@treeui/vue",
+      "kind": "data-display",
+      "status": "available",
+      "purpose": "Full-screen calendar with four views. A thin wrapper: `month` is TCalendarMonthGrid, the other three are TCalendarTimeGrid with a different set of day columns. What it adds is the window arithmetic, so \"what does workweek mean\" is answered once.\n",
+      "sourceFile": "packages/vue/src/components/TCalendar.vue",
+      "manifestFile": "docs/ai/COMPONENTS/calendar.yaml",
+      "props": [
+        {
+          "name": "view",
+          "type": "TCalendarView",
+          "default": "month",
+          "values": [
+            "month",
+            "week",
+            "workweek",
+            "day"
+          ]
+        },
+        {
+          "name": "anchor",
+          "type": "Date",
+          "note": "Any date inside the window to show."
+        },
+        {
+          "name": "items",
+          "type": "TCalendarItem[]",
+          "default": "[]"
+        },
+        {
+          "name": "weekStartsOn",
+          "type": "number",
+          "default": "undefined — derived from `locale` via CLDR",
+          "note": "0 = Sunday. Pass it explicitly when the product has a rule of its own."
+        },
+        {
+          "name": "locale",
+          "type": "string",
+          "default": "en"
+        },
+        {
+          "name": "today",
+          "type": "Date",
+          "note": "Overrides 'today', so a screenshot test stays stable."
+        },
+        {
+          "name": "hourHeight",
+          "type": "number",
+          "default": "48"
+        },
+        {
+          "name": "scrollTo",
+          "type": "number",
+          "default": "7",
+          "note": "Hour the time grid scrolls to on mount."
+        },
+        {
+          "name": "labels",
+          "type": "TCalendarLabels",
+          "note": "Accessible names. The library ships no user-facing copy."
+        }
+      ],
+      "events": [
+        {
+          "name": "select-day"
+        },
+        {
+          "name": "select-slot"
+        },
+        {
+          "name": "select-allday"
+        },
+        {
+          "name": "select-event"
+        }
+      ],
+      "slots": [
+        {
+          "name": "event"
+        },
+        {
+          "name": "all-day-item"
+        },
+        {
+          "name": "day-cell"
+        }
+      ],
+      "a11y": [],
+      "behavior": [],
+      "selection": {
+        "keywords": [],
+        "useWhen": [],
+        "avoidWhen": [],
+        "alternatives": []
+      },
+      "setup": {
+        "required": [],
+        "notes": []
+      },
+      "recipes": [],
+      "practices": []
+    },
+    {
+      "name": "TCalendarMonthGrid",
+      "aliases": [],
+      "package": "@treeui/vue",
+      "kind": "data-display",
+      "status": "available",
+      "purpose": "Month grid: whole weeks, spill days of the adjacent months dimmed, today marked.",
+      "sourceFile": "packages/vue/src/components/TCalendarMonthGrid.vue",
+      "manifestFile": "docs/ai/COMPONENTS/calendar-grids.yaml",
+      "props": [
+        {
+          "name": "anchor",
+          "type": "Date"
+        },
+        {
+          "name": "items",
+          "type": "TCalendarItem[]",
+          "default": "[]"
+        },
+        {
+          "name": "weekStartsOn",
+          "type": "number",
+          "default": "0"
+        },
+        {
+          "name": "locale",
+          "type": "string",
+          "default": "en"
+        },
+        {
+          "name": "today",
+          "type": "Date"
+        },
+        {
+          "name": "labels",
+          "type": "TCalendarLabels"
+        }
+      ],
+      "events": [
+        {
+          "name": "select-day"
+        },
+        {
+          "name": "select-event"
+        }
+      ],
+      "slots": [
+        {
+          "name": "event"
+        },
+        {
+          "name": "day-cell"
+        }
+      ],
+      "a11y": [],
+      "behavior": [],
+      "selection": {
+        "keywords": [],
+        "useWhen": [],
+        "avoidWhen": [],
+        "alternatives": []
+      },
+      "setup": {
+        "required": [],
+        "notes": []
+      },
+      "recipes": [],
+      "practices": []
+    },
+    {
+      "name": "TCalendarTimeGrid",
+      "aliases": [],
+      "package": "@treeui/vue",
+      "kind": "data-display",
+      "status": "available",
+      "purpose": "Time grid: day columns, a 24h ruler, an all-day band, and overlapping events side by side.",
+      "sourceFile": "packages/vue/src/components/TCalendarTimeGrid.vue",
+      "manifestFile": "docs/ai/COMPONENTS/calendar-grids.yaml",
+      "props": [
+        {
+          "name": "days",
+          "type": "Date[]",
+          "note": "The day columns, in order. TCalendar computes these per view."
+        },
+        {
+          "name": "items",
+          "type": "TCalendarItem[]",
+          "default": "[]"
+        },
+        {
+          "name": "hourHeight",
+          "type": "number",
+          "default": "48",
+          "note": "Drives every vertical measurement, and is the same number the maths is given."
+        },
+        {
+          "name": "minEventHeight",
+          "type": "number",
+          "default": "18",
+          "note": "So a 3-minute event stays visible."
+        },
+        {
+          "name": "scrollTo",
+          "type": "number",
+          "default": "7"
+        },
+        {
+          "name": "locale",
+          "type": "string",
+          "default": "en"
+        },
+        {
+          "name": "today",
+          "type": "Date"
+        },
+        {
+          "name": "now",
+          "type": "Date",
+          "note": "Current time for the marker."
+        },
+        {
+          "name": "labels",
+          "type": "TCalendarLabels"
+        }
+      ],
+      "events": [
+        {
+          "name": "select-slot"
+        },
+        {
+          "name": "select-allday"
+        },
+        {
+          "name": "select-event"
+        }
+      ],
+      "slots": [
+        {
+          "name": "event"
+        },
+        {
+          "name": "all-day-item"
+        }
+      ],
+      "a11y": [],
+      "behavior": [],
+      "selection": {
+        "keywords": [],
+        "useWhen": [],
+        "avoidWhen": [],
+        "alternatives": []
+      },
+      "setup": {
+        "required": [],
+        "notes": []
+      },
+      "recipes": [],
+      "practices": []
     },
     {
       "name": "TCard",
@@ -4601,6 +4953,52 @@
         "interaction-feedback",
         "accessible-by-default"
       ]
+    },
+    {
+      "name": "TDropVeil",
+      "aliases": [],
+      "package": "@treeui/vue",
+      "kind": "feedback",
+      "status": "available",
+      "purpose": "The 'let go here' surface for a drop target. Pair with `useDrop`.",
+      "sourceFile": "packages/vue/src/components/TDropVeil.vue",
+      "manifestFile": "docs/ai/COMPONENTS/drop-veil.yaml",
+      "props": [
+        {
+          "name": "active",
+          "type": "boolean",
+          "default": "false",
+          "note": "Bind `useDrop().isOver`."
+        },
+        {
+          "name": "scope",
+          "type": "'page' | 'region'",
+          "default": "page",
+          "note": "`page` covers the viewport above the app chrome; `region` fills the nearest positioned ancestor."
+        },
+        {
+          "name": "label",
+          "type": "string",
+          "default": "undefined",
+          "note": "Product copy, so it is localizable."
+        }
+      ],
+      "events": [],
+      "slots": [],
+      "a11y": [],
+      "behavior": [],
+      "selection": {
+        "keywords": [],
+        "useWhen": [],
+        "avoidWhen": [],
+        "alternatives": []
+      },
+      "setup": {
+        "required": [],
+        "notes": []
+      },
+      "recipes": [],
+      "practices": []
     },
     {
       "name": "TEmptyState",
@@ -8271,6 +8669,60 @@
       ]
     },
     {
+      "name": "TPane",
+      "aliases": [],
+      "package": "@treeui/vue",
+      "kind": "layout",
+      "status": "available",
+      "purpose": "Docked pane: fill the parent's height, scroll only the middle, keep a header and a footer anchored. The shape every operational surface needs and every one of them re-wrote.\n",
+      "sourceFile": "packages/vue/src/components/TPane.vue",
+      "manifestFile": "docs/ai/COMPONENTS/pane.yaml",
+      "props": [
+        {
+          "name": "as",
+          "type": "string",
+          "default": "section"
+        },
+        {
+          "name": "padded",
+          "type": "boolean",
+          "default": "true",
+          "note": "Padding inside the SCROLLING region only, so a sticky bar sits flush."
+        }
+      ],
+      "events": [],
+      "slots": [
+        {
+          "name": "header",
+          "description": "Pinned to the top; never scrolls."
+        },
+        {
+          "name": "default",
+          "description": "The scrolling region."
+        },
+        {
+          "name": "footer",
+          "description": "Pinned to the bottom — a composer, an action bar."
+        }
+      ],
+      "a11y": [
+        "Structural. The regions carry no roles of their own — put the semantics in the content."
+      ],
+      "behavior": [],
+      "selection": {
+        "keywords": [],
+        "useWhen": [],
+        "avoidWhen": [],
+        "alternatives": []
+      },
+      "setup": {
+        "required": [],
+        "notes": []
+      },
+      "recipes": [],
+      "practices": []
+    },
+    {
       "name": "TPopover",
       "aliases": [],
       "package": "@treeui/vue",
@@ -8912,7 +9364,7 @@
             "danger",
             "info"
           ],
-          "note": "Declares the accent for this subtree by remapping `--tree-color-accent-*`. Closed axis — see CONTRACTS.yaml → shared_props.accent.\n"
+          "note": "Declares the accent for this subtree by remapping `--tree-color-accent-*`. Closed axis — see CONTRACTS.yaml → shared_props.accent. Note that `accent=\"brand\"` FLATTENS a surface that pairs an accent eyebrow with a brand CTA: the axis remaps to the brand, so `tone=\"accent\"` and the CTA become the same colour. Leaving it unset is what gives two levels, and is why unset is the default.\n"
         }
       ],
       "events": [],
@@ -9675,6 +10127,75 @@
       "practices": [
         "content-alignment"
       ]
+    },
+    {
+      "name": "TSpanLanes",
+      "aliases": [],
+      "package": "@treeui/vue",
+      "kind": "data-display",
+      "status": "available",
+      "purpose": "Horizontal lanes on a shared time axis: one row per subject, N bars positioned by start/duration inside the same window. How \"what ran in parallel\" becomes legible.\n",
+      "sourceFile": "packages/vue/src/components/TSpanLanes.vue",
+      "manifestFile": "docs/ai/COMPONENTS/span-lanes.yaml",
+      "props": [
+        {
+          "name": "rows",
+          "type": "TSpanLane[]"
+        },
+        {
+          "name": "from",
+          "type": "number",
+          "note": "Start of the window, in the spans' own unit."
+        },
+        {
+          "name": "to",
+          "type": "number"
+        },
+        {
+          "name": "laneHeight",
+          "type": "number",
+          "default": "20"
+        },
+        {
+          "name": "label",
+          "type": "string",
+          "note": "Accessible name of the whole chart."
+        },
+        {
+          "name": "minSpanPercent",
+          "type": "number",
+          "default": "0.4",
+          "note": "Floor on a bar's visible width, as a percentage of the window. A 3ms invocation in a 60s window is otherwise present in the data and invisible on screen. The floor never spills past the window.\n"
+        }
+      ],
+      "events": [],
+      "slots": [
+        {
+          "name": "marker",
+          "description": "Non-colour marker drawn on a span. Failure must NEVER be encoded by colour alone: `--tree-color-status-success` and `--tree-color-status-error` sit at ΔE 4.4 under deuteranopia, so a red bar and a green bar are the same bar for some readers.\n"
+        },
+        {
+          "name": "label",
+          "description": "Replaces the lane label."
+        }
+      ],
+      "a11y": [
+        "Each lane's track is `role=\"img\"` named by `description` (falling back to `label`).",
+        "Colour is never the only signal — use the `marker` slot for state."
+      ],
+      "behavior": [],
+      "selection": {
+        "keywords": [],
+        "useWhen": [],
+        "avoidWhen": [],
+        "alternatives": []
+      },
+      "setup": {
+        "required": [],
+        "notes": []
+      },
+      "recipes": [],
+      "practices": []
     },
     {
       "name": "TSparkline",
@@ -10894,11 +11415,22 @@
           "type": "boolean",
           "default": "true",
           "note": "Confirm the pending draft when the field loses focus. On by default because typing the last value and clicking Save otherwise dropped it with no warning — a defect independent of any one product.\n"
+        },
+        {
+          "name": "trim",
+          "type": "boolean",
+          "default": "true",
+          "note": "Trim each value and drop empty ones. Turn it off where a leading or trailing space is meaningful — with it off, the text still pending in the field keeps its spaces too.\n"
         }
       ],
       "events": [
         {
           "name": "update:modelValue"
+        },
+        {
+          "name": "update:draft",
+          "description": "The pending, unconfirmed text (`v-model:draft`). A form that enables Save from a dirty count cannot see the draft otherwise, and `commitOnBlur` does not help there: clicking a DISABLED Save fires no mousedown, so the field never blurs and the user is left staring at a greyed-out button with the value in front of them.\n",
+          "payload": "[value: string]"
         }
       ],
       "slots": [],
@@ -11719,6 +12251,101 @@
       "practices": [
         "accessible-by-default"
       ]
+    },
+    {
+      "name": "TVoiceRecorder",
+      "aliases": [],
+      "package": "@treeui/vue",
+      "kind": "media",
+      "status": "available",
+      "purpose": "The STATES of a voice recorder — record / recording / preview — with the pulse, the timer and the cap.",
+      "sourceFile": "packages/vue/src/components/TVoiceRecorder.vue",
+      "manifestFile": "docs/ai/COMPONENTS/voice-recorder.yaml",
+      "props": [
+        {
+          "name": "state",
+          "type": "TVoiceRecorderState",
+          "default": "idle",
+          "values": [
+            "idle",
+            "recording",
+            "preview"
+          ]
+        },
+        {
+          "name": "elapsed",
+          "type": "number",
+          "default": "0",
+          "note": "Seconds. The product owns the clock, because it owns the recorder."
+        },
+        {
+          "name": "maxDuration",
+          "type": "number",
+          "note": "Hard stop in seconds; emits `cap-reached` once."
+        },
+        {
+          "name": "size",
+          "type": "TSize",
+          "default": "md"
+        },
+        {
+          "name": "recordLabel",
+          "type": "string",
+          "default": "Record"
+        },
+        {
+          "name": "stopLabel",
+          "type": "string",
+          "default": "Stop"
+        },
+        {
+          "name": "discardLabel",
+          "type": "string",
+          "default": "Discard"
+        },
+        {
+          "name": "recordingLabel",
+          "type": "string",
+          "default": "Recording"
+        }
+      ],
+      "events": [
+        {
+          "name": "record"
+        },
+        {
+          "name": "stop"
+        },
+        {
+          "name": "discard"
+        },
+        {
+          "name": "cap-reached"
+        }
+      ],
+      "slots": [
+        {
+          "name": "preview",
+          "description": "The captured audio — typically a TAudioPlayer."
+        }
+      ],
+      "a11y": [
+        "reduced_motion: The pulse is frozen under `prefers-reduced-motion` BY DEFAULT, not as an opt-in. A recording indicator runs for as long as someone is talking, which is exactly the kind of never-ending animation that makes people ill.",
+        "announcements: `aria-live` is on the TIMER, not the dot — announcing every second would flood a screen reader."
+      ],
+      "behavior": [],
+      "selection": {
+        "keywords": [],
+        "useWhen": [],
+        "avoidWhen": [],
+        "alternatives": []
+      },
+      "setup": {
+        "required": [],
+        "notes": []
+      },
+      "recipes": [],
+      "practices": []
     }
   ],
   "tokens": [

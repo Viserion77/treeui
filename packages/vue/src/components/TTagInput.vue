@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { computed, ref, useAttrs } from 'vue';
+import { computed, ref, useAttrs, watch } from 'vue';
 import type { TFieldWidth, TSize } from '../types/contracts';
 import TTag from './TTag.vue';
-import { useFormFieldIdentity } from './form-field';
+import { useFormFieldIdentity, type TModelModifiers } from './form-field';
 
 defineOptions({
   inheritAttrs: false,
@@ -39,8 +39,14 @@ const props = withDefaults(
      * warning. Use `commit()` on the exposed instance for an explicit flush.
      */
     commitOnBlur?: boolean;
-  }>(),
+    /**
+     * Trim each value and drop empty ones. On by default; turn it off where a
+     * leading or trailing space is meaningful.
+     */
+    trim?: boolean;
+  } & TModelModifiers>(),
   {
+    modelModifiers: () => ({}),
     modelValue: () => [],
     size: 'md',
     width: 'full',
@@ -51,15 +57,26 @@ const props = withDefaults(
     allowDuplicates: false,
     separator: ',',
     commitOnBlur: true,
+    trim: true,
   },
 );
 
 const emit = defineEmits<{
   'update:modelValue': [value: string[]];
+  /**
+   * The pending, unconfirmed text — `v-model:draft`. A form that enables Save
+   * from a dirty count cannot see the draft otherwise, and `commitOnBlur` does
+   * not help there: clicking a DISABLED Save fires no mousedown, so the field
+   * never blurs and the user stares at a greyed-out button with the value in
+   * front of them.
+   */
+  'update:draft': [value: string];
 }>();
 
 const attrs = useAttrs();
 const draft = ref('');
+
+watch(draft, (value) => emit('update:draft', value));
 const inputRef = ref<HTMLInputElement | null>(null);
 
 const rootClasses = computed(() => [
@@ -105,7 +122,9 @@ function splitRaw(raw: string): string[] {
 /** Add already-split candidates: trim, drop empties, apply the dedupe policy. */
 function addParts(candidates: string[]) {
   if (props.disabled) return;
-  const parts = candidates.map((part) => part.trim()).filter(Boolean);
+  const parts = (props.trim ? candidates.map((part) => part.trim()) : candidates).filter(
+    (part) => part.length > 0,
+  );
   if (!parts.length) return;
 
   const next = [...props.modelValue];
@@ -158,7 +177,9 @@ function onInput(event: Event) {
   const remainder = parts.pop() ?? '';
 
   if (parts.length) addParts(parts);
-  draft.value = remainder.replace(/^\s+/, '');
+  // Drop the space after a separator ("a, b"), but only when trimming is on —
+  // with `trim: false` a leading space is a value the user meant to type.
+  draft.value = props.trim ? remainder.replace(/^\s+/, '') : remainder;
   syncField();
 }
 
@@ -184,7 +205,7 @@ function focusInput() {
   inputRef.value?.focus();
 }
 
-defineExpose({ focus: focusInput, commit: commitDraft });
+defineExpose({ focus: focusInput, commit: commitDraft, hasDraft: computed(() => draft.value.length > 0) });
 </script>
 
 <template>

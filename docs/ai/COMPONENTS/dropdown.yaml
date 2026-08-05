@@ -274,3 +274,19 @@ item_fields:
       `role="menuitemradio"` with `aria-checked`, so the state has real
       semantics — the `#item` slot could paint it but could not say it. Leave it
       undefined for a plain action item and the role stays `menuitem`.
+
+trigger_slot:
+  slot_props: [isOpen, menuId, triggerProps]
+  note: >
+    `triggerProps` is the headless half: `v-bind` it onto your own control and
+    it carries what the built-in trigger has — `aria-haspopup="menu"`,
+    `aria-expanded`, `aria-controls` and `disabled`. Without it a custom trigger
+    announced only "button": it did not say it opens a menu, nor whether the
+    menu was open, and the fix at the call site was three ARIA attributes
+    replicated per consumer.
+
+icon_gutter:
+  note: >
+    The gutter is reserved for EVERY item as soon as any item has an `icon`, so
+    the labels of the icon-less ones stay aligned instead of sliding left and
+    reading as two ragged columns. No item has an icon, no gutter is rendered.

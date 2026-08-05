@@ -131,3 +131,21 @@ identity:
     `invalid`, `disabled` and `required` are NOT pushed onto the control. A
     field carrying a summary error would otherwise restyle a control the
     consumer never marked, and those props already exist on the controls.
+
+label_for_contract:
+  note: >
+    `for` is emitted unless a child declares it has no labellable element.
+    `<label for>` may only point at a button, input, select, textarea, meter,
+    output or progress — a `div[role="radiogroup"]` is none of them — so
+    TRadioGroup and TToggleGroup release the id and name themselves with
+    `aria-labelledby` off the label's own id instead. Emitting `for`
+    unconditionally pointed the label at an id no element carried, which is
+    worse than the gap it closed: the markup went from incomplete to incoherent.
+  why_the_group_declares_itself: >
+    The inverse — every adopter announcing itself — reads better but is wrong
+    where it counts: a child's `setup` runs after its parent has rendered, so
+    the first render, and therefore the whole server-rendered document, would
+    ship without `for` for every input, select and textarea. This way only a
+    group is briefly over-labelled, and only until the first patch.
+  adopters: [TInput, TTextarea, TSelect, TCheckbox, TTagInput, TKeyValueEditor]
+  groups: [TRadioGroup, TToggleGroup]

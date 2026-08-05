@@ -1,0 +1,61 @@
+name: TCalendarMonthGrid
+source_file: packages/vue/src/components/TCalendarMonthGrid.vue
+package: "@treeui/vue"
+kind: data-display
+status: available
+purpose: "Month grid: whole weeks, spill days of the adjacent months dimmed, today marked."
+
+props:
+  anchor: { type: Date }
+  items: { type: "TCalendarItem[]", default: "[]" }
+  weekStartsOn: { type: number, default: 0 }
+  locale: { type: string, default: en }
+  today: { type: Date }
+  labels: { type: TCalendarLabels }
+
+events: [select-day, select-event]
+slots: [event, day-cell]
+
+single_source_of_truth:
+  note: >
+    The grid CONSUMES `getMonthMatrix` from @treeui/utils and draws exactly the
+    matrix it returns — it never recomputes the grid with a rule of its own.
+    That is deliberate and it is the contract: a consumer's fetch window is
+    `getMonthMatrix(...).flat()`, so a component with a different idea of which
+    days a month contains would show days nobody fetched, silently.
+
+---
+name: TCalendarTimeGrid
+source_file: packages/vue/src/components/TCalendarTimeGrid.vue
+package: "@treeui/vue"
+kind: data-display
+status: available
+purpose: "Time grid: day columns, a 24h ruler, an all-day band, and overlapping events side by side."
+
+props:
+  days: { type: "Date[]", note: "The day columns, in order. TCalendar computes these per view." }
+  items: { type: "TCalendarItem[]", default: "[]" }
+  hourHeight: { type: number, default: 48, note: "Drives every vertical measurement, and is the same number the maths is given." }
+  minEventHeight: { type: number, default: 18, note: "So a 3-minute event stays visible." }
+  scrollTo: { type: number, default: 7 }
+  locale: { type: string, default: en }
+  today: { type: Date }
+  now: { type: Date, note: "Current time for the marker." }
+  labels: { type: TCalendarLabels }
+
+events: [select-slot, select-allday, select-event]
+slots: [event, all-day-item]
+
+maths_lives_in_utils:
+  functions: [placeInDay, layoutDayColumns]
+  note: >
+    Vertical placement and the overlap algorithm (interval-graph colouring) are
+    framework-agnostic and live in @treeui/utils, so a React time grid reuses
+    them unchanged. `placeInDay` also guarantees the minimum height never pushes
+    a block past the end of the day.
+
+states:
+  now_marker: >
+    Drawn ONLY in the column of the current day. Across every column it reads as
+    a grid line and stops meaning "now".
+  slot_snap: "A click on a column snaps to 30 minutes — a calendar click is an intent, not a measurement."

@@ -1,0 +1,36 @@
+name: TVoiceRecorder
+source_file: packages/vue/src/components/TVoiceRecorder.vue
+package: "@treeui/vue"
+kind: media
+status: available
+purpose: "The STATES of a voice recorder — record / recording / preview — with the pulse, the timer and the cap."
+
+props:
+  state: { type: TVoiceRecorderState, default: idle, values: [idle, recording, preview] }
+  elapsed: { type: number, default: 0, note: "Seconds. The product owns the clock, because it owns the recorder." }
+  maxDuration: { type: number, note: "Hard stop in seconds; emits `cap-reached` once." }
+  size: { type: TSize, default: md }
+  recordLabel: { type: string, default: Record }
+  stopLabel: { type: string, default: Stop }
+  discardLabel: { type: string, default: Discard }
+  recordingLabel: { type: string, default: Recording }
+
+events: [record, stop, discard, cap-reached]
+
+slots:
+  preview: { description: "The captured audio — typically a TAudioPlayer." }
+
+scope:
+  not_capture: >
+    `MediaRecorder`/`getUserMedia` and the upload stay with the product: they
+    need permissions, error handling and a transport policy no design system
+    should have an opinion about.
+
+a11y:
+  reduced_motion: >
+    The pulse is frozen under `prefers-reduced-motion` BY DEFAULT, not as an
+    opt-in. A recording indicator runs for as long as someone is talking, which
+    is exactly the kind of never-ending animation that makes people ill.
+  announcements: >
+    `aria-live` is on the TIMER, not the dot — announcing every second would
+    flood a screen reader.

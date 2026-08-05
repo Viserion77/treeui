@@ -74,3 +74,13 @@ describe('icon slot scale (TREEUX-010)', () => {
     },
   );
 });
+
+describe('follow-ups from the 0.28 validation', () => {
+  it('soft tags carry the tone ring (TREEUX-048 b)', () => {
+    expect(stylesheet).toContain(".t-tag--soft[class*='t-tag--tone-']");
+  });
+
+  it('the empty-state frame has a width cap of its own (TREEUX-046)', () => {
+    expect(stylesheet).toContain('.t-empty-state--frame-narrow');
+  });
+});

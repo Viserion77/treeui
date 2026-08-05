@@ -25,6 +25,7 @@ import {
 import { useControllableOpen } from '../composables/useControllableOpen';
 import type { TSize } from '../types/contracts';
 import TSpinner from './TSpinner.vue';
+import type { TModelModifiers } from './form-field';
 
 defineOptions({
   inheritAttrs: false,
@@ -70,8 +71,9 @@ const props = withDefaults(
     weekStartsOn?: 0 | 1 | 2 | 3 | 4 | 5 | 6;
     id?: string;
     step?: number;
-  }>(),
+  } & TModelModifiers>(),
   {
+    modelModifiers: () => ({}),
     modelValue: '',
     open: undefined,
     defaultOpen: false,

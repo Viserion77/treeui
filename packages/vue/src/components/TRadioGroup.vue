@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, provide, useAttrs } from 'vue';
 import type { TSize } from '../types/contracts';
+import { useFormFieldGroup, type TModelModifiers } from './form-field';
 
 defineOptions({
   inheritAttrs: false,
@@ -13,13 +14,14 @@ const props = withDefaults(
     disabled?: boolean;
     invalid?: boolean;
     size?: TSize;
-  }>(),
+  } & TModelModifiers>(),
   {
     modelValue: undefined,
     name: undefined,
     disabled: false,
     invalid: false,
     size: 'md',
+    modelModifiers: () => ({}),
   },
 );
 
@@ -47,8 +49,19 @@ const rootClasses = computed(() => [
 
 const rootStyle = computed(() => attrs.style);
 
+// A radio group has no single labellable element, so it deliberately does NOT
+// claim the TFormField id: the field then leaves `for` off and the group names
+// itself with the label's id, which is what `role="radiogroup"` expects.
+const { labelledBy, describedBy } = useFormFieldGroup(attrs);
+
 const groupAttrs = computed(() => {
-  const { class: _class, style: _style, ...rest } = attrs;
+  const {
+    class: _class,
+    style: _style,
+    'aria-labelledby': _labelledBy,
+    'aria-describedby': _describedBy,
+    ...rest
+  } = attrs;
   return rest;
 });
 </script>
@@ -59,6 +72,8 @@ const groupAttrs = computed(() => {
     :class="rootClasses"
     :style="rootStyle"
     role="radiogroup"
+    :aria-labelledby="labelledBy"
+    :aria-describedby="describedBy"
   >
     <slot />
   </div>

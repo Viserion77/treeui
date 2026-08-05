@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, useAttrs } from 'vue';
 import type { TSize } from '../types/contracts';
+import type { TModelModifiers } from './form-field';
 
 defineOptions({
   inheritAttrs: false,
@@ -12,8 +13,9 @@ const props = withDefaults(
     size?: TSize;
     disabled?: boolean;
     invalid?: boolean;
-  }>(),
+  } & TModelModifiers>(),
   {
+    modelModifiers: () => ({}),
     modelValue: false,
     size: 'md',
     disabled: false,

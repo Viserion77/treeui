@@ -25,6 +25,7 @@ import {
 } from 'vue';
 import { useControllableOpen } from '../composables/useControllableOpen';
 import type { TSize } from '../types/contracts';
+import type { TModelModifiers } from './form-field';
 
 defineOptions({
   inheritAttrs: false,
@@ -59,8 +60,9 @@ const props = withDefaults(
     max?: string;
     weekStartsOn?: 0 | 1 | 2 | 3 | 4 | 5 | 6;
     id?: string;
-  }>(),
+  } & TModelModifiers>(),
   {
+    modelModifiers: () => ({}),
     modelValue: '',
     open: undefined,
     defaultOpen: false,

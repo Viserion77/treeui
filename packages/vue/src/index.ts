@@ -1,10 +1,16 @@
 import './styles/index.css';
-// Ambient only: types the plugin's global registration so `vue-tsc` catches a
-// prop that does not exist. See global-components.ts.
-import './global-components';
 
 export * from './components';
 export * from './plugin';
+// Types the plugin's global registration, and the attribute surface every
+// component accepts, so `vue-tsc --strictTemplates` reports a prop that does not
+// exist without rejecting a legitimate `aria-label`. This is a TYPE re-export on
+// purpose: a bare side-effect import is elided from the emitted `index.d.ts`,
+// which left the augmentation unreachable from `dist/`. See global-components.ts.
+export type {
+  TreeUIGlobalComponentsRegistered,
+  TreeUIPassthroughAttributes,
+} from './global-components';
 export * from './types/contracts';
 export { useTheme } from './composables/useTheme';
 export type {
@@ -13,6 +19,14 @@ export type {
   UseThemeOptions,
   UseThemeReturn,
 } from './composables/useTheme';
+export { useDrop } from './composables/useDrop';
+export type { UseDropOptions, UseDropReturn } from './composables/useDrop';
+export { useDecorativeCanvas } from './composables/useDecorativeCanvas';
+export type {
+  DecorativeCanvasFrame,
+  UseDecorativeCanvasOptions,
+  UseDecorativeCanvasReturn,
+} from './composables/useDecorativeCanvas';
 export { useToast } from './composables/useToast';
 export type { ToastVariant, ToastPosition, ToastOptions, ToastItem } from './composables/useToast';
 

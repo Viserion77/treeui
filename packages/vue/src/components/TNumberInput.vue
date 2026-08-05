@@ -2,6 +2,7 @@
 import { clamp } from '@treeui/utils';
 import { computed, ref, useAttrs, watch } from 'vue';
 import type { TSize } from '../types/contracts';
+import type { TModelModifiers } from './form-field';
 
 defineOptions({
   inheritAttrs: false,
@@ -18,8 +19,9 @@ const props = withDefaults(
     invalid?: boolean;
     placeholder?: string;
     controls?: boolean;
-  }>(),
+  } & TModelModifiers>(),
   {
+    modelModifiers: () => ({}),
     modelValue: null,
     min: undefined,
     max: undefined,

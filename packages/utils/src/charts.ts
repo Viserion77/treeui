@@ -105,14 +105,47 @@ const controlPoint = (
 };
 
 /**
- * Turn a series of points into an SVG polyline `d`. With `smooth`, adjacent
- * points are joined by Catmull-Rom-derived cubic béziers for a soft curve.
+ * How consecutive points are joined (TREEUX-003).
+ *
+ * `linear` and `smooth` both INTERPOLATE between samples. That is wrong for a
+ * quantity that holds its value across a bucket — concurrency, queue depth, a
+ * feature flag over time: a curve, or even a diagonal, draws a state that never
+ * existed. `step` holds each value until the next sample and then jumps.
  */
-export const buildLinePath = (points: ChartPoint[], smooth = false): string => {
+export type ChartInterpolation = 'linear' | 'smooth' | 'step';
+
+/**
+ * Turn a series of points into an SVG polyline `d`.
+ *
+ * `smooth` joins adjacent points with Catmull-Rom-derived cubic béziers.
+ * `step` holds each y until the next x, so a step function is drawn as one —
+ * the consumer no longer has to emit two points per bucket, which could not
+ * reproduce the vertical jump anyway with `data: number[]` aligned to `labels`.
+ */
+export const buildLinePath = (
+  points: ChartPoint[],
+  interpolation: ChartInterpolation | boolean = false,
+): string => {
+  // `boolean` keeps the previous `smooth` signature working.
+  const mode: ChartInterpolation =
+    typeof interpolation === 'boolean' ? (interpolation ? 'smooth' : 'linear') : interpolation;
+
   if (points.length === 0) return '';
   if (points.length === 1) return `M${formatPoint(points[0])}`;
 
-  if (!smooth) {
+  if (mode === 'step') {
+    // Horizontal to the next x at the CURRENT y, then vertical to the next y.
+    let stepped = `M${formatPoint(points[0])}`;
+    for (let index = 1; index < points.length; index += 1) {
+      const previous = points[index - 1];
+      const current = points[index];
+      stepped += `L${Number(current.x.toFixed(2))},${Number(previous.y.toFixed(2))}`;
+      stepped += `L${formatPoint(current)}`;
+    }
+    return stepped;
+  }
+
+  if (mode === 'linear') {
     return points.map((point, index) => `${index === 0 ? 'M' : 'L'}${formatPoint(point)}`).join('');
   }
 
@@ -140,11 +173,11 @@ export const buildLinePath = (points: ChartPoint[], smooth = false): string => {
 export const buildAreaPath = (
   points: ChartPoint[],
   baselineY: number,
-  smooth = false,
+  interpolation: ChartInterpolation | boolean = false,
 ): string => {
   if (points.length === 0) return '';
 
-  const line = buildLinePath(points, smooth);
+  const line = buildLinePath(points, interpolation);
   const last = points[points.length - 1];
   const first = points[0];
 

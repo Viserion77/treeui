@@ -31,13 +31,15 @@
     "build:packages": "pnpm --filter @treeui/tokens build && pnpm --filter @treeui/utils build && pnpm --filter @treeui/icons build && pnpm --filter @treeui/vue build && pnpm --filter @treeui/react build && pnpm --filter @treeui/mcp build",
     "build": "pnpm docs:build",
     "lint": "pnpm -w exec eslint . --max-warnings 0",
-    "typecheck": "pnpm --filter @treeui/tokens typecheck && pnpm --filter @treeui/utils typecheck && pnpm --filter @treeui/icons typecheck && pnpm --filter @treeui/vue typecheck && pnpm --filter @treeui/react typecheck && pnpm --filter @treeui/mcp typecheck && pnpm --filter @treeui/docs typecheck && pnpm --filter @treeui/docs-react typecheck && pnpm --filter @treeui/landing typecheck && pnpm --filter @treeui/example-dashboard-vue typecheck && pnpm --filter @treeui/example-dashboard-react typecheck",
+    "typecheck": "pnpm --filter @treeui/tokens typecheck && pnpm --filter @treeui/utils typecheck && pnpm --filter @treeui/icons typecheck && pnpm --filter @treeui/vue typecheck && pnpm --filter @treeui/react typecheck && pnpm --filter @treeui/mcp typecheck && pnpm --filter @treeui/docs typecheck && pnpm --filter @treeui/docs-react typecheck && pnpm --filter @treeui/landing typecheck && pnpm --filter @treeui/example-dashboard-vue typecheck && pnpm --filter @treeui/example-dashboard-react typecheck && pnpm typecheck:strict-templates",
     "test": "pnpm -w exec vitest run --coverage",
     "test:e2e": "pnpm -w exec playwright test",
     "render:logos": "node scripts/render-logos.mjs",
     "changeset": "pnpm -w exec changeset",
     "version-packages": "pnpm -w exec changeset version",
-    "release": "pnpm build:packages && pnpm -w exec changeset publish"
+    "release": "pnpm build:packages && pnpm -w exec changeset publish",
+    "typecheck:strict-templates": "pnpm --filter @treeui/vue build && node tooling/strict-templates/check.mjs",
+    "changeset:status": "pnpm -w exec changeset status --since=origin/main"
   },
   "devDependencies": {
     "@changesets/cli": "^2.31.1",

@@ -1,0 +1,25 @@
+name: TAudioPlayer
+source_file: packages/vue/src/components/TAudioPlayer.vue
+package: "@treeui/vue"
+kind: media
+status: available
+purpose: "Compact audio chip: play/pause, duration and seek, for a voice message in a chat."
+
+props:
+  src: { type: string, note: "Agnostic — the component fetches nothing." }
+  size: { type: TSize, default: md }
+  disabled: { type: boolean, default: false }
+  playLabel: { type: string, default: Play, note: "Product copy." }
+  pauseLabel: { type: string, default: Pause }
+  seekLabel: { type: string, default: Seek }
+  preload: { type: "'none' | 'metadata' | 'auto'", default: metadata }
+
+events: [play, pause, ended]
+
+scope:
+  waveform: >
+    Deliberately absent. It needs Web Audio analysis and is a much larger
+    surface; seek WITHOUT a waveform was the part that was actually missing.
+  duration: >
+    A stream with no known length reports `Infinity`; the chip shows nothing
+    rather than "Infinity:NaN", and seek stays disabled until a duration exists.

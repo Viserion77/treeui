@@ -45,6 +45,10 @@ props:
     note: >
       Declares the accent for this subtree by remapping `--tree-color-accent-*`.
       Closed axis — see CONTRACTS.yaml → shared_props.accent.
+      Note that `accent="brand"` FLATTENS a surface that pairs an accent eyebrow
+      with a brand CTA: the axis remaps to the brand, so `tone="accent"` and the
+      CTA become the same colour. Leaving it unset is what gives two levels, and
+      is why unset is the default.
 
 slots:
   - default

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, provide, reactive } from 'vue';
 import { type AccordionType, type AccordionVariant, accordionInjectionKey } from './accordion';
+import type { TModelModifiers } from './form-field';
 
 export type TAccordionVariant = AccordionVariant;
 
@@ -24,8 +25,9 @@ const props = withDefaults(
      * above it". Only meaningful with `variant="quiet"`.
      */
     rail?: boolean;
-  }>(),
+  } & TModelModifiers>(),
   {
+    modelModifiers: () => ({}),
     type: 'single',
     modelValue: undefined,
     defaultValue: undefined,

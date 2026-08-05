@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import type { TSize } from '../types/contracts';
+import type { TModelModifiers } from './form-field';
 
 const _treeColorSwatchShapes = ['pill', 'square'] as const;
 
@@ -46,8 +47,9 @@ const props = withDefaults(
      * Only meaningful with `readonly`.
      */
     block?: boolean;
-  }>(),
+  } & TModelModifiers>(),
   {
+    modelModifiers: () => ({}),
     modelValue: undefined,
     options: () => [],
     allowCustom: false,

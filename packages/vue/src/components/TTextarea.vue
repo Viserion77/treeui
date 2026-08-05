@@ -2,7 +2,7 @@
 import { computed, useAttrs, onMounted, ref, watch, nextTick } from 'vue';
 import type { TFieldWidth, TSize } from '../types/contracts';
 import TSpinner from './TSpinner.vue';
-import { useFormFieldIdentity } from './form-field';
+import { useFormFieldIdentity, type TModelModifiers } from './form-field';
 
 export type TTextareaFamily = 'sans' | 'mono';
 
@@ -35,8 +35,9 @@ const props = withDefaults(
      * otherwise leaves a `.mono` class behind in the consumer's stylesheet.
      */
     family?: TTextareaFamily;
-  }>(),
+  } & TModelModifiers>(),
   {
+    modelModifiers: () => ({}),
     modelValue: '',
     size: 'md',
     width: 'full',

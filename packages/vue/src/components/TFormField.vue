@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, provide, useAttrs, useId } from 'vue';
+import { computed, provide, ref, useAttrs, useId } from 'vue';
 import type { TSize } from '../types/contracts';
 import { formFieldInjectionKey } from './form-field';
 
@@ -38,6 +38,15 @@ const baseId = useId();
 const generatedControlId = `${baseId}-control`;
 const errorId = `${baseId}-error`;
 const hintId = `${baseId}-hint`;
+const generatedLabelId = `${baseId}-label`;
+
+// `for` is emitted unless a child says it has no labellable element. A radio or
+// toggle group is exactly that case (`<label for>` may only point at a button,
+// input, select, textarea, meter, output or progress), and pointing `for` at an
+// id nothing carries is worse than omitting it: the markup goes from incomplete
+// to incoherent and an audit tool flags it. Those groups name themselves with
+// `aria-labelledby` off this label's id instead.
+const released = ref(false);
 
 const hasError = computed(() => !!props.error || !!slots.error);
 
@@ -61,7 +70,20 @@ const describedBy = computed(() => {
   return undefined;
 });
 
-provide(formFieldInjectionKey, { id: controlId, describedBy });
+const labelId = computed(() => generatedLabelId);
+
+provide(formFieldInjectionKey, {
+  id: controlId,
+  describedBy,
+  labelId,
+  releaseId: () => {
+    released.value = true;
+  },
+});
+
+// An explicit `htmlFor` is the consumer promising the id exists somewhere the
+// field cannot see, so it always wins.
+const labelFor = computed(() => props.htmlFor ?? (released.value ? undefined : controlId.value));
 
 const rootClasses = computed(() => [
   't-form-field',
@@ -90,8 +112,9 @@ const fieldAttrs = computed(() => {
   >
     <label
       v-if="label || $slots.label"
+      :id="labelId"
       class="t-form-field__label"
-      :for="controlId"
+      :for="labelFor"
     >
       <slot name="label">{{ label }}</slot>
       <span

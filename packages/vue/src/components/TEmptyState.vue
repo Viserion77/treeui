@@ -3,7 +3,7 @@ import { createId } from '@treeui/utils';
 import { computed, useAttrs } from 'vue';
 import type { TSize } from '../types/contracts';
 
-const _treeEmptyStateFrames = ['block', 'fill', 'inline'] as const;
+const _treeEmptyStateFrames = ['block', 'fill', 'inline', 'narrow'] as const;
 
 export type TEmptyStateFrame = (typeof _treeEmptyStateFrames)[number];
 
@@ -31,8 +31,10 @@ const props = withDefaults(
      * message inside it: the same empty state fills a board column, a side
      * panel and a page. `fill` makes it take the height of its container and
      * centre the message in it — the difference between "this column is empty"
-     * and "this page is empty". `inline` shrinks the frame to its content, for
-     * an empty state that sits inside a larger composition.
+     * and "this page is empty". `inline` shrinks the frame to its content.
+     * `narrow` caps the frame at a readable width and centres it, so a dashed
+     * box in a wide panel stops reading as an enormous void — the library
+     * already capped the inner content, but not the box around it.
      */
     frame?: TEmptyStateFrame;
   }>(),

@@ -34,6 +34,9 @@ export { default as TMultiSelect } from './TMultiSelect.vue';
 export type { TMultiSelectOption } from './TMultiSelect.vue';
 export { default as TGrid } from './TGrid.vue';
 export type {
+  TFileUploadVariant,
+  TFileUploadRejectionContext,
+  TFileUploadRejectionLabels,
   TFileUploadCancelPayload,
   TFileUploadFileSlotProps,
   TFileUploadRejection,
@@ -115,6 +118,8 @@ export { default as TSwitch } from './TSwitch.vue';
 export { default as TTooltip } from './TTooltip.vue';
 export { default as TFormField } from './TFormField.vue';
 export type { FormFieldContext as TFormFieldContext } from './form-field';
+export { default as TPane } from './TPane.vue';
+export { default as TDropVeil } from './TDropVeil.vue';
 export { default as TPage } from './TPage.vue';
 export type { TPageGap } from './TPage.vue';
 export { default as TPageSurface } from './TPageSurface.vue';
@@ -146,7 +151,12 @@ export { default as TTag } from './TTag.vue';
 export type { TTagDensity, TTagTone, TTagVariant } from './TTag.vue';
 export { default as TTagInput } from './TTagInput.vue';
 export { default as TKeyValueEditor } from './TKeyValueEditor.vue';
-export type { TKeyValueEditorLabels, TKeyValueEditorValidity } from './TKeyValueEditor.vue';
+export type {
+  TKeyValueEditorLabels,
+  TKeyValueEditorMode,
+  TKeyValueEditorSecretMap,
+  TKeyValueEditorValidity,
+} from './TKeyValueEditor.vue';
 export { default as TTimeline } from './TTimeline.vue';
 export type { TTimelineItem, TTimelineTone } from './TTimeline.vue';
 export { default as TPricing } from './TPricing.vue';
@@ -157,6 +167,15 @@ export { default as TMarkdownEditor } from './TMarkdownEditor.vue';
 export { default as TChart } from './TChart.vue';
 export type { TChartType, TChartSeries, TChartActivePayload } from './TChart.vue';
 export { default as TSparkline } from './TSparkline.vue';
+export { default as TSpanLanes } from './TSpanLanes.vue';
+export { default as TCalendar } from './TCalendar.vue';
+export { default as TCalendarMonthGrid } from './TCalendarMonthGrid.vue';
+export { default as TCalendarTimeGrid } from './TCalendarTimeGrid.vue';
+export type { TCalendarItem, TCalendarLabels, TCalendarView } from './calendar';
+export { default as TAudioPlayer } from './TAudioPlayer.vue';
+export { default as TVoiceRecorder } from './TVoiceRecorder.vue';
+export type { TVoiceRecorderState } from './TVoiceRecorder.vue';
+export type { TSpan, TSpanLane, TSpanTone } from './TSpanLanes.vue';
 export { default as TDonutChart } from './TDonutChart.vue';
 export type { TDonutSegment } from './TDonutChart.vue';
 export { default as TIcon } from './TIcon.vue';

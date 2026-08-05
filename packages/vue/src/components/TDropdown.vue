@@ -59,7 +59,24 @@ const emit = defineEmits<{
 }>();
 
 defineSlots<{
-  trigger(props: { isOpen: boolean; menuId: string }): unknown;
+  /**
+   * `triggerProps` is the headless half of this slot: `v-bind` it onto your own
+   * control and it carries the ARIA the built-in trigger has
+   * (`aria-haspopup`, `aria-expanded`, `aria-controls`) plus `disabled`.
+   * Without it a custom trigger announced only "button" — it did not say it
+   * opens a menu, nor whether the menu was open — and the fix at the call site
+   * was three attributes replicated per consumer (TREEUX-014).
+   */
+  trigger(props: {
+    isOpen: boolean;
+    menuId: string;
+    triggerProps: {
+      'aria-haspopup': 'menu';
+      'aria-expanded': boolean;
+      'aria-controls': string | undefined;
+      disabled: boolean | undefined;
+    };
+  }): unknown;
   item(props: { item: TDropdownItem; index: number }): unknown;
 }>();
 
@@ -74,6 +91,17 @@ const triggerAttrs = computed(() => {
   const { class: _class, style: _style, ...rest } = attrs;
   return rest;
 });
+
+/** The same ARIA the built-in trigger carries, for a slotted one to v-bind. */
+const triggerProps = computed(() => ({
+  'aria-haspopup': 'menu' as const,
+  'aria-expanded': isOpen.value,
+  'aria-controls': isOpen.value ? menuId : undefined,
+  disabled: props.disabled || undefined,
+}));
+
+/** Reserve the icon gutter as soon as ANY item has an icon, so labels line up. */
+const hasItemIcons = computed(() => props.items.some((item) => Boolean(item.icon)));
 
 const { value: isOpen, setValue } = useControllableOpen(
   toRef(props, 'open'),
@@ -254,6 +282,7 @@ onBeforeUnmount(() => {
         name="trigger"
         :is-open="isOpen"
         :menu-id="menuId"
+        :trigger-props="triggerProps"
       >
         <button
           v-bind="triggerAttrs"
@@ -286,6 +315,7 @@ onBeforeUnmount(() => {
         :id="menuId"
         role="menu"
         class="t-dropdown__menu"
+        :class="{ 'has-icons': hasItemIcons }"
         :aria-label="label || undefined"
       >
         <li
@@ -310,13 +340,17 @@ onBeforeUnmount(() => {
             :item="item"
             :index="index"
           >
-            <component
-              :is="resolveTreeIcon(item.icon)"
-              v-if="item.icon"
-              v-bind="treeIconDefaults"
+            <span
+              v-if="hasItemIcons"
               class="t-dropdown__item-icon"
               aria-hidden="true"
-            />
+            >
+              <component
+                :is="resolveTreeIcon(item.icon)"
+                v-if="item.icon"
+                v-bind="treeIconDefaults"
+              />
+            </span>
             <span class="t-dropdown__item-label">{{ item.label }}</span>
           </slot>
         </li>

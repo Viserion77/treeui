@@ -1,0 +1,40 @@
+name: TSpanLanes
+source_file: packages/vue/src/components/TSpanLanes.vue
+package: "@treeui/vue"
+kind: data-display
+status: available
+purpose: >
+  Horizontal lanes on a shared time axis: one row per subject, N bars positioned
+  by start/duration inside the same window. How "what ran in parallel" becomes
+  legible.
+
+props:
+  rows: { type: "TSpanLane[]" }
+  from: { type: number, note: "Start of the window, in the spans' own unit." }
+  to: { type: number }
+  laneHeight: { type: number, default: 20 }
+  label: { type: string, note: "Accessible name of the whole chart." }
+  minSpanPercent:
+    type: number
+    default: 0.4
+    note: >
+      Floor on a bar's visible width, as a percentage of the window. A 3ms
+      invocation in a 60s window is otherwise present in the data and invisible
+      on screen. The floor never spills past the window.
+
+slots:
+  marker:
+    description: >
+      Non-colour marker drawn on a span. Failure must NEVER be encoded by colour
+      alone: `--tree-color-status-success` and `--tree-color-status-error` sit at
+      ΔE 4.4 under deuteranopia, so a red bar and a green bar are the same bar
+      for some readers.
+  label: { description: "Replaces the lane label." }
+
+not_the_same_as:
+  TTimeline: "vertical, ordered by event — not positioned by time."
+  TChart: "takes `data: number[]` aligned to `labels`, which cannot place anything."
+
+a11y:
+  - "Each lane's track is `role=\"img\"` named by `description` (falling back to `label`)."
+  - "Colour is never the only signal — use the `marker` slot for state."

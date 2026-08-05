@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { createId, isActivationKey, isEscapeKey } from '@treeui/utils';
 import { computed, nextTick, onBeforeUnmount, ref, toRef, useAttrs, watch } from 'vue';
+import { useFormFieldIdentity, type TModelModifiers } from './form-field';
 import { useControllableOpen } from '../composables/useControllableOpen';
 import type { TFieldWidth, TSize } from '../types/contracts';
 import TSpinner from './TSpinner.vue';
@@ -28,8 +29,9 @@ const props = withDefaults(
     loading?: boolean;
     invalid?: boolean;
     placeholder?: string;
-  }>(),
+  } & TModelModifiers>(),
   {
+    modelModifiers: () => ({}),
     modelValue: '',
     options: () => [],
     open: undefined,
@@ -58,8 +60,18 @@ const optionRefs = ref<Map<string | number, HTMLElement>>(new Map());
 const focusedIndex = ref(-1);
 const dropUp = ref(false);
 
+// The trigger is a real `<button>`, so this control CAN carry a TFormField's id
+// and be the target of its `<label for>` (TREEUX-012).
+const { controlId, describedBy } = useFormFieldIdentity(attrs);
+
 const triggerAttrs = computed(() => {
-  const { class: _class, style: _style, ...rest } = attrs;
+  const {
+    class: _class,
+    style: _style,
+    id: _id,
+    'aria-describedby': _describedBy,
+    ...rest
+  } = attrs;
   return rest;
 });
 
@@ -282,11 +294,13 @@ onBeforeUnmount(() => {
     :data-state="isOpen ? 'open' : 'closed'"
   >
     <button
+      :id="controlId"
       ref="triggerRef"
       v-bind="triggerAttrs"
       type="button"
       class="t-select__trigger"
       :disabled="disabled"
+      :aria-describedby="describedBy"
       :aria-controls="isOpen ? listboxId : undefined"
       aria-haspopup="listbox"
       :aria-expanded="isOpen"

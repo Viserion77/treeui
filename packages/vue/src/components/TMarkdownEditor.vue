@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, useAttrs, nextTick } from 'vue';
 import type { TSize } from '../types/contracts';
+import type { TModelModifiers } from './form-field';
 
 defineOptions({
   inheritAttrs: false,
@@ -14,8 +15,9 @@ const props = withDefaults(
     placeholder?: string;
     uploadImage?: (file: File) => Promise<string>;
     sanitize?: (html: string) => string;
-  }>(),
+  } & TModelModifiers>(),
   {
+    modelModifiers: () => ({}),
     modelValue: '',
     size: 'md',
     disabled: false,

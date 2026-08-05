@@ -4,6 +4,7 @@ import { resolveTreeIcon, type TIconInput } from '@treeui/icons';
 import { computed, getCurrentInstance, inject, nextTick, ref, useAttrs, watch, type Component, type ComponentPublicInstance } from 'vue';
 import type { TSize } from '../types/contracts';
 import { treeSidebarInjectionKey } from './sidebar';
+import type { TModelModifiers } from './form-field';
 
 defineOptions({
   inheritAttrs: false,
@@ -41,8 +42,9 @@ const props = withDefaults(
     collapsed?: boolean;
     disabled?: boolean;
     exact?: boolean;
-  }>(),
+  } & TModelModifiers>(),
   {
+    modelModifiers: () => ({}),
     modelValue: undefined,
     defaultValue: '',
     items: () => [],

@@ -4,6 +4,8 @@ import { computed, getCurrentInstance, type Component } from 'vue';
 export type TLinkVariant = 'default' | 'muted' | 'danger';
 export type TLinkUnderline = 'always' | 'hover' | 'none';
 export type TLinkWeight = 'regular' | 'medium' | 'semibold';
+export type TLinkFamily = 'sans' | 'mono';
+export type TLinkSize = 'xs' | 'sm' | 'md' | 'lg';
 
 const props = withDefaults(
   defineProps<{
@@ -16,6 +18,17 @@ const props = withDefaults(
     underline?: TLinkUnderline;
     /** Text weight. Defaults to `medium`, matching the base link. */
     weight?: TLinkWeight;
+    /**
+     * Font family, same vocabulary as TText. `mono` is for a link whose label
+     * is machine text — a partition key, an ARN, a resource name — which
+     * otherwise needs a TText wrapped inside the anchor.
+     */
+    family?: TLinkFamily;
+    /**
+     * Type size, same vocabulary as TText's `xs`–`lg`. Omitted, the link
+     * inherits, which is the right default inside prose.
+     */
+    size?: TLinkSize;
   }>(),
   {
     to: undefined,
@@ -25,6 +38,8 @@ const props = withDefaults(
     variant: 'default',
     underline: 'always',
     weight: 'medium',
+    family: undefined,
+    size: undefined,
   },
 );
 
@@ -61,6 +76,8 @@ const classes = computed(() => [
   `t-link--${props.variant}`,
   props.underline !== 'always' ? `t-link--underline-${props.underline}` : null,
   props.weight !== 'medium' ? `t-link--weight-${props.weight}` : null,
+  props.family ? `t-link--family-${props.family}` : null,
+  props.size ? `t-link--size-${props.size}` : null,
   {
     'is-disabled': props.disabled,
   },

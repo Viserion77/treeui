@@ -113,3 +113,21 @@ accessibility_gaps:
       />
       <template #hint><span id="email-help">Work address</span></template>
     </TFormField>
+
+identity:
+  note: >
+    TFormField mints an id, points its `<label for>` at it, and PROVIDES it to
+    the TreeUI control nested inside (TInput, TTextarea, TCheckbox, TTagInput,
+    TKeyValueEditor). Inventing and repeating the id by hand was a silent
+    failure mode: forget one half and nothing warns — the label simply names
+    nothing. `htmlFor` still wins, for a control the field cannot reach, and an
+    explicit `id` on the control wins over the generated one.
+  described_by: >
+    The error and hint paragraphs now carry ids and the labelled control gets
+    `aria-describedby` — error first, hint otherwise.
+  slot_props:
+    note: "The default slot receives `{ id, describedBy }` for a control that cannot inject the context."
+  deliberately_not_propagated: >
+    `invalid`, `disabled` and `required` are NOT pushed onto the control. A
+    field carrying a summary error would otherwise restyle a control the
+    consumer never marked, and those props already exist on the controls.

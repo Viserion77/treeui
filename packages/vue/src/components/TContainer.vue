@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, useAttrs } from 'vue';
+import { listRoleFor } from './list-semantics';
 
 defineOptions({
   inheritAttrs: false,
@@ -38,6 +39,8 @@ const rootClasses = computed(() => [
 
 const rootStyle = computed(() => attrs.style);
 
+const listRole = computed(() => listRoleFor(props.as));
+
 const rootAttrs = computed(() => {
   const { class: _class, style: _style, ...rest } = attrs;
   return rest;
@@ -47,6 +50,7 @@ const rootAttrs = computed(() => {
 <template>
   <component
     :is="as"
+    :role="listRole"
     v-bind="rootAttrs"
     :class="rootClasses"
     :style="rootStyle"

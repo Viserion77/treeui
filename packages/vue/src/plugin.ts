@@ -197,6 +197,13 @@ const components = {
   TImage,
 };
 
+/**
+ * Exactly what `TreeUIPlugin` registers globally. Exported so the ambient
+ * declaration in `global-components.ts` cannot drift from the registry — the
+ * augmentation IS this object's type, not a hand-kept copy of it.
+ */
+export type TreeUIGlobalComponents = typeof components;
+
 export const TreeUIPlugin: Plugin = {
   install(app: App) {
     Object.entries(components).forEach(([name, component]) => {

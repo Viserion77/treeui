@@ -45,3 +45,13 @@ example: |
     <MainDashboard />
     <template #aside><SidePanel /></template>
   </TSplit>
+
+list_semantics:
+  note: >
+    With `as="ul"`/`"ol"`/`"menu"` the primitive cancels the user-agent list box
+    (marker, indent, block margin) so the three-line reset stops being copied
+    into every consumer, and sets `role="list"` back — `list-style: none` makes
+    Safari/VoiceOver drop the list role, which is the whole reason `as="ul"` was
+    chosen. A `role` passed by the consumer still wins. Semantics are untouched:
+    the element is a real `<ul>`/`<li>` in the accessibility tree.
+  css: ':where(ul, ol, menu):is(.t-split, …)'

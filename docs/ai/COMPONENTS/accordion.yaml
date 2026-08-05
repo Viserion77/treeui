@@ -187,3 +187,17 @@ example: |
     <TAccordionItem value="b">Panel B</TAccordionItem>
   </TAccordion>
   <!-- const openItems = ref<string[]>(['a']) -->
+
+item_props_addendum:
+  headingLevel:
+    type: "2 | 3 | 4 | 5 | 6 | false"
+    default: "undefined — follows the container"
+    description: >
+      Heading element wrapping the trigger. `false` renders no heading at all.
+      TAccordionItem used to hardcode an `<h3>`, which floods the document
+      outline when the disclosure is attached to one item of content: 20 rounds
+      of a conversation became 20 headings for someone navigating by heading,
+      inside a surface with no sections. The APG asks for a heading around a
+      DOCUMENT accordion, and a note is not one — so `variant="quiet"` defaults
+      to no heading and `variant="default"` keeps `<h3>`. An explicit value wins
+      in both directions.

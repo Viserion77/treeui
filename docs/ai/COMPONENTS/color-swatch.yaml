@@ -47,6 +47,22 @@ props:
       The chip border steps up to `--tree-color-border-strong` because half of
       these chips ARE background colours, and in their own theme a weak border
       makes the chip vanish into the page.
+  shape:
+    type: TColorSwatchShape
+    default: pill
+    values: [pill, square]
+    note: >
+      Chip geometry. `pill` is the picker's round chip; `square` uses
+      `--tree-radius-md`, the shape a brand manual's colour PLATE has, where the
+      colour is the subject of the page rather than a control.
+  block:
+    type: boolean
+    default: false
+    note: >
+      Let each chip take the width of the group instead of the fixed
+      `--tree-color-swatch-size` square, so a read-only plate can be as wide as
+      its card. Only meaningful with `readonly`; ignored for the picker, whose
+      chips are buttons in a row.
 
 events:
   - "update:modelValue"

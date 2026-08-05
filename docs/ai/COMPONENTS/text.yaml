@@ -13,13 +13,30 @@ props:
   size:
     type: TTextSize
     default: undefined
-    values: [xs, sm, md, lg, xl, 2xl, 3xl, 4xl, 5xl, display, title, overline]
-    note: "xs–5xl map to --tree-font-size-*. `display` is a responsive hero step (clamp 3xl→5xl, compact line-height, tight tracking). `title` is a responsive section-heading step (clamp xl→4xl, tight line-height and tracking) that stays below `display` at every width, so a section heading never out-sizes the hero. `overline` is a closed eyebrow style (xs, semibold, uppercase, wide tracking) that leaves colour to `tone`. Omitted = inherit."
+    values: [xs, sm, md, lg, xl, 2xl, 3xl, 4xl, 5xl, display, title, subtitle, overline]
+    note: >
+      xs–5xl map to --tree-font-size-*. Three RESPONSIVE steps stay ordered at
+      every viewport width, because two steps sharing a slope collapse into each
+      other below the smaller one's cap: `display` (hero, clamp 3xl→5xl at 5vw),
+      `title` (page or section heading, clamp xl→4xl at 4vw) and `subtitle`
+      (the heading under one of those, clamp lg→2xl at 2.5vw — a gentler climb,
+      not merely a lower ceiling). Measured title vs subtitle at 390/500/600/700px:
+      22/22/24/28 against 18/18/18/18. `overline` is a closed eyebrow style
+      (xs, semibold, uppercase, wide tracking) that leaves colour to `tone`.
+      Omitted = inherit.
   tone:
     type: TTextTone
     default: default
-    values: [default, muted, inverse, brand]
-    note: "`default` inherits the current colour; others map to --tree-color-text-* / brand."
+    values: [default, muted, inverse, brand, danger, success, warning, info]
+    note: >
+      `default` inherits the current colour; `muted`/`inverse`/`brand` map to
+      --tree-color-text-* / brand. The four STATUS tones read
+      --tree-color-status-* (`danger` → `error`, the vocabulary-to-token mapping
+      in CONTRACTS.yaml). They exist because a sentence that IS the state — the
+      error line under a field, the green "connected" beside a resource — is not
+      a TAlert (a box with an icon and the weight of an announcement) and not a
+      TBadge/TTag (a pill, when the datum is prose). Without them the only way to
+      say "this failed" in text was local CSS.
   weight:
     type: TTextWeight
     default: undefined
@@ -29,6 +46,25 @@ props:
     default: undefined
     values: [sans, mono]
     note: "Font family. Omitted = inherit. `mono` maps to --tree-font-family-mono for inline code, IDs, ARNs and machine text — the token-driven alternative to a local monospace class. Not a substitute for a code/log block."
+  wrap:
+    type: TTextWrap
+    default: undefined
+    values: [anywhere, break-word]
+    note: >
+      Break axis for a string with no break opportunity — an id, ARN, API key or
+      hash is one long word, so it overflows its box. `truncate` is the wrong
+      answer when the string IS what the reader came to copy: an ellipsis makes
+      an id useless. `anywhere` breaks at any character (and sets
+      `min-inline-size: 0`, without which a flex or grid child still refuses to
+      shrink below its longest word and never breaks); `break-word` only breaks a
+      word that would otherwise overflow. Ignored when `truncate` is set.
+  balance:
+    type: boolean
+    default: false
+    note: >
+      `text-wrap: balance` — evens out the line lengths of a short block, for
+      headlines where a one-word last line reads as a mistake. Browsers without
+      support wrap normally.
   truncate:
     type: boolean
     default: false
@@ -40,8 +76,13 @@ props:
   measure:
     type: TTextMeasure
     default: undefined
-    values: [lead, prose]
-    note: "Reading measure — a max-width in `ch` for legibility, rendered block so it applies. `lead` (~58ch, hero subtitle) and `prose` (~68ch, body). Closed axis so every surface caps at the same width without inventing a `ch` value (parallels treeFieldWidths for form controls)."
+    values: [headline, lead, prose]
+    note: >
+      Reading measure — a max-width in `ch` for legibility, rendered block so it
+      applies. `headline` (~20ch, a hero or section headline), `lead` (~58ch,
+      hero subtitle) and `prose` (~68ch, body). Closed axis so every surface caps
+      at the same width without inventing a `ch` value (parallels
+      treeFieldWidths for form controls).
 
 slots:
   - default

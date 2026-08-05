@@ -11,7 +11,11 @@ export const treeTokens = {
       base: '0.9375rem',
       lg: '1.125rem',
       xl: '1.375rem',
-      '2xl': '1.375rem',
+      // `2xl` used to repeat `xl` verbatim, which made every
+      // `clamp(xl … 2xl)` a constant and left a hole between 1.375 and 1.75rem.
+      // It now fills that hole; `xl` is unchanged, since it is the more used of
+      // the two. `tokens.test.ts` keeps the scale strictly increasing.
+      '2xl': '1.5rem',
       '3xl': '1.75rem',
       '4xl': '2.25rem',
       '5xl': '3rem',

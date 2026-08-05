@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, useAttrs, watch } from 'vue';
 import type { TSize } from '../types/contracts';
+import { useFormFieldIdentity } from './form-field';
 
 defineOptions({
   inheritAttrs: false,
@@ -13,6 +14,14 @@ const props = withDefaults(
     disabled?: boolean;
     indeterminate?: boolean;
     invalid?: boolean;
+    /**
+     * Visible label, rendered beside the box and tied to the input by the
+     * wrapping `<label>`. Every other control in the library names itself with
+     * a `label` prop; the checkbox was the only one labelled by slot alone, and a
+     * consumer reaching for the prop got a checkbox with no accessible name at
+     * all. The `default` slot still wins when both are given.
+     */
+    label?: string;
   }>(),
   {
     modelValue: false,
@@ -20,6 +29,7 @@ const props = withDefaults(
     disabled: false,
     indeterminate: false,
     invalid: false,
+    label: undefined,
   },
 );
 
@@ -59,8 +69,16 @@ const rootClasses = computed(() => [
 
 const rootStyle = computed(() => attrs.style);
 
+const { controlId, describedBy } = useFormFieldIdentity(attrs);
+
 const inputAttrs = computed(() => {
-  const { class: _class, style: _style, ...rest } = attrs;
+  const {
+    class: _class,
+    style: _style,
+    id: _id,
+    'aria-describedby': _describedBy,
+    ...rest
+  } = attrs;
   return rest;
 });
 
@@ -75,9 +93,11 @@ const onChange = () => {
     :style="rootStyle"
   >
     <input
+      :id="controlId"
       ref="inputRef"
       v-bind="inputAttrs"
       type="checkbox"
+      :aria-describedby="describedBy"
       class="t-checkbox__input"
       :checked="modelValue"
       :disabled="disabled"
@@ -119,10 +139,10 @@ const onChange = () => {
       </svg>
     </span>
     <span
-      v-if="$slots.default"
+      v-if="$slots.default || label"
       class="t-checkbox__label"
     >
-      <slot />
+      <slot>{{ label }}</slot>
     </span>
   </label>
 </template>

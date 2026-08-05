@@ -215,6 +215,20 @@ table.t-visually-hidden {
   justify-content: center;
 }
 
+/* Same scale contract as the tag's icon slot (TREEUX-010). */
+.t-badge__icon > :where(svg) {
+  inline-size: var(--tree-badge-icon-size, var(--tree-size-icon-sm));
+  block-size: var(--tree-badge-icon-size, var(--tree-size-icon-sm));
+}
+
+.t-badge--sm .t-badge__icon {
+  --tree-badge-icon-size: 0.875rem;
+}
+
+.t-badge--lg .t-badge__icon {
+  --tree-badge-icon-size: var(--tree-size-icon-md);
+}
+
 .t-button__spinner .t-spinner {
   color: currentColor;
 }
@@ -786,6 +800,16 @@ table.t-visually-hidden {
   resize: vertical;
 }
 
+/* The family lands on the field, not the label wrapper, because the wrapper
+   also holds the spinner (TREEUX-005). */
+.t-textarea--family-sans .t-textarea__field {
+  font-family: var(--tree-font-family-sans);
+}
+
+.t-textarea--family-mono .t-textarea__field {
+  font-family: var(--tree-font-family-mono);
+}
+
 .t-textarea__field::placeholder {
   color: var(--tree-color-text-muted);
 }
@@ -1183,6 +1207,21 @@ table.t-visually-hidden {
 .t-card--interactive:focus-visible {
   outline: none;
   box-shadow: 0 0 0 2px var(--tree-color-focus-ring);
+}
+
+/* `as="button"` is the right element whenever the card's action is not
+   navigation (open a modal, select, focus) — but a `<button>` inherits none of
+   font, width or alignment, and Chrome's default button font is 13.33px,
+   centred, shrink-to-fit. Measured on the SAME card in a 900px parent:
+   134.75px / 13.33px / center as a button against 900px / 16px / start as a
+   div. Scoped to the element, so a card as `<a>` or `<div>` is untouched;
+   `type`, `disabled` and the focus ring are untouched either way (TREEUX-045). */
+button.t-card {
+  appearance: none;
+  inline-size: 100%;
+  font: inherit;
+  text-align: inherit;
+  color: inherit;
 }
 
 /* ─── Brand lockup ─── */
@@ -1794,6 +1833,21 @@ a.t-brand-lockup:focus-visible {
   background: color-mix(in srgb, var(--tree-color-bg-subtle) 72%, var(--tree-color-bg-surface));
   color: var(--tree-color-text-primary);
   text-align: center;
+}
+
+/* Frame geometry (TREEUX-046). `size` is the message; `frame` is the box the
+   message sits in — a board column, a side panel and a page are the same empty
+   state with three geometries, and wrapping the component to supply them was
+   the workaround in 9 files. */
+.t-empty-state--frame-fill {
+  block-size: 100%;
+  min-block-size: 0;
+  align-content: center;
+}
+
+.t-empty-state--frame-inline {
+  width: auto;
+  justify-self: start;
 }
 
 .t-empty-state--sm {
@@ -3766,6 +3820,24 @@ a.t-brand-lockup:focus-visible {
   right: 0;
 }
 
+/* An item with an icon or a selected mark still lays out as one row
+   (TREEUX-009). */
+.t-dropdown__item-icon {
+  flex: none;
+}
+
+.t-dropdown__item-label {
+  min-inline-size: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.t-dropdown__item.is-selected {
+  font-weight: var(--tree-font-weight-medium);
+  color: var(--tree-color-brand-primary);
+}
+
 .t-dropdown__item {
   display: flex;
   align-items: center;
@@ -4010,7 +4082,8 @@ a.t-brand-lockup:focus-visible {
   border-bottom: var(--tree-border-width-subtle) solid var(--tree-color-border-default);
 }
 
-.t-accordion__heading {
+.t-accordion__heading,
+.t-accordion__heading-bare {
   margin: 0;
   font-size: inherit;
   font-weight: inherit;
@@ -4578,15 +4651,49 @@ a.t-brand-lockup:focus-visible {
   --tree-tag-border: color-mix(in srgb, var(--tree-color-status-info) 36%, var(--tree-color-border-default));
 }
 
+/* Label density (TREEUX-048). "Height = the control step" is right for a tag
+   that sits in a row of controls and wrong for a static label next to a
+   heading: adopting `tone` on a hero badge took it from 26.25px to 40px (+52%),
+   and stepping down to `size="sm"` fixed the height by shrinking the type from
+   13px to 11px — the wrong knob. Compact keeps the type of its size step and
+   derives the height from padding + line-height instead. Compound selector so
+   it outranks the equal-specificity `.t-tag--<size>` height. */
+.t-tag.t-tag--density-compact {
+  height: auto;
+  padding-block: var(--tree-space-1);
+  line-height: var(--tree-font-lineHeight-tight);
+}
+
 .t-tag.is-disabled {
   opacity: 0.5;
   cursor: not-allowed;
 }
 
 .t-tag__icon {
+  --tree-tag-icon-size: var(--tree-size-icon-sm);
   display: inline-flex;
   align-items: center;
   flex-shrink: 0;
+}
+
+/* The slot provides the scale (TREEUX-010). A TIcon renders its `size` prop as
+   width/height ATTRIBUTES, which CSS outranks — so a slotted icon with no
+   `size` stops entering at the 20px default and lines up with the tag's own
+   type instead. It was either that or a magic number at each call site: a
+   `TTag size="sm"` is 28px tall with 11px text, and a 20px glyph inside it is
+   taller than the line it sits on. An explicit `size` on the TIcon still wins,
+   because an inline width/height on the element beats this rule. */
+.t-tag__icon > :where(svg) {
+  inline-size: var(--tree-tag-icon-size);
+  block-size: var(--tree-tag-icon-size);
+}
+
+.t-tag--sm .t-tag__icon {
+  --tree-tag-icon-size: 0.875rem;
+}
+
+.t-tag--lg .t-tag__icon {
+  --tree-tag-icon-size: var(--tree-size-icon-md);
 }
 
 .t-tag__label {
@@ -6584,7 +6691,7 @@ a.t-brand-lockup:focus-visible {
 }
 
 .t-color-swatch__option {
-  border-radius: var(--tree-radius-pill);
+  border-radius: var(--tree-color-swatch-radius, var(--tree-radius-pill));
 }
 
 .t-color-swatch__option.is-selected {
@@ -6618,7 +6725,25 @@ a.t-brand-lockup:focus-visible {
   inline-size: var(--tree-color-swatch-size);
   block-size: var(--tree-color-swatch-size);
   border: var(--tree-border-width-subtle) solid var(--tree-color-border-strong);
-  border-radius: var(--tree-radius-pill);
+  border-radius: var(--tree-color-swatch-radius, var(--tree-radius-pill));
+}
+
+/* Plate geometry (TREEUX-038, second half). A round chip is right for a
+   picker and wrong for a brand manual, where the colour IS the subject:
+   `shape="square"` swaps the radius, `block` lets the plate span its card
+   instead of staying a fixed square. Height still comes from `size`. */
+.t-color-swatch--square {
+  --tree-color-swatch-radius: var(--tree-radius-md);
+}
+
+.t-color-swatch.is-block {
+  display: grid;
+  align-items: stretch;
+}
+
+.t-color-swatch.is-block .t-color-swatch__chip {
+  inline-size: 100%;
+  block-size: calc(var(--tree-color-swatch-size) * 1.75);
 }
 
 /* ── Spacer ───────────────────────────────────────────── */
@@ -6696,6 +6821,16 @@ a.t-brand-lockup:focus-visible {
   letter-spacing: var(--tree-font-tracking-tight);
 }
 
+/* Subtitle: the heading UNDER a `title`, on a gentler slope (2.5vw vs 4vw).
+   Two responsive steps that share a slope collapse into each other below the
+   smaller one's cap — they only separate where the screen is already wide — so
+   the fix is a different rate of climb, not merely a lower ceiling. Measured
+   against `title` at 390/500/600/700px: 22/22/24/28 vs 18/18/18/18. */
+.t-text--size-subtitle {
+  font-size: clamp(var(--tree-font-size-lg), 2.5vw, var(--tree-font-size-2xl));
+  line-height: var(--tree-font-lineHeight-tight);
+}
+
 /* Overline / eyebrow: closed style. Sets size, weight, case and tracking but
    NOT colour — the tone axis still governs it (brand on a site, muted on an LP). */
 .t-text--size-overline {
@@ -6706,6 +6841,10 @@ a.t-brand-lockup:focus-visible {
 }
 
 /* Reading measure — cap the line length in ch and render block so it applies. */
+.t-text--measure-headline {
+  display: block;
+  max-inline-size: 20ch;
+}
 .t-text--measure-lead {
   display: block;
   max-inline-size: 58ch;
@@ -6723,6 +6862,21 @@ a.t-brand-lockup:focus-visible {
 }
 .t-text--brand {
   color: var(--tree-color-brand-primary);
+}
+
+/* Status tones. `danger` is the vocabulary name, `--tree-color-status-error`
+   the token — the mapping documented in CONTRACTS.yaml, not a second colour. */
+.t-text--danger {
+  color: var(--tree-color-status-error);
+}
+.t-text--success {
+  color: var(--tree-color-status-success);
+}
+.t-text--warning {
+  color: var(--tree-color-status-warning);
+}
+.t-text--info {
+  color: var(--tree-color-status-info);
 }
 
 .t-text--weight-regular {
@@ -6756,6 +6910,42 @@ a.t-brand-lockup:focus-visible {
 .t-text.is-pre-wrap {
   white-space: pre-wrap;
   overflow-wrap: break-word;
+}
+
+/* Break axis for machine strings (ids, ARNs, keys, hashes). `min-inline-size: 0`
+   goes with `anywhere`: without it the element still refuses to shrink below
+   its longest word inside a flex or grid parent, and the break never happens. */
+.t-text--wrap-anywhere {
+  min-inline-size: 0;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.t-text--wrap-break-word {
+  overflow-wrap: break-word;
+}
+
+.t-text.is-balanced {
+  text-wrap: balance;
+}
+
+/* ------------------------------------------------------------------ *
+ * List semantics on a layout primitive (TREEUX-044).
+ *
+ * A list of resources IS a `<ul>` — that is what a screen reader announces as
+ * "list, 7 items". But swapping `div` for `ul` on a layout primitive brings the
+ * user-agent marker, indent and margin back, so every consumer re-wrote the
+ * same three lines. The reset is scoped to the primitives that take an `as`, so
+ * it never touches prose lists a consumer wrote by hand. Semantics are
+ * untouched: the element is still a `<ul>`/`<ol>` in the accessibility tree.
+ *
+ * `list-style: none` on a `<ul>` removes the list role in Safari/VoiceOver;
+ * `role="list"` is set back by the components themselves for exactly that case.
+ * ------------------------------------------------------------------ */
+:where(ul, ol, menu):is(.t-stack, .t-grid, .t-split, .t-section__inner, .t-container) {
+  margin-block: 0;
+  padding-inline-start: 0;
+  list-style: none;
 }
 
 /* ── Navbar ───────────────────────────────────────────── */
@@ -7066,6 +7256,28 @@ a.t-nav-menu__item.is-disabled {
   transition:
     color var(--tree-motion-duration-fast) var(--tree-motion-easing-standard),
     text-decoration-color var(--tree-motion-duration-fast) var(--tree-motion-easing-standard);
+}
+
+/* Typographic axes, same vocabulary as TText (TREEUX-005). A link whose label
+   is machine text needed a TText nested inside the anchor to get `mono`, and a
+   disclosure link smaller than the body had no way to say so at all. */
+.t-link--family-sans {
+  font-family: var(--tree-font-family-sans);
+}
+.t-link--family-mono {
+  font-family: var(--tree-font-family-mono);
+}
+.t-link--size-xs {
+  font-size: var(--tree-font-size-xs);
+}
+.t-link--size-sm {
+  font-size: var(--tree-font-size-sm);
+}
+.t-link--size-md {
+  font-size: var(--tree-font-size-md);
+}
+.t-link--size-lg {
+  font-size: var(--tree-font-size-lg);
 }
 
 .t-link:focus-visible {
@@ -8492,6 +8704,15 @@ body:has(.t-app-shell) {
 
 .t-key-value-editor.is-disabled {
   opacity: 0.68;
+}
+
+/* `invalid` marks the WHOLE control (the aggregated TFormField summary), which
+   a container has no border of its own to show. A rail on the inline start
+   reads as "everything in here is the problem" without fighting the per-row
+   marks, which stay on the individual key inputs. */
+.t-key-value-editor.is-invalid {
+  padding-inline-start: var(--tree-space-3);
+  border-inline-start: var(--tree-border-width-strong) solid var(--tree-color-status-error);
 }
 
 /* ------------------------------------------------------------------ *

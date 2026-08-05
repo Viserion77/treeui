@@ -59,6 +59,8 @@ import TColorSwatch from './TColorSwatch.vue';
 import TStack from './TStack.vue';
 import TStackItem from './TStackItem.vue';
 import TSplit from './TSplit.vue';
+import TGrid from './TGrid.vue';
+import TContainer from './TContainer.vue';
 import TSpacer from './TSpacer.vue';
 import TKbd from './TKbd.vue';
 import TText from './TText.vue';
@@ -6192,5 +6194,398 @@ describe('TREEUX-001 — TTagInput localizable chip copy (LSS)', () => {
     const buttons = wrapper.findAll('.t-tag__remove');
     expect(buttons).toHaveLength(2);
     expect(buttons.every((b) => b.attributes('aria-label') === 'Remover')).toBe(true);
+  });
+});
+
+describe('TREEUX-002 — TKeyValueEditor, defects found in real adoption (LSS)', () => {
+  it('does not drop a row when the parent holds the map reactively', async () => {
+    // The parent pattern that broke it: a `reactive()` object handed back as a
+    // proxy, which is never `===` the raw record the editor emitted.
+    const state = reactive<{ map: Record<string, string> }>({
+      map: { primary: '#111', accent: '#222' },
+    });
+
+    const wrapper = mount(TKeyValueEditor, {
+      props: {
+        modelValue: state.map,
+        'onUpdate:modelValue': (value: Record<string, string>) => {
+          state.map = value;
+        },
+      },
+    });
+
+    const keys = () => wrapper.findAll('.t-key-value-editor__key');
+    expect(keys()).toHaveLength(2);
+
+    // Clearing the key of an existing row used to delete the row AND its value.
+    await keys()[0].setValue('');
+    await nextTick();
+
+    expect(keys()).toHaveLength(2);
+    expect((keys()[1].element as HTMLInputElement).value).toBe('accent');
+    const values = wrapper.findAll('.t-key-value-editor__value');
+    expect((values[0].element as HTMLInputElement).value).toBe('#111');
+    expect(wrapper.find('.t-key-value-editor__row-error').exists()).toBe(true);
+  });
+
+  it('keeps the row identity of untouched keys across an external change', async () => {
+    const wrapper = mount(TKeyValueEditor, { props: { modelValue: { a: '1' } } });
+    await wrapper.setProps({ modelValue: { a: '1', b: '2' } });
+    await nextTick();
+    expect(wrapper.findAll('.t-key-value-editor__key')).toHaveLength(2);
+  });
+
+  it('emits validity on mount, because a Record can arrive invalid', () => {
+    const wrapper = mount(TKeyValueEditor, { props: { modelValue: { '': 'x' } } });
+    expect(wrapper.emitted('validity-change')?.[0]?.[0]).toEqual({
+      valid: false,
+      errors: ['Key is required.'],
+    });
+    expect(wrapper.find('.t-key-value-editor__row-error').exists()).toBe(true);
+  });
+
+  it('emits validity again when an external reset makes it valid', async () => {
+    const wrapper = mount(TKeyValueEditor, { props: { modelValue: { '': 'x' } } });
+    await wrapper.setProps({ modelValue: { a: '1' } });
+    await nextTick();
+    expect(wrapper.emitted('validity-change')?.at(-1)?.[0]).toEqual({ valid: true, errors: [] });
+  });
+
+  it('does not re-emit the same validity on every keystroke', async () => {
+    const wrapper = mount(TKeyValueEditor, { props: { modelValue: { a: '1' } } });
+    const before = wrapper.emitted('validity-change')?.length ?? 0;
+    await wrapper.findAll('.t-key-value-editor__value')[0].setValue('2');
+    await wrapper.findAll('.t-key-value-editor__value')[0].setValue('3');
+    expect(wrapper.emitted('validity-change')?.length).toBe(before);
+  });
+
+  it('makes `invalid` visible instead of inert', () => {
+    const wrapper = mount(TKeyValueEditor, { props: { modelValue: {}, invalid: true } });
+    expect(wrapper.classes()).toContain('is-invalid');
+    expect(wrapper.attributes('aria-invalid')).toBe('true');
+    expect(wrapper.attributes('role')).toBe('group');
+  });
+
+  it('routes an incoming id to the first key input, not the wrapper', () => {
+    const wrapper = mount(TKeyValueEditor, {
+      props: { modelValue: { a: '1' } },
+      attrs: { id: 'branding-colors' },
+    });
+    expect(wrapper.attributes('id')).toBeUndefined();
+    expect(wrapper.findAll('.t-key-value-editor__key')[0].attributes('id')).toBe(
+      'branding-colors',
+    );
+  });
+});
+
+describe('TREEUX-001 — TTagInput, defects found in real adoption (LSS)', () => {
+  it('keeps repeated values when allowDuplicates is set', async () => {
+    const wrapper = mount(TTagInput, {
+      props: { modelValue: ['--param', 'a=1'], allowDuplicates: true },
+    });
+    const field = wrapper.get('.t-tag-input__field');
+    await field.setValue('--param');
+    await field.trigger('keydown', { key: 'Enter' });
+    expect(wrapper.emitted('update:modelValue')?.at(-1)?.[0]).toEqual([
+      '--param',
+      'a=1',
+      '--param',
+    ]);
+  });
+
+  it('still dedupes by default', async () => {
+    const wrapper = mount(TTagInput, { props: { modelValue: ['a'] } });
+    const field = wrapper.get('.t-tag-input__field');
+    await field.setValue('a');
+    await field.trigger('keydown', { key: 'Enter' });
+    expect(wrapper.emitted('update:modelValue')).toBeUndefined();
+  });
+
+  it('makes Enter the only confirm when separator is null', async () => {
+    const wrapper = mount(TTagInput, { props: { modelValue: [], separator: null } });
+    const field = wrapper.get('.t-tag-input__field');
+    await field.setValue('--param=tags=a,b');
+    await field.trigger('keydown', { key: 'Enter' });
+    expect(wrapper.emitted('update:modelValue')?.[0]?.[0]).toEqual(['--param=tags=a,b']);
+  });
+
+  it('accepts several separators', async () => {
+    const wrapper = mount(TTagInput, { props: { modelValue: [], separator: [',', ';'] } });
+    const field = wrapper.get('.t-tag-input__field');
+    await field.setValue('a;b,c;');
+    expect(wrapper.emitted('update:modelValue')?.at(-1)?.[0]).toEqual(['a', 'b', 'c']);
+  });
+
+  it('commits the pending draft on blur, so a value is never dropped silently', async () => {
+    const wrapper = mount(TTagInput, { props: { modelValue: [] } });
+    const field = wrapper.get('.t-tag-input__field');
+    await field.setValue('sqs');
+    await field.trigger('blur');
+    expect(wrapper.emitted('update:modelValue')?.at(-1)?.[0]).toEqual(['sqs']);
+  });
+
+  it('can be told not to commit on blur, and exposes commit() instead', async () => {
+    const wrapper = mount(TTagInput, { props: { modelValue: [], commitOnBlur: false } });
+    const field = wrapper.get('.t-tag-input__field');
+    await field.setValue('sqs');
+    await field.trigger('blur');
+    expect(wrapper.emitted('update:modelValue')).toBeUndefined();
+
+    (wrapper.vm as unknown as { commit: () => void }).commit();
+    expect(wrapper.emitted('update:modelValue')?.at(-1)?.[0]).toEqual(['sqs']);
+  });
+
+  it('does not strand a lone separator in the field', async () => {
+    const wrapper = mount(TTagInput, { props: { modelValue: [] } });
+    const field = wrapper.get('.t-tag-input__field');
+    const el = field.element as HTMLInputElement;
+    el.value = ',';
+    await field.trigger('input');
+    expect(el.value).toBe('');
+  });
+});
+
+describe('TREEUX-043 / 047 — TText status tones and the break axis (S7 + LSS)', () => {
+  it.each(['danger', 'success', 'warning', 'info'] as const)('paints the %s tone', (tone) => {
+    expect(mount(TText, { props: { tone } }).classes()).toContain(`t-text--${tone}`);
+  });
+
+  it.each(['anywhere', 'break-word'] as const)('breaks a machine string with %s', (wrap) => {
+    expect(mount(TText, { props: { wrap } }).classes()).toContain(`t-text--wrap-${wrap}`);
+  });
+
+  it('drops the break axis when truncate wins, since the two contradict', () => {
+    const wrapper = mount(TText, { props: { wrap: 'anywhere', truncate: true } });
+    expect(wrapper.classes()).toContain('is-truncated');
+    expect(wrapper.classes().some((c) => c.startsWith('t-text--wrap-'))).toBe(false);
+  });
+
+  it('balances a headline on request', () => {
+    expect(mount(TText, { props: { balance: true } }).classes()).toContain('is-balanced');
+  });
+
+  it('carries a headline measure alongside lead and prose', () => {
+    expect(mount(TText, { props: { measure: 'headline' } }).classes()).toContain(
+      't-text--measure-headline',
+    );
+  });
+
+  it('adds the subtitle step below title', () => {
+    expect(mount(TText, { props: { size: 'subtitle' } }).classes()).toContain(
+      't-text--size-subtitle',
+    );
+  });
+});
+
+describe('TREEUX-044 — list semantics on a layout primitive (S7)', () => {
+  it.each([TStack, TGrid, TSplit, TContainer])(
+    'restores role="list" when rendered as a ul',
+    (component) => {
+      expect(mount(component, { props: { as: 'ul' } }).attributes('role')).toBe('list');
+    },
+  );
+
+  it('adds no role for a normal element', () => {
+    expect(mount(TStack).attributes('role')).toBeUndefined();
+  });
+
+  it('lets a consumer role win', () => {
+    const wrapper = mount(TStack, { props: { as: 'ul' }, attrs: { role: 'presentation' } });
+    expect(wrapper.attributes('role')).toBe('presentation');
+  });
+});
+
+describe('TREEUX-048 — TTag label density (S7)', () => {
+  it('keeps the control height by default', () => {
+    expect(mount(TTag).classes().some((c) => c.startsWith('t-tag--density-'))).toBe(false);
+  });
+
+  it('hugs the text with density="compact", keeping the size step', () => {
+    const wrapper = mount(TTag, { props: { density: 'compact', size: 'md' } });
+    expect(wrapper.classes()).toContain('t-tag--density-compact');
+    expect(wrapper.classes()).toContain('t-tag--md');
+  });
+});
+
+describe('TREEUX-050 — accordion heading wrapper (S7)', () => {
+  const mountItem = (accordionProps: Record<string, unknown>, itemProps = {}) =>
+    mount(TAccordion, {
+      props: accordionProps,
+      slots: {
+        default: `<TAccordionItem value="a" v-bind='${JSON.stringify(itemProps)}'>
+          <template #trigger>Trail</template>Steps
+        </TAccordionItem>`,
+      },
+      global: { components: { TAccordionItem } },
+    });
+
+  it('keeps the h3 for a document accordion', () => {
+    expect(mountItem({}).find('h3.t-accordion__heading').exists()).toBe(true);
+  });
+
+  it('drops the heading in the quiet variant, so a chat trail adds none', () => {
+    const wrapper = mountItem({ variant: 'quiet' });
+    expect(wrapper.find('h3').exists()).toBe(false);
+    expect(wrapper.find('.t-accordion__heading-bare').exists()).toBe(true);
+    // The disclosure semantics survive the change.
+    expect(wrapper.get('.t-accordion__trigger').attributes('aria-expanded')).toBe('false');
+  });
+
+  it('takes an explicit level in either direction', () => {
+    expect(mountItem({}, { headingLevel: 2 }).find('h2').exists()).toBe(true);
+    expect(mountItem({ variant: 'quiet' }, { headingLevel: 4 }).find('h4').exists()).toBe(true);
+    expect(mountItem({}, { headingLevel: false }).find('h3').exists()).toBe(false);
+  });
+});
+
+describe('TREEUX-046 / 038 — frame and plate geometry (S7)', () => {
+  it('gives TEmptyState a frame axis separate from its message size', () => {
+    expect(mount(TEmptyState, { props: { frame: 'fill' } }).classes()).toContain(
+      't-empty-state--frame-fill',
+    );
+    expect(mount(TEmptyState, { props: { size: 'lg' } }).classes()).not.toContain(
+      't-empty-state--frame-fill',
+    );
+  });
+
+  it('gives TColorSwatch a square plate shape', () => {
+    const wrapper = mount(TColorSwatch, {
+      props: {
+        readonly: true,
+        shape: 'square',
+        block: true,
+        options: [{ label: 'Mark', value: '#3ab8ff' }],
+      },
+    });
+    expect(wrapper.classes()).toContain('t-color-swatch--square');
+    expect(wrapper.classes()).toContain('is-block');
+    expect(wrapper.get('.t-color-swatch__chip').attributes('role')).toBe('img');
+  });
+
+  it('ignores block outside readonly, where the chips are buttons', () => {
+    expect(mount(TColorSwatch, { props: { block: true } }).classes()).not.toContain('is-block');
+  });
+});
+
+describe('TREEUX-005 / 007 — typographic and navigation axes (LSS)', () => {
+  it('gives TLink the family and size vocabulary of TText', () => {
+    const wrapper = mount(TLink, { props: { href: '#', family: 'mono', size: 'sm' } });
+    expect(wrapper.classes()).toContain('t-link--family-mono');
+    expect(wrapper.classes()).toContain('t-link--size-sm');
+  });
+
+  it('gives TTextarea a family for machine content', () => {
+    expect(mount(TTextarea, { props: { family: 'mono' } }).classes()).toContain(
+      't-textarea--family-mono',
+    );
+  });
+
+  // A plain options object, not defineComponent(): the file already holds the
+  // one component `vue/one-component-per-file` allows.
+  const RouterLinkStub = {
+    props: { to: { type: [String, Object], required: true } },
+    template: '<a :href="typeof to === \'string\' ? to : to.path"><slot /></a>',
+  };
+
+  it('renders TButton `to` as a real link, not a button', () => {
+    const wrapper = mount(TButton, {
+      props: { to: '/settings' },
+      slots: { default: 'Settings' },
+      global: { components: { RouterLink: RouterLinkStub } },
+    });
+
+    expect(wrapper.element.tagName).toBe('A');
+    expect(wrapper.attributes('href')).toBe('/settings');
+    expect(wrapper.attributes('type')).toBeUndefined();
+    expect(wrapper.classes()).toContain('t-button');
+  });
+
+  it('falls back to a button when there is no router, and when disabled', () => {
+    expect(mount(TButton, { props: { to: '/x' } }).element.tagName).toBe('BUTTON');
+
+    const disabled = mount(TButton, {
+      props: { to: '/x', disabled: true },
+      global: { components: { RouterLink: RouterLinkStub } },
+    });
+    // A disabled link is not a thing; the native button can actually refuse.
+    expect(disabled.element.tagName).toBe('BUTTON');
+    expect(disabled.attributes('disabled')).toBeDefined();
+  });
+});
+
+describe('TREEUX-009 — labelling and identity in form controls (LSS)', () => {
+  it('names a TCheckbox from the label prop', () => {
+    const wrapper = mount(TCheckbox, { props: { label: 'Ativar' } });
+    expect(wrapper.get('.t-checkbox__label').text()).toBe('Ativar');
+  });
+
+  it('lets the slot win over the prop', () => {
+    const wrapper = mount(TCheckbox, { props: { label: 'Prop' }, slots: { default: 'Slot' } });
+    expect(wrapper.get('.t-checkbox__label').text()).toBe('Slot');
+  });
+
+  it('wires the TFormField label to the control it labels, with no ids by hand', () => {
+    const wrapper = mount(TFormField, {
+      props: { label: 'Bucket key', hint: 'Leave blank for the root' },
+      slots: { default: '<TInput />' },
+      global: { components: { TInput } },
+    });
+
+    const controlId = wrapper.get('input').attributes('id');
+    expect(controlId).toBeTruthy();
+    expect(wrapper.get('label').attributes('for')).toBe(controlId);
+    expect(wrapper.get('input').attributes('aria-describedby')).toBe(
+      wrapper.get('.t-form-field__hint').attributes('id'),
+    );
+  });
+
+  it('points aria-describedby at the error once there is one', () => {
+    const wrapper = mount(TFormField, {
+      props: { label: 'Key', error: 'Required' },
+      slots: { default: '<TInput />' },
+      global: { components: { TInput } },
+    });
+    expect(wrapper.get('input').attributes('aria-describedby')).toBe(
+      wrapper.get('.t-form-field__error').attributes('id'),
+    );
+  });
+
+  it('still honours an explicit htmlFor and an explicit control id', () => {
+    const wrapper = mount(TFormField, {
+      props: { label: 'Key', htmlFor: 'mine' },
+      slots: { default: '<TInput id="mine" />' },
+      global: { components: { TInput } },
+    });
+    expect(wrapper.get('label').attributes('for')).toBe('mine');
+    expect(wrapper.get('input').attributes('id')).toBe('mine');
+  });
+
+  it('gives a TDropdown item a selected state with real semantics', () => {
+    const wrapper = mount(TDropdown, {
+      props: {
+        defaultOpen: true,
+        label: 'Language',
+        items: [
+          { label: 'Português', value: 'pt', selected: true, icon: 'globe' },
+          { label: 'English', value: 'en', selected: false },
+        ],
+      },
+    });
+
+    const items = wrapper.findAll('.t-dropdown__item');
+    expect(items[0].attributes('role')).toBe('menuitemradio');
+    expect(items[0].attributes('aria-checked')).toBe('true');
+    expect(items[0].classes()).toContain('is-selected');
+    expect(items[1].attributes('aria-checked')).toBe('false');
+    expect(items[0].find('.t-dropdown__item-icon').exists()).toBe(true);
+  });
+
+  it('leaves a plain item as a menuitem', () => {
+    const wrapper = mount(TDropdown, {
+      props: { defaultOpen: true, label: 'Menu', items: [{ label: 'A', value: 'a' }] },
+    });
+    const item = wrapper.get('.t-dropdown__item');
+    expect(item.attributes('role')).toBe('menuitem');
+    expect(item.attributes('aria-checked')).toBeUndefined();
   });
 });

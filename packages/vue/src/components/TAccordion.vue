@@ -1,10 +1,8 @@
 <script setup lang="ts">
 import { computed, provide, reactive } from 'vue';
-import { type AccordionType, accordionInjectionKey } from './accordion';
+import { type AccordionType, type AccordionVariant, accordionInjectionKey } from './accordion';
 
-const _treeAccordionVariants = ['default', 'quiet'] as const;
-
-export type TAccordionVariant = (typeof _treeAccordionVariants)[number];
+export type TAccordionVariant = AccordionVariant;
 
 const props = withDefaults(
   defineProps<{
@@ -167,6 +165,7 @@ const rootClasses = computed(() => [
 
 provide(accordionInjectionKey, {
   type: computed(() => props.type),
+  variant: computed(() => props.variant),
   disabled: computed(() => props.disabled),
   collapsible: computed(() => props.collapsible),
   isItemOpen,

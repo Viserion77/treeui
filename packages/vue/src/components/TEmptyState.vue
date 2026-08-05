@@ -3,6 +3,10 @@ import { createId } from '@treeui/utils';
 import { computed, useAttrs } from 'vue';
 import type { TSize } from '../types/contracts';
 
+const _treeEmptyStateFrames = ['block', 'fill', 'inline'] as const;
+
+export type TEmptyStateFrame = (typeof _treeEmptyStateFrames)[number];
+
 defineOptions({
   inheritAttrs: false,
 });
@@ -18,15 +22,26 @@ const slots = defineSlots<{
 const props = withDefaults(
   defineProps<{
     as?: string;
+    /** Type and inner spacing of the message. Does not change the frame. */
     size?: TSize;
     title?: string;
     description?: string;
+    /**
+     * Geometry of the FRAME, which is a separate question from the size of the
+     * message inside it: the same empty state fills a board column, a side
+     * panel and a page. `fill` makes it take the height of its container and
+     * centre the message in it — the difference between "this column is empty"
+     * and "this page is empty". `inline` shrinks the frame to its content, for
+     * an empty state that sits inside a larger composition.
+     */
+    frame?: TEmptyStateFrame;
   }>(),
   {
     as: 'section',
     size: 'md',
     title: '',
     description: '',
+    frame: 'block',
   },
 );
 
@@ -41,6 +56,7 @@ const hasDescription = computed(() => Boolean(props.description || slots.descrip
 const classes = computed(() => [
   't-empty-state',
   `t-empty-state--${props.size}`,
+  props.frame !== 'block' ? `t-empty-state--frame-${props.frame}` : null,
   attrs.class,
 ]);
 

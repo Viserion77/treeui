@@ -1,4 +1,7 @@
 import './styles/index.css';
+// Ambient only: types the plugin's global registration so `vue-tsc` catches a
+// prop that does not exist. See global-components.ts.
+import './global-components';
 
 export * from './components';
 export * from './plugin';

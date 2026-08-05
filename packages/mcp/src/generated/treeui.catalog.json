@@ -1,7 +1,7 @@
 {
-  "generatedAt": "0.25.0",
+  "generatedAt": "0.27.0",
   "packageName": "@treeui/vue",
-  "packageVersion": "0.25.0",
+  "packageVersion": "0.27.0",
   "decisionGuides": [
     {
       "id": "single-choice",
@@ -759,7 +759,9 @@
         "TPopover",
         "TImage",
         "TSkipLink",
-        "TAppShell"
+        "TAppShell",
+        "TCheckbox",
+        "TText"
       ]
     },
     {
@@ -784,7 +786,11 @@
         "TKeyValueEditor",
         "TSection",
         "THero",
-        "TPageSurface"
+        "TPageSurface",
+        "TText",
+        "TLink",
+        "TTextarea",
+        "TCheckbox"
       ]
     },
     {
@@ -833,7 +839,8 @@
         "THero",
         "TPageSurface",
         "TShow",
-        "THide"
+        "THide",
+        "TEmptyState"
       ]
     },
     {
@@ -864,7 +871,10 @@
         "TSection",
         "THero",
         "TPageSurface",
-        "TColorSwatch"
+        "TColorSwatch",
+        "TText",
+        "TLink",
+        "TTextarea"
       ]
     }
   ],
@@ -2065,6 +2075,12 @@
       "manifestFile": "docs/ai/COMPONENTS/button.yaml",
       "props": [
         {
+          "name": "to",
+          "type": "string | RouteLocationRaw",
+          "default": "undefined",
+          "note": "Route target. Renders a RouterLink (an `<a>` with a real `href`) wearing the button's skin, so a CTA that NAVIGATES stays navigation: ctrl/middle-click, \"open in new tab\" and the status-bar URL preview keep working and the accessible role is `link`. The two alternatives are both wrong: wrapping a TButton in a RouterLink emits `<a><button>` (invalid markup, two tab stops), and `as=\"a\" :href` leaves the SPA and reloads the page. Resolved from the app context like TLink, so the component carries no vue-router dependency — with no router installed the prop does nothing. Takes precedence over `as`; a `disabled`/`loading` button falls back to the native `<button>`, because there is no `disabled` on an `<a>`.\n"
+        },
+        {
           "name": "as",
           "type": "string",
           "default": "button",
@@ -2551,6 +2567,12 @@
       "manifestFile": "docs/ai/COMPONENTS/checkbox.yaml",
       "props": [
         {
+          "name": "label",
+          "type": "string",
+          "default": "undefined",
+          "note": "Visible label, rendered beside the box and tied to the input by the wrapping `<label>`. Every other control names itself with a `label` prop; the checkbox was labelled by slot alone, so a consumer reaching for the prop got a checkbox with no accessible name at all and no warning. The `default` slot still wins when both are given.\n"
+        },
+        {
           "name": "modelValue",
           "type": "boolean",
           "default": "false",
@@ -2651,7 +2673,9 @@
       },
       "recipes": [],
       "practices": [
-        "interaction-feedback"
+        "interaction-feedback",
+        "accessible-by-default",
+        "predictable-api"
       ]
     },
     {
@@ -2821,6 +2845,22 @@
           "type": "boolean",
           "default": "false",
           "note": "Show the colours as evidence rather than as a choice — a brand manual, a palette table, a legend. Each option renders as an inert `<span class=\"t-color-swatch__chip\" role=\"img\">` named by its `label`: not focusable, not clickable, no `is-selected` state, no events. `modelValue` is ignored and the custom input is not rendered even with `allowCustom`. The chip border steps up to `--tree-color-border-strong` because half of these chips ARE background colours, and in their own theme a weak border makes the chip vanish into the page.\n"
+        },
+        {
+          "name": "shape",
+          "type": "TColorSwatchShape",
+          "default": "pill",
+          "values": [
+            "pill",
+            "square"
+          ],
+          "note": "Chip geometry. `pill` is the picker's round chip; `square` uses `--tree-radius-md`, the shape a brand manual's colour PLATE has, where the colour is the subject of the page rather than a control.\n"
+        },
+        {
+          "name": "block",
+          "type": "boolean",
+          "default": "false",
+          "note": "Let each chip take the width of the group instead of the fixed `--tree-color-swatch-size` square, so a read-only plate can be as wide as its card. Only meaningful with `readonly`; ignored for the picker, whose chips are buttons in a row.\n"
         }
       ],
       "events": [
@@ -4576,6 +4616,17 @@
       "manifestFile": "docs/ai/COMPONENTS/empty-state.yaml",
       "props": [
         {
+          "name": "frame",
+          "type": "TEmptyStateFrame",
+          "default": "block",
+          "values": [
+            "block",
+            "fill",
+            "inline"
+          ],
+          "note": "Geometry of the FRAME, a separate question from the size of the message inside it: the same empty state fills a board column, a side panel and a page. `fill` takes the height of the container and centres the message in it — the difference between \"this column is empty\" and \"this page is empty\". `inline` shrinks the frame to its content. Wrapping the component to supply this was the workaround.\n"
+        },
+        {
           "name": "as",
           "type": "string",
           "default": "section"
@@ -4654,7 +4705,8 @@
       },
       "recipes": [],
       "practices": [
-        "state-clarity"
+        "state-clarity",
+        "content-alignment"
       ]
     },
     {
@@ -6558,6 +6610,28 @@
       "manifestFile": "docs/ai/COMPONENTS/link.yaml",
       "props": [
         {
+          "name": "family",
+          "type": "TLinkFamily",
+          "default": "undefined",
+          "values": [
+            "sans",
+            "mono"
+          ],
+          "note": "Font family, same vocabulary as TText. `mono` is for a link whose label is machine text (a partition key, an ARN), which otherwise needed a TText nested inside the anchor.\n"
+        },
+        {
+          "name": "size",
+          "type": "TLinkSize",
+          "default": "undefined",
+          "values": [
+            "xs",
+            "sm",
+            "md",
+            "lg"
+          ],
+          "note": "Type size. Omitted, the link inherits — the right default inside prose."
+        },
+        {
           "name": "to",
           "type": "string | Record<string, unknown>",
           "default": "undefined",
@@ -6668,7 +6742,9 @@
       },
       "recipes": [],
       "practices": [
-        "interaction-feedback"
+        "interaction-feedback",
+        "predictable-api",
+        "token-driven"
       ]
     },
     {
@@ -10661,6 +10737,16 @@
           "description": "Colour axis, orthogonal to `variant`. Closed set — never a free colour, the same policy TLinkTile's `tone` states. `accent` reads the surface accent (`--tree-color-accent-*`), which defaults to the secondary brand accent and follows a TSection/THero/TPageSurface that declares one. Omitted, the tag keeps the pre-tone look: brand `solid`, neutral `outline` and `soft` — so `tone` is purely additive.\n"
         },
         {
+          "name": "density",
+          "type": "TTagDensity",
+          "default": "control",
+          "values": [
+            "control",
+            "compact"
+          ],
+          "description": "`control` locks the height to the matching control step, so a tag lines up with the inputs and buttons around it. `compact` drops the fixed height for padding + line-height, so the tag hugs its text and KEEPS the type size of its `size` step. A static label beside a heading wants `compact`: at `size=\"md\"` the control height is 40px against ~26px for the label, and stepping down to `size=\"sm\"` fixes the height by shrinking the type from 13px to 11px — the wrong knob.\n"
+        },
+        {
           "name": "size",
           "type": "TSize",
           "default": "md",
@@ -10790,6 +10876,24 @@
           "type": "string",
           "default": "Remove",
           "note": "Accessible name for each chip's remove button, forwarded to the underlying TTag. Localizable copy — the library ships an English default only as a fallback.\n"
+        },
+        {
+          "name": "allowDuplicates",
+          "type": "boolean",
+          "default": "false",
+          "note": "Keep repeated values instead of dropping them. Dedupe is right for a set of names and wrong for an ordered argument list, where `--param a --param b` is meaningful and losing the second `--param` silently corrupts the command that gets spawned.\n"
+        },
+        {
+          "name": "separator",
+          "type": "string | string[] | null",
+          "default": ",",
+          "note": "Character(s) that confirm the current tag alongside Enter, both on keydown and when pasting. `null` makes Enter the only way to confirm — needed when the values legitimately contain the separator (`--param=tags=a,b` must stay one argument). An array accepts several.\n"
+        },
+        {
+          "name": "commitOnBlur",
+          "type": "boolean",
+          "default": "true",
+          "note": "Confirm the pending draft when the field loses focus. On by default because typing the last value and clicking Save otherwise dropped it with no warning — a defect independent of any one product.\n"
         }
       ],
       "events": [
@@ -10808,7 +10912,7 @@
         "values_are_free_strings: true",
         "enter_and_comma_confirm_current_tag: true",
         "pasted_comma_separated_string_splits_into_tags: true",
-        "trims_and_dedupes_silently: true",
+        "trims_and_dedupes_silently: unless allowDuplicates",
         "empty_after_trim_ignored: true",
         "no_autocomplete_or_suggestions: true",
         "reuses_ttag_for_chips: true"
@@ -10867,9 +10971,10 @@
             "5xl",
             "display",
             "title",
+            "subtitle",
             "overline"
           ],
-          "note": "xs–5xl map to --tree-font-size-*. `display` is a responsive hero step (clamp 3xl→5xl, compact line-height, tight tracking). `title` is a responsive section-heading step (clamp xl→4xl, tight line-height and tracking) that stays below `display` at every width, so a section heading never out-sizes the hero. `overline` is a closed eyebrow style (xs, semibold, uppercase, wide tracking) that leaves colour to `tone`. Omitted = inherit."
+          "note": "xs–5xl map to --tree-font-size-*. Three RESPONSIVE steps stay ordered at every viewport width, because two steps sharing a slope collapse into each other below the smaller one's cap: `display` (hero, clamp 3xl→5xl at 5vw), `title` (page or section heading, clamp xl→4xl at 4vw) and `subtitle` (the heading under one of those, clamp lg→2xl at 2.5vw — a gentler climb, not merely a lower ceiling). Measured title vs subtitle at 390/500/600/700px: 22/22/24/28 against 18/18/18/18. `overline` is a closed eyebrow style (xs, semibold, uppercase, wide tracking) that leaves colour to `tone`. Omitted = inherit.\n"
         },
         {
           "name": "tone",
@@ -10879,9 +10984,13 @@
             "default",
             "muted",
             "inverse",
-            "brand"
+            "brand",
+            "danger",
+            "success",
+            "warning",
+            "info"
           ],
-          "note": "`default` inherits the current colour; others map to --tree-color-text-* / brand."
+          "note": "`default` inherits the current colour; `muted`/`inverse`/`brand` map to --tree-color-text-* / brand. The four STATUS tones read --tree-color-status-* (`danger` → `error`, the vocabulary-to-token mapping in CONTRACTS.yaml). They exist because a sentence that IS the state — the error line under a field, the green \"connected\" beside a resource — is not a TAlert (a box with an icon and the weight of an announcement) and not a TBadge/TTag (a pill, when the datum is prose). Without them the only way to say \"this failed\" in text was local CSS.\n"
         },
         {
           "name": "weight",
@@ -10905,6 +11014,22 @@
           "note": "Font family. Omitted = inherit. `mono` maps to --tree-font-family-mono for inline code, IDs, ARNs and machine text — the token-driven alternative to a local monospace class. Not a substitute for a code/log block."
         },
         {
+          "name": "wrap",
+          "type": "TTextWrap",
+          "default": "undefined",
+          "values": [
+            "anywhere",
+            "break-word"
+          ],
+          "note": "Break axis for a string with no break opportunity — an id, ARN, API key or hash is one long word, so it overflows its box. `truncate` is the wrong answer when the string IS what the reader came to copy: an ellipsis makes an id useless. `anywhere` breaks at any character (and sets `min-inline-size: 0`, without which a flex or grid child still refuses to shrink below its longest word and never breaks); `break-word` only breaks a word that would otherwise overflow. Ignored when `truncate` is set.\n"
+        },
+        {
+          "name": "balance",
+          "type": "boolean",
+          "default": "false",
+          "note": "`text-wrap: balance` — evens out the line lengths of a short block, for headlines where a one-word last line reads as a mistake. Browsers without support wrap normally.\n"
+        },
+        {
           "name": "truncate",
           "type": "boolean",
           "default": "false",
@@ -10921,10 +11046,11 @@
           "type": "TTextMeasure",
           "default": "undefined",
           "values": [
+            "headline",
             "lead",
             "prose"
           ],
-          "note": "Reading measure — a max-width in `ch` for legibility, rendered block so it applies. `lead` (~58ch, hero subtitle) and `prose` (~68ch, body). Closed axis so every surface caps at the same width without inventing a `ch` value (parallels treeFieldWidths for form controls)."
+          "note": "Reading measure — a max-width in `ch` for legibility, rendered block so it applies. `headline` (~20ch, a hero or section headline), `lead` (~58ch, hero subtitle) and `prose` (~68ch, body). Closed axis so every surface caps at the same width without inventing a `ch` value (parallels treeFieldWidths for form controls).\n"
         }
       ],
       "events": [],
@@ -10955,7 +11081,11 @@
         "brand-lockup",
         "marketing-page"
       ],
-      "practices": []
+      "practices": [
+        "accessible-by-default",
+        "predictable-api",
+        "token-driven"
+      ]
     },
     {
       "name": "TTextarea",
@@ -11034,6 +11164,16 @@
           "type": "number",
           "default": "undefined",
           "note": "Ceiling for `autoGrow`, in lines. Without it a composer grows forever and pushes the conversation off screen. At the cap the field starts scrolling internally (`overflow-y: auto` on the `<textarea>`) instead of growing, and the component's border and focus ring stop moving. Measured from the field's resolved line-height plus its vertical padding and border, so the cap follows `size` and the theme. Ignored when `autoGrow` is off.\n"
+        },
+        {
+          "name": "family",
+          "type": "TTextareaFamily",
+          "default": "undefined",
+          "values": [
+            "sans",
+            "mono"
+          ],
+          "note": "Font family of the editable content, same vocabulary as TText. `mono` is for machine text — JSON, a policy document, a payload — which otherwise leaves a `.mono` class behind in the consumer's stylesheet. Applied to the `<textarea>`, not the label wrapper, which also holds the loading spinner.\n"
         }
       ],
       "events": [
@@ -11082,7 +11222,10 @@
         "notes": []
       },
       "recipes": [],
-      "practices": []
+      "practices": [
+        "predictable-api",
+        "token-driven"
+      ]
     },
     {
       "name": "TTimeline",
@@ -11638,7 +11781,7 @@
     {
       "cssVar": "--tree-font-size-2xl",
       "path": "font.size.2xl",
-      "value": "1.375rem",
+      "value": "1.5rem",
       "category": "font",
       "description": "Typography token: font family, size, weight, or line height."
     },

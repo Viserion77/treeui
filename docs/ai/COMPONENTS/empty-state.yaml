@@ -6,6 +6,17 @@ status: available
 purpose: "Structured empty, no-results, and first-run placeholder block with optional icon, body content, and actions."
 
 props:
+  frame:
+    type: TEmptyStateFrame
+    default: block
+    values: [block, fill, inline]
+    note: >
+      Geometry of the FRAME, a separate question from the size of the message
+      inside it: the same empty state fills a board column, a side panel and a
+      page. `fill` takes the height of the container and centres the message in
+      it — the difference between "this column is empty" and "this page is
+      empty". `inline` shrinks the frame to its content. Wrapping the component
+      to supply this was the workaround.
   as:
     type: string
     default: section

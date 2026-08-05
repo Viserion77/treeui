@@ -76,8 +76,8 @@ afterEach(() => {
 describe('@treeui/icons registry', () => {
   // The one place the shipped set's size is pinned. Update it when adding an
   // icon — the change should be deliberate, not incidental.
-  it('ships 364 built-in icons', () => {
-    expect(Object.keys(builtinTreeIconNodes)).toHaveLength(364);
+  it('ships 365 built-in icons', () => {
+    expect(Object.keys(builtinTreeIconNodes)).toHaveLength(365);
   });
 
   it('lists every built-in icon name in sorted order', () => {
@@ -483,7 +483,7 @@ describe('treeIcons view', () => {
 describe('builtin icon geometry', () => {
   const entries = Object.entries(builtinTreeIconNodes) as [string, TIconNodes][];
 
-  it('gives all 352 canonical icons unique geometry fingerprints', () => {
+  it('gives all 353 canonical icons unique geometry fingerprints', () => {
     const canonicalEntries = entries.filter(
       ([name]) => !Object.prototype.hasOwnProperty.call(MIGRATION_ALIASES, name),
     );
@@ -517,8 +517,8 @@ describe('builtin icon geometry', () => {
       (names) => names.length > 1,
     );
 
-    expect(canonicalEntries).toHaveLength(352);
-    expect(namesByFingerprint.size).toBe(352);
+    expect(canonicalEntries).toHaveLength(353);
+    expect(namesByFingerprint.size).toBe(353);
     expect(duplicateNames).toEqual([]);
   });
 

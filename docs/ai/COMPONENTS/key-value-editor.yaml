@@ -58,3 +58,39 @@ example: |
       @validity-change="summary = $event.valid ? '' : $event.errors.join(' ')"
     />
   </TFormField>
+
+validity_emission:
+  note: >
+    `validity-change` is emitted on mount, on every real change, and whenever
+    `modelValue` changes from outside — not only on keystroke. A Record can
+    ARRIVE invalid (`{"": "x"}` is a legitimate `Record<string, string>` and the
+    control mounts already showing the row error), and after an external reset
+    the rows can render clean while the consumer's aggregated summary still says
+    invalid. Repeat emissions of an unchanged validity are suppressed.
+
+external_updates:
+  note: >
+    The rows are rebuilt from `modelValue` only when it differs BY CONTENT from
+    what the editor last emitted. A reference check is wrong here: a parent
+    holding the map in `reactive()`/`ref()` hands back a proxy that is never
+    `===` the raw object, so the guard failed on every keystroke and rebuilt the
+    rows from the committed record — which by contract omits the row being
+    edited, so clearing a key deleted that row and its value. Row ids of
+    surviving keys are reused, so an external change patches inputs instead of
+    remounting them and stealing the caret.
+
+identity:
+  note: >
+    An incoming `id` (explicit, or from a TFormField) lands on the FIRST key
+    input, never on the wrapper `div` — a `<label for>` has to name a real
+    control. The root is `role="group"` and carries `aria-invalid` when
+    `invalid` is set, which also draws an error rail
+    (`.t-key-value-editor.is-invalid`); the prop used to apply a class with no
+    rule behind it.
+
+known_behaviour:
+  numeric_keys: >
+    Renaming a key to an integer-like string ("10") moves its row to the top of
+    the emitted Record — JavaScript itself orders integer-like keys first. It
+    does not affect colour tokens or env names; it matters if the component is
+    reused for a map with numeric keys.

@@ -261,3 +261,16 @@ example: |
     ]"
     @select="handleAction"
   />
+
+item_fields:
+  icon:
+    type: TIconInput
+    note: "Leading icon, rendered `aria-hidden` since the label names the item."
+  selected:
+    type: boolean
+    note: >
+      The item currently in effect (the active locale in a language menu, the
+      active sort). Switches the row from `role="menuitem"` to
+      `role="menuitemradio"` with `aria-checked`, so the state has real
+      semantics — the `#item` slot could paint it but could not say it. Leave it
+      undefined for a plain action item and the role stays `menuitem`.

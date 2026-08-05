@@ -2,6 +2,7 @@
 import { computed, ref, useAttrs } from 'vue';
 import type { TFieldWidth, TSize } from '../types/contracts';
 import TTag from './TTag.vue';
+import { useFormFieldIdentity } from './form-field';
 
 defineOptions({
   inheritAttrs: false,
@@ -19,6 +20,25 @@ const props = withDefaults(
     placeholder?: string;
     /** Accessible name for each chip's remove button. Localizable copy. */
     removeLabel?: string;
+    /**
+     * Keep repeated values instead of dropping them. Dedupe is the right policy
+     * for a set of names; it is the wrong one for an ordered argument list,
+     * where `--param a --param b` is meaningful and losing the second
+     * `--param` silently corrupts the command.
+     */
+    allowDuplicates?: boolean;
+    /**
+     * Character(s) that confirm the current tag alongside Enter. `null` makes
+     * Enter the only way to confirm — needed when the values legitimately
+     * contain the separator (`--param=tags=a,b` must stay one argument).
+     */
+    separator?: string | string[] | null;
+    /**
+     * Confirm the pending draft when the field loses focus. On by default:
+     * typing the last value and clicking Save otherwise drops it with no
+     * warning. Use `commit()` on the exposed instance for an explicit flush.
+     */
+    commitOnBlur?: boolean;
   }>(),
   {
     modelValue: () => [],
@@ -28,6 +48,9 @@ const props = withDefaults(
     invalid: false,
     placeholder: '',
     removeLabel: 'Remove',
+    allowDuplicates: false,
+    separator: ',',
+    commitOnBlur: true,
   },
 );
 
@@ -52,30 +75,72 @@ const rootClasses = computed(() => [
 
 const rootStyle = computed(() => attrs.style);
 
+const { controlId, describedBy } = useFormFieldIdentity(attrs);
+
 const inputAttrs = computed(() => {
-  const { class: _class, style: _style, ...rest } = attrs;
+  const {
+    class: _class,
+    style: _style,
+    id: _id,
+    'aria-describedby': _describedBy,
+    ...rest
+  } = attrs;
   return rest;
 });
 
-/** Add one or more comma-separated tags: trim, drop empties, dedupe silently. */
-function addTags(raw: string) {
+/** Configured separators, normalized. Empty when `separator` is `null`. */
+const separators = computed(() => {
+  if (props.separator === null || props.separator === undefined) return [];
+  const list = Array.isArray(props.separator) ? props.separator : [props.separator];
+  return list.filter((value) => typeof value === 'string' && value.length > 0);
+});
+
+function splitRaw(raw: string): string[] {
+  return separators.value.reduce<string[]>(
+    (parts, separator) => parts.flatMap((part) => part.split(separator)),
+    [raw],
+  );
+}
+
+/** Add already-split candidates: trim, drop empties, apply the dedupe policy. */
+function addParts(candidates: string[]) {
   if (props.disabled) return;
-  const parts = raw
-    .split(',')
-    .map((part) => part.trim())
-    .filter(Boolean);
+  const parts = candidates.map((part) => part.trim()).filter(Boolean);
   if (!parts.length) return;
 
   const next = [...props.modelValue];
+  let changed = false;
   for (const part of parts) {
-    if (!next.includes(part)) next.push(part);
+    // Dedupe is a policy, not a law — see `allowDuplicates`. Note the check is
+    // against `next`, so a single paste cannot introduce a duplicate either.
+    if (!props.allowDuplicates && next.includes(part)) continue;
+    next.push(part);
+    changed = true;
   }
-  if (next.length !== props.modelValue.length) emit('update:modelValue', next);
+  // Emit on `changed`, never on a length comparison: with duplicates allowed a
+  // repeated value grows the array, and with them dropped nothing should be
+  // emitted at all.
+  if (changed) emit('update:modelValue', next);
+}
+
+function addTags(raw: string) {
+  addParts(splitRaw(raw));
+}
+
+/**
+ * The field is bound to `draft`, so when a keystroke leaves `draft` unchanged
+ * (pasting only a separator, for example) Vue patches nothing and the DOM keeps
+ * text the component no longer knows about. Push the truth back into the input.
+ */
+function syncField() {
+  const el = inputRef.value;
+  if (el && el.value !== draft.value) el.value = draft.value;
 }
 
 function commitDraft() {
   addTags(draft.value);
   draft.value = '';
+  syncField();
 }
 
 function removeAt(index: number) {
@@ -85,22 +150,21 @@ function removeAt(index: number) {
 }
 
 function onInput(event: Event) {
-  const value = (event.target as HTMLInputElement).value;
-  // A pasted "a, b, c" enters through input, not keydown: commit the complete
-  // segments and keep the trailing fragment in the field.
-  if (value.includes(',')) {
-    const segments = value.split(',');
-    const remainder = segments.pop() ?? '';
-    addTags(segments.join(','));
-    draft.value = remainder.replace(/^\s+/, '');
-  } else {
-    draft.value = value;
-  }
+  // A pasted "a, b, c" arrives through input, not keydown. Split on EVERY
+  // configured separator in one pass: the last fragment is what the user is
+  // still typing, everything before it is complete. With no separators
+  // configured this is a single fragment, so the field just tracks the draft.
+  const parts = splitRaw((event.target as HTMLInputElement).value);
+  const remainder = parts.pop() ?? '';
+
+  if (parts.length) addParts(parts);
+  draft.value = remainder.replace(/^\s+/, '');
+  syncField();
 }
 
 function onKeydown(event: KeyboardEvent) {
-  if (event.key === 'Enter' || event.key === ',') {
-    // Enter and comma both confirm the current tag.
+  if (event.key === 'Enter' || separators.value.includes(event.key)) {
+    // Enter always confirms; a configured separator key does too.
     event.preventDefault();
     commitDraft();
     return;
@@ -112,11 +176,15 @@ function onKeydown(event: KeyboardEvent) {
   }
 }
 
+function onBlur() {
+  if (props.commitOnBlur) commitDraft();
+}
+
 function focusInput() {
   inputRef.value?.focus();
 }
 
-defineExpose({ focus: focusInput });
+defineExpose({ focus: focusInput, commit: commitDraft });
 </script>
 
 <template>
@@ -138,9 +206,11 @@ defineExpose({ focus: focusInput });
       {{ tag }}
     </TTag>
     <input
+      :id="controlId"
       ref="inputRef"
       v-bind="inputAttrs"
       class="t-tag-input__field"
+      :aria-describedby="describedBy"
       type="text"
       :value="draft"
       :placeholder="modelValue.length ? '' : placeholder"
@@ -148,6 +218,7 @@ defineExpose({ focus: focusInput });
       :aria-invalid="invalid || undefined"
       @input="onInput"
       @keydown="onKeydown"
+      @blur="onBlur"
     >
   </div>
 </template>

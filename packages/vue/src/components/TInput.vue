@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, useAttrs } from 'vue';
+import { useFormFieldIdentity } from './form-field';
 import type { TFieldWidth, TSize } from '../types/contracts';
 import TSpinner from './TSpinner.vue';
 
@@ -51,8 +52,16 @@ const rootClasses = computed(() => [
 
 const rootStyle = computed(() => attrs.style);
 
+const { controlId, describedBy } = useFormFieldIdentity(attrs);
+
 const inputAttrs = computed(() => {
-  const { class: _class, style: _style, ...rest } = attrs;
+  const {
+    class: _class,
+    style: _style,
+    id: _id,
+    'aria-describedby': _describedBy,
+    ...rest
+  } = attrs;
   return rest;
 });
 
@@ -75,8 +84,10 @@ const onInput = (event: Event) => {
       <slot name="prefix" />
     </span>
     <input
+      :id="controlId"
       v-bind="inputAttrs"
       class="t-input__field"
+      :aria-describedby="describedBy"
       :type="type"
       :value="stringValue"
       :placeholder="placeholder"

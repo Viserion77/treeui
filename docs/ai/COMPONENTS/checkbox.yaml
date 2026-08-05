@@ -6,6 +6,15 @@ status: available
 purpose: "Boolean toggle with indeterminate state; supports v-model via modelValue."
 
 props:
+  label:
+    type: string
+    default: undefined
+    note: >
+      Visible label, rendered beside the box and tied to the input by the
+      wrapping `<label>`. Every other control names itself with a `label` prop;
+      the checkbox was labelled by slot alone, so a consumer reaching for the
+      prop got a checkbox with no accessible name at all and no warning. The
+      `default` slot still wins when both are given.
   modelValue:
     type: boolean
     default: false

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, useAttrs, watchEffect } from 'vue';
+import { computed, getCurrentInstance, useAttrs, watchEffect, type Component } from 'vue';
 import { tv } from '@treeui/utils';
 import type { TSize, TVariant } from '../types/contracts';
 import TSpinner from './TSpinner.vue';
@@ -33,6 +33,16 @@ const props = withDefaults(
     block?: boolean;
     /** Content alignment — only meaningful together with `block`. */
     align?: 'start' | 'center' | 'end';
+    /**
+     * Route target. Renders a RouterLink (an `<a>` with a real `href`) wearing
+     * the button's skin, so a CTA that NAVIGATES stays navigation:
+     * ctrl/middle-click, "open in new tab" and the status-bar URL preview all
+     * keep working, and the accessible role is `link`, not `button`.
+     * Wrapping a TButton in a RouterLink produces `<a><button>` — invalid
+     * markup and two tab stops — and `as="a" :href` leaves the SPA and reloads
+     * the page. Takes precedence over `as`; ignored when `disabled`.
+     */
+    to?: string | Record<string, unknown>;
   }>(),
   {
     as: 'button',
@@ -47,6 +57,7 @@ const props = withDefaults(
     type: 'button',
     block: false,
     align: 'center',
+    to: undefined,
   },
 );
 
@@ -74,8 +85,29 @@ const buttonClass = tv({
 });
 
 const attrs = useAttrs();
-const isNativeButton = computed(() => props.as === 'button');
+const instance = getCurrentInstance();
+
+// Resolved from the app context, exactly as TLink does it, so the component
+// carries no vue-router dependency: with no router installed the prop simply
+// does nothing and the button stays a button.
+const routerLink = computed<Component | null>(() => {
+  if (!props.to) return null;
+  return (instance?.appContext.components.RouterLink as Component | undefined) ?? null;
+});
+
 const isDisabled = computed(() => props.disabled || props.loading);
+
+// A disabled link is not a thing — there is no `disabled` on `<a>` — so a
+// disabled `to` falls back to the native button, which CAN refuse activation.
+const rendersAsLink = computed(() => Boolean(routerLink.value) && !isDisabled.value);
+
+const tag = computed<string | Component>(() =>
+  rendersAsLink.value ? routerLink.value! : props.as,
+);
+
+const isNativeButton = computed(() => !rendersAsLink.value && props.as === 'button');
+
+const linkProps = computed(() => (rendersAsLink.value ? { to: props.to } : {}));
 
 // An icon-only button has no visible text and an aria-hidden icon, so without a
 // name it is unlabelled for assistive tech. This is a BARE `process.env.NODE_ENV`
@@ -134,7 +166,8 @@ const onClick = (event: MouseEvent) => {
 
 <template>
   <component
-    :is="as"
+    :is="tag"
+    v-bind="linkProps"
     :type="isNativeButton ? type : undefined"
     :class="classes"
     :disabled="isNativeButton ? isDisabled : undefined"

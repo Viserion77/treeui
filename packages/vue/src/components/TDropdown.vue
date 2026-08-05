@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { createId, focusFirst, isActivationKey, isEscapeKey } from '@treeui/utils';
+import { resolveTreeIcon, treeIconDefaults, type TIconInput } from '@treeui/icons';
 import { computed, nextTick, onBeforeUnmount, ref, toRef, useAttrs, watch } from 'vue';
 import { useControllableOpen } from '../composables/useControllableOpen';
 import type { TSize } from '../types/contracts';
@@ -12,6 +13,18 @@ export interface TDropdownItem {
   label: string;
   value: string;
   disabled?: boolean;
+  /**
+   * Leading icon — a registered name or a component, same `TIconInput` the rest
+   * of the library uses. Rendered `aria-hidden`, since the label names the item.
+   */
+  icon?: TIconInput;
+  /**
+   * The item currently in effect (the active locale in a language menu, the
+   * active sort). Emits the right ARIA for the menu's semantics — `aria-checked`
+   * on a `menuitemradio` — instead of leaving the state to a slot with no
+   * semantics at all, which is what the `#item` slot forced.
+   */
+  selected?: boolean;
 }
 
 export type TDropdownAlign = 'start' | 'end';
@@ -279,13 +292,15 @@ onBeforeUnmount(() => {
           v-for="(item, index) in items"
           :key="item.value"
           :ref="(el) => setItemRef(el as Element | null, item.value)"
-          role="menuitem"
+          :role="item.selected === undefined ? 'menuitem' : 'menuitemradio'"
           class="t-dropdown__item"
           :class="{
             'is-disabled': item.disabled,
             'is-focused': index === focusedIndex,
+            'is-selected': item.selected,
           }"
           :aria-disabled="item.disabled || undefined"
+          :aria-checked="item.selected === undefined ? undefined : item.selected"
           :tabindex="item.disabled ? -1 : 0"
           @click="selectItem(item)"
           @keydown="onItemKeydown($event, item)"
@@ -295,7 +310,14 @@ onBeforeUnmount(() => {
             :item="item"
             :index="index"
           >
-            {{ item.label }}
+            <component
+              :is="resolveTreeIcon(item.icon)"
+              v-if="item.icon"
+              v-bind="treeIconDefaults"
+              class="t-dropdown__item-icon"
+              aria-hidden="true"
+            />
+            <span class="t-dropdown__item-label">{{ item.label }}</span>
           </slot>
         </li>
       </ul>

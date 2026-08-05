@@ -2,6 +2,10 @@
 import { computed } from 'vue';
 import type { TSize } from '../types/contracts';
 
+const _treeColorSwatchShapes = ['pill', 'square'] as const;
+
+export type TColorSwatchShape = (typeof _treeColorSwatchShapes)[number];
+
 export interface TColorSwatchOption {
   label: string;
   value: string;
@@ -29,6 +33,19 @@ const props = withDefaults(
      * vanish into the page.
      */
     readonly?: boolean;
+    /**
+     * Chip geometry. `pill` (default) is the picker's round chip. `square`
+     * uses `--tree-radius-md`, the shape a brand manual's colour plate has —
+     * where the colour is the subject of the page, not a control.
+     */
+    shape?: TColorSwatchShape;
+    /**
+     * Let each chip take the width of the group instead of the fixed
+     * `--tree-color-swatch-size` square, so a read-only plate can be as wide as
+     * its card. Height still follows `size`; `block` also stacks the chips.
+     * Only meaningful with `readonly`.
+     */
+    block?: boolean;
   }>(),
   {
     modelValue: undefined,
@@ -39,6 +56,8 @@ const props = withDefaults(
     customLabel: 'Custom color',
     disabled: false,
     readonly: false,
+    shape: 'pill',
+    block: false,
   },
 );
 
@@ -49,7 +68,11 @@ const emit = defineEmits<{
 const classes = computed(() => [
   't-color-swatch',
   `t-color-swatch--${props.size}`,
-  { 'is-readonly': props.readonly },
+  props.shape !== 'pill' ? `t-color-swatch--${props.shape}` : null,
+  {
+    'is-readonly': props.readonly,
+    'is-block': props.block && props.readonly,
+  },
 ]);
 
 const isSelected = (value: string) =>

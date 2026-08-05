@@ -2,6 +2,9 @@
 import { computed, useAttrs, onMounted, ref, watch, nextTick } from 'vue';
 import type { TFieldWidth, TSize } from '../types/contracts';
 import TSpinner from './TSpinner.vue';
+import { useFormFieldIdentity } from './form-field';
+
+export type TTextareaFamily = 'sans' | 'mono';
 
 defineOptions({
   inheritAttrs: false,
@@ -26,6 +29,12 @@ const props = withDefaults(
      * border and focus ring stop moving. Ignored when `autoGrow` is off.
      */
     maxRows?: number;
+    /**
+     * Font family for the editable content, same vocabulary as TText. `mono`
+     * is for machine text — JSON, a policy document, a Lambda payload — which
+     * otherwise leaves a `.mono` class behind in the consumer's stylesheet.
+     */
+    family?: TTextareaFamily;
   }>(),
   {
     modelValue: '',
@@ -38,6 +47,7 @@ const props = withDefaults(
     rows: 3,
     autoGrow: false,
     maxRows: undefined,
+    family: undefined,
   },
 );
 
@@ -52,6 +62,7 @@ const rootClasses = computed(() => [
   't-textarea',
   `t-textarea--${props.size}`,
   props.width !== 'full' ? `t-field-width--${props.width}` : null,
+  props.family ? `t-textarea--family-${props.family}` : null,
   {
     'is-disabled': props.disabled,
     'is-invalid': props.invalid,
@@ -62,8 +73,16 @@ const rootClasses = computed(() => [
 
 const rootStyle = computed(() => attrs.style);
 
+const { controlId, describedBy } = useFormFieldIdentity(attrs);
+
 const textareaAttrs = computed(() => {
-  const { class: _class, style: _style, ...rest } = attrs;
+  const {
+    class: _class,
+    style: _style,
+    id: _id,
+    'aria-describedby': _describedBy,
+    ...rest
+  } = attrs;
   return rest;
 });
 
@@ -135,9 +154,11 @@ onMounted(() => {
     :style="rootStyle"
   >
     <textarea
+      :id="controlId"
       ref="textareaRef"
       v-bind="textareaAttrs"
       class="t-textarea__field"
+      :aria-describedby="describedBy"
       :value="stringValue"
       :placeholder="placeholder"
       :disabled="disabled"

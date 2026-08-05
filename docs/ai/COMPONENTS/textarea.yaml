@@ -46,6 +46,15 @@ props:
       and the component's border and focus ring stop moving. Measured from the
       field's resolved line-height plus its vertical padding and border, so the
       cap follows `size` and the theme. Ignored when `autoGrow` is off.
+  family:
+    type: TTextareaFamily
+    default: undefined
+    values: [sans, mono]
+    note: >
+      Font family of the editable content, same vocabulary as TText. `mono` is
+      for machine text — JSON, a policy document, a payload — which otherwise
+      leaves a `.mono` class behind in the consumer's stylesheet. Applied to the
+      `<textarea>`, not the label wrapper, which also holds the loading spinner.
 
 events:
   - update:modelValue

@@ -6,6 +6,20 @@ status: available
 purpose: "Clickable action trigger with variants, sizes, optional polymorphism, and loading state."
 
 props:
+  to:
+    type: "string | RouteLocationRaw"
+    default: undefined
+    note: >
+      Route target. Renders a RouterLink (an `<a>` with a real `href`) wearing
+      the button's skin, so a CTA that NAVIGATES stays navigation:
+      ctrl/middle-click, "open in new tab" and the status-bar URL preview keep
+      working and the accessible role is `link`. The two alternatives are both
+      wrong: wrapping a TButton in a RouterLink emits `<a><button>` (invalid
+      markup, two tab stops), and `as="a" :href` leaves the SPA and reloads the
+      page. Resolved from the app context like TLink, so the component carries no
+      vue-router dependency — with no router installed the prop does nothing.
+      Takes precedence over `as`; a `disabled`/`loading` button falls back to the
+      native `<button>`, because there is no `disabled` on an `<a>`.
   as:
     type: string
     default: button

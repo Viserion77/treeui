@@ -131,7 +131,7 @@ variant_to_token_mapping:
     token_role: status.error
     css_variable: "--tree-color-status-error"
     there_is_no: ["--tree-color-status-danger", "--tree-color-danger"]
-    used_by: [TButton, TAlert, TToast, TBadge, TStat, TTimeline, TLink, TConfirmDialog]
+    used_by: [TButton, TAlert, TToast, TBadge, TStat, TTimeline, TLink, TConfirmDialog, TText, TTag]
     verified_in: packages/vue/src/styles/index.css
     examples:
       - ".t-button--danger sets --tree-button-bg: var(--tree-color-status-error)"
@@ -149,9 +149,9 @@ emitted_variables:
     packages/tokens/src/tokens.ts via packages/tokens/src/css.ts. If a name is
     not in this list, it does not exist. Copy names from here verbatim rather
     than composing them from roles.
-  total: 105
+  total: 115
   foundation:
-    count: 79
+    count: 85
     scope: "Emitted on :root — theme-independent, identical in light and dark."
     variables:
       # font — the token layer emits these custom properties only. It ships no
@@ -165,7 +165,7 @@ emitted_variables:
       --tree-font-size-base: "0.9375rem"
       --tree-font-size-lg: "1.125rem"
       --tree-font-size-xl: "1.375rem"
-      --tree-font-size-2xl: "1.375rem"
+      --tree-font-size-2xl: "1.5rem"
       --tree-font-size-3xl: "1.75rem"
       --tree-font-size-4xl: "2.25rem"
       --tree-font-size-5xl: "3rem"
@@ -253,7 +253,7 @@ emitted_variables:
       --tree-breakpoint-lg: "1024px"
       --tree-breakpoint-xl: "1280px"
   theme_colors:
-    count: 26
+    count: 30
     scope: "Re-emitted per theme under [data-tree-theme]. Values in theme_values below."
     note: "The name set is identical in light and dark — verified against both."
     variables:
@@ -269,6 +269,10 @@ emitted_variables:
       - --tree-color-brand-hover
       - --tree-color-brand-soft
       - --tree-color-brand-contrast
+      - --tree-color-accent-primary
+      - --tree-color-accent-hover
+      - --tree-color-accent-soft
+      - --tree-color-accent-contrast
       - --tree-color-status-success
       - --tree-color-status-warning
       - --tree-color-status-error
@@ -304,7 +308,7 @@ font:
     base: "0.9375rem"
     lg: "1.125rem"
     xl: "1.375rem"
-    2xl: "1.375rem"
+    2xl: "1.5rem"
     3xl: "1.75rem"
     4xl: "2.25rem"
     5xl: "3rem"

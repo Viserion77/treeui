@@ -132,3 +132,70 @@ export const MonospaceFamily: Story = {
     `,
   }),
 };
+
+export const StatusTones: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'A sentence that IS the state — the error line under a field, the green "connected" beside a resource — is not a `TAlert` (a box with an icon and the weight of an announcement) and not a `TBadge`/`TTag` (a pill, when the datum is prose). Without these tones the only way to say "this failed" in text was local CSS. They read `--tree-color-status-*`, so they follow the theme.',
+      },
+    },
+  },
+  render: () => ({
+    components: { TText },
+    template: `
+      <div style="display: grid; gap: 0.5rem;">
+        <TText size="sm" tone="danger">Could not reach the endpoint.</TText>
+        <TText size="sm" tone="success">Connected.</TText>
+        <TText size="sm" tone="warning">Credential expires in 3 days.</TText>
+        <TText size="sm" tone="info">Replaying from the last checkpoint.</TText>
+      </div>
+    `,
+  }),
+};
+
+export const BreakingMachineStrings: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'An ARN, an API key or a hash is one long word with no break opportunity: it overflows its box. `truncate` is the wrong answer when the string IS the thing the reader came to copy — an ellipsis makes an id useless — so `wrap` breaks it instead.',
+      },
+    },
+  },
+  render: () => ({
+    components: { TText },
+    template: `
+      <div style="display: grid; gap: 1rem; max-width: 260px;">
+        <TText family="mono" size="sm" wrap="anywhere">
+          arn:aws:secretsmanager:us-east-1:000000000000:secret:minha-secret-AbCdEf
+        </TText>
+        <TText family="mono" size="sm" truncate>
+          arn:aws:secretsmanager:us-east-1:000000000000:secret:minha-secret-AbCdEf
+        </TText>
+      </div>
+    `,
+  }),
+};
+
+export const ResponsiveSteps: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Three responsive steps that stay ordered at every width. Two steps sharing a slope collapse into each other below the smaller one\'s cap — they separate only where the screen is already wide — so `subtitle` climbs slower (2.5vw) rather than merely capping lower. Resize the preview.',
+      },
+    },
+  },
+  render: () => ({
+    components: { TText },
+    template: `
+      <div style="display: grid; gap: 0.5rem;">
+        <TText as="h1" size="display" measure="headline" balance>Ship the interface</TText>
+        <TText as="h2" size="title">A section heading</TText>
+        <TText as="h3" size="subtitle">The heading under it</TText>
+      </div>
+    `,
+  }),
+};

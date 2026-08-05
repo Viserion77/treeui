@@ -70,7 +70,9 @@
         "TPopover",
         "TImage",
         "TSkipLink",
-        "TAppShell"
+        "TAppShell",
+        "TCheckbox",
+        "TText"
       ]
     },
     {
@@ -96,7 +98,11 @@
         "TKeyValueEditor",
         "TSection",
         "THero",
-        "TPageSurface"
+        "TPageSurface",
+        "TText",
+        "TLink",
+        "TTextarea",
+        "TCheckbox"
       ]
     },
     {
@@ -147,7 +153,8 @@
         "THero",
         "TPageSurface",
         "TShow",
-        "THide"
+        "THide",
+        "TEmptyState"
       ]
     },
     {
@@ -179,7 +186,10 @@
         "TSection",
         "THero",
         "TPageSurface",
-        "TColorSwatch"
+        "TColorSwatch",
+        "TText",
+        "TLink",
+        "TTextarea"
       ]
     }
   ],
@@ -235,6 +245,8 @@
     "TTabs": "components-navigation-tabs",
     "TTag": "components-data-display-tag",
     "TTagInput": "components-data-entry-taginput",
+    "TText": "components-data-display-text",
+    "TTextarea": "components-data-entry-textarea",
     "TToastProvider": "components-feedback-toast",
     "TTooltip": "components-overlay-tooltip",
     "TTreeView": "components-navigation-treeview"

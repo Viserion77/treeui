@@ -28,6 +28,7 @@ export { default as TDrawer } from './TDrawer.vue';
 export { default as TDropdown } from './TDropdown.vue';
 export type { TDropdownAlign, TDropdownItem } from './TDropdown.vue';
 export { default as TEmptyState } from './TEmptyState.vue';
+export type { TEmptyStateFrame } from './TEmptyState.vue';
 export { default as TFileUpload } from './TFileUpload.vue';
 export { default as TMultiSelect } from './TMultiSelect.vue';
 export type { TMultiSelectOption } from './TMultiSelect.vue';
@@ -45,7 +46,13 @@ export type {
 export { default as TNavbar } from './TNavbar.vue';
 export { default as TAppBar } from './TNavbar.vue';
 export { default as TLink } from './TLink.vue';
-export type { TLinkVariant, TLinkUnderline, TLinkWeight } from './TLink.vue';
+export type {
+  TLinkVariant,
+  TLinkUnderline,
+  TLinkWeight,
+  TLinkFamily,
+  TLinkSize,
+} from './TLink.vue';
 export { default as TLinkTile } from './TLinkTile.vue';
 export type { TLinkTileTone } from './TLinkTile.vue';
 export { default as TList } from './TList.vue';
@@ -70,7 +77,7 @@ export { default as TNumberInput } from './TNumberInput.vue';
 export { default as TSelectableList } from './TSelectableList.vue';
 export type { TSelectableListItem } from './TSelectableList.vue';
 export { default as TColorSwatch } from './TColorSwatch.vue';
-export type { TColorSwatchOption } from './TColorSwatch.vue';
+export type { TColorSwatchOption, TColorSwatchShape } from './TColorSwatch.vue';
 export { default as TStack } from './TStack.vue';
 export type { TStackDirection, TStackFill } from './TStack.vue';
 export { default as TStackItem } from './TStackItem.vue';
@@ -78,7 +85,14 @@ export { default as TSplit } from './TSplit.vue';
 export { default as TSpacer } from './TSpacer.vue';
 export { default as TKbd } from './TKbd.vue';
 export { default as TText } from './TText.vue';
-export type { TTextSize, TTextTone, TTextWeight, TTextFamily, TTextMeasure } from './TText.vue';
+export type {
+  TTextSize,
+  TTextTone,
+  TTextWeight,
+  TTextFamily,
+  TTextMeasure,
+  TTextWrap,
+} from './TText.vue';
 export { default as TTreeView } from './TTreeView.vue';
 export type { TTreeViewNode, TTreeViewSelectionMode } from './tree-view';
 export { default as TSteps } from './TSteps.vue';
@@ -91,6 +105,7 @@ export type {
   TToggleGroupVariant,
 } from './TToggleGroup.vue';
 export { default as TTextarea } from './TTextarea.vue';
+export type { TTextareaFamily } from './TTextarea.vue';
 export { default as TModal } from './TModal.vue';
 export { default as TSkeleton } from './TSkeleton.vue';
 export { default as TSpinner } from './TSpinner.vue';
@@ -99,6 +114,7 @@ export type { TStatTone, TStatTrendDirection } from './TStat.vue';
 export { default as TSwitch } from './TSwitch.vue';
 export { default as TTooltip } from './TTooltip.vue';
 export { default as TFormField } from './TFormField.vue';
+export type { FormFieldContext as TFormFieldContext } from './form-field';
 export { default as TPage } from './TPage.vue';
 export type { TPageGap } from './TPage.vue';
 export { default as TPageSurface } from './TPageSurface.vue';
@@ -127,7 +143,7 @@ export { default as TDivider } from './TDivider.vue';
 export { default as TTable } from './TTable.vue';
 export type { TTableColumn, TTableSortDirection, TTableSortState, TTableRowState } from './TTable.vue';
 export { default as TTag } from './TTag.vue';
-export type { TTagTone, TTagVariant } from './TTag.vue';
+export type { TTagDensity, TTagTone, TTagVariant } from './TTag.vue';
 export { default as TTagInput } from './TTagInput.vue';
 export { default as TKeyValueEditor } from './TKeyValueEditor.vue';
 export type { TKeyValueEditorLabels, TKeyValueEditorValidity } from './TKeyValueEditor.vue';

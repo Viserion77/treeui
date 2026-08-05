@@ -6,9 +6,20 @@ const props = withDefaults(
   defineProps<{
     value: string;
     disabled?: boolean;
+    /**
+     * Heading element that wraps the trigger. `false` renders no heading at
+     * all — the right answer for a disclosure attached to one item of content
+     * (a note under a chat bubble), where a heading per row would flood the
+     * document outline: 20 rounds of a conversation became 20 headings for
+     * someone navigating by heading, inside a surface with no sections.
+     * The APG asks for a heading around a DOCUMENT accordion; a note is not
+     * one, so `variant="quiet"` defaults to `false` here.
+     */
+    headingLevel?: 2 | 3 | 4 | 5 | 6 | false;
   }>(),
   {
     disabled: false,
+    headingLevel: undefined,
   },
 );
 
@@ -25,6 +36,15 @@ const panelId = useId();
 const triggerRef = ref<HTMLButtonElement | null>(null);
 
 const isOpen = computed(() => ctx.isItemOpen(props.value));
+
+// Unset follows the container: a document accordion keeps its <h3>, a quiet one
+// drops the wrapper. An explicit value always wins, in both directions.
+const headingTag = computed<string | false>(() => {
+  if (props.headingLevel !== undefined) {
+    return props.headingLevel === false ? false : `h${props.headingLevel}`;
+  }
+  return ctx.variant.value === 'quiet' ? false : 'h3';
+});
 const isDisabled = computed(() => props.disabled || ctx.disabled.value);
 
 const itemClasses = computed(() => [
@@ -76,7 +96,10 @@ onBeforeUnmount(() => {
 
 <template>
   <div :class="itemClasses">
-    <h3 class="t-accordion__heading">
+    <component
+      :is="headingTag || 'div'"
+      :class="headingTag ? 't-accordion__heading' : 't-accordion__heading-bare'"
+    >
       <button
         :id="triggerId"
         ref="triggerRef"
@@ -111,7 +134,7 @@ onBeforeUnmount(() => {
           <polyline points="6 9 12 15 18 9" />
         </svg>
       </button>
-    </h3>
+    </component>
     <div
       v-if="isOpen"
       :id="panelId"

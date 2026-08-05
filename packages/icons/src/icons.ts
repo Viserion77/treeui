@@ -318,6 +318,7 @@ const BUILTIN_ICON_NAMES = [
   'signal-medium',
   'signal-off',
   'siren',
+  'skip-forward',
   'sliders-horizontal',
   'smartphone',
   'sparkles',
@@ -821,6 +822,9 @@ const directGeometry = (name: string): TIconNodes | undefined => {
     case 'sparkles': return glyph(path('M12 2.75c.8 5.3 2.95 7.45 8.25 8.25-5.3.8-7.45 2.95-8.25 8.25-.8-5.3-2.95-7.45-8.25-8.25C9.05 10.2 11.2 8.05 12 2.75Z'), path('M19 2.75v4.5M16.75 5h4.5'));
     case 'play': return glyph(polygon('6,3.75 20.25,12 6,20.25'), circle(6, 12, 0.55));
     case 'pause': return glyph(rect(5.25, 3.5, 4.5, 17, 1.5), rect(14.25, 3.5, 4.5, 17, 1.5));
+    // Transport, not navigation: the pair of play/pause. A chevron says "next
+    // page"; this says "end this phase now" (TREEUX-042).
+    case 'skip-forward': return glyph(polygon('5.5,4 16,12 5.5,20'), rect(17.5, 4, 2.5, 16, 1.25));
     case 'play-circle': return glyph(circle(12, 12, 9.25), polygon('9.5,7.75 17,12 9.5,16.25'));
     case 'pause-circle': return glyph(circle(12, 12, 9.25), line(9.5, 8, 9.5, 16), line(14.5, 8, 14.5, 16));
     case 'eye': return glyph(path('M2.75 12c2.8-5 6-7.25 9.25-7.25S18.45 7 21.25 12c-2.8 5-6 7.25-9.25 7.25S5.55 17 2.75 12Z'), circle(12, 12, 2.75), circle(12, 12, 0.55));

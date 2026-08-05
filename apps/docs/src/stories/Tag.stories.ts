@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite';
-import { TSection, TTag } from '@treeui/vue';
+import { TSection, TTag, TText } from '@treeui/vue';
 import { practiceNote } from './practice-refs';
 
 const meta = {
@@ -157,6 +157,33 @@ export const AccentFollowsTheSurface: Story = {
         <TSection rhythm="tight" container="none" accent="warning">
           <TTag tone="accent">inside accent="warning"</TTag>
         </TSection>
+      </div>
+    `,
+  }),
+};
+
+export const LabelDensity: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '"Height = the control step" is right for a tag in a row of controls and wrong for a static label beside a heading. `density="compact"` keeps the type of its `size` step and derives the height from padding and line-height instead — the alternative, stepping down to `size="sm"`, fixes the height by shrinking the type, which is the wrong knob.',
+      },
+    },
+  },
+  render: () => ({
+    components: { TTag, TText },
+    template: `
+      <div style="display: grid; gap: 1rem;">
+        <div style="display: flex; align-items: baseline; gap: 0.75rem;">
+          <TText as="h2" size="title">Tech house</TText>
+          <TTag tone="accent" density="compact">control height</TTag>
+        </div>
+        <div style="display: flex; align-items: center; gap: 0.75rem;">
+          <TTag tone="accent">md, control</TTag>
+          <TTag tone="accent" density="compact">md, compact</TTag>
+          <TTag tone="accent" size="sm">sm, control</TTag>
+        </div>
       </div>
     `,
   }),

@@ -2,6 +2,7 @@
 import { computed, ref, useAttrs, useId, watch } from 'vue';
 import type { TSize } from '../types/contracts';
 import TIcon from './TIcon.vue';
+import { useFormFieldIdentity } from './form-field';
 
 defineOptions({
   inheritAttrs: false,
@@ -77,8 +78,23 @@ const rows = ref<Row[]>([]);
 // The last record we emitted, so v-model's echo doesn't rebuild rows mid-edit.
 let lastEmitted: Record<string, string> | null = null;
 
+/**
+ * Rebuild the rows from an external record, reusing the row id of any key that
+ * survives so its `<input>` is patched rather than remounted (a remount steals
+ * the caret). Keys the incoming record no longer has simply lose their row.
+ */
 function buildRows(record: Record<string, string>): Row[] {
-  return Object.entries(record).map(([key, value]) => ({ id: (uid += 1), key, value }));
+  const idsByKey = new Map<string, number>();
+  for (const row of rows.value) {
+    const key = row.key.trim();
+    if (key && !idsByKey.has(key)) idsByKey.set(key, row.id);
+  }
+
+  return Object.entries(record).map(([key, value]) => ({
+    id: idsByKey.get(key) ?? (uid += 1),
+    key,
+    value,
+  }));
 }
 
 rows.value = buildRows(props.modelValue);
@@ -86,7 +102,12 @@ rows.value = buildRows(props.modelValue);
 watch(
   () => props.modelValue,
   (val) => {
-    if (val === lastEmitted) return; // our own emit round-tripped back
+    // Compare by CONTENT, not by reference. A parent holding the map in
+    // `reactive()`/`ref()` hands back a proxy, which is never `===` the raw
+    // object we emitted — an identity check therefore fails on every keystroke
+    // and rebuilds the rows from the COMMITTED record, which by contract omits
+    // the row being edited. Clearing a key would delete that row and its value.
+    if (recordsEqual(val, lastEmitted)) return;
     rows.value = buildRows(val);
   },
   { deep: true },
@@ -127,18 +148,37 @@ function recordsEqual(a: Record<string, string>, b: Record<string, string> | nul
   return aKeys.every((key) => a[key] === b[key]);
 }
 
-function emitState() {
-  const next = committed.value;
-  if (!recordsEqual(next, lastEmitted)) {
-    lastEmitted = next;
-    emit('update:modelValue', next);
-  }
-
+const validity = computed<TKeyValueEditorValidity>(() => {
   const errors: string[] = [];
   const kinds = new Set(rowErrors.value.filter(Boolean) as Exclude<RowError, null>[]);
   if (kinds.has('empty')) errors.push(labels.value.emptyKey);
   if (kinds.has('duplicate')) errors.push(labels.value.duplicateKey);
-  emit('validity-change', { valid: errors.length === 0, errors });
+  return { valid: errors.length === 0, errors };
+});
+
+// Validity is watched, not emitted from the input handlers, because a Record
+// can ARRIVE invalid: `{"": "x"}` is a legitimate `Record<string, string>` and
+// the control mounts already showing the row error. Emitting only on keystroke
+// left the consumer's aggregated summary out of sync on mount, after an
+// external reset, and after add-row. `immediate` covers mount; the signature
+// guard keeps it to one emit per actual change.
+let lastValiditySignature: string | null = null;
+watch(
+  validity,
+  (value) => {
+    const signature = JSON.stringify(value);
+    if (signature === lastValiditySignature) return;
+    lastValiditySignature = signature;
+    emit('validity-change', value);
+  },
+  { immediate: true },
+);
+
+function emitState() {
+  const next = committed.value;
+  if (recordsEqual(next, lastEmitted)) return;
+  lastEmitted = next;
+  emit('update:modelValue', next);
 }
 
 function onKeyInput(index: number, event: Event) {
@@ -184,8 +224,20 @@ const rootClasses = computed(() => [
 
 const rootStyle = computed(() => attrs.style);
 
+// A `<label for>` has to point at a form control. TFormField hands the control
+// an `id` (explicitly, or through the field context); landing it on the wrapper
+// `div` makes the label name nothing at all, so it is routed to the first key
+// input — the field the label is about — and everything else stays on the group.
+const { controlId, describedBy } = useFormFieldIdentity(attrs);
+
 const fieldAttrs = computed(() => {
-  const { class: _class, style: _style, ...rest } = attrs;
+  const {
+    class: _class,
+    style: _style,
+    id: _id,
+    'aria-describedby': _describedBy,
+    ...rest
+  } = attrs;
   return rest;
 });
 </script>
@@ -195,6 +247,9 @@ const fieldAttrs = computed(() => {
     v-bind="fieldAttrs"
     :class="rootClasses"
     :style="rootStyle"
+    role="group"
+    :aria-invalid="invalid || undefined"
+    :aria-describedby="describedBy"
   >
     <div
       v-if="rows.length"
@@ -208,6 +263,7 @@ const fieldAttrs = computed(() => {
       >
         <div class="t-key-value-editor__fields">
           <input
+            :id="index === 0 ? controlId : undefined"
             class="t-key-value-editor__key"
             type="text"
             :value="row.key"

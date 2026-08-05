@@ -20,6 +20,18 @@ props:
       accent and follows a TSection/THero/TPageSurface that declares one.
       Omitted, the tag keeps the pre-tone look: brand `solid`, neutral
       `outline` and `soft` — so `tone` is purely additive.
+  density:
+    type: TTagDensity
+    default: control
+    values: [control, compact]
+    description: >
+      `control` locks the height to the matching control step, so a tag lines up
+      with the inputs and buttons around it. `compact` drops the fixed height for
+      padding + line-height, so the tag hugs its text and KEEPS the type size of
+      its `size` step. A static label beside a heading wants `compact`: at
+      `size="md"` the control height is 40px against ~26px for the label, and
+      stepping down to `size="sm"` fixes the height by shrinking the type from
+      13px to 11px — the wrong knob.
   size:
     type: TSize
     default: md
@@ -59,6 +71,7 @@ css:
     - "t-tag--solid | t-tag--outline | t-tag--soft"
     - "t-tag--sm | t-tag--md | t-tag--lg"
     - "t-tag--tone-<tone> (only when `tone` is set)"
+    - "t-tag--density-compact (only when `density` is not `control`)"
   custom_properties:
     note: >
       The tone modifiers remap five variables the variant rules read —

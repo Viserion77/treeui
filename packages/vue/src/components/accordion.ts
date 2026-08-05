@@ -1,12 +1,14 @@
 import type { ComputedRef, InjectionKey } from 'vue';
 
 export type AccordionType = 'single' | 'multiple';
+export type AccordionVariant = 'default' | 'quiet';
 
 export interface AccordionContext {
   // Refs, not plain values: reading `props.x` while building the provided object
   // snapshots it at setup time, so items would never see a container prop
   // change. Mirrors the shape TTreeView provides to TTreeViewItem.
   type: ComputedRef<AccordionType>;
+  variant: ComputedRef<AccordionVariant>;
   disabled: ComputedRef<boolean>;
   collapsible: ComputedRef<boolean>;
   isItemOpen: (value: string) => boolean;

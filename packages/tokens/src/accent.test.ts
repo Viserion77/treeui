@@ -52,3 +52,22 @@ describe('marketing-scale elevation', () => {
     expect(treeTokens.shadow.accent).toContain('var(--tree-color-accent-primary)');
   });
 });
+
+describe('type scale (TREEUX-049)', () => {
+  // `2xl` used to repeat `xl` verbatim, which made every `clamp(xl … 2xl)` a
+  // constant — 12 of them in one consumer's landing pages. A scale with two
+  // equal steps is a scale with a missing step; this keeps it monotonic.
+  const order = ['xs', 'sm', 'md', 'lg', 'xl', '2xl', '3xl', '4xl', '5xl'] as const;
+  const rem = (value: string) => Number.parseFloat(value);
+
+  it('is strictly increasing, with no duplicated step', () => {
+    const sizes = order.map((name) => rem(treeTokens.font.size[name]));
+    for (let index = 1; index < sizes.length; index += 1) {
+      expect(sizes[index]).toBeGreaterThan(sizes[index - 1]);
+    }
+  });
+
+  it('keeps `base` an alias of `md` rather than a step of its own', () => {
+    expect(treeTokens.font.size.base).toBe(treeTokens.font.size.md);
+  });
+});

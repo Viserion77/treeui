@@ -126,6 +126,24 @@ export_aliases:
     - canonical: TSteps
       alias: TStepper
 
+global_component_typing:
+  note: >-
+    `@treeui/vue` augments Vue's `GlobalComponents` with exactly what
+    `TreeUIPlugin` registers (the augmentation IS `typeof components` from
+    plugin.ts, so it cannot drift). Without it `vue-tsc` has nothing to check a
+    globally registered `<TTag>` against, and a prop that does not exist is not
+    an error: it becomes an entry in `$attrs` and, on a component with
+    `inheritAttrs: false`, lands on an inner element as an invalid HTML
+    attribute and disappears. One consumer audit found six such props across 19
+    call sites — a checkbox with no accessible name, a destructive button in the
+    default colour, translated copy that never rendered — with no warning in
+    dev, in build, or in `vue-tsc`.
+  trade_off: >-
+    The augmentation is unconditional, so an app importing components by name
+    instead of installing the plugin is also told they resolve globally. That
+    direction fails loudly at runtime ("Failed to resolve component"); the
+    direction it fixes failed silently.
+
 layout_capabilities_already_shipping:
   note: >
     Layout sizing and flex behavior already exist as dedicated primitives. Reach
@@ -197,8 +215,17 @@ shared_props:
     note: >-
       Status tone, not an action variant. The accepted values differ per
       component (TBadge/TStat omit `brand`, TTimeline omits `info`, TTag adds
-      `accent`, and TText's `tone` is a text-color role:
-      default | muted | inverse | brand). See DECISIONS.md → "Variant Vocabulary".
+      `accent`, and TText's `tone` is a text-color role — default | muted |
+      inverse | brand — EXTENDED with the four status tones, since a sentence
+      that is the state is neither an alert box nor a pill).
+      See DECISIONS.md → "Variant Vocabulary".
+    not_universal: >-
+      `tone` is NOT on every component with a destructive state: TButton and
+      TLink express it through `variant` (`danger` is a member of the shared
+      action scale) and TConfirmDialog through `confirmVariant`. Reaching for
+      `tone` on those is the single most common wrong guess; `GlobalComponents`
+      typing (see `global_component_typing`) now turns it into a compile error
+      instead of a silent no-op.
   accent:
     type: TAccent
     values: [brand, neutral, success, warning, danger, info]
@@ -241,6 +268,27 @@ shared_props:
     note: >-
       Polymorphic root element (a tag name). Carried by the layout primitives
       and by TButton/TCard; the manifest of each says which tags make sense.
+    ua_boxes: >-
+      Swapping the element brings the browser's own box with it, and the library
+      cancels the two that bite: `as="ul"/"ol"/"menu"` on TStack/TGrid/TSplit/
+      TContainer drops the marker, indent and margin (and restores `role="list"`,
+      which `list-style: none` removes in Safari), and `as="button"` on TCard
+      restores font, width and text alignment, which a `<button>` does not
+      inherit. Do NOT re-write those resets in product CSS.
+  family:
+    values: [sans, mono]
+    used_by: [TText, TLink, TTextarea]
+    note: >-
+      Font family, one vocabulary across the text surfaces. `mono` is for
+      machine text — ids, ARNs, keys, JSON — and is what replaces a local
+      `.mono` class.
+  wrap:
+    values: [anywhere, break-word]
+    used_by: [TText]
+    note: >-
+      Break axis for a string with no break opportunity. Distinct from
+      `truncate`, which is the wrong answer when the string IS the datum the
+      reader came to copy. Mutually exclusive with it.
   label:
     note: >-
       `label` is the component's own label — visible where the component paints

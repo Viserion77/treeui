@@ -35,12 +35,36 @@ props:
       Accessible name for each chip's remove button, forwarded to the underlying
       TTag. Localizable copy — the library ships an English default only as a
       fallback.
+  allowDuplicates:
+    type: boolean
+    default: false
+    note: >
+      Keep repeated values instead of dropping them. Dedupe is right for a set of
+      names and wrong for an ordered argument list, where `--param a --param b`
+      is meaningful and losing the second `--param` silently corrupts the command
+      that gets spawned.
+  separator:
+    type: "string | string[] | null"
+    default: ","
+    note: >
+      Character(s) that confirm the current tag alongside Enter, both on keydown
+      and when pasting. `null` makes Enter the only way to confirm — needed when
+      the values legitimately contain the separator (`--param=tags=a,b` must stay
+      one argument). An array accepts several.
+  commitOnBlur:
+    type: boolean
+    default: true
+    note: >
+      Confirm the pending draft when the field loses focus. On by default because
+      typing the last value and clicking Save otherwise dropped it with no
+      warning — a defect independent of any one product.
 
 events:
   - update:modelValue
 
 exposed:
   - "focus(): focuses the text field."
+  - "commit(): flushes the pending draft, for a form that turns commitOnBlur off."
 
 a11y:
   chips_are_ttag_removable: true
@@ -52,7 +76,7 @@ behavior:
   values_are_free_strings: true
   enter_and_comma_confirm_current_tag: true
   pasted_comma_separated_string_splits_into_tags: true
-  trims_and_dedupes_silently: true
+  trims_and_dedupes_silently: "unless allowDuplicates"
   empty_after_trim_ignored: true
   no_autocomplete_or_suggestions: true
   reuses_ttag_for_chips: true

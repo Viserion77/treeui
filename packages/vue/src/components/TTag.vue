@@ -17,6 +17,10 @@ const _treeTagTones = [
 
 export type TTagTone = (typeof _treeTagTones)[number];
 
+const _treeTagDensities = ['control', 'compact'] as const;
+
+export type TTagDensity = (typeof _treeTagDensities)[number];
+
 const props = withDefaults(
   defineProps<{
     variant?: TTagVariant;
@@ -29,6 +33,14 @@ const props = withDefaults(
      * `outline` and `soft`.
      */
     tone?: TTagTone;
+    /**
+     * `control` (default) locks the height to the matching control step, so a
+     * tag lines up with the inputs and buttons around it. `compact` drops the
+     * fixed height for padding + line-height, so the tag hugs its text and
+     * keeps the type size of its `size` step — the right shape for a static
+     * label beside a heading, where a control-height pill reads as oversized.
+     */
+    density?: TTagDensity;
     size?: TSize;
     removable?: boolean;
     disabled?: boolean;
@@ -38,6 +50,7 @@ const props = withDefaults(
   {
     variant: 'soft',
     tone: undefined,
+    density: 'control',
     size: 'md',
     removable: false,
     disabled: false,
@@ -53,6 +66,7 @@ const classes = computed(() => [
   't-tag',
   `t-tag--${props.variant}`,
   `t-tag--${props.size}`,
+  props.density !== 'control' ? `t-tag--density-${props.density}` : '',
   props.tone ? `t-tag--tone-${props.tone}` : '',
   props.disabled ? 'is-disabled' : '',
 ]);

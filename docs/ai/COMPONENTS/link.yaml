@@ -6,6 +6,19 @@ status: available
 purpose: "Inline link with consistent styling, optional RouterLink rendering, and external link support."
 
 props:
+  family:
+    type: TLinkFamily
+    default: undefined
+    values: [sans, mono]
+    note: >
+      Font family, same vocabulary as TText. `mono` is for a link whose label is
+      machine text (a partition key, an ARN), which otherwise needed a TText
+      nested inside the anchor.
+  size:
+    type: TLinkSize
+    default: undefined
+    values: [xs, sm, md, lg]
+    note: "Type size. Omitted, the link inherits — the right default inside prose."
   to:
     type: "string | Record<string, unknown>"
     default: undefined

@@ -34,6 +34,23 @@ props:
     type: string
     default: button
     note: "Root tag rendered through `<component :is>`. Any value other than `button` switches the component onto the non-native accessibility path (see `a11y`) and stops the `type` attribute from being rendered."
+  href:
+    type: string
+    default: undefined
+    note: >
+      Anchor attributes (`href`, `target`, `rel`, `download`) are declared props
+      and are only rendered when `as="a"`. They were fallthrough before, which
+      typechecked as an error in a consumer's `strictTemplates` build even
+      though a link button is the documented use of `as` (TREEUX-011, group 1).
+  target:
+    type: string
+    default: undefined
+  rel:
+    type: string
+    default: undefined
+  download:
+    type: "string | boolean"
+    default: undefined
   variant:
     type: "TVariant | brand"
     default: solid

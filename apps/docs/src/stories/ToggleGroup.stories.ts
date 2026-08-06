@@ -1,6 +1,14 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite';
+import type { ComponentProps } from 'vue-component-type-helpers';
 import { ref } from 'vue';
 import { TToggleGroup } from '@treeui/vue';
+
+// `TToggleGroup` is generic over its option type AND its selection mode, so
+// `typeof TToggleGroup` is a generic FUNCTION, which Storybook's
+// `Meta<Component>` cannot accept. Same shape as Input.stories.ts: type the
+// story by its PROPS and annotate, so `Story` never infers args back out of the
+// component. The component itself is untouched.
+type TToggleGroupArgs = ComponentProps<typeof TToggleGroup>;
 
 const options = [
   { label: 'Day', value: 'day' },
@@ -9,9 +17,9 @@ const options = [
   { label: 'Quarter', value: 'quarter', disabled: true },
 ];
 
-const meta = {
+const meta: Meta<TToggleGroupArgs> = {
   title: 'Components/Data Entry/ToggleGroup',
-  component: TToggleGroup,
+  component: TToggleGroup as never,
   tags: ['autodocs'],
   args: {
     size: 'md',
@@ -35,10 +43,10 @@ const meta = {
       options: ['single', 'multiple'],
     },
   },
-} satisfies Meta<typeof TToggleGroup>;
+};
 
 export default meta;
-type Story = StoryObj<typeof meta>;
+type Story = StoryObj<TToggleGroupArgs>;
 
 export const Playground: Story = {
   render: (args: Record<string, unknown>) => ({

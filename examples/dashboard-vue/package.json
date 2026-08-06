@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "pnpm exec vite --port 6008",
     "build": "pnpm exec vite build",
-    "typecheck": "pnpm exec vue-tsc --noEmit -p tsconfig.json"
+    "typecheck": "pnpm exec vue-tsc --noEmit -p tsconfig.json",
+    "check:theme": "node --experimental-strip-types scripts/check-theme.ts"
   },
   "dependencies": {
     "@treeui/icons": "workspace:*",

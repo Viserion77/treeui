@@ -9,6 +9,13 @@ props:
   modelValue:
     type: "number | null"
     default: null
+    note: >
+      `null` is REAL, not an error state: clearing the field is empty, and the
+      component emits `null` for it. So `v-model` needs a `ref<number | null>`,
+      and a `ref<number>` is a genuine type error under a consumer's
+      `strictTemplates` rather than a gap in the library. This is the one place
+      in the round where the checker was right and the call site was wrong — the
+      others (TInput, TTabs, TToggleGroup) were the library's fault.
   min:
     type: number
     default: undefined

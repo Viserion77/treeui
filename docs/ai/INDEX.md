@@ -33,6 +33,7 @@ Load files in this order and stop as soon as you have enough context:
 - `RECIPES.yaml`: cross-component composition guidance
 - `TOKENS.yaml`: framework-agnostic visual contract, the three colour layers, and every theme value
 - `../../MIGRATION.md`: what a consuming product does about a colour-contract change
+- `PROMPTS/adopt-colour-contract.md`: a ready-to-run prompt for a CONSUMING product's agent — audit, seed, migrate, deliver. Worked example: `examples/dashboard-vue` (`src/theme.ts`, `scripts/check-theme.ts`)
 - `STANDARDS.yaml`: design-system conformance rules (colors, typography, spacing, motion, icons)
 - `VALIDATION.yaml`: the acceptance-criteria definitions (naming, structure, CSS, states, a11y, docs) a component review cites by id
 - `COMPONENTS/*.yaml`: component-level public API manifests
@@ -53,6 +54,7 @@ If a public API changes, update the matching file here in the same change. If a 
   referenced. Semantics are the public API. Derived states (hover, press, selected,
   disabled) are computed by the library and must be read, never set. `TOKENS.yaml` ->
   `layers` and `derived_variables` say which is which.
+- When a consuming product asks how to set ITS colours, hand it `PROMPTS/adopt-colour-contract.md` rather than explaining the contract inline. A missing colour role in that report is a change to `contract.ts`, not a product-local override.
 - For rationale, migration context, or intent behind the contracts, load `DECISIONS.md`.
 
 ## Coverage

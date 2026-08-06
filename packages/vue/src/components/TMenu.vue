@@ -41,8 +41,12 @@ const emit = defineEmits<{
 
 defineSlots<{
   trigger(props: { isOpen: boolean; contentId: string }): unknown;
-  /** Panel header, rendered outside the `role="menu"` element. */
-  header(): unknown;
+  /**
+   * Panel header, rendered outside the `role="menu"` element. Optional, and
+   * declared optional: the template guards it with `v-if`, so declaring it
+   * required told the type checker the guard was dead code.
+   */
+  header?(): unknown;
   default(): unknown;
 }>();
 

@@ -84,3 +84,7 @@ example: |
     :model-value="draft"
     @update:model-value="draft = $event"
   />
+
+element_attributes:
+  note: "Same reason as TInput — see `input.yaml` -> `element_attributes` (TREEUX-011, group 1)."
+  declared: [readonly, minlength, maxlength, name, required, autocomplete]

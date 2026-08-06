@@ -7,16 +7,35 @@ purpose: "Segmented button group for single or multiple visible choices."
 
 props:
   modelValue:
-    type: "string | string[]"
+    type: "TToggleGroupModel<T, M> — `T` in single mode, `T[]` in multiple"
     default: undefined
+    note: >
+      Generic over the option type AND the selection mode, so the model is the
+      type the call site actually has: `<TToggleGroup v-model="view">` with a
+      `ref<'grid' | 'list'>` binds, and `selectionMode="multiple"` binds a
+      `('grid' | 'list')[]`. It was `string | string[]` in and
+      `string | string[] | undefined` out, which no literal-union ref could bind
+      under a consumer's `strictTemplates` — the same defect as TTabs/TInput
+      (TREEUX-011, group 3), found by the gate once it ran on the same `vue-tsc`
+      major consumers use. `undefined` was never actually emitted.
   options:
-    type: "TToggleGroupOption[]"
+    type: "TToggleGroupOption<NoInfer<T>>[]"
     default: "[]"
-    note: "Array of `{ label, value, disabled? }`."
+    note: >
+      Array of `{ label, value, disabled? }`. `NoInfer` so the MODEL drives `T`,
+      not the options: otherwise a group whose options list one value narrows
+      `T` to it, and a `ref<'grid' | 'list'>` stops binding the moment an option
+      is filtered out. Options are checked against the model instead, which is
+      the direction that catches the real mistake — offering a value the model
+      cannot hold.
   selectionMode:
-    type: TToggleGroupSelectionMode
+    type: "M ('single' | 'multiple')"
     default: single
     values: [single, multiple]
+    note: >
+      No `withDefaults` entry, deliberately: a default value cannot be proven
+      assignable to the type parameter it would fill in. The default is applied
+      internally, so the runtime behaviour is unchanged.
   size:
     type: TSize
     default: md

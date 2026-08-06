@@ -47,6 +47,19 @@ accent and gets a complete, contrast-checked interaction set.
   brand land at 4.37:1 on the quietest surface; it now checks both, and no
   longer returns an invisible hover for a near-black or near-white seed.
 
+- A near-miss contrast failure printed `4.50:1 is below 4.5:1`, which reads as a
+  bug in the validator to whoever has to fix it in CI. The measured ratio now
+  gains digits until it is visibly under the threshold.
+- `examples/dashboard-vue` is the worked example for a product whose theme is a
+  PICKER rather than a single brand colour: `src/theme.ts` holds the seed and
+  every colour literal in the app, `scripts/check-theme.ts` validates all five
+  accents in both modes in CI, and the settings drawer runs a custom accent
+  through the same helper at pick time, so the build and the running app cannot
+  disagree about what passes.
+- `docs/ai/PROMPTS/adopt-colour-contract.md` is a ready-to-run migration prompt
+  for a consuming product's agent: audit (with a mandatory stop), define the
+  theme, migrate, deliverables. It does not let an agent choose the brand tone.
+
 **Enforced**
 
 - `contract.test.ts` fails on any colour literal outside `primitives.ts` —

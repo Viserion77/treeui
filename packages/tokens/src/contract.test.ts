@@ -184,6 +184,24 @@ describe(`@treeui/tokens colour contract v${CONTRACT_VERSION}`, () => {
       expect(result.errors.some((error) => error.message.includes('below 4.5:1'))).toBe(true);
     });
 
+    it('never prints a failing ratio that rounds up onto its own threshold', () => {
+      // A near miss at two decimals reads `4.50:1 is below 4.5:1`, which looks
+      // like a bug in the validator to whoever has to fix it in CI. Every
+      // failing ratio the validator prints must be visibly under its threshold.
+      const { results } = createValidatedThemePair({ accent: '#ffe600' });
+      const failures = results.flatMap((result) => result.errors);
+
+      expect(failures.length).toBeGreaterThan(0);
+
+      for (const failure of failures) {
+        const printed = failure.message.match(/contrast ([\d.]+):1 is below ([\d.]+):1/);
+
+        if (!printed) continue;
+
+        expect(Number.parseFloat(printed[1])).toBeLessThan(Number.parseFloat(printed[2]));
+      }
+    });
+
     it('fails a theme that is missing a required token', () => {
       const incomplete = structuredClone(treeThemes.light.color) as unknown as Record<
         string,

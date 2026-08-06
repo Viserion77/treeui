@@ -39,6 +39,7 @@
     "version-packages": "pnpm -w exec changeset version",
     "release": "pnpm build:packages && pnpm -w exec changeset publish",
     "typecheck:strict-templates": "node tooling/strict-templates/check.mjs",
+    "check:theme": "pnpm --filter @treeui/example-dashboard-vue check:theme",
     "changeset:status": "pnpm -w exec changeset status --since=origin/main"
   },
   "devDependencies": {

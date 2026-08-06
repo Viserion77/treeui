@@ -2,6 +2,7 @@
 import { computed } from 'vue';
 import {
   TButton,
+  TAlert,
   TCheckbox,
   TColorSwatch,
   TDivider,
@@ -9,11 +10,13 @@ import {
   TFormField,
   TSelect,
   TStack,
+  TText,
   TToggleGroup,
   useToast,
 } from '@treeui/vue';
 import type { TCardVariant, TSize, TThemeMode } from '@treeui/vue';
 import { useAppTheme, useDashboardConfig } from '../composables/useDashboardConfig';
+import { accentPresets, checkAccent } from '../theme';
 
 const props = defineProps<{
   open: boolean;
@@ -57,13 +60,26 @@ const cardVariantOptions: Array<{ label: string; value: TCardVariant }> = [
   { label: 'Inset', value: 'inset' },
 ];
 
-const accentPresets = [
-  { label: 'Ocean blue', value: '#0969da' },
-  { label: 'Forest green', value: '#1a7f37' },
-  { label: 'Grape violet', value: '#6d28d9' },
-  { label: 'Clay orange', value: '#c2410c' },
-  { label: 'Rosewood', value: '#be185d' },
-];
+/**
+ * Accent feedback, live.
+ *
+ * The presets are validated in CI (`pnpm check:theme`), so the only accent that
+ * can reach this component unchecked is a custom one — and a colour input will
+ * happily produce a pale yellow whose pressed state nobody can see. Running it
+ * through the same `checkAccent` the build runs means the app can SAY that,
+ * naming the pair and the measured ratio.
+ *
+ * It reports rather than blocks: brand colour is a stakeholder decision, and a
+ * demo that silently refuses a colour teaches nothing. What it must not do is
+ * accept it quietly.
+ */
+const accentIssues = computed(() => {
+  const accent = theme.accent.value;
+
+  if (!accent) return [];
+
+  return checkAccent(accent).problems;
+});
 
 const widgetOptions: Array<{ key: keyof typeof config.widgets; label: string }> = [
   { key: 'stats', label: 'Key metrics' },
@@ -108,14 +124,35 @@ function restoreDefaults() {
         label="Accent color"
         hint="Re-derived per theme so it stays readable in light and dark."
       >
-        <TColorSwatch
-          :model-value="theme.accent.value ?? undefined"
-          :options="accentPresets"
-          allow-custom
-          label="Accent color"
-          custom-label="Custom accent color"
-          @update:model-value="theme.setAccent($event)"
-        />
+        <TStack gap="var(--tree-space-3)">
+          <TColorSwatch
+            :model-value="theme.accent.value ?? undefined"
+            :options="accentPresets"
+            allow-custom
+            label="Accent color"
+            custom-label="Custom accent color"
+            @update:model-value="theme.setAccent($event)"
+          />
+          <TAlert
+            v-if="accentIssues.length"
+            variant="warning"
+            size="sm"
+            role="status"
+          >
+            <TStack gap="var(--tree-space-2)">
+              <TText weight="semibold">
+                This accent fails the colour contract
+              </TText>
+              <TText
+                v-for="issue in accentIssues"
+                :key="issue"
+                size="sm"
+              >
+                {{ issue }}
+              </TText>
+            </TStack>
+          </TAlert>
+        </TStack>
       </TFormField>
 
       <TFormField

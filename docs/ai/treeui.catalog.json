@@ -2217,6 +2217,27 @@
           "note": "Root tag rendered through `<component :is>`. Any value other than `button` switches the component onto the non-native accessibility path (see `a11y`) and stops the `type` attribute from being rendered."
         },
         {
+          "name": "href",
+          "type": "string",
+          "default": "undefined",
+          "note": "Anchor attributes (`href`, `target`, `rel`, `download`) are declared props and are only rendered when `as=\"a\"`. They were fallthrough before, which typechecked as an error in a consumer's `strictTemplates` build even though a link button is the documented use of `as` (TREEUX-011, group 1).\n"
+        },
+        {
+          "name": "target",
+          "type": "string",
+          "default": "undefined"
+        },
+        {
+          "name": "rel",
+          "type": "string",
+          "default": "undefined"
+        },
+        {
+          "name": "download",
+          "type": "string | boolean",
+          "default": "undefined"
+        },
+        {
           "name": "variant",
           "type": "TVariant | brand",
           "default": "solid",
@@ -3570,7 +3591,7 @@
         {
           "name": "confirmVariant",
           "type": "TVariant",
-          "default": "danger",
+          "default": "solid",
           "values": [
             "solid",
             "outline",
@@ -3578,7 +3599,22 @@
             "soft",
             "danger"
           ],
-          "note": "Ignored when the `actions` slot is supplied."
+          "note": "Shape of the confirm button; ignored when the `actions` slot is supplied. The default moved from `danger` to `solid` when the `danger` VARIANT was deprecated in favour of `tone` — leaving it made every dialog in an app emit the deprecation warning from INSIDE the library, which a consumer could only silence by reimplementing the footer through `actions`. Appearance is unchanged, because `confirmTone` defaults to `danger`.\n"
+        },
+        {
+          "name": "confirmTone",
+          "type": "TActionTone",
+          "default": "danger",
+          "values": [
+            "brand",
+            "accent",
+            "neutral",
+            "success",
+            "warning",
+            "danger",
+            "info"
+          ],
+          "note": "Colour of the confirm button, forwarded to its `tone`; ignored when the `actions` slot is supplied. \"It composes through TButton\" was the answer for most components and the wrong one here: the dialog OWNS its footer buttons, so there is no call site to compose from.\n"
         },
         {
           "name": "confirmDisabled",
@@ -6567,8 +6603,9 @@
       "props": [
         {
           "name": "modelValue",
-          "type": "string | number",
-          "default": ""
+          "type": "T",
+          "default": "undefined",
+          "note": "Generic over `T extends string | number`, so a `ref<number>` binds without a cast and `update:modelValue` pays back a number. `<script setup>` was widening every model to `string | number`, which under a consumer's `strictTemplates` made a numeric field a type error at the call site with no correct way to write it (TREEUX-011, group 3). When `T` is `number` the component parses the raw input value and only falls back to the raw string when it does not parse.\n"
         },
         {
           "name": "size",
@@ -8224,7 +8261,8 @@
       "props": [
         {
           "name": "modelValue",
-          "type": "number | null"
+          "type": "number | null",
+          "note": "`null` is REAL, not an error state: clearing the field is empty, and the component emits `null` for it. So `v-model` needs a `ref<number | null>`, and a `ref<number>` is a genuine type error under a consumer's `strictTemplates` rather than a gap in the library. This is the one place in the round where the checker was right and the call site was wrong — the others (TInput, TTabs, TToggleGroup) were the library's fault.\n"
         },
         {
           "name": "min",
@@ -10216,6 +10254,18 @@
           "note": "Accessible name of the whole chart."
         },
         {
+          "name": "maxRows",
+          "type": "number",
+          "default": "undefined",
+          "note": "Cap on how many lanes are drawn. A live window over a large stack can produce hundreds; slicing in the consumer hides data WITHOUT SAYING SO, which is worse than a long list. The component always renders a footer declaring how many lanes it left out.\n"
+        },
+        {
+          "name": "overflowLabel",
+          "type": "(hidden: number) => string",
+          "default": "undefined",
+          "note": "Copy for that footer. English fallback only, so the count is never silently dropped."
+        },
+        {
           "name": "minSpanPercent",
           "type": "number",
           "default": "0.4",
@@ -11184,14 +11234,14 @@
       "props": [
         {
           "name": "modelValue",
-          "type": "string",
-          "default": "",
-          "note": "The value of the currently active tab. Use with v-model."
+          "type": "T",
+          "default": "undefined",
+          "note": "The value of the currently active tab; use with v-model. Generic over `T extends string`, so a `ref<'overview' | 'logs'>` keeps its literal union instead of being widened to `string` — under a consumer's `strictTemplates` that widening made the binding an error with no correct way to write it (TREEUX-011, group 3).\n"
         },
         {
           "name": "defaultValue",
-          "type": "string",
-          "default": "",
+          "type": "T",
+          "default": "undefined",
           "note": "Initial active tab when uncontrolled."
         },
         {
@@ -11970,23 +12020,25 @@
       "props": [
         {
           "name": "modelValue",
-          "type": "string | string[]",
-          "default": "undefined"
+          "type": "TToggleGroupModel<T, M> — `T` in single mode, `T[]` in multiple",
+          "default": "undefined",
+          "note": "Generic over the option type AND the selection mode, so the model is the type the call site actually has: `<TToggleGroup v-model=\"view\">` with a `ref<'grid' | 'list'>` binds, and `selectionMode=\"multiple\"` binds a `('grid' | 'list')[]`. It was `string | string[]` in and `string | string[] | undefined` out, which no literal-union ref could bind under a consumer's `strictTemplates` — the same defect as TTabs/TInput (TREEUX-011, group 3), found by the gate once it ran on the same `vue-tsc` major consumers use. `undefined` was never actually emitted.\n"
         },
         {
           "name": "options",
-          "type": "TToggleGroupOption[]",
+          "type": "TToggleGroupOption<NoInfer<T>>[]",
           "default": "[]",
-          "note": "Array of `{ label, value, disabled? }`."
+          "note": "Array of `{ label, value, disabled? }`. `NoInfer` so the MODEL drives `T`, not the options: otherwise a group whose options list one value narrows `T` to it, and a `ref<'grid' | 'list'>` stops binding the moment an option is filtered out. Options are checked against the model instead, which is the direction that catches the real mistake — offering a value the model cannot hold.\n"
         },
         {
           "name": "selectionMode",
-          "type": "TToggleGroupSelectionMode",
+          "type": "M ('single' | 'multiple')",
           "default": "single",
           "values": [
             "single",
             "multiple"
-          ]
+          ],
+          "note": "No `withDefaults` entry, deliberately: a default value cannot be proven assignable to the type parameter it would fill in. The default is applied internally, so the runtime behaviour is unchanged.\n"
         },
         {
           "name": "size",

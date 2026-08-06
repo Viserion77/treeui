@@ -176,6 +176,39 @@ global_component_typing:
       fixtures: a consumer-style template that MUST compile, and a known-bad one
       whose six dead props MUST still error. Checking only the first would let a
       future change "fix" the noise by allowing everything.
+  element_attributes_are_declared: >-
+    Where a component wraps a native element and the ELEMENT's own attributes are
+    part of its documented use, those attributes are declared props bound
+    explicitly, not left to `$attrs` fallthrough: `min`/`max`/`step`/`pattern`/
+    `inputmode`/`minlength`/`maxlength`/`autocomplete`/`name`/`required`/
+    `readonly` on TInput, the text subset on TTextarea, and `href`/`target`/
+    `rel`/`download` on TButton (rendered only when `as="a"`). Fallthrough works
+    at runtime and is invisible to the type checker, so under a consumer's
+    `strictTemplates` a numeric input or a link button was untypeable — there was
+    no correct way to write the thing the docs told them to write. The
+    passthrough surface above covers attributes ANY component may take; this
+    covers attributes ONE component's element defines.
+  generic_models: >-
+    `TInput` (`T extends string | number`), `TTabs` (`T extends string`) and
+    `TToggleGroup` (`T extends string`, plus `M` for the selection mode) are
+    generic `<script setup>` components, so a `ref<number>` or a
+    `ref<'overview' | 'logs'>` binds without a cast and gets its own type back
+    from `update:modelValue` instead of the widened union. `TNumberInput` is
+    NOT in this list and will not be: it genuinely emits `null` when the field
+    is cleared, so a `ref<number>` binding is unsound and the error is correct.
+    Three costs, all accepted: a generic SFC is a generic function rather than a
+    `ConcreteComponent`, so a Storybook `Meta<typeof TInput>` no longer infers
+    (use `component: TInput as never` with an explicit
+    `Meta<ComponentProps<typeof TInput>>`); `toRef(props, 'x')` inside such a
+    component cannot narrow the mapped props type — use a `computed` getter; and
+    a generic `<script setup>` does not re-export the types declared inside it,
+    so a component with public types (`TToggleGroupOption`) needs a plain
+    `<script lang="ts">` block beside it.
+  checker_version: >-
+    The gate runs the same `vue-tsc` MAJOR consumers do (3.x). It was 2.x while
+    consumers were on 3.x, and three rounds of a reported model-typing error
+    could not be reproduced here for exactly that reason: 2.x did not emit it.
+    A gate on an older checker is a gate that agrees with itself.
 
 layout_capabilities_already_shipping:
   note: >

@@ -159,7 +159,9 @@ This is the part that keeps the contract true over time. Add one script:
 ```ts
 // scripts/check-theme.ts
 import { assertThemeValid } from '@treeui/tokens';
-import { light, dark } from '../src/theme';
+// The extension is required: `--experimental-strip-types` does no extension
+// resolution, so `'../src/theme'` fails with ERR_MODULE_NOT_FOUND.
+import { light, dark } from '../src/theme.ts';
 
 assertThemeValid(light, 'light', { label: 'acme-light' });
 assertThemeValid(dark, 'dark', { label: 'acme-dark' });
@@ -182,6 +184,13 @@ FAIL @treeui/tokens colour contract v1.0 — acme-light (light): 47/50 pairs pas
          brand.hover (#0e1420) measures 1.031:1, below 1.05:1. Press vs hover on
          a primary button would give no visible feedback.
 ```
+
+If your product does not have one theme but a RANGE — an accent picker, a
+per-tenant brand colour — validate the range, not the default. A worked example
+is `examples/dashboard-vue`: `src/theme.ts` exports the accents it offers plus a
+`checkAccent` helper, `scripts/check-theme.ts` runs every preset through it in
+CI, and the settings drawer runs a custom accent through the same helper at pick
+time, so the build and the running app can never disagree about what passes.
 
 If you seed rather than hand-author, use `createValidatedThemePair`, which does
 both in one pass:

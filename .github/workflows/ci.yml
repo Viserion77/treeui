@@ -49,6 +49,12 @@ jobs:
       - name: Typecheck consumer templates (strictTemplates)
         run: pnpm typecheck:strict-templates
 
+      # Also after the build: the validator is imported from `dist`, and the
+      # example is the worked demonstration of MIGRATION.md -> Path D, so a
+      # shipped accent that stops passing the colour contract is a red build.
+      - name: Validate the example's accent presets (colour contract)
+        run: pnpm check:theme
+
       - name: Build docs site (landing + Vue + React Storybooks)
         run: pnpm build:site
 

@@ -43,9 +43,24 @@ props:
     note: "Ignored when the `actions` slot is supplied."
   confirmVariant:
     type: TVariant
-    default: danger
+    default: solid
     values: [solid, outline, ghost, soft, danger]
-    note: "Ignored when the `actions` slot is supplied."
+    note: >
+      Shape of the confirm button; ignored when the `actions` slot is supplied.
+      The default moved from `danger` to `solid` when the `danger` VARIANT was
+      deprecated in favour of `tone` — leaving it made every dialog in an app
+      emit the deprecation warning from INSIDE the library, which a consumer
+      could only silence by reimplementing the footer through `actions`.
+      Appearance is unchanged, because `confirmTone` defaults to `danger`.
+  confirmTone:
+    type: TActionTone
+    default: danger
+    values: [brand, accent, neutral, success, warning, danger, info]
+    note: >
+      Colour of the confirm button, forwarded to its `tone`; ignored when the
+      `actions` slot is supplied. "It composes through TButton" was the answer
+      for most components and the wrong one here: the dialog OWNS its footer
+      buttons, so there is no call site to compose from.
   confirmDisabled:
     type: boolean
     default: false

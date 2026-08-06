@@ -173,3 +173,19 @@ example: |
     smooth
     aria-label="Monthly revenue"
   />
+
+localizable_copy:
+  seriesLabel:
+    default: Series
+    note: >
+      Header of the series column in the accessible data table. It was the one
+      string in the component with no way out — the empty state has a slot, this
+      had nothing — so in a multilingual UI it was the single label that could
+      not go through the app's catalogue.
+  interpolation:
+    values: [linear, smooth, step]
+    note: >
+      `linear` and `smooth` INTERPOLATE between samples, which draws a state
+      that never existed for a quantity that holds its value across a bucket.
+      `step` holds each value until the next sample. `smooth` still works and
+      maps to `"smooth"`.

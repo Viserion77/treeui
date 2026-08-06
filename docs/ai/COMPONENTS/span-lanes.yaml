@@ -14,6 +14,18 @@ props:
   to: { type: number }
   laneHeight: { type: number, default: 20 }
   label: { type: string, note: "Accessible name of the whole chart." }
+  maxRows:
+    type: number
+    default: undefined
+    note: >
+      Cap on how many lanes are drawn. A live window over a large stack can
+      produce hundreds; slicing in the consumer hides data WITHOUT SAYING SO,
+      which is worse than a long list. The component always renders a footer
+      declaring how many lanes it left out.
+  overflowLabel:
+    type: "(hidden: number) => string"
+    default: undefined
+    note: "Copy for that footer. English fallback only, so the count is never silently dropped."
   minSpanPercent:
     type: number
     default: 0.4

@@ -1,6 +1,7 @@
 import { reactive, watch } from 'vue';
 import { treeCardVariants, treeSizes, useTheme } from '@treeui/vue';
 import type { TCardVariant, TSize } from '@treeui/vue';
+import { DEFAULT_ACCENT } from '../theme';
 
 /**
  * Theme mode + accent are a design-system concern, so they live in TreeUI's
@@ -11,7 +12,7 @@ import type { TCardVariant, TSize } from '@treeui/vue';
  */
 const theme = useTheme({
   storageKey: 'treeui-example-theme',
-  defaultAccent: '#0969da',
+  defaultAccent: DEFAULT_ACCENT,
 });
 
 export function useAppTheme() {
@@ -98,7 +99,7 @@ export function useDashboardConfig() {
   const reset = () => {
     Object.assign(config, structuredClone(DEFAULTS));
     theme.setMode('system');
-    theme.setAccent('#0969da');
+    theme.setAccent(DEFAULT_ACCENT);
   };
 
   return { config, reset };

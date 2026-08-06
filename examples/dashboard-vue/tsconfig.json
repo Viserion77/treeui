@@ -1,4 +1,9 @@
 {
   "extends": "../../tsconfig.json",
-  "include": ["src/**/*", "env.d.ts", "vite.config.ts"]
+  "compilerOptions": {
+    // `scripts/check-theme.ts` imports `../src/theme.ts` with the extension,
+    // because the Node loader that runs it does no extension resolution.
+    "allowImportingTsExtensions": true
+  },
+  "include": ["src/**/*", "scripts/**/*", "env.d.ts", "vite.config.ts"]
 }

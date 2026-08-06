@@ -71,3 +71,40 @@ accessibility:
   aria-sort: Set on sortable column headers (ascending, descending, none).
   keyboard: Sortable headers are focusable and activated with Enter or Space.
   scope: col on all th elements.
+
+row_activation:
+  note: >
+    A row either NAVIGATES or it does not, and the API forces the choice —
+    `rowHref`/`rowTo` and `rowActivatable` are mutually exclusive and dev builds
+    say so. One consumer audit found four screens that had each invented their
+    own row activation, and the contortion a screen picked had no correlation
+    with whether it navigated; offering two equivalent ways out reproduces that.
+  rowHref_rowTo:
+    shape: "A real `<a>` in the FIRST cell, stretched over the row by `::after`."
+    why_not_a_tr: >
+      A `<tr>` cannot be an `<a>` and cannot contain one: its only permitted
+      content is `<td>`/`<th>`, and the parser hoists anything else out of the
+      table.
+    containing_block: >
+      Only the cells AFTER the first are positioned. Positioning EVERY cell made
+      the first one the overlay's containing block, so `inset: 0` covered that
+      cell alone — the whole row showed pointer and hover while only the first
+      cell navigated.
+    affordance: >
+      `is-linked` follows the RESOLVED target, not the presence of the prop: a
+      row whose `rowTo` returns `undefined` renders no link and gets no pointer.
+  rowActivatable:
+    shape: "A real `<button>` in the first cell, stretched the same way."
+    why_not_role_button_on_tr: >
+      `role="button"` on a `<tr>` makes every cell presentational and destroys
+      the table's grid semantics, so a row that is activatable AND contains a
+      control had no accessible shape at all. A button in a cell also means a
+      control in another cell never fires `row-activate` by accident.
+  rowLabel: "Used by BOTH modes. Without it the name is every cell concatenated, per row."
+  detail_slot:
+    note: >
+      Rendered as a `<tr>` adjacent to its own row. `aria-expanded`/
+      `aria-controls` are NOT put on the `<tr>`: that announced every row as
+      expandable and pointed at an id the consumer could not reach. The cell
+      slot receives `detailId` and `expanded` so the control that actually
+      toggles can carry them.

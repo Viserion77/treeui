@@ -94,6 +94,21 @@ const at = (source: Record<string, unknown>, path: string): string | undefined =
 const isHex = (value: string) => /^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/.test(value.trim());
 
 /**
+ * Two decimals, unless that rounds a failing ratio up onto its own threshold —
+ * a near miss then reads `4.50:1 is below 4.5:1`, which looks like a bug in the
+ * validator to whoever has to fix it in CI. Add digits until the number shown
+ * is visibly under the number required.
+ */
+const formatRatio = (ratio: number, required: number) => {
+  for (let digits = 2; digits < 6; digits += 1) {
+    const text = ratio.toFixed(digits);
+    if (Number.parseFloat(text) < required) return text;
+  }
+
+  return ratio.toFixed(6);
+};
+
+/**
  * Merge the semantic layer with its derived states into one lookup, so a pair
  * spec can name `brand.primary` and `state.disabled-fg` the same way.
  */
@@ -203,7 +218,7 @@ export const validateTheme = (
       ratio,
       required,
       message:
-        `[${label}] contrast ${ratio.toFixed(2)}:1 is below ${required}:1 — ` +
+        `[${label}] contrast ${formatRatio(ratio, required)}:1 is below ${required}:1 — ` +
         `${pair.foreground} (${foreground}) on ${pair.background} (${background}). ` +
         `${pair.where}.` +
         (pair.derived

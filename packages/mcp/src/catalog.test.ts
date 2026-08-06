@@ -104,7 +104,9 @@ describe('@treeui/mcp catalog', () => {
     const byLength = searchTokens('1024px');
     const byRem = searchTokens('0.875rem');
     const byLightColor = searchTokens('#0969da');
-    const byDarkColor = searchTokens('#539bf5');
+    // The dark brand moved from #539bf5 to #559cf5: the old value measured
+    // 4.47:1 on the dark subtle band, just under AA.
+    const byDarkColor = searchTokens('#559cf5');
 
     expect(byLength.map((result) => result.token.cssVar)).toContain('--tree-breakpoint-lg');
     expect(byRem.map((result) => result.token.cssVar)).toContain('--tree-radius-lg');

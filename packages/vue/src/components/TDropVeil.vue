@@ -10,7 +10,13 @@ const props = withDefaults(
      * nearest positioned ancestor, for a card-sized target.
      */
     scope?: 'page' | 'region';
-    /** Copy shown while the veil is up. Product's, so it is localizable. */
+    /**
+     * Copy shown while the veil is up. Product's, so it is localizable.
+     *
+     * MUTUALLY EXCLUSIVE with the default slot: the slot REPLACES this label,
+     * it does not sit beside it. Passing both renders only the slot, and the
+     * label vanishes with no warning — use one or the other.
+     */
     label?: string;
   }>(),
   {

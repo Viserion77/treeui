@@ -1,12 +1,19 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite';
+import type { ComponentProps } from 'vue-component-type-helpers';
 import { ref } from 'vue';
 import { TInput } from '@treeui/vue';
 import { CheckIcon, SearchIcon, iconProps } from './icon-helpers';
 import { practiceNote } from './practice-refs';
 
-const meta = {
+// `TInput` is generic over its model type, so `typeof TInput` is a generic FUNCTION,
+// which Storybook's `Meta<Component>` cannot accept. Type the story by its
+// PROPS and annotate instead of `satisfies`, so `Story` never has to infer
+// args back out of the component. The component itself is untouched.
+type TInputArgs = ComponentProps<typeof TInput>;
+
+const meta: Meta<TInputArgs> = {
   title: 'Components/Data Entry/Input',
-  component: TInput,
+  component: TInput as never,
   parameters: {
     docs: { description: { component: practiceNote('TInput') } },
   },
@@ -25,11 +32,11 @@ const meta = {
       options: ['sm', 'md', 'lg'],
     },
   },
-} satisfies Meta<typeof TInput>;
+};
 
 export default meta;
 
-type Story = StoryObj<typeof meta>;
+type Story = StoryObj<TInputArgs>;
 
 export const Playground: Story = {
   render: (args: Record<string, unknown>) => ({

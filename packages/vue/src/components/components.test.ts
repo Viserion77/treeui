@@ -1755,7 +1755,26 @@ describe('@treeui/vue', () => {
     const buttons = wrapper.findAllComponents(TButton);
     expect(buttons[1].props('loading')).toBe(true);
     expect(buttons[1].text()).toContain('Delete now');
-    expect(buttons[1].props('variant')).toBe('danger');
+    // The confirm button is still destructive, but through the tone axis: the
+    // old `variant="danger"` default made every dialog emit the deprecation
+    // warning from inside the library, which no consumer could silence.
+    expect(buttons[1].props('variant')).toBe('solid');
+    expect(buttons[1].props('tone')).toBe('danger');
+  });
+
+  it('emits no deprecation warning of its own (TREEUX-016)', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    mount(TConfirmDialog, { props: { defaultOpen: true, title: 'x' }, attachTo: document.body });
+    expect(warn).not.toHaveBeenCalledWith(expect.stringContaining('variant="danger"'));
+    warn.mockRestore();
+  });
+
+  it('forwards confirmTone to the confirm button', () => {
+    const wrapper = mount(TConfirmDialog, {
+      props: { defaultOpen: true, title: 'x', confirmTone: 'warning' },
+      attachTo: document.body,
+    });
+    expect(wrapper.findAllComponents(TButton)[1].props('tone')).toBe('warning');
   });
 
   it('applies combobox states and sizes', () => {
@@ -7053,18 +7072,49 @@ describe('TREEUX-004 — TTable row activation and detail (LSS)', () => {
     expect(wrapper.get('.t-table__row.is-linked').exists()).toBe(true);
   });
 
-  it('makes the row a button when the activation is not navigation', async () => {
-    const wrapper = mount(TTable, { props: { columns, rows, rowKey: 'id', rowActivatable: true } });
+  it('activates through a real button, keeping the row a row', async () => {
+    const wrapper = mount(TTable, {
+      props: { columns, rows, rowKey: 'id', rowActivatable: true, rowLabel: (r) => `Abrir ${r.name}` },
+    });
+
+    // NOT `role="button"` on the <tr>: that makes every cell presentational and
+    // destroys the table's grid semantics, so a row that is activatable AND
+    // holds a control had no accessible shape at all.
     const row = wrapper.get('.t-table__row.is-activatable');
-    expect(row.attributes('role')).toBe('button');
-    expect(row.attributes('tabindex')).toBe('0');
-    expect(wrapper.find('.t-table__row-link').exists()).toBe(false);
+    expect(row.attributes('role')).toBeUndefined();
+    expect(row.attributes('tabindex')).toBeUndefined();
 
-    await row.trigger('click');
+    const action = wrapper.get('.t-table__row-action');
+    expect(action.element.tagName).toBe('BUTTON');
+    expect(action.attributes('aria-label')).toBe('Abrir orders');
+
+    await action.trigger('click');
     expect(wrapper.emitted('row-activate')?.[0]?.[1]).toBe(0);
+  });
 
-    await row.trigger('keydown', { key: 'Enter' });
-    expect(wrapper.emitted('row-activate')).toHaveLength(2);
+  it('does not fire row-activate from a control in another cell', async () => {
+    const wrapper = mount(TTable, {
+      props: { columns, rows, rowKey: 'id', rowActivatable: true },
+      slots: { 'cell-actions': '<button type="button" class="del">x</button>' },
+    });
+    await wrapper.get('.del').trigger('click');
+    expect(wrapper.emitted('row-activate')).toBeUndefined();
+  });
+
+  it('drops the affordance for a row whose target resolves to nothing', () => {
+    const wrapper = mount(TTable, {
+      props: {
+        columns,
+        rows: [{ name: 'orders', id: 'o1' }, { name: 'seed-only', id: 'o2' }],
+        rowKey: 'id',
+        rowHref: (row) => (row.id === 'o1' ? '/dynamo/orders' : undefined),
+        rowLabel: (row) => `Abrir ${row.name}`,
+      },
+    });
+    const rows_ = wrapper.findAll('tbody tr');
+    expect(rows_[0].classes()).toContain('is-linked');
+    // No link is rendered for the second row, so it must not promise one.
+    expect(rows_[1].classes()).not.toContain('is-linked');
   });
 
   it('warns when both modes are requested, since a row cannot be both', () => {
@@ -7086,8 +7136,28 @@ describe('TREEUX-004 — TTable row activation and detail (LSS)', () => {
     expect(allRows[0].classes()).toContain('t-table__row');
     expect(allRows[1].classes()).toContain('t-table__row--detail');
     expect(allRows[1].find('.detail').exists()).toBe(true);
-    expect(allRows[0].attributes('aria-expanded')).toBe('true');
-    expect(allRows[0].attributes('aria-controls')).toBe(allRows[1].attributes('id'));
+
+    // NOT on the <tr>: that announced every row as expandable and pointed
+    // `aria-controls` at an id the consumer could not reach. The cell slot gets
+    // `detailId`/`expanded` so the control that actually toggles can carry them.
+    expect(allRows[0].attributes('aria-expanded')).toBeUndefined();
+  });
+
+  it('hands the panel id and state to the cell, for the control that toggles', () => {
+    const wrapper = mount(TTable, {
+      props: { columns, rows, rowKey: 'id', expandedRow: 'o1' },
+      slots: {
+        'cell-name': `<template #cell-name="{ detailId, expanded }">
+          <button type="button" class="toggle" :aria-controls="detailId" :aria-expanded="expanded">n</button>
+        </template>`,
+        detail: '<span class="detail">payload</span>',
+      },
+    });
+    const toggle = wrapper.get('.toggle');
+    expect(toggle.attributes('aria-expanded')).toBe('true');
+    expect(toggle.attributes('aria-controls')).toBe(
+      wrapper.get('.t-table__row--detail').attributes('id'),
+    );
   });
 
   it('renders no detail row when nothing is expanded', () => {
@@ -7111,5 +7181,88 @@ describe('TREEUX-046/048 — follow-ups from the 0.28 validation (S7)', () => {
     const wrapper = mount(TTag, { props: { variant: 'soft', tone: 'accent' } });
     expect(wrapper.classes()).toContain('t-tag--soft');
     expect(wrapper.classes()).toContain('t-tag--tone-accent');
+  });
+});
+
+describe('TREEUX-011 — element attributes and the generic model (LSS)', () => {
+  it('forwards the input attributes it declares to the native field', () => {
+    const wrapper = mount(TInput, {
+      props: { type: 'number', min: 1, max: 65535, step: 1, inputmode: 'numeric', required: true },
+    });
+    const input = wrapper.get('input');
+    expect(input.attributes('min')).toBe('1');
+    expect(input.attributes('max')).toBe('65535');
+    expect(input.attributes('inputmode')).toBe('numeric');
+    expect(input.attributes('required')).toBeDefined();
+  });
+
+  it('forwards the textarea attributes it declares', () => {
+    const wrapper = mount(TTextarea, { props: { readonly: true, maxlength: 2000 } });
+    expect(wrapper.get('textarea').attributes('readonly')).toBeDefined();
+    expect(wrapper.get('textarea').attributes('maxlength')).toBe('2000');
+  });
+
+  it('puts anchor attributes on an anchor and nowhere else', () => {
+    const link = mount(TButton, { props: { as: 'a', href: '/x', download: true, rel: 'noopener' } });
+    expect(link.attributes('href')).toBe('/x');
+    expect(link.attributes('download')).toBe('');
+
+    // On a <button> they would be invalid HTML, which is what leaving them in
+    // $attrs used to produce.
+    const button = mount(TButton, { props: { href: '/x' } });
+    expect(button.attributes('href')).toBeUndefined();
+  });
+
+  it('emits the type the model holds, not always a string', async () => {
+    const numeric = mount(TInput, { props: { modelValue: 3100 } });
+    await numeric.get('input').setValue('8080');
+    expect(numeric.emitted('update:modelValue')?.[0]?.[0]).toBe(8080);
+
+    const text = mount(TInput, { props: { modelValue: '' } });
+    await text.get('input').setValue('8080');
+    expect(text.emitted('update:modelValue')?.[0]?.[0]).toBe('8080');
+  });
+
+  it('keeps a half-written number as typed instead of destroying it', async () => {
+    const wrapper = mount(TInput, { props: { modelValue: 1 } });
+    await wrapper.get('input').setValue('-');
+    expect(wrapper.emitted('update:modelValue')?.[0]?.[0]).toBe('-');
+  });
+});
+
+describe('TREEUX-017 — chart copy and lane budget (LSS)', () => {
+  it('lets the accessible table header be localized', () => {
+    const wrapper = mount(TChart, {
+      props: {
+        type: 'bar',
+        labels: ['a'],
+        series: [{ name: 's', data: [1] }],
+        seriesLabel: 'Série',
+      },
+    });
+    expect(wrapper.get('.t-chart__a11y th').text()).toBe('Série');
+  });
+
+  it('caps the lanes and SAYS how many it hid', () => {
+    const rows = Array.from({ length: 5 }, (_, i) => ({ label: `l${i}`, spans: [] }));
+    const wrapper = mount(TSpanLanes, { props: { rows, from: 0, to: 1, maxRows: 2 } });
+    expect(wrapper.findAll('.t-span-lanes__lane')).toHaveLength(2);
+    // Silence would make a capped chart read as a complete one.
+    expect(wrapper.get('.t-span-lanes__overflow').text()).toContain('3');
+  });
+
+  it('takes localized copy for that footer', () => {
+    const rows = Array.from({ length: 3 }, (_, i) => ({ label: `l${i}`, spans: [] }));
+    const wrapper = mount(TSpanLanes, {
+      props: { rows, from: 0, to: 1, maxRows: 1, overflowLabel: (n: number) => `+${n} faixas` },
+    });
+    expect(wrapper.get('.t-span-lanes__overflow').text()).toBe('+2 faixas');
+  });
+
+  it('renders no footer when nothing was hidden', () => {
+    const wrapper = mount(TSpanLanes, {
+      props: { rows: [{ label: 'a', spans: [] }], from: 0, to: 1, maxRows: 5 },
+    });
+    expect(wrapper.find('.t-span-lanes__overflow').exists()).toBe(false);
   });
 });

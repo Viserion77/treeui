@@ -56,6 +56,15 @@ const props = withDefaults(
      * the page. Takes precedence over `as`; ignored when `disabled`.
      */
     to?: string | Record<string, unknown>;
+    /**
+     * Anchor attributes, for `as="a"` (TREEUX-011). Declared rather than left
+     * to `$attrs` so `strictTemplates` sees them; they are simply absent from
+     * the rendered element when the button is not an anchor.
+     */
+    href?: string;
+    target?: string;
+    rel?: string;
+    download?: string | boolean;
   }>(),
   {
     as: 'button',
@@ -72,6 +81,10 @@ const props = withDefaults(
     block: false,
     align: 'center',
     to: undefined,
+    href: undefined,
+    target: undefined,
+    rel: undefined,
+    download: undefined,
   },
 );
 
@@ -130,7 +143,18 @@ const tag = computed<string | Component>(() =>
 
 const isNativeButton = computed(() => !rendersAsLink.value && props.as === 'button');
 
-const linkProps = computed(() => (rendersAsLink.value ? { to: props.to } : {}));
+const linkProps = computed(() => {
+  if (rendersAsLink.value) return { to: props.to };
+  // Anchor attributes only reach an anchor: on a `<button>` they would be
+  // invalid HTML, which is what leaving them in `$attrs` used to produce.
+  if (props.as !== 'a') return {};
+  return {
+    href: props.href,
+    target: props.target,
+    rel: props.rel,
+    download: props.download === true ? '' : props.download,
+  };
+});
 
 // An icon-only button has no visible text and an aria-hidden icon, so without a
 // name it is unlabelled for assistive tech. This is a BARE `process.env.NODE_ENV`

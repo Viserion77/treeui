@@ -84,3 +84,24 @@ describe('follow-ups from the 0.28 validation', () => {
     expect(stylesheet).toContain('.t-empty-state--frame-narrow');
   });
 });
+
+describe('TTable row overlay containing block (TREEUX-015)', () => {
+  // Not testable through jsdom — it has no layout — and that is exactly how it
+  // shipped: the row showed pointer and hover while only the first cell
+  // navigated, because a positioned first cell became the overlay's containing
+  // block instead of the <tr>.
+  it('positions only the cells AFTER the first', () => {
+    expect(stylesheet).toContain('.t-table__row.is-linked .t-table__cell + .t-table__cell');
+    expect(stylesheet).not.toContain('.t-table__row.is-linked .t-table__cell {');
+  });
+
+  it('stretches both the link and the action button over the row', () => {
+    expect(stylesheet).toContain('.t-table__row-link::after,\n.t-table__row-action::after');
+  });
+});
+
+describe('tone reaches every variant it claims (TREEUX-016)', () => {
+  it.each(['outline', 'ghost', 'soft'])('%s', (variant) => {
+    expect(stylesheet).toContain(`.t-button.has-tone.t-button--${variant}`);
+  });
+});

@@ -23,7 +23,7 @@ consumer code resolves back to the token that already provides it:
 ```
 search_tokens("space")               -> --tree-space-0 … --tree-space-16
 search_tokens("status")              -> --tree-color-status-success | warning | error | info
-search_tokens("#0969da")             -> --tree-color-brand-primary (light #0969da | dark #539bf5)
+search_tokens("#0969da")             -> --tree-color-brand-primary (light #0969da | dark #559cf5)
 search_tokens("64rem")               -> --tree-breakpoint-lg (1024px)
 search_tokens("--tree-gradient-brand") -> --tree-gradient-brand
 ```

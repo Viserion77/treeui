@@ -11,7 +11,14 @@ props:
     type: "'page' | 'region'"
     default: page
     note: "`page` covers the viewport above the app chrome; `region` fills the nearest positioned ancestor."
-  label: { type: string, default: undefined, note: "Product copy, so it is localizable." }
+  label:
+    type: string
+    default: undefined
+    note: >
+      Product copy, so it is localizable. MUTUALLY EXCLUSIVE with the default
+      slot: the slot REPLACES the label rather than sitting beside it, so
+      passing both renders only the slot and the label disappears with no
+      warning. Use one or the other.
 
 critical:
   pointer_events: >
@@ -20,3 +27,10 @@ critical:
   aria_hidden: >
     Marked `aria-hidden`: it announces nothing a screen-reader user can act on.
     The drop target itself carries the accessible name.
+
+testing:
+  transition: >
+    The veil leaves through a `<Transition>`, so after a drop the node is still
+    in the DOM for two frames with `t-fade-leave-*` classes — `flushPromises()`
+    alone does not remove it and `.exists()` stays true. An exit assertion has
+    to wait a frame; every consumer testing the veil hits this.

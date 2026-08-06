@@ -99,12 +99,24 @@ describe('@treeui/tokens theme generator', () => {
   it('maps the ramp onto runtime-applicable css variables', () => {
     const vars = accentCssVariables('#0969da', 'dark');
 
+    // Every variable the brand ramp feeds, not just the five it is made of:
+    // a runtime accent switch that leaves `brand-press` or the selection
+    // surface on the previous accent is a half-applied theme.
     expect(Object.keys(vars)).toEqual([
       '--tree-color-brand-primary',
       '--tree-color-brand-hover',
       '--tree-color-brand-soft',
       '--tree-color-brand-contrast',
       '--tree-color-focus-ring',
+      '--tree-color-brand-press',
+      '--tree-color-brand-soft-hover',
+      '--tree-color-brand-soft-press',
+      '--tree-color-brand-on-soft',
+      '--tree-color-brand-on-soft-hover',
+      '--tree-color-brand-on-soft-press',
+      '--tree-color-state-selected-bg',
+      '--tree-color-state-selected-fg',
+      '--tree-color-state-selected-border',
     ]);
     expect(vars['--tree-color-brand-primary']).toBe(deriveBrandRamp('#0969da', 'dark').primary);
   });

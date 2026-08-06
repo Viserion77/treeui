@@ -17,7 +17,7 @@
 #   N/A    — not applicable to this component
 # ─────────────────────────────────────────────────────────────
 
-version: "0.2"
+version: "0.3"
 
 # ═══════════════════════════════════════════════════════════════
 # GLOBAL CRITERIA (apply to EVERY component)
@@ -36,6 +36,40 @@ global-criteria:
     - id: NAM-05
       title: "CSS custom properties use --tree-*"
       rule: "No raw color/spacing values; always var(--tree-*)"
+      enforced_by: "packages/tokens/src/contract.test.ts — fails on any colour literal outside primitives.ts"
+
+  colour:
+    - id: COL-01
+      title: "Components name only semantic tokens"
+      rule: >
+        A component may reference the semantic layer and the derived state layer.
+        It may never reference a primitive (they are not emitted) and never a
+        literal colour.
+      enforced_by: "packages/tokens/src/contract.test.ts"
+    - id: COL-02
+      title: "Interaction states come from the derived layer"
+      rule: >
+        Hover, press, selected and disabled use --tree-color-state-* or the
+        family's derived tokens. Do not hand-write a color-mix() at the call
+        site, and do not use opacity where a label sits on a surface.
+      enforced_by: "review; docs/ai/TOKENS.yaml -> derived_variables lists every name"
+    - id: COL-03
+      title: "Every text/background pair the component renders passes AA"
+      rule: >
+        4.5:1 for normal text, 3:1 for UI elements and inactive controls. If a
+        component introduces a new pair, add it to CONTRAST_PAIRS in
+        packages/tokens/src/contract.ts so it is measured.
+      enforced_by: "packages/tokens/src/validate.ts, run by contract.test.ts"
+    - id: COL-04
+      title: "Form control boundaries clear 3:1"
+      rule: >
+        The border that identifies an input, select, checkbox or radio uses
+        --tree-color-border-interactive (WCAG 1.4.11). Cards, dividers and table
+        rules keep --tree-color-border-default and are not held to it.
+    - id: COL-05
+      title: "A new colour value is added to TOKENS.yaml in the same change"
+      rule: "docs/ai/TOKENS.yaml -> theme_values is the published contract."
+      enforced_by: "packages/mcp/src/tokens-contract-sync.test.ts"
 
   structure:
     - id: STR-01

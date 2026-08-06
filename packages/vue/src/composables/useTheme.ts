@@ -7,18 +7,22 @@ import {
   type ComputedRef,
   type Ref,
 } from 'vue';
-import { accentCssVariables } from '@treeui/tokens';
+import { accentCssVariables, treePrimitives } from '@treeui/tokens';
 
 export type TThemeMode = 'system' | 'light' | 'dark';
 export type TResolvedTheme = 'light' | 'dark';
 
-const ACCENT_VARIABLES = [
-  '--tree-color-brand-primary',
-  '--tree-color-brand-hover',
-  '--tree-color-brand-soft',
-  '--tree-color-brand-contrast',
-  '--tree-color-focus-ring',
-] as const;
+/**
+ * Exactly the properties `accentCssVariables` writes, so clearing an accent
+ * removes everything setting one added.
+ *
+ * Derived rather than listed: this was a hardcoded array of five names, and the
+ * accent ramp now feeds fourteen properties. A literal list silently stops
+ * cleaning up the moment the ramp grows, leaving the previous accent's press
+ * and selection colours pinned as inline styles.
+ */
+// The seed only has to be a valid colour; only the key set is read.
+const ACCENT_VARIABLES = Object.keys(accentCssVariables(treePrimitives.black, 'light'));
 
 export interface UseThemeOptions {
   /** localStorage key for the persisted preference. `null` disables persistence. */

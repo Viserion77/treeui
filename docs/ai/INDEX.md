@@ -31,7 +31,8 @@ Load files in this order and stop as soon as you have enough context:
 - `SELECTION.yaml`: component-choice heuristics, alternatives, and decision guides
 - `SETUP.yaml`: installation, import, provider, and value-format requirements
 - `RECIPES.yaml`: cross-component composition guidance
-- `TOKENS.yaml`: framework-agnostic visual contract and theme values
+- `TOKENS.yaml`: framework-agnostic visual contract, the three colour layers, and every theme value
+- `../../MIGRATION.md`: what a consuming product does about a colour-contract change
 - `STANDARDS.yaml`: design-system conformance rules (colors, typography, spacing, motion, icons)
 - `VALIDATION.yaml`: the acceptance-criteria definitions (naming, structure, CSS, states, a11y, docs) a component review cites by id
 - `COMPONENTS/*.yaml`: component-level public API manifests
@@ -48,6 +49,10 @@ If a public API changes, update the matching file here in the same change. If a 
 - For a single component change, load `CONTRACTS.yaml` and that component manifest.
 - For multi-component feature work, load `RECIPES.yaml` after the relevant manifests.
 - For styling or theme work, load `TOKENS.yaml` in addition to the component manifest.
+- Before writing any colour: it belongs to one of three layers. Primitives are never
+  referenced. Semantics are the public API. Derived states (hover, press, selected,
+  disabled) are computed by the library and must be read, never set. `TOKENS.yaml` ->
+  `layers` and `derived_variables` say which is which.
 - For rationale, migration context, or intent behind the contracts, load `DECISIONS.md`.
 
 ## Coverage

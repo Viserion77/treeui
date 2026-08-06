@@ -78,6 +78,13 @@ const props = withDefaults(
     loading?: boolean;
     /** Accessible summary of the chart. */
     ariaLabel?: string;
+    /**
+     * Header of the series column in the accessible data table. It was the one
+     * string in the whole component with no way out — the empty state has a
+     * slot, this had nothing — so in a multilingual UI it was the single label
+     * that could not go through the app's catalogue (TREEUX-017).
+     */
+    seriesLabel?: string;
   }>(),
   {
     type: 'line',
@@ -100,6 +107,7 @@ const props = withDefaults(
     animated: true,
     loading: false,
     ariaLabel: undefined,
+    seriesLabel: 'Series',
   },
 );
 
@@ -650,7 +658,7 @@ const rootClasses = computed(() => [
         <thead>
           <tr>
             <th scope="col">
-              Series
+              {{ seriesLabel }}
             </th>
             <th
               v-for="index in axisIndices"

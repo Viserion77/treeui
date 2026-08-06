@@ -157,7 +157,8 @@ describe('@treeui/mcp server', () => {
     expect(byNameText).toContain('--tree-color-status-success');
     // A themed token reports both theme values so an agent can pick the right one.
     expect(byNameText).toContain('light #1a7f37');
-    expect(byNameText).toContain('dark #57ab5a');
+    // Nudged from #57ab5a, which measured 4.48:1 on the dark subtle band.
+    expect(byNameText).toContain('dark #59ac5c');
     expect(byValueText).toContain('--tree-color-brand-primary');
   });
 

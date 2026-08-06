@@ -1,11 +1,18 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite';
+import type { ComponentProps } from 'vue-component-type-helpers';
 import { ref } from 'vue';
 import { TTabs, TTabList, TTab, TTabPanel } from '@treeui/vue';
 import { practiceNote } from './practice-refs';
 
-const meta = {
+// `TTabs` is generic over its model type, so `typeof TTabs` is a generic FUNCTION,
+// which Storybook's `Meta<Component>` cannot accept. Type the story by its
+// PROPS and annotate instead of `satisfies`, so `Story` never has to infer
+// args back out of the component. The component itself is untouched.
+type TTabsArgs = ComponentProps<typeof TTabs>;
+
+const meta: Meta<TTabsArgs> = {
   title: 'Components/Navigation/Tabs',
-  component: TTabs,
+  component: TTabs as never,
   parameters: {
     docs: { description: { component: practiceNote('TTabs') } },
   },
@@ -26,10 +33,10 @@ const meta = {
       options: ['automatic', 'manual'],
     },
   },
-} satisfies Meta<typeof TTabs>;
+};
 
 export default meta;
-type Story = StoryObj<typeof meta>;
+type Story = StoryObj<TTabsArgs>;
 
 export const Playground: Story = {
   render: (args: Record<string, unknown>) => ({

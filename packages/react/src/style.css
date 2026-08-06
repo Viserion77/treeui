@@ -53,6 +53,16 @@ html {
   --tree-button-text: var(--tree-color-brand-contrast);
   --tree-button-border: transparent;
   --tree-button-shadow: transparent;
+  /* Interaction state defaults, so every variant has a visible hover and press
+     without writing a fallback at each call site. Mirrors the Vue package. */
+  --tree-button-bg-hover: var(--tree-color-brand-hover);
+  --tree-button-bg-press: var(--tree-color-brand-press);
+  --tree-button-text-hover: var(--tree-button-text);
+  --tree-button-text-press: var(--tree-button-text);
+  --tree-button-border-hover: var(--tree-button-border);
+  --tree-button-border-press: var(--tree-button-border);
+  --tree-button-bg-disabled: var(--tree-color-state-disabled-bg);
+  --tree-button-border-disabled: var(--tree-color-state-disabled-border);
   position: relative;
   display: inline-flex;
   align-items: center;
@@ -91,7 +101,19 @@ html {
 }
 
 .t-button:hover:not(.is-disabled) {
+  background: var(--tree-button-bg-hover);
+  color: var(--tree-button-text-hover);
+  border-color: var(--tree-button-border-hover);
   transform: translateY(-1px);
+}
+
+/* Press. Mirrors the Vue package: the fill takes a bigger step than hover and
+   the lift drops, so a held button reads as pushed in. */
+.t-button:active:not(.is-disabled) {
+  background: var(--tree-button-bg-press);
+  color: var(--tree-button-text-press);
+  border-color: var(--tree-button-border-press);
+  transform: translateY(0);
 }
 
 .t-button:focus-visible {
@@ -100,7 +122,9 @@ html {
 }
 
 .t-button.is-disabled {
-  opacity: 0.65;
+  background: var(--tree-button-bg-disabled);
+  color: var(--tree-color-state-disabled-fg);
+  border-color: var(--tree-button-border-disabled);
   cursor: not-allowed;
 }
 
@@ -137,6 +161,8 @@ html {
 
 .t-button--solid {
   --tree-button-bg: var(--tree-color-brand-primary);
+  --tree-button-bg-hover: var(--tree-color-brand-hover);
+  --tree-button-bg-press: var(--tree-color-brand-press);
   --tree-button-text: var(--tree-color-brand-contrast);
 }
 
@@ -144,21 +170,36 @@ html {
   --tree-button-bg: var(--tree-color-bg-surface);
   --tree-button-text: var(--tree-color-text-primary);
   --tree-button-border: var(--tree-color-border-default);
+  --tree-button-bg-hover: var(--tree-color-state-hover-bg);
+  --tree-button-bg-press: var(--tree-color-state-press-bg);
+  --tree-button-border-hover: var(--tree-color-border-strong);
+  --tree-button-border-press: var(--tree-color-border-strong);
 }
 
 .t-button--ghost {
   --tree-button-bg: transparent;
   --tree-button-text: var(--tree-color-text-primary);
+  --tree-button-bg-hover: var(--tree-color-state-hover-bg);
+  --tree-button-bg-press: var(--tree-color-state-press-bg);
+  /* No fill at rest means no fill when disabled either. */
+  --tree-button-bg-disabled: transparent;
+  --tree-button-border-disabled: transparent;
 }
 
 .t-button--soft {
+  --tree-button-bg-hover: var(--tree-color-brand-soft-hover);
+  --tree-button-bg-press: var(--tree-color-brand-soft-press);
+  --tree-button-text-hover: var(--tree-color-brand-on-soft-hover);
+  --tree-button-text-press: var(--tree-color-brand-on-soft-press);
   --tree-button-bg: var(--tree-color-brand-soft);
-  --tree-button-text: var(--tree-color-brand-primary);
+  --tree-button-text: var(--tree-color-brand-on-soft);
 }
 
 .t-button--danger {
   --tree-button-bg: var(--tree-color-status-error);
-  --tree-button-text: var(--tree-color-brand-contrast);
+  --tree-button-bg-hover: var(--tree-color-status-error-hover);
+  --tree-button-bg-press: var(--tree-color-status-error-press);
+  --tree-button-text: var(--tree-color-status-error-contrast);
 }
 
 .t-button__icon,
@@ -182,7 +223,7 @@ html {
   min-inline-size: 0;
   min-height: var(--tree-size-control-md);
   padding-inline: var(--tree-space-3);
-  border: var(--tree-border-width-subtle) solid var(--tree-color-border-default);
+  border: var(--tree-border-width-subtle) solid var(--tree-color-border-interactive);
   border-radius: var(--tree-radius-md);
   background: var(--tree-color-bg-surface);
   color: var(--tree-color-text-primary);
@@ -201,7 +242,9 @@ html {
 }
 
 .t-input.is-disabled {
-  opacity: 0.68;
+  background: var(--tree-color-state-disabled-bg);
+  color: var(--tree-color-state-disabled-fg);
+  border-color: var(--tree-color-state-disabled-border);
   cursor: not-allowed;
 }
 
@@ -325,7 +368,7 @@ html {
 .t-badge--tone-success {
   --tree-badge-solid-bg: var(--tree-color-status-success);
   --tree-badge-outline-text: var(--tree-color-status-success);
-  --tree-badge-outline-border: color-mix(in srgb, var(--tree-color-status-success) 36%, var(--tree-color-border-default));
+  --tree-badge-outline-border: var(--tree-color-status-success-border);
   --tree-badge-ghost-text: var(--tree-color-status-success);
   --tree-badge-soft-bg: color-mix(in srgb, var(--tree-color-status-success) 14%, var(--tree-color-bg-surface));
   --tree-badge-soft-text: var(--tree-color-status-success);
@@ -336,7 +379,7 @@ html {
 .t-badge--tone-warning {
   --tree-badge-solid-bg: var(--tree-color-status-warning);
   --tree-badge-outline-text: var(--tree-color-status-warning);
-  --tree-badge-outline-border: color-mix(in srgb, var(--tree-color-status-warning) 36%, var(--tree-color-border-default));
+  --tree-badge-outline-border: var(--tree-color-status-warning-border);
   --tree-badge-ghost-text: var(--tree-color-status-warning);
   --tree-badge-soft-bg: color-mix(in srgb, var(--tree-color-status-warning) 14%, var(--tree-color-bg-surface));
   --tree-badge-soft-text: var(--tree-color-status-warning);
@@ -347,7 +390,7 @@ html {
 .t-badge--tone-danger {
   --tree-badge-solid-bg: var(--tree-color-status-error);
   --tree-badge-outline-text: var(--tree-color-status-error);
-  --tree-badge-outline-border: color-mix(in srgb, var(--tree-color-status-error) 36%, var(--tree-color-border-default));
+  --tree-badge-outline-border: var(--tree-color-status-error-border);
   --tree-badge-ghost-text: var(--tree-color-status-error);
   --tree-badge-soft-bg: color-mix(in srgb, var(--tree-color-status-error) 14%, var(--tree-color-bg-surface));
   --tree-badge-soft-text: var(--tree-color-status-error);
@@ -356,7 +399,7 @@ html {
 .t-badge--tone-info {
   --tree-badge-solid-bg: var(--tree-color-status-info);
   --tree-badge-outline-text: var(--tree-color-status-info);
-  --tree-badge-outline-border: color-mix(in srgb, var(--tree-color-status-info) 36%, var(--tree-color-border-default));
+  --tree-badge-outline-border: var(--tree-color-status-info-border);
   --tree-badge-ghost-text: var(--tree-color-status-info);
   --tree-badge-soft-bg: color-mix(in srgb, var(--tree-color-status-info) 14%, var(--tree-color-bg-surface));
   --tree-badge-soft-text: var(--tree-color-status-info);

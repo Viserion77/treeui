@@ -161,7 +161,9 @@ theming:
     required:
       - "Call once near the application root — it mutates a shared element."
     notes:
-      - "Do not hand-roll accent variables: a raw hex is not legible in both themes. `deriveBrandRamp`/`accentCssVariables` from `@treeui/tokens` walk the colour until it clears WCAG AA on its own soft tint and flip the on-brand text colour with it."
+      - "Do not hand-roll accent variables: a raw hex is not legible in both themes. `deriveBrandRamp`/`accentCssVariables` from `@treeui/tokens` walk the colour until it clears WCAG AA on its own soft tint AND on the quietest page surface, and flip the on-brand text colour with it."
+      - "`accentCssVariables` returns the full derived set (press, tint states, the ink on each, and the selection surface), not just the five brand variables. Apply all of them: setting a subset leaves the previous accent pinned on the states you skipped."
+      - "For a build-time theme rather than a runtime one, use `createThemePair({ accent })` + `createSemanticThemeCss` and validate with `assertThemeValid`. See MIGRATION.md -> Path C."
       - "Pair with `TColorSwatch` for the accent picker UI."
     example: |
       const { mode, resolved, accent } = useTheme({ storageKey: 'my-app-theme' });

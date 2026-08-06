@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, toRef, useAttrs } from 'vue';
 import { useControllableOpen } from '../composables/useControllableOpen';
-import type { TSize, TVariant } from '../types/contracts';
+import type { TActionTone, TSize, TVariant } from '../types/contracts';
 import TButton from './TButton.vue';
 import TModal from './TModal.vue';
 
@@ -30,7 +30,22 @@ const props = withDefaults(
     description?: string;
     confirmLabel?: string;
     cancelLabel?: string;
+    /**
+     * Shape of the confirm button. The default moved from `danger` to `solid`
+     * when `danger` was deprecated: leaving it made every dialog in an app emit
+     * the deprecation warning from INSIDE the library, which the consumer could
+     * not silence without reimplementing the footer through the `actions` slot —
+     * exactly the local reimplementation the contract rejects.
+     */
     confirmVariant?: TVariant;
+    /**
+     * Colour of the confirm button, forwarded to its `tone`. Defaults to
+     * `danger`, because confirming is overwhelmingly destructive here — so the
+     * dialog looks the same as before while the deprecated value is gone.
+     * "It composes through TButton" was wrong for this component: the dialog
+     * owns the button, so there is no call site to compose from.
+     */
+    confirmTone?: TActionTone;
     confirmDisabled?: boolean;
     cancelDisabled?: boolean;
     loading?: boolean;
@@ -50,7 +65,8 @@ const props = withDefaults(
     description: '',
     confirmLabel: 'Confirm',
     cancelLabel: 'Cancel',
-    confirmVariant: 'danger',
+    confirmVariant: 'solid',
+    confirmTone: 'danger',
     confirmDisabled: false,
     cancelDisabled: false,
     loading: false,
@@ -179,6 +195,7 @@ const handleConfirm = () => {
         </TButton>
         <TButton
           :variant="confirmVariant"
+          :tone="confirmTone"
           :loading="loading"
           :disabled="confirmDisabled"
           @click="handleConfirm"

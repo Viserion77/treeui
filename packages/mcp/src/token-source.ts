@@ -1,4 +1,4 @@
-import { treeThemes, treeTokens } from '@treeui/tokens';
+import { deriveStateColors, treeThemes, treeTokens } from '@treeui/tokens';
 import type { TreeuiTokenEntry } from './types';
 
 type TokenValue = string | number;
@@ -67,23 +67,38 @@ export const buildTokenEntries = (): TreeuiTokenEntry[] => {
   const themed = new Map<string, TreeuiTokenEntry>();
 
   for (const [themeName, theme] of Object.entries(treeThemes)) {
-    for (const [path, value] of flattenTokens(theme as TokenRecord)) {
-      const cssVar = toCssVariable(path);
-      const existing = themed.get(cssVar);
+    const mode = themeName === 'dark' ? 'dark' : 'light';
+    // The stylesheet emits the semantic layer *and* the states derived from it.
+    // The catalog has to carry both or `search_tokens` reports a name that does
+    // not exist and misses ~50 that do.
+    const derived = { color: deriveStateColors(theme.color as never, mode) };
 
-      if (existing) {
-        existing.themeValues = { ...existing.themeValues, [themeName]: String(value) };
-        continue;
+    for (const [source, entries] of [
+      ['semantic', flattenTokens(theme as TokenRecord)],
+      ['derived', flattenTokens(derived as TokenRecord)],
+    ] as const) {
+      for (const [path, value] of entries) {
+        const cssVar = toCssVariable(path);
+        const existing = themed.get(cssVar);
+
+        if (existing) {
+          existing.themeValues = { ...existing.themeValues, [themeName]: String(value) };
+          continue;
+        }
+
+        themed.set(cssVar, {
+          cssVar,
+          path: path.join('.'),
+          value: String(value),
+          category: path[0],
+          derived: source === 'derived',
+          description:
+            source === 'derived'
+              ? `${describeToken(path[0])} Derived by the library from the semantic layer — read it, do not override it.`
+              : describeToken(path[0]),
+          themeValues: { [themeName]: String(value) },
+        });
       }
-
-      themed.set(cssVar, {
-        cssVar,
-        path: path.join('.'),
-        value: String(value),
-        category: path[0],
-        description: describeToken(path[0]),
-        themeValues: { [themeName]: String(value) },
-      });
     }
   }
 

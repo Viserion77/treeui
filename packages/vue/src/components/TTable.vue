@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, getCurrentInstance, ref, useAttrs, watchEffect, type Component } from 'vue';
 import type { TIconName } from '@treeui/icons';
-import { createId, isActivationKey } from '@treeui/utils';
+import { createId } from '@treeui/utils';
 import type { TSize } from '../types/contracts';
 import TIcon from './TIcon.vue';
 
@@ -66,14 +66,19 @@ const props = withDefaults(
     /** Same as `rowHref`, resolved through the app's RouterLink. */
     rowTo?: (row: Record<string, unknown>, index: number) => string | undefined;
     /**
-     * Accessible name for the row link, per row. Required with `rowHref`/
-     * `rowTo`: "open" repeated N times names nothing.
+     * Accessible name for the row's activator, per row — used by BOTH modes.
+     * Required with `rowHref`/`rowTo` and strongly advised with
+     * `rowActivatable`: without it the name is the concatenation of every cell,
+     * repeated for every row.
      */
     rowLabel?: (row: Record<string, unknown>, index: number) => string;
     /**
      * The row ACTIVATES something that is not a route — a modal, a selection.
-     * The `<tr>` becomes a focusable `role="button"`. Use this only when there
-     * is no URL: it deliberately does not pretend to be a link.
+     * Renders a real `<button>` in the first cell, stretched over the row, the
+     * same shape `rowHref` uses. It is NOT `role="button"` on the `<tr>`: that
+     * makes every cell presentational and destroys the grid semantics of the
+     * whole table, so a row that is activatable AND contains a control had no
+     * accessible shape at all. Use this only when there is no URL.
      */
     rowActivatable?: boolean;
     /** Key of the row whose detail panel is open, matched against `rowKey`. */
@@ -132,22 +137,36 @@ if (process.env.NODE_ENV !== 'production') {
 const rowTarget = (row: Record<string, unknown>, index: number) =>
   props.rowTo?.(row, index) ?? props.rowHref?.(row, index);
 
-const onRowActivate = (row: Record<string, unknown>, index: number, event: KeyboardEvent) => {
-  if (!isActivationKey(event)) return;
-  event.preventDefault();
-  emit('row-activate', row, index);
-};
-
 const isExpanded = (row: Record<string, unknown>, index: number) =>
   props.expandedRow != null && resolveRowKey(row, index) === props.expandedRow;
 
 const detailId = (row: Record<string, unknown>, index: number) =>
   `${tableId}-detail-${resolveRowKey(row, index)}`;
 
+// The affordance follows the RESOLVED target, not the presence of the prop: a
+// row whose `rowTo` returns undefined renders no link, and promising a pointer
+// and a hover for a row that does not navigate is a lie the consumer then has
+// to explain.
+const rowIsLinked = (row: Record<string, unknown>, index: number) =>
+  linksRows.value && Boolean(rowTarget(row, index));
+
 defineSlots<{
   /** Detail panel for the expanded row, rendered as an adjacent `<tr>`. */
   detail?: (props: { row: Record<string, unknown>; index: number }) => void;
-  [key: `cell-${string}`]: (props: { row: Record<string, unknown>; value: unknown }) => void;
+  /**
+   * `detailId` and `expanded` are handed to the cell so the control that
+   * actually toggles the detail can carry `aria-expanded`/`aria-controls`. The
+   * library does not know which control that is, and putting them on the `<tr>`
+   * announced every row as expandable and pointed `aria-controls` at something
+   * the consumer could not reach.
+   */
+  [key: `cell-${string}`]: (props: {
+    row: Record<string, unknown>;
+    value: unknown;
+    index: number;
+    detailId: string;
+    expanded: boolean;
+  }) => void;
   [key: `header-${string}`]: (props: { column: TTableColumn }) => void;
   empty: () => void;
 }>();
@@ -326,17 +345,11 @@ const tableAttrs = computed(() => {
             :class="[
               rowStateClass(row, index),
               {
-                'is-linked': linksRows,
+                'is-linked': rowIsLinked(row, index),
                 'is-activatable': rowActivatable && !linksRows,
                 'is-expanded': isExpanded(row, index),
               },
             ]"
-            :role="rowActivatable && !linksRows ? 'button' : undefined"
-            :tabindex="rowActivatable && !linksRows ? 0 : undefined"
-            :aria-expanded="$slots.detail ? isExpanded(row, index) : undefined"
-            :aria-controls="$slots.detail && isExpanded(row, index) ? detailId(row, index) : undefined"
-            @click="rowActivatable && !linksRows ? emit('row-activate', row, index) : undefined"
-            @keydown="rowActivatable && !linksRows ? onRowActivate(row, index, $event) : undefined"
           >
             <td
               v-for="(column, columnIndex) in columns"
@@ -351,9 +364,27 @@ const tableAttrs = computed(() => {
                 button in the actions column stays clickable — leaving that to
                 the consumer would have every one of them rediscover it.
               -->
+              <button
+                v-if="columnIndex === 0 && rowActivatable && !linksRows"
+                type="button"
+                class="t-table__row-action"
+                :aria-label="rowLabel?.(row, index)"
+                @click="emit('row-activate', row, index)"
+              >
+                <slot
+                  :name="`cell-${column.key}`"
+                  :row="row"
+                  :value="row[column.key]"
+                  :index="index"
+                  :detail-id="detailId(row, index)"
+                  :expanded="isExpanded(row, index)"
+                >
+                  {{ row[column.key] ?? '' }}
+                </slot>
+              </button>
               <component
                 :is="rowTo !== undefined && routerLink ? routerLink : 'a'"
-                v-if="columnIndex === 0 && linksRows && rowTarget(row, index)"
+                v-else-if="columnIndex === 0 && rowIsLinked(row, index)"
                 class="t-table__row-link"
                 v-bind="rowTo !== undefined && routerLink
                   ? { to: rowTarget(row, index) }
@@ -364,6 +395,9 @@ const tableAttrs = computed(() => {
                   :name="`cell-${column.key}`"
                   :row="row"
                   :value="row[column.key]"
+                  :index="index"
+                  :detail-id="detailId(row, index)"
+                  :expanded="isExpanded(row, index)"
                 >
                   {{ row[column.key] ?? '' }}
                 </slot>
@@ -373,6 +407,9 @@ const tableAttrs = computed(() => {
                 :name="`cell-${column.key}`"
                 :row="row"
                 :value="row[column.key]"
+                :index="index"
+                :detail-id="detailId(row, index)"
+                :expanded="isExpanded(row, index)"
               >
                 {{ row[column.key] ?? '' }}
               </slot>

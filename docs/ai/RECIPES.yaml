@@ -189,6 +189,22 @@ recipes:
       - "Wrap it in `TFormField` for the label, hint and error."
       - "For selection from a fixed option set, use `TMultiSelect`/`TCombobox` instead — `TTagInput` is free input."
 
+  - id: page-drop-target
+    name: "Whole-page drop target"
+    use_when:
+      - "Dragging a file anywhere over the app should be accepted, including over the shell chrome."
+      - "A card is dragged onto a region that is not the viewport."
+    compose:
+      - useDrop
+      - TDropVeil
+      - TFileUpload
+    notes:
+      - "`useDrop({ accepts: ['Files'], scope: 'page' })` binds on `window` so the target survives outside this component's subtree; `scope: 'region'` returns handlers to spread on your own element."
+      - "`accepts` takes DataTransfer types, so a file drag (`'Files'`) and a card drag (a product MIME type) use the same predicate."
+      - "Bind `isOver` to `TDropVeil active`. The veil is `pointer-events: none` — a veil that accepts the pointer swallows the very drop it announces."
+      - "`TDropVeil`'s `label` and its default slot are MUTUALLY EXCLUSIVE: the slot replaces the label, silently."
+      - "TESTING: the veil leaves through a `<Transition>`, so it stays in the DOM for two frames after the drop. `flushPromises()` is not enough — wait a frame before asserting it is gone."
+
   - id: marketing-page
     name: "Marketing / anonymous page"
     use_when:

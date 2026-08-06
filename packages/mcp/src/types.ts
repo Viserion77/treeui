@@ -114,6 +114,13 @@ export interface TreeuiTokenEntry {
   description?: string;
   /** Per-theme values for tokens that change with `[data-tree-theme]`. */
   themeValues?: Record<string, string>;
+  /**
+   * True for interaction states the library computes from the semantic layer
+   * (hover, press, selected, disabled). They are real, emitted variables an
+   * agent may read, but a product must not theme against them — and they rank
+   * below the semantic tokens in search so they cannot bury the answer.
+   */
+  derived?: boolean;
 }
 
 export interface TreeuiCatalog {

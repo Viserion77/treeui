@@ -45,11 +45,27 @@ const props = withDefaults(
      * the data, invisible on screen.
      */
     minSpanPercent?: number;
+    /**
+     * Cap on how many lanes are drawn. A live window over a large stack can
+     * produce hundreds; slicing in the consumer hides data WITHOUT SAYING SO,
+     * which is worse than a long list. So the cap is the library's, and it
+     * always renders a footer declaring how many lanes it left out
+     * (TREEUX-017).
+     */
+    maxRows?: number;
+    /**
+     * Copy for that footer, given the number omitted. Product's, so it is
+     * localizable — the component ships an English fallback only so the count
+     * is never silently dropped.
+     */
+    overflowLabel?: (hidden: number) => string;
   }>(),
   {
     laneHeight: 20,
     label: undefined,
     minSpanPercent: 0.4,
+    maxRows: undefined,
+    overflowLabel: undefined,
   },
 );
 
@@ -66,6 +82,19 @@ defineSlots<{
 }>();
 
 const span = computed(() => Math.max(props.to - props.from, 1));
+
+const visibleRows = computed(() =>
+  props.maxRows && props.maxRows > 0 ? props.rows.slice(0, props.maxRows) : props.rows,
+);
+
+const hiddenRows = computed(() => props.rows.length - visibleRows.value.length);
+
+const overflowText = computed(() =>
+  hiddenRows.value > 0
+    ? (props.overflowLabel?.(hiddenRows.value) ??
+      `${hiddenRows.value} more lane${hiddenRows.value === 1 ? '' : 's'} not shown`)
+    : '',
+);
 
 const geometry = (item: TSpan) => {
   const left = clamp(((item.start - props.from) / span.value) * 100, 0, 100);
@@ -88,7 +117,7 @@ const geometry = (item: TSpan) => {
     :aria-label="label"
   >
     <div
-      v-for="row in rows"
+      v-for="row in visibleRows"
       :key="row.label"
       class="t-span-lanes__lane"
       :style="{ '--tree-span-lane-height': `${laneHeight}px` }"
@@ -120,5 +149,17 @@ const geometry = (item: TSpan) => {
         </span>
       </div>
     </div>
+
+    <!--
+      Never silent: a capped chart that does not say it was capped reads as a
+      complete one. `role="status"` because the count changes with the window.
+    -->
+    <p
+      v-if="overflowText"
+      class="t-span-lanes__overflow"
+      role="status"
+    >
+      {{ overflowText }}
+    </p>
   </div>
 </template>

@@ -9,6 +9,7 @@ import {
   withAlpha,
   type Rgb,
 } from './color';
+import { deriveStateColors, type ColorMode, type SemanticColorInput } from './states';
 import { treeThemes, treeTokens, type TreeThemeName } from './tokens';
 
 type TokenValue = string | number;
@@ -42,26 +43,62 @@ export const createFoundationCss = () => {
   return `:root {\n${declarations}\n}`;
 };
 
+/**
+ * A theme's full variable set: the semantic layer a product fills in, plus the
+ * interaction states the library derives from it.
+ *
+ * Both are emitted, because the stylesheet consumes both. Only the semantic
+ * half is public — see `contract.ts`.
+ */
+export const themeDeclarations = (
+  color: SemanticColorInput,
+  mode: ColorMode,
+): Array<[string, TokenValue]> => [
+  ...flattenTokens({ color } as unknown as TokenRecord),
+  ...flattenTokens({ color: deriveStateColors(color, mode) } as unknown as TokenRecord),
+];
+
+const renderThemeBlock = (
+  selector: string,
+  color: SemanticColorInput,
+  mode: ColorMode,
+) =>
+  `${selector} {\n  color-scheme: ${mode};\n${renderDeclarationBlock(
+    themeDeclarations(color, mode),
+  )}\n}`;
+
 export const createThemeCss = (
   themeName: TreeThemeName,
   selector = `[data-tree-theme="${themeName}"]`,
-) => {
-  const declarations = renderDeclarationBlock(
-    flattenTokens(treeThemes[themeName] as TokenRecord),
+) =>
+  renderThemeBlock(
+    selector,
+    treeThemes[themeName].color as unknown as SemanticColorInput,
+    themeName === 'dark' ? 'dark' : 'light',
   );
-  const colorScheme = themeName === 'dark' ? 'dark' : 'light';
 
-  return `${selector} {\n  color-scheme: ${colorScheme};\n${declarations}\n}`;
-};
-
-export const createDefaultThemeCss = (themeName: TreeThemeName) => {
-  const declarations = renderDeclarationBlock(
-    flattenTokens(treeThemes[themeName] as TokenRecord),
+export const createDefaultThemeCss = (themeName: TreeThemeName) =>
+  renderThemeBlock(
+    ':root',
+    treeThemes[themeName].color as unknown as SemanticColorInput,
+    themeName === 'dark' ? 'dark' : 'light',
   );
-  const colorScheme = themeName === 'dark' ? 'dark' : 'light';
 
-  return `:root {\n  color-scheme: ${colorScheme};\n${declarations}\n}`;
-};
+/**
+ * A complete, self-contained theme block from a semantic colour set — the
+ * output a product ships when it themes by seed.
+ *
+ * @example
+ * const { light, dark } = createThemePair({ accent: '#7c3aed' });
+ * createSemanticThemeCss('acme', light, 'light');
+ * // [data-tree-theme="acme"] { color-scheme: light; --tree-color-bg-primary: …
+ */
+export const createSemanticThemeCss = (
+  name: string,
+  color: SemanticColorInput,
+  mode: ColorMode,
+  selector = `[data-tree-theme="${name}"]`,
+) => renderThemeBlock(selector, color, mode);
 
 export const createStylesheet = () =>
   [createFoundationCss(), createDefaultThemeCss('light')].join('\n\n');
@@ -103,19 +140,29 @@ export interface BrandThemeOptions {
 
 /** WCAG AA contrast for normal-size text. */
 const AA_NORMAL = 4.5;
+/** Mirrors `MIN_STATE_DELTA` in contract.ts — the floor a state must clear. */
+const MIN_STATE_DELTA = 1.12;
 /** Step used while walking a brand color toward legibility. */
 const LEGIBILITY_STEP = 0.04;
-const LEGIBILITY_MAX_STEPS = 20;
+/**
+ * 20 was not enough for the extremes: a near-black seed in dark mode needs to
+ * travel most of the ramp, and stopping early returned a value that failed the
+ * very check the walk exists to satisfy. `validateTheme` is still the backstop
+ * if a seed cannot be made legible at all.
+ */
+const LEGIBILITY_MAX_STEPS = 32;
 
 /**
  * Derive a full brand ramp (hover, soft tint, readable contrast, focus ring)
  * from a single primary color. Operates in sRGB; contrast uses WCAG luminance.
  *
  * The brand color doubles as *text* on its own soft tint (soft buttons, badges,
- * selected nav items). A raw accent frequently fails AA there — a mid-tone blue
- * that reads fine on a light tint drops to ~2.7:1 on the dark one — so by
- * default the primary is walked darker (light mode) or lighter (dark mode)
- * until it clears. Pass `ensureLegible: false` to keep the color verbatim.
+ * selected nav items) and as link text on the quietest page surface. A raw
+ * accent frequently fails AA in one or both places — a mid-tone blue that reads
+ * fine on a light tint drops to ~2.7:1 on the dark one, and a mid-tone rose
+ * lands at 4.37:1 on the dark subtle band — so by default the primary is walked
+ * darker (light mode) or lighter (dark mode) until it clears both.
+ * Pass `ensureLegible: false` to keep the color verbatim.
  */
 export const deriveBrandRamp = (
   primary: string,
@@ -129,19 +176,35 @@ export const deriveBrandRamp = (
       ? mixColors(color, CONTRAST_LIGHT, 0.88)
       : mixColors(color, SOFT_DARK_BASE, 0.76);
 
+  /** The quietest surface the brand is used as ink on — the hardest of the three. */
+  const subtleBg = parseHex(treeThemes[mode].color.bg.subtle);
+
+  const legible = (color: Rgb) =>
+    contrastRatio(color, softFor(color)) >= AA_NORMAL &&
+    contrastRatio(color, subtleBg) >= AA_NORMAL;
+
   let base = parseHex(primary);
 
   if (ensureLegible) {
-    for (
-      let step = 0;
-      step < LEGIBILITY_MAX_STEPS && contrastRatio(base, softFor(base)) < AA_NORMAL;
-      step += 1
-    ) {
+    for (let step = 0; step < LEGIBILITY_MAX_STEPS && !legible(base); step += 1) {
       base = mode === 'light' ? darken(base, LEGIBILITY_STEP) : lighten(base, LEGIBILITY_STEP);
     }
   }
 
-  const hover = mode === 'light' ? darken(base, 0.18) : lighten(base, 0.16);
+  // Same degeneracy guard, and the same threshold, as the derived state layer:
+  // a near-black or near-white accent has no room in the preferred direction,
+  // and a hover that equals its rest state is not a hover. `MIN_STATE_DELTA` in
+  // contract.ts is what the validator asks for, so the ramp aims at it too.
+  const hoverAmount = mode === 'light' ? 0.18 : 0.16;
+  const preferredHover =
+    mode === 'light' ? darken(base, hoverAmount) : lighten(base, hoverAmount);
+  const flippedHover =
+    mode === 'light' ? lighten(base, hoverAmount) : darken(base, hoverAmount);
+  const hover =
+    contrastRatio(preferredHover, base) >= MIN_STATE_DELTA ||
+    contrastRatio(preferredHover, base) >= contrastRatio(flippedHover, base)
+      ? preferredHover
+      : flippedHover;
   const soft = softFor(base);
 
   return {
@@ -163,6 +226,16 @@ export const accentCssVariables = (
   mode: 'light' | 'dark' = 'light',
 ): Record<string, string> => {
   const ramp = deriveBrandRamp(accent, mode);
+  const base = treeThemes[mode].color;
+
+  // The derived states have to move with the accent too. Setting only the five
+  // brand variables used to leave `--tree-color-brand-press` and the selection
+  // surface pointing at the previous accent, so a runtime accent switch changed
+  // a button's rest colour but not its pressed colour.
+  const derived = deriveStateColors(
+    { ...base, brand: { ...ramp } } as unknown as SemanticColorInput,
+    mode,
+  );
 
   return {
     '--tree-color-brand-primary': ramp.primary,
@@ -170,6 +243,17 @@ export const accentCssVariables = (
     '--tree-color-brand-soft': ramp.soft,
     '--tree-color-brand-contrast': ramp.contrast,
     '--tree-color-focus-ring': ramp.focusRing,
+    // Everything the brand ramp feeds. Listing only the five above left the
+    // press fill, the tint states and the selection surface pointing at the
+    // previous accent.
+    ...Object.fromEntries(
+      Object.entries(derived.brand).map(([key, value]) => [`--tree-color-brand-${key}`, value]),
+    ),
+    ...Object.fromEntries(
+      Object.entries(derived.state)
+        .filter(([key]) => key.startsWith('selected-'))
+        .map(([key, value]) => [`--tree-color-state-${key}`, value]),
+    ),
   };
 };
 
@@ -243,8 +327,12 @@ export const createCustomThemeCss = (
     treeThemes[base] as TokenRecord,
     overrides as unknown as TokenRecord,
   );
-  const declarations = renderDeclarationBlock(flattenTokens(merged));
-  const colorScheme = base === 'dark' ? 'dark' : 'light';
 
-  return `${selector} {\n  color-scheme: ${colorScheme};\n${declarations}\n}`;
+  // Derived states are recomputed from the *merged* semantics, so an override
+  // carries its own hover, press, selected and disabled with it.
+  return renderThemeBlock(
+    selector,
+    (merged as { color: unknown }).color as SemanticColorInput,
+    base === 'dark' ? 'dark' : 'light',
+  );
 };

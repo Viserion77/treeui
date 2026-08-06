@@ -88,3 +88,41 @@ export const bestContrast = (color: Rgb, candidates: [Rgb, Rgb]): Rgb =>
 
 export const withAlpha = ({ r, g, b }: Rgb, alpha: number): string =>
   `rgba(${clampChannel(r)}, ${clampChannel(g)}, ${clampChannel(b)}, ${alpha})`;
+
+/**
+ * Re-light `color` so it carries `targetLuminance`, keeping as much of its hue
+ * as the move allows.
+ *
+ * Tinting a neutral ramp toward a brand hue is a hue operation, but a plain mix
+ * moves luminance too: pulling the light `#eff2f5` band toward a violet dropped
+ * it far enough that four status colours stopped passing AA on it. Everything
+ * that tints a neutral runs the result through here, so a warm or cool UI is
+ * still the same UI contrast-wise.
+ */
+export const withLuminance = (color: Rgb, targetLuminance: number): Rgb => {
+  const current = relativeLuminance(color);
+
+  if (Math.abs(current - targetLuminance) < 0.0005) return color;
+
+  const toward = current < targetLuminance ? WHITE : BLACK;
+  let low = 0;
+  let high = 1;
+
+  // 24 halvings resolves far below one 8-bit step.
+  for (let i = 0; i < 24; i += 1) {
+    const mid = (low + high) / 2;
+    const candidate = mixColors(color, toward, mid);
+
+    if (
+      current < targetLuminance
+        ? relativeLuminance(candidate) < targetLuminance
+        : relativeLuminance(candidate) > targetLuminance
+    ) {
+      low = mid;
+    } else {
+      high = mid;
+    }
+  }
+
+  return mixColors(color, toward, (low + high) / 2);
+};

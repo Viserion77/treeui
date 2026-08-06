@@ -394,7 +394,15 @@ export const searchTokens = (query: string, limit = 12): TreeuiTokenSearchResult
       score: scoreToken(token, query),
     }))
     .filter((result) => result.score > 0)
-    .sort((left, right) => right.score - left.score || left.token.cssVar.localeCompare(right.token.cssVar))
+    .sort(
+      (left, right) =>
+        right.score - left.score ||
+        // A derived state never outranks the semantic token it came from.
+        // `status` returns the four status colours before it returns the forty
+        // hover/press/tint variants computed from them.
+        Number(left.token.derived ?? false) - Number(right.token.derived ?? false) ||
+        left.token.cssVar.localeCompare(right.token.cssVar),
+    )
     .slice(0, limit);
 
 const formatFieldList = (label: string, values: string[]) =>

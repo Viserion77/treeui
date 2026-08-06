@@ -1,8 +1,46 @@
-version: 0.1
+version: "1.0"
 package: "@treeui/tokens"
+colour_contract_version: "1.0"
 css_variable_prefix: "--tree-"
 theme_selector: '[data-tree-theme="<name>"]'
 themes: [light, dark]
+
+layers:
+  read_this_first: >
+    Colour is three layers. Which layer a name belongs to decides whether a
+    product may set it. Getting this wrong is the most expensive mistake in the
+    file: setting a derived token appears to work and silently breaks the next
+    release.
+  primitives:
+    source: packages/tokens/src/primitives.ts
+    emitted: false
+    themeable: false
+    description: >
+      Raw values with descriptive names (`blue.500`, `gray.200`). The only file
+      in the system that contains a literal colour. Never emitted as a CSS
+      custom property, so a component physically cannot reference one.
+  semantic:
+    source: packages/tokens/src/contract.ts (SEMANTIC_TOKENS)
+    emitted: true
+    themeable: true
+    count: 31
+    description: >
+      The public API. This is the list a product fills in, by hand or by seeding.
+      The authoritative, versioned list is `contract.ts`; `semantic_color_roles`
+      and `theme_values` below describe it.
+  derived:
+    source: packages/tokens/src/states.ts
+    emitted: true
+    themeable: false
+    count: 53
+    description: >
+      Hover, press, selected, disabled, status tints and edges, and the ink that
+      goes on each. The library computes all of them from the semantic layer, so
+      a product that supplies one accent gets a complete, contrast-checked set of
+      interaction states without naming any of them. Emitted because the
+      stylesheet consumes them; overriding one is unsupported.
+    see: derived_variables
+
 
 naming_grammar:
   read_this_first: >
@@ -253,7 +291,7 @@ emitted_variables:
       --tree-breakpoint-lg: "1024px"
       --tree-breakpoint-xl: "1280px"
   theme_colors:
-    count: 30
+    count: 31
     scope: "Re-emitted per theme under [data-tree-theme]. Values in theme_values below."
     note: "The name set is identical in light and dark — verified against both."
     variables:
@@ -287,6 +325,78 @@ emitted_variables:
       - --tree-color-chart-8
       - --tree-color-overlay
       - --tree-color-focus-ring
+      # Umbra as an "r, g, b" triple; the elevation scale varies alpha over it.
+      # Near-black in dark, slate in light — the shadow scale used to be
+      # theme-independent and emitted a slate umbra on the dark surface.
+      - --tree-color-shadow-rgb
+
+derived_variables:
+  read_this_first: >
+    These are emitted and safe to READ. Do not set them, and do not tell a
+    product to set them — the library recomputes them from the semantic layer
+    on every theme, and a value written here is overwritten or, worse, left
+    inconsistent with the tint it is supposed to sit on.
+  count: 53
+  source: packages/tokens/src/states.ts
+  how_to_change_one: >
+    Change the semantic token it derives from, or seed a different accent. If a
+    derived value is wrong, that is a library bug — the derivation rules are in
+    `states.ts` and every one of them is covered by `contract.test.ts`.
+  groups:
+    control_boundary:
+      - --tree-color-border-interactive   # 3:1 on every surface — WCAG 1.4.11
+    solid_interaction:
+      - --tree-color-brand-press
+      - --tree-color-accent-press
+      - --tree-color-status-{success,warning,error,info}-hover
+      - --tree-color-status-{success,warning,error,info}-press
+    tint_surfaces:
+      - --tree-color-{brand,accent}-soft-hover
+      - --tree-color-{brand,accent}-soft-press
+      - --tree-color-status-{success,warning,error,info}-soft
+      - --tree-color-status-{success,warning,error,info}-soft-hover
+      - --tree-color-status-{success,warning,error,info}-border
+    ink_on_a_fill:
+      note: >
+        A tint has limited headroom before its label stops clearing AA, so the
+        ink ships alongside each tint state and moves with it. Pair them:
+        `on-soft` with `soft`, `on-soft-hover` with `soft-hover`.
+      members:
+        - --tree-color-{brand,accent}-on-soft
+        - --tree-color-{brand,accent}-on-soft-hover
+        - --tree-color-{brand,accent}-on-soft-press
+        - --tree-color-status-{success,warning,error,info}-on-soft
+        - --tree-color-status-{success,warning,error,info}-on-soft-hover
+        - --tree-color-status-{success,warning,error,info}-contrast
+    neutral_states:
+      - --tree-color-state-hover-bg
+      - --tree-color-state-press-bg
+      - --tree-color-state-selected-bg
+      - --tree-color-state-selected-fg
+      - --tree-color-state-selected-border
+      - --tree-color-state-disabled-bg
+      - --tree-color-state-disabled-fg
+      - --tree-color-state-disabled-border
+
+theming:
+  minimum_input: >
+    One colour. `createThemePair({ accent: '#7c3aed' })` produces both modes,
+    both ramps, every tint, every interaction state, the computed on-accent ink
+    and the focus ring.
+  optional_input:
+    accentSecondary: "A second voice. Defaults to the library's secondary accent."
+    neutral: "Tints the greys toward a hue, preserving luminance so no contrast moves."
+    status: "Per-status overrides. Statuses are NEVER derived from the accent."
+    overrides: "Pointwise per-mode overrides of any semantic token. Validated like everything else."
+  validation:
+    entry_point: "assertThemeValid(color, mode) — throws, so a bad theme breaks the build."
+    also: "createValidatedThemePair(seed) — seeds and validates in one pass."
+    checks:
+      - "Every required semantic token is present."
+      - "Every text-on-background pair the library renders clears AA for its tier (4.5:1 text, 3:1 UI)."
+      - "Every interactive state is visibly distinguishable from the state it replaces."
+    pair_list: "CONTRAST_PAIRS in packages/tokens/src/contract.ts — not a heuristic."
+  preview: "Storybook -> Foundation -> Theme preview renders any seed in both modes with every pair measured."
 
 data_viz_palette:
   variables: "--tree-color-chart-1 … --tree-color-chart-8"
@@ -423,7 +533,11 @@ breakpoint:
   xl: "1280px"
 
 theme_values:
+  note: >
+    Generated from packages/tokens/src. `tokens-sync.test.ts` fails if this
+    section drifts from what the package emits.
   light:
+    # Semantic — what a product fills in.
     color:
       bg:
         primary: "#f6f8fa"
@@ -436,6 +550,7 @@ theme_values:
         primary: "#1f2328"
         muted: "#59636e"
         inverse: "#ffffff"
+      shadow-rgb: "15, 23, 42"
       brand:
         primary: "#0969da"
         hover: "#0550ae"
@@ -448,21 +563,82 @@ theme_values:
         contrast: "#ffffff"
       status:
         success: "#1a7f37"
-        warning: "#9a6700"
+        warning: "#956400"
         error: "#d1242f"
         info: "#0969da"
       chart:
         1: "#2a78d6"
-        2: "#1baf7a"
-        3: "#eda100"
+        2: "#12855c"
+        3: "#8a6100"
         4: "#008300"
         5: "#4a3aa7"
         6: "#e34948"
-        7: "#e87ba4"
+        7: "#c4587f"
         8: "#eb6834"
       overlay: "rgba(31, 35, 40, 0.5)"
       focus-ring: "rgba(9, 105, 218, 0.32)"
+    # Derived — computed by the library. Read, never set.
+    derived:
+      border:
+        interactive: "#81878e"
+      brand:
+        press: "#064794"
+        soft-hover: "#bfe1fa"
+        soft-press: "#a6d0f5"
+        on-soft: "#0969da"
+        on-soft-hover: "#085abb"
+        on-soft-press: "#0751a9"
+      accent:
+        press: "#52348a"
+        soft-hover: "#ded4f3"
+        soft-press: "#d0c1ed"
+        on-soft: "#794dcb"
+        on-soft-hover: "#6d45b7"
+        on-soft-press: "#633fa5"
+      status:
+        success-hover: "#15682d"
+        success-press: "#125625"
+        success-soft: "#dfede3"
+        success-soft-hover: "#c3decb"
+        success-border: "#419559"
+        success-contrast: "#ffffff"
+        success-on-soft: "#197934"
+        success-on-soft-hover: "#15672d"
+        warning-hover: "#7a5200"
+        warning-press: "#654400"
+        warning-soft: "#f0e9db"
+        warning-soft-hover: "#e3d6bc"
+        warning-border: "#a77f2c"
+        warning-contrast: "#ffffff"
+        warning-on-soft: "#8e5f00"
+        warning-on-soft-hover: "#805600"
+        error-hover: "#ab1e27"
+        error-press: "#8e1820"
+        error-soft: "#f9e0e2"
+        error-soft-hover: "#f3c6c9"
+        error-border: "#db535c"
+        error-contrast: "#ffffff"
+        error-on-soft: "#c7222d"
+        error-on-soft-hover: "#aa1d26"
+        info-hover: "#0756b3"
+        info-press: "#064794"
+        info-soft: "#ddeafa"
+        info-soft-hover: "#bfd8f6"
+        info-border: "#3383e0"
+        info-contrast: "#ffffff"
+        info-on-soft: "#0964cf"
+        info-on-soft-hover: "#085abb"
+      state:
+        hover-bg: "#f2f2f2"
+        press-bg: "#e4e5e5"
+        selected-bg: "#ddf4ff"
+        selected-fg: "#0969da"
+        selected-border: "#0969da"
+        disabled-bg: "#eff2f5"
+        disabled-fg: "#7f8790"
+        disabled-border: "#dee3e8"
   dark:
+    # Semantic — what a product fills in.
     color:
       bg:
         primary: "#1c2128"
@@ -475,8 +651,9 @@ theme_values:
         primary: "#adbac7"
         muted: "#95a3b2"
         inverse: "#1c2128"
+      shadow-rgb: "0, 0, 0"
       brand:
-        primary: "#539bf5"
+        primary: "#559cf5"
         hover: "#6cabf7"
         soft: "#1a3453"
         contrast: "#0a1a2f"
@@ -486,9 +663,9 @@ theme_values:
         soft: "#332e4a"
         contrast: "#1c2128"
       status:
-        success: "#57ab5a"
+        success: "#59ac5c"
         warning: "#c69026"
-        error: "#f47067"
+        error: "#f5766e"
         info: "#6cb6ff"
       chart:
         1: "#3987e5"
@@ -500,7 +677,67 @@ theme_values:
         7: "#d55181"
         8: "#d95926"
       overlay: "rgba(13, 17, 23, 0.6)"
-      focus-ring: "rgba(83, 155, 245, 0.32)"
+      focus-ring: "rgba(85, 156, 245, 0.32)"
+    # Derived — computed by the library. Read, never set.
+    derived:
+      border:
+        interactive: "#767f8b"
+      brand:
+        press: "#8bbcf8"
+        soft-hover: "#22436a"
+        soft-press: "#294f7d"
+        on-soft: "#5ea1f6"
+        on-soft-hover: "#7bb2f7"
+        on-soft-press: "#99c4f9"
+      accent:
+        press: "#c7b0f3"
+        soft-hover: "#443b61"
+        soft-press: "#534674"
+        on-soft: "#ad8bed"
+        on-soft-hover: "#bca1f0"
+        on-soft-press: "#cbb6f4"
+      status:
+        success-hover: "#77bb79"
+        success-press: "#8ec790"
+        success-soft: "#2a3a34"
+        success-soft-hover: "#314a3a"
+        success-border: "#4d9052"
+        success-contrast: "#1c2128"
+        success-on-soft: "#61b064"
+        success-on-soft-hover: "#85c287"
+        warning-hover: "#d0a44d"
+        warning-press: "#d8b46b"
+        warning-soft: "#39362d"
+        warning-soft-hover: "#4d432c"
+        warning-border: "#a37a28"
+        warning-contrast: "#1c2128"
+        warning-on-soft: "#c99631"
+        warning-on-soft-hover: "#d5ad5f"
+        error-hover: "#f78f88"
+        error-press: "#f8a29c"
+        error-soft: "#403237"
+        error-soft-hover: "#593c3f"
+        error-border: "#c86560"
+        error-contrast: "#1c2128"
+        error-on-soft: "#f67d75"
+        error-on-soft-hover: "#f7958f"
+        info-hover: "#86c3ff"
+        info-press: "#9bcdff"
+        info-soft: "#2c3b4b"
+        info-soft-hover: "#354c64"
+        info-border: "#568bc0"
+        info-contrast: "#1c2128"
+        info-on-soft: "#6cb6ff"
+        info-on-soft-hover: "#81c0ff"
+      state:
+        hover-bg: "#2a3037"
+        press-bg: "#333940"
+        selected-bg: "#1a3453"
+        selected-fg: "#5ea1f6"
+        selected-border: "#559cf5"
+        disabled-bg: "#2d333b"
+        disabled-fg: "#76818e"
+        disabled-border: "#3a414a"
 
 rules:
   - "Use semantic color roles, not raw hex values, in component code."

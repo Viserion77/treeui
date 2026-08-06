@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script setup lang="ts" generic="T extends string | number = string">
 import { computed, useAttrs } from 'vue';
 import { useFormFieldIdentity, type TModelModifiers } from './form-field';
 import type { TFieldWidth, TSize } from '../types/contracts';
@@ -10,7 +10,14 @@ defineOptions({
 
 const props = withDefaults(
   defineProps<{
-    modelValue?: string | number;
+    /**
+     * Generic over the bound type, so the value the field EMITS is the type the
+     * ref holds (TREEUX-011, group 3). Accepting `string | number` while always
+     * emitting `string` made every `ref<number>` a compile error under
+     * `strictTemplates` — and, underneath the type, actually put a string into
+     * that ref at runtime.
+     */
+    modelValue?: T;
     size?: TSize;
     /** Inline-size cap. Fluid (`full`) by default. */
     width?: TFieldWidth;
@@ -21,10 +28,30 @@ const props = withDefaults(
     placeholder?: string;
     /** Native `readonly`: the value is shown and selectable but not editable. */
     readonly?: boolean;
+    /**
+     * Native constraint and behaviour attributes of the `<input>` this
+     * component IS (TREEUX-011). `ComponentCustomProps` covers what ANY
+     * component accepts; these are what THIS one accepts by being an input —
+     * `min` on a number field is not a typo, it is the reason the field exists.
+     * They are declared rather than left to `$attrs` so `strictTemplates` sees
+     * them; the values still land on the native element.
+     */
+    min?: number | string;
+    max?: number | string;
+    step?: number | string;
+    minlength?: number | string;
+    maxlength?: number | string;
+    pattern?: string;
+    inputmode?: 'none' | 'text' | 'decimal' | 'numeric' | 'tel' | 'search' | 'email' | 'url';
+    autocomplete?: string;
+    name?: string;
+    required?: boolean;
   } & TModelModifiers>(),
   {
     modelModifiers: () => ({}),
-    modelValue: '',
+    // No default: with a generic model the empty string is not a valid default
+    // for every T. The rendered value already falls back to '' below.
+    modelValue: undefined,
     size: 'md',
     width: 'full',
     disabled: false,
@@ -33,11 +60,21 @@ const props = withDefaults(
     type: 'text',
     placeholder: '',
     readonly: false,
+    min: undefined,
+    max: undefined,
+    step: undefined,
+    minlength: undefined,
+    maxlength: undefined,
+    pattern: undefined,
+    inputmode: undefined,
+    autocomplete: undefined,
+    name: undefined,
+    required: false,
   },
 );
 
 const emit = defineEmits<{
-  'update:modelValue': [value: string];
+  'update:modelValue': [value: T];
 }>();
 
 const attrs = useAttrs();
@@ -72,7 +109,19 @@ const inputAttrs = computed(() => {
 const stringValue = computed(() => `${props.modelValue ?? ''}`);
 
 const onInput = (event: Event) => {
-  emit('update:modelValue', (event.target as HTMLInputElement).value);
+  const raw = (event.target as HTMLInputElement).value;
+
+  // A DOM input always yields a string, so emitting `T` has to be made true
+  // rather than merely declared. When the bound value is a number, coerce —
+  // mirroring Vue's own `.number`: an unparseable value stays as typed, so a
+  // half-written "-" or "1e" is not destroyed mid-entry.
+  if (typeof props.modelValue === 'number') {
+    const parsed = Number.parseFloat(raw);
+    emit('update:modelValue', (Number.isNaN(parsed) ? raw : parsed) as T);
+    return;
+  }
+
+  emit('update:modelValue', raw as T);
 };
 </script>
 
@@ -97,6 +146,16 @@ const onInput = (event: Event) => {
       :placeholder="placeholder"
       :disabled="disabled"
       :readonly="readonly || undefined"
+      :min="min"
+      :max="max"
+      :step="step"
+      :minlength="minlength"
+      :maxlength="maxlength"
+      :pattern="pattern"
+      :inputmode="inputmode"
+      :autocomplete="autocomplete"
+      :name="name"
+      :required="required || undefined"
       :aria-invalid="invalid || undefined"
       :aria-busy="loading || undefined"
       @input="onInput"

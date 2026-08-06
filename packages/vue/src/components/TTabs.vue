@@ -1,6 +1,6 @@
-<script setup lang="ts">
+<script setup lang="ts" generic="T extends string = string">
 import { createId } from '@treeui/utils';
-import { computed, provide, reactive, ref, toRef, watch } from 'vue';
+import { computed, provide, reactive, ref, watch } from 'vue';
 import type { TSize } from '../types/contracts';
 import type { TabsActivationMode } from './tabs-context';
 import { TABS_INJECTION_KEY } from './tabs-context';
@@ -8,8 +8,12 @@ import type { TModelModifiers } from './form-field';
 
 const props = withDefaults(
   defineProps<{
-    modelValue?: string;
-    defaultValue?: string;
+    /**
+     * Generic over the tab id, so a `ref<'overview' | 'logs'>` gets its own
+     * literal union back instead of a widened `string` (TREEUX-011, group 3).
+     */
+    modelValue?: T;
+    defaultValue?: T;
     size?: TSize;
     activationMode?: TabsActivationMode;
     disabled?: boolean;
@@ -17,7 +21,7 @@ const props = withDefaults(
   {
     modelModifiers: () => ({}),
     modelValue: undefined,
-    defaultValue: '',
+    defaultValue: undefined,
     size: 'md',
     activationMode: 'automatic',
     disabled: false,
@@ -25,22 +29,24 @@ const props = withDefaults(
 );
 
 const emit = defineEmits<{
-  'update:modelValue': [value: string];
+  'update:modelValue': [value: T];
 }>();
 
 const baseId = createId('t-tabs');
-const internalValue = ref(props.defaultValue);
+const internalValue = ref<string>(props.defaultValue ?? '');
 const tabOrder = ref<string[]>([]);
 const disabledTabs: Record<string, boolean> = reactive({});
 
-const activeValue = computed(() => props.modelValue ?? internalValue.value);
+const activeValue = computed<string>(() => props.modelValue ?? internalValue.value);
 
 const setActiveValue = (value: string) => {
   if (value === activeValue.value) return;
   if (props.modelValue === undefined) {
     internalValue.value = value;
   }
-  emit('update:modelValue', value);
+  // The registered tabs ARE the union: a value that reached here came from a
+  // TTab the consumer declared, so it is a T by construction.
+  emit('update:modelValue', value as T);
 };
 
 const registerTab = (value: string) => {
@@ -79,9 +85,13 @@ watch(
 provide(TABS_INJECTION_KEY, {
   activeValue,
   setActiveValue,
-  size: toRef(props, 'size'),
-  activationMode: toRef(props, 'activationMode'),
-  disabled: toRef(props, 'disabled'),
+  // `computed`, not `toRef`: on a generic `<script setup>` the props object is a
+  // conditional mapped type, and `toRef(props, 'disabled')` cannot narrow it
+  // back to `Ref<boolean>`. A getter reads the same value with no inference to
+  // unwind, and the context type stays honest.
+  size: computed(() => props.size),
+  activationMode: computed(() => props.activationMode),
+  disabled: computed(() => props.disabled),
   baseId,
   registerTab,
   unregisterTab,

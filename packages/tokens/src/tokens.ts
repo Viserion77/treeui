@@ -1,3 +1,9 @@
+import { parseHex, withAlpha } from './color';
+import { treeAlpha, treePrimitives as p } from './primitives';
+
+/** Compose an alpha primitive over a colour primitive. */
+const alpha = (color: string, amount: number) => withAlpha(parseHex(color), amount);
+
 export const treeTokens = {
   font: {
     family: {
@@ -60,15 +66,19 @@ export const treeTokens = {
     lg: '0.875rem',
     pill: '999px',
   },
+  // Elevation. The geometry is theme-independent and lives here; the *colour*
+  // comes from `--tree-color-shadow-rgb`, which the theme sets — a slate shadow
+  // was being emitted on `:root` and reused verbatim on the dark surface, where
+  // a near-black umbra is what actually reads.
   shadow: {
-    xs: '0 1px 2px rgba(15, 23, 42, 0.06)',
-    sm: '0 6px 18px rgba(15, 23, 42, 0.08)',
-    md: '0 14px 34px rgba(15, 23, 42, 0.12)',
+    xs: '0 1px 2px rgba(var(--tree-color-shadow-rgb), 0.06)',
+    sm: '0 6px 18px rgba(var(--tree-color-shadow-rgb), 0.08)',
+    md: '0 14px 34px rgba(var(--tree-color-shadow-rgb), 0.12)',
     // Marketing-scale elevation: a large, soft lift for a hero card or a banded
     // section, where `md` reads flat. Same neutral shadow colour as the smaller
     // steps, so the whole scale stays one family.
-    lg: '0 24px 48px -24px rgba(15, 23, 42, 0.22)',
-    xl: '0 40px 80px -32px rgba(15, 23, 42, 0.28)',
+    lg: '0 24px 48px -24px rgba(var(--tree-color-shadow-rgb), 0.22)',
+    xl: '0 40px 80px -32px rgba(var(--tree-color-shadow-rgb), 0.28)',
     // Elevation tinted by whatever accent is in scope (see `--tree-color-accent-*`
     // and the `accent` prop on TSection/THero/TPageSurface), so a surface's glow
     // follows its accent instead of being written by hand per landing page.
@@ -86,6 +96,15 @@ export const treeTokens = {
       subtle: '1px',
       strong: '1.5px',
     },
+  },
+  /**
+   * Opacity for the parts of a disabled control that carry no text — an icon,
+   * a thumbnail, a toolbar. Anywhere a label sits on a surface, disabled is a
+   * colour instead (`--tree-color-state-disabled-*`), because opacity cannot be
+   * measured for contrast. This replaces eight different hand-picked values.
+   */
+  opacity: {
+    disabled: '0.5',
   },
   motion: {
     duration: {
@@ -148,28 +167,48 @@ export const treeTokens = {
   },
 } as const;
 
+/**
+ * Layer 2 — semantics. This is the public API of the colour system: the list a
+ * product fills in, and the only colour layer a component is allowed to name.
+ * Every value here is a primitive reference, never a literal.
+ *
+ * Interactive states (hover on a surface, press, disabled, selected) are NOT
+ * here — the library derives them from these roles in `states.ts`. The one
+ * exception is `brand.hover` / `accent.hover`, which shipped as public before
+ * the derived layer existed and stays public for compatibility.
+ *
+ * The authoritative, versioned list of these roles is `contract.ts`.
+ */
 export const treeThemes = {
   light: {
     color: {
       bg: {
-        primary: '#f6f8fa',
-        surface: '#ffffff',
-        subtle: '#eff2f5',
+        primary: p.gray[50],
+        surface: p.gray[0],
+        subtle: p.gray[100],
       },
       border: {
-        default: '#d0d7de',
-        strong: '#afb8c1',
+        default: p.gray[200],
+        strong: p.gray[300],
+        // `border.interactive` is deliberately absent: WCAG 1.4.11 asks for 3:1
+        // on the boundary that *identifies* a control, and `default` measures
+        // 1.45:1 here — fine for a card edge, not fine for the only thing
+        // telling a user where an input is. The library derives a passing value
+        // from `strong` (see states.ts); a product may set one, and it is
+        // validated the same way.
       },
       text: {
-        primary: '#1f2328',
-        muted: '#59636e',
-        inverse: '#ffffff',
+        primary: p.gray.ink,
+        muted: p.gray[600],
+        inverse: p.gray[0],
       },
+      /** Umbra as an `r, g, b` triple so the elevation scale can vary alpha. */
+      'shadow-rgb': '15, 23, 42',
       brand: {
-        primary: '#0969da',
-        hover: '#0550ae',
-        soft: '#ddf4ff',
-        contrast: '#ffffff',
+        primary: p.blue[500],
+        hover: p.blue[600],
+        soft: p.blue[50],
+        contrast: p.gray[0],
       },
       // Secondary brand accent — a closed axis, never a free colour. It is what
       // `TTag tone="accent"` paints with, and the default value of the surface
@@ -178,87 +217,71 @@ export const treeThemes = {
       // `deriveBrandRamp` from #8957e5 so the accent stays legible as text on
       // its own soft tint (measured 4.77:1) and on every background.
       accent: {
-        primary: '#794dcb',
-        hover: '#633fa6',
-        soft: '#efeaf9',
-        contrast: '#ffffff',
+        primary: p.purple[500],
+        hover: p.purple[600],
+        soft: p.purple[50],
+        contrast: p.gray[0],
       },
       status: {
-        success: '#1a7f37',
-        warning: '#9a6700',
-        error: '#d1242f',
-        info: '#0969da',
+        success: p.green[500],
+        warning: p.amber[500],
+        error: p.red[500],
+        info: p.blue[500],
       },
       // Categorical data-viz palette. Fixed hue order (blue → orange), validated
       // for CVD separation and contrast against the light surface. Assign in order;
       // the components cycle after 8 as a fallback, but prefer folding a 9th+
       // category into "Other".
-      chart: {
-        1: '#2a78d6',
-        2: '#1baf7a',
-        3: '#eda100',
-        4: '#008300',
-        5: '#4a3aa7',
-        6: '#e34948',
-        7: '#e87ba4',
-        8: '#eb6834',
-      },
-      overlay: 'rgba(31, 35, 40, 0.5)',
-      'focus-ring': 'rgba(9, 105, 218, 0.32)',
+      chart: p.dataviz.light,
+      overlay: alpha(p.gray.ink, treeAlpha.overlay.light),
+      'focus-ring': alpha(p.blue[500], treeAlpha.focusRing),
     },
   },
   dark: {
     color: {
       bg: {
-        primary: '#1c2128',
-        surface: '#22272e',
-        subtle: '#2d333b',
+        primary: p.gray[900],
+        surface: p.gray[850],
+        subtle: p.gray[800],
       },
       border: {
-        default: '#444c56',
-        strong: '#576270',
+        default: p.gray[700],
+        strong: p.gray[650],
       },
       text: {
-        primary: '#adbac7',
-        muted: '#95a3b2',
-        inverse: '#1c2128',
+        primary: p.gray.inkDark,
+        muted: p.gray.inkDarkMuted,
+        inverse: p.gray[900],
       },
+      /** Near-black umbra: a slate shadow is invisible on a dark surface. */
+      'shadow-rgb': '0, 0, 0',
       brand: {
-        primary: '#539bf5',
-        hover: '#6cabf7',
-        soft: '#1a3453',
-        contrast: '#0a1a2f',
+        primary: p.blue[400],
+        hover: p.blue[450],
+        soft: p.blue[800],
+        contrast: p.blue[900],
       },
       // Dark pair of the secondary accent (same #8957e5 seed, stepped for the
       // dark surface). Measured 5.93:1 on bg-primary, 4.67:1 on bg-subtle and
       // 4.72:1 on its own soft tint — AA on every background, and above what
       // the dark brand pair itself clears. `accent.test.ts` holds that bar.
       accent: {
-        primary: '#ad8bed',
-        hover: '#ba9df0',
-        soft: '#332e4a',
-        contrast: '#1c2128',
+        primary: p.purple[400],
+        hover: p.purple[300],
+        soft: p.purple[800],
+        contrast: p.gray[900],
       },
       status: {
-        success: '#57ab5a',
-        warning: '#c69026',
-        error: '#f47067',
-        info: '#6cb6ff',
+        success: p.green[400],
+        warning: p.amber[400],
+        error: p.red[400],
+        info: p.blue[300],
       },
       // Same hue order stepped for the dark surface (not a separate palette) —
       // each step re-validated for the dark band and >= 3:1 on the dark surface.
-      chart: {
-        1: '#3987e5',
-        2: '#199e70',
-        3: '#c98500',
-        4: '#008300',
-        5: '#9085e9',
-        6: '#e66767',
-        7: '#d55181',
-        8: '#d95926',
-      },
-      overlay: 'rgba(13, 17, 23, 0.6)',
-      'focus-ring': 'rgba(83, 155, 245, 0.32)',
+      chart: p.dataviz.dark,
+      overlay: alpha(p.gray[950], treeAlpha.overlay.dark),
+      'focus-ring': alpha(p.blue[400], treeAlpha.focusRing),
     },
   },
 } as const;
@@ -266,3 +289,5 @@ export const treeThemes = {
 export type TreeTokens = typeof treeTokens;
 export type TreeThemes = typeof treeThemes;
 export type TreeThemeName = keyof TreeThemes;
+/** The semantic colour block a theme is made of — what a product fills in. */
+export type TreeThemeColors = TreeThemes[TreeThemeName]['color'];

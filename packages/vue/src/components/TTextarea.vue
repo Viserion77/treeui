@@ -35,6 +35,17 @@ const props = withDefaults(
      * otherwise leaves a `.mono` class behind in the consumer's stylesheet.
      */
     family?: TTextareaFamily;
+    /**
+     * Native attributes of the `<textarea>` this component IS (TREEUX-011) —
+     * declared so `strictTemplates` sees them instead of rejecting the reason
+     * the component exists.
+     */
+    readonly?: boolean;
+    minlength?: number | string;
+    maxlength?: number | string;
+    name?: string;
+    required?: boolean;
+    autocomplete?: string;
   } & TModelModifiers>(),
   {
     modelModifiers: () => ({}),
@@ -49,6 +60,12 @@ const props = withDefaults(
     autoGrow: false,
     maxRows: undefined,
     family: undefined,
+    readonly: false,
+    minlength: undefined,
+    maxlength: undefined,
+    name: undefined,
+    required: false,
+    autocomplete: undefined,
   },
 );
 
@@ -164,6 +181,12 @@ onMounted(() => {
       :placeholder="placeholder"
       :disabled="disabled"
       :rows="rows"
+      :readonly="readonly || undefined"
+      :minlength="minlength"
+      :maxlength="maxlength"
+      :name="name"
+      :required="required || undefined"
+      :autocomplete="autocomplete"
       :aria-invalid="invalid || undefined"
       :aria-busy="loading || undefined"
       @input="onInput"

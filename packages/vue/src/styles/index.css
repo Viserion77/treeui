@@ -77,12 +77,32 @@ table.t-visually-hidden {
      destructive action in a row of ghost buttons had no way to be expressed.
      Unset, the triple is the brand and every variant renders exactly as before. */
   --tree-button-accent: var(--tree-color-brand-primary);
+  --tree-button-accent-hover: var(--tree-color-brand-hover);
+  --tree-button-accent-press: var(--tree-color-brand-press);
   --tree-button-accent-soft: var(--tree-color-brand-soft);
+  --tree-button-accent-soft-hover: var(--tree-color-brand-soft-hover);
+  --tree-button-accent-soft-press: var(--tree-color-brand-soft-press);
+  --tree-button-accent-on-soft: var(--tree-color-brand-on-soft);
+  --tree-button-accent-on-soft-hover: var(--tree-color-brand-on-soft-hover);
+  --tree-button-accent-on-soft-press: var(--tree-color-brand-on-soft-press);
   --tree-button-accent-contrast: var(--tree-color-brand-contrast);
   --tree-button-bg: var(--tree-button-accent);
   --tree-button-text: var(--tree-button-accent-contrast);
   --tree-button-border: transparent;
   --tree-button-shadow: transparent;
+  /* Interaction state defaults, so every variant has a hover and a press
+     without any of them writing a fallback. A variant that wants different
+     feedback redefines these; one that does not still gets a visible state.
+     Before this, `--tree-button-bg` was never reassigned on hover and the only
+     feedback any variant had was a 1px lift. */
+  --tree-button-bg-hover: var(--tree-button-accent-hover);
+  --tree-button-bg-press: var(--tree-button-accent-press);
+  --tree-button-text-hover: var(--tree-button-text);
+  --tree-button-text-press: var(--tree-button-text);
+  --tree-button-border-hover: var(--tree-button-border);
+  --tree-button-border-press: var(--tree-button-border);
+  --tree-button-bg-disabled: var(--tree-color-state-disabled-bg);
+  --tree-button-border-disabled: var(--tree-color-state-disabled-border);
   position: relative;
   display: inline-flex;
   align-items: center;
@@ -121,7 +141,21 @@ table.t-visually-hidden {
 }
 
 .t-button:hover:not(.is-disabled) {
+  background: var(--tree-button-bg-hover);
+  color: var(--tree-button-text-hover);
+  border-color: var(--tree-button-border-hover);
   transform: translateY(-1px);
+}
+
+/* Press. There was no `:active` rule anywhere in the library — a button that
+   is being held looked exactly like one that is not. The press fill is a
+   bigger step than hover (see STEP in @treeui/tokens/states.ts) and the lift
+   drops, so the control reads as pushed in rather than further out. */
+.t-button:active:not(.is-disabled) {
+  background: var(--tree-button-bg-press);
+  color: var(--tree-button-text-press);
+  border-color: var(--tree-button-border-press);
+  transform: translateY(0);
 }
 
 .t-button:focus-visible {
@@ -129,8 +163,14 @@ table.t-visually-hidden {
   box-shadow: 0 0 0 var(--tree-focus-ring-width) var(--tree-color-focus-ring);
 }
 
+/* Disabled is a colour, not an opacity. `opacity: 0.65` over muted ink
+   measured roughly 2.2:1 against the surface and was invisible to every
+   contrast check, because opacity is not a colour. These three tokens are
+   derived and held at the 3:1 UI floor. */
 .t-button.is-disabled {
-  opacity: 0.65;
+  background: var(--tree-button-bg-disabled);
+  color: var(--tree-color-state-disabled-fg);
+  border-color: var(--tree-button-border-disabled);
   cursor: not-allowed;
 }
 
@@ -183,27 +223,47 @@ table.t-visually-hidden {
   --tree-button-text: var(--tree-button-accent-contrast);
 }
 
+/* The quiet variants hover and press on the neutral state surfaces rather than
+   on the accent — an outline button that fills with brand on hover reads as a
+   different button, not as the same button being pointed at. */
 .t-button--outline {
   --tree-button-bg: var(--tree-color-bg-surface);
   --tree-button-text: var(--tree-color-text-primary);
   --tree-button-border: var(--tree-color-border-default);
+  --tree-button-bg-hover: var(--tree-color-state-hover-bg);
+  --tree-button-bg-press: var(--tree-color-state-press-bg);
+  --tree-button-border-hover: var(--tree-color-border-strong);
+  --tree-button-border-press: var(--tree-color-border-strong);
 }
 
 .t-button--ghost {
   --tree-button-bg: transparent;
   --tree-button-text: var(--tree-color-text-primary);
+  --tree-button-bg-hover: var(--tree-color-state-hover-bg);
+  --tree-button-bg-press: var(--tree-color-state-press-bg);
+  /* A ghost button has no fill at rest, so it has none when disabled either. */
+  --tree-button-bg-disabled: transparent;
+  --tree-button-border-disabled: transparent;
 }
 
+/* The tint deepens and its ink deepens with it, because a tint has only so
+   much headroom before the label stops clearing AA on it. */
 .t-button--soft {
   --tree-button-bg: var(--tree-button-accent-soft);
-  --tree-button-text: var(--tree-button-accent);
+  --tree-button-bg-hover: var(--tree-button-accent-soft-hover);
+  --tree-button-bg-press: var(--tree-button-accent-soft-press);
+  --tree-button-text: var(--tree-button-accent-on-soft);
+  --tree-button-text-hover: var(--tree-button-accent-on-soft-hover);
+  --tree-button-text-press: var(--tree-button-accent-on-soft-press);
 }
 
 /* Deprecated in favour of `variant="solid" tone="danger"`, which composes.
    Kept working, and kept identical, until the next major. */
 .t-button--danger {
   --tree-button-bg: var(--tree-color-status-error);
-  --tree-button-text: var(--tree-color-brand-contrast);
+  --tree-button-bg-hover: var(--tree-color-status-error-hover);
+  --tree-button-bg-press: var(--tree-color-status-error-press);
+  --tree-button-text: var(--tree-color-status-error-contrast);
 }
 
 /* Tone only changes the ink on the quiet variants — a ghost or outline button
@@ -218,46 +278,111 @@ table.t-visually-hidden {
   --tree-button-text: var(--tree-button-accent);
 }
 
+/* `soft` accepted `tone` and rendered nothing — the same silent no-op the tone
+   axis existed to kill, one level down. It tints the same way it does for the
+   brand: accent ink on the accent's soft tint. */
+.t-button.has-tone.t-button--soft {
+  --tree-button-bg: var(--tree-button-accent-soft);
+  --tree-button-text: var(--tree-button-accent-on-soft);
+}
+
 .t-button--tone-neutral {
   --tree-button-accent: var(--tree-color-text-primary);
+  --tree-button-accent-hover: var(--tree-color-text-primary);
+  --tree-button-accent-press: var(--tree-color-text-primary);
   --tree-button-accent-soft: var(--tree-color-bg-subtle);
+  --tree-button-accent-soft-hover: var(--tree-color-state-hover-bg);
+  --tree-button-accent-soft-press: var(--tree-color-state-press-bg);
+  --tree-button-accent-on-soft: var(--tree-color-text-primary);
+  --tree-button-accent-on-soft-hover: var(--tree-color-text-primary);
+  --tree-button-accent-on-soft-press: var(--tree-color-text-primary);
   --tree-button-accent-contrast: var(--tree-color-text-inverse);
 }
 
 .t-button--tone-brand {
   --tree-button-accent: var(--tree-color-brand-primary);
+  --tree-button-accent-hover: var(--tree-color-brand-hover);
+  --tree-button-accent-press: var(--tree-color-brand-press);
   --tree-button-accent-soft: var(--tree-color-brand-soft);
+  --tree-button-accent-soft-hover: var(--tree-color-brand-soft-hover);
+  --tree-button-accent-soft-press: var(--tree-color-brand-soft-press);
+  --tree-button-accent-on-soft: var(--tree-color-brand-on-soft);
+  --tree-button-accent-on-soft-hover: var(--tree-color-brand-on-soft-hover);
+  --tree-button-accent-on-soft-press: var(--tree-color-brand-on-soft-press);
   --tree-button-accent-contrast: var(--tree-color-brand-contrast);
 }
 
 .t-button--tone-accent {
   --tree-button-accent: var(--tree-color-accent-primary);
+  --tree-button-accent-hover: var(--tree-color-accent-hover);
+  --tree-button-accent-press: var(--tree-color-accent-press);
   --tree-button-accent-soft: var(--tree-color-accent-soft);
+  --tree-button-accent-soft-hover: var(--tree-color-accent-soft-hover);
+  --tree-button-accent-soft-press: var(--tree-color-accent-soft-press);
+  --tree-button-accent-on-soft: var(--tree-color-accent-on-soft);
+  --tree-button-accent-on-soft-hover: var(--tree-color-accent-on-soft-hover);
+  --tree-button-accent-on-soft-press: var(--tree-color-accent-on-soft-press);
   --tree-button-accent-contrast: var(--tree-color-accent-contrast);
 }
 
 .t-button--tone-success {
   --tree-button-accent: var(--tree-color-status-success);
-  --tree-button-accent-soft: color-mix(in srgb, var(--tree-color-status-success) 14%, var(--tree-color-bg-surface));
-  --tree-button-accent-contrast: var(--tree-color-text-inverse);
+  --tree-button-accent-hover: var(--tree-color-status-success-hover);
+  --tree-button-accent-press: var(--tree-color-status-success-press);
+  --tree-button-accent-soft: var(--tree-color-status-success-soft);
+  --tree-button-accent-soft-hover: var(--tree-color-status-success-soft-hover);
+  --tree-button-accent-soft-press: var(--tree-color-status-success-soft-hover);
+  --tree-button-accent-on-soft: var(--tree-color-status-success-on-soft);
+  --tree-button-accent-on-soft-hover: var(--tree-color-status-success-on-soft-hover);
+  --tree-button-accent-on-soft-press: var(--tree-color-status-success-on-soft-hover);
+  /* Computed per theme, not `text-inverse`: white on the light warning
+     measured 4.87:1 and would break on any lighter amber. */
+  --tree-button-accent-contrast: var(--tree-color-status-success-contrast);
 }
 
 .t-button--tone-warning {
   --tree-button-accent: var(--tree-color-status-warning);
-  --tree-button-accent-soft: color-mix(in srgb, var(--tree-color-status-warning) 14%, var(--tree-color-bg-surface));
-  --tree-button-accent-contrast: var(--tree-color-text-inverse);
+  --tree-button-accent-hover: var(--tree-color-status-warning-hover);
+  --tree-button-accent-press: var(--tree-color-status-warning-press);
+  --tree-button-accent-soft: var(--tree-color-status-warning-soft);
+  --tree-button-accent-soft-hover: var(--tree-color-status-warning-soft-hover);
+  --tree-button-accent-soft-press: var(--tree-color-status-warning-soft-hover);
+  --tree-button-accent-on-soft: var(--tree-color-status-warning-on-soft);
+  --tree-button-accent-on-soft-hover: var(--tree-color-status-warning-on-soft-hover);
+  --tree-button-accent-on-soft-press: var(--tree-color-status-warning-on-soft-hover);
+  /* Computed per theme, not `text-inverse`: white on the light warning
+     measured 4.87:1 and would break on any lighter amber. */
+  --tree-button-accent-contrast: var(--tree-color-status-warning-contrast);
 }
 
 .t-button--tone-danger {
   --tree-button-accent: var(--tree-color-status-error);
-  --tree-button-accent-soft: color-mix(in srgb, var(--tree-color-status-error) 14%, var(--tree-color-bg-surface));
-  --tree-button-accent-contrast: var(--tree-color-text-inverse);
+  --tree-button-accent-hover: var(--tree-color-status-error-hover);
+  --tree-button-accent-press: var(--tree-color-status-error-press);
+  --tree-button-accent-soft: var(--tree-color-status-error-soft);
+  --tree-button-accent-soft-hover: var(--tree-color-status-error-soft-hover);
+  --tree-button-accent-soft-press: var(--tree-color-status-error-soft-hover);
+  --tree-button-accent-on-soft: var(--tree-color-status-error-on-soft);
+  --tree-button-accent-on-soft-hover: var(--tree-color-status-error-on-soft-hover);
+  --tree-button-accent-on-soft-press: var(--tree-color-status-error-on-soft-hover);
+  /* Computed per theme, not `text-inverse`: white on the light warning
+     measured 4.87:1 and would break on any lighter amber. */
+  --tree-button-accent-contrast: var(--tree-color-status-error-contrast);
 }
 
 .t-button--tone-info {
   --tree-button-accent: var(--tree-color-status-info);
-  --tree-button-accent-soft: color-mix(in srgb, var(--tree-color-status-info) 14%, var(--tree-color-bg-surface));
-  --tree-button-accent-contrast: var(--tree-color-text-inverse);
+  --tree-button-accent-hover: var(--tree-color-status-info-hover);
+  --tree-button-accent-press: var(--tree-color-status-info-press);
+  --tree-button-accent-soft: var(--tree-color-status-info-soft);
+  --tree-button-accent-soft-hover: var(--tree-color-status-info-soft-hover);
+  --tree-button-accent-soft-press: var(--tree-color-status-info-soft-hover);
+  --tree-button-accent-on-soft: var(--tree-color-status-info-on-soft);
+  --tree-button-accent-on-soft-hover: var(--tree-color-status-info-on-soft-hover);
+  --tree-button-accent-on-soft-press: var(--tree-color-status-info-on-soft-hover);
+  /* Computed per theme, not `text-inverse`: white on the light warning
+     measured 4.87:1 and would break on any lighter amber. */
+  --tree-button-accent-contrast: var(--tree-color-status-info-contrast);
 }
 
 .t-button--brand {
@@ -305,7 +430,7 @@ table.t-visually-hidden {
   min-inline-size: 0;
   min-height: var(--tree-size-control-md);
   padding-inline: var(--tree-space-3);
-  border: var(--tree-border-width-subtle) solid var(--tree-color-border-default);
+  border: var(--tree-border-width-subtle) solid var(--tree-color-border-interactive);
   border-radius: var(--tree-radius-md);
   background: var(--tree-color-bg-surface);
   color: var(--tree-color-text-primary);
@@ -324,7 +449,9 @@ table.t-visually-hidden {
 }
 
 .t-input.is-disabled {
-  opacity: 0.68;
+  background: var(--tree-color-state-disabled-bg);
+  color: var(--tree-color-state-disabled-fg);
+  border-color: var(--tree-color-state-disabled-border);
   cursor: not-allowed;
 }
 
@@ -421,7 +548,7 @@ table.t-visually-hidden {
   min-height: 2.5rem;
   width: 100%;
   padding: 0 var(--tree-space-3);
-  border: var(--tree-border-width-subtle) solid var(--tree-color-border-default);
+  border: var(--tree-border-width-subtle) solid var(--tree-color-border-interactive);
   border-radius: var(--tree-radius-md);
   background: var(--tree-color-bg-surface);
   color: var(--tree-color-text-primary);
@@ -439,7 +566,9 @@ table.t-visually-hidden {
 }
 
 .t-date-time-picker__select:disabled {
-  opacity: 0.68;
+  background: var(--tree-color-state-disabled-bg);
+  color: var(--tree-color-state-disabled-fg);
+  border-color: var(--tree-color-state-disabled-border);
   cursor: not-allowed;
 }
 
@@ -496,7 +625,7 @@ table.t-visually-hidden {
 .t-file-upload.is-drag-reject .t-file-upload__dropzone {
   border-color: var(--tree-color-status-error);
   border-style: solid;
-  background: color-mix(in srgb, var(--tree-color-status-error) 10%, var(--tree-color-bg-surface));
+  background: var(--tree-color-status-error-soft);
   box-shadow: 0 0 0 6px color-mix(in srgb, var(--tree-color-status-error) 24%, transparent);
   transform: translateY(-2px);
 }
@@ -511,7 +640,7 @@ table.t-visually-hidden {
 }
 
 .t-file-upload.is-disabled .t-file-upload__dropzone {
-  opacity: 0.68;
+  opacity: var(--tree-opacity-disabled);
   cursor: not-allowed;
 }
 
@@ -684,11 +813,11 @@ table.t-visually-hidden {
 
 .t-file-upload__file.is-error {
   border-color: var(--tree-color-status-error);
-  background: color-mix(in srgb, var(--tree-color-status-error) 8%, var(--tree-color-bg-surface));
+  background: var(--tree-color-status-error-soft);
 }
 
 .t-file-upload__file.is-success {
-  border-color: color-mix(in srgb, var(--tree-color-status-success) 45%, var(--tree-color-border-default));
+  border-color: var(--tree-color-status-success-border);
 }
 
 .t-file-upload__file.is-error .t-file-upload__file-status {
@@ -765,7 +894,7 @@ table.t-visually-hidden {
 .t-file-upload__clear:disabled,
 .t-file-upload__remove:disabled,
 .t-file-upload__retry:disabled {
-  opacity: 0.5;
+  opacity: var(--tree-opacity-disabled);
   cursor: not-allowed;
 }
 
@@ -819,7 +948,7 @@ table.t-visually-hidden {
   gap: var(--tree-space-2);
   width: 100%;
   padding: var(--tree-space-2) var(--tree-space-3);
-  border: var(--tree-border-width-subtle) solid var(--tree-color-border-default);
+  border: var(--tree-border-width-subtle) solid var(--tree-color-border-interactive);
   border-radius: var(--tree-radius-md);
   background: var(--tree-color-bg-surface);
   color: var(--tree-color-text-primary);
@@ -838,7 +967,9 @@ table.t-visually-hidden {
 }
 
 .t-textarea.is-disabled {
-  opacity: 0.68;
+  background: var(--tree-color-state-disabled-bg);
+  color: var(--tree-color-state-disabled-fg);
+  border-color: var(--tree-color-state-disabled-border);
   cursor: not-allowed;
 }
 
@@ -898,7 +1029,7 @@ table.t-visually-hidden {
   width: 100%;
   min-height: var(--tree-size-control-md);
   padding-inline: var(--tree-space-3);
-  border: var(--tree-border-width-subtle) solid var(--tree-color-border-default);
+  border: var(--tree-border-width-subtle) solid var(--tree-color-border-interactive);
   border-radius: var(--tree-radius-md);
   background: var(--tree-color-bg-surface);
   color: var(--tree-color-text-primary);
@@ -917,7 +1048,9 @@ table.t-visually-hidden {
 }
 
 .t-date-picker.is-disabled .t-date-picker__trigger {
-  opacity: 0.68;
+  background: var(--tree-color-state-disabled-bg);
+  color: var(--tree-color-state-disabled-fg);
+  border-color: var(--tree-color-state-disabled-border);
   cursor: not-allowed;
 }
 
@@ -1029,7 +1162,7 @@ table.t-visually-hidden {
 
 .t-date-picker__nav:disabled,
 .t-date-picker__day:disabled {
-  opacity: 0.45;
+  color: var(--tree-color-state-disabled-fg);
   cursor: not-allowed;
 }
 
@@ -1210,7 +1343,7 @@ table.t-visually-hidden {
 }
 
 .t-modal__close:hover {
-  background: var(--tree-color-bg-subtle);
+  background: var(--tree-color-state-hover-bg);
   color: var(--tree-color-text-primary);
 }
 
@@ -1502,19 +1635,19 @@ a.t-brand-lockup:focus-visible {
 }
 .t-link-tile--success {
   --tree-link-tile-accent: var(--tree-color-status-success);
-  --tree-link-tile-accent-soft: color-mix(in srgb, var(--tree-color-status-success) 14%, var(--tree-color-bg-surface));
+  --tree-link-tile-accent-soft: var(--tree-color-status-success-soft);
 }
 .t-link-tile--warning {
   --tree-link-tile-accent: var(--tree-color-status-warning);
-  --tree-link-tile-accent-soft: color-mix(in srgb, var(--tree-color-status-warning) 14%, var(--tree-color-bg-surface));
+  --tree-link-tile-accent-soft: var(--tree-color-status-warning-soft);
 }
 .t-link-tile--danger {
   --tree-link-tile-accent: var(--tree-color-status-error);
-  --tree-link-tile-accent-soft: color-mix(in srgb, var(--tree-color-status-error) 14%, var(--tree-color-bg-surface));
+  --tree-link-tile-accent-soft: var(--tree-color-status-error-soft);
 }
 .t-link-tile--info {
   --tree-link-tile-accent: var(--tree-color-status-info);
-  --tree-link-tile-accent-soft: color-mix(in srgb, var(--tree-color-status-info) 14%, var(--tree-color-bg-surface));
+  --tree-link-tile-accent-soft: var(--tree-color-status-info-soft);
 }
 
 /* ─── List (non-selectable content list) ─── */
@@ -1647,7 +1780,11 @@ a.t-brand-lockup:focus-visible {
 
 .t-menu-item:hover:not(.is-disabled),
 .t-menu-item:focus-visible {
-  background: var(--tree-color-bg-subtle);
+  background: var(--tree-color-state-hover-bg);
+}
+
+.t-menu-item:active:not(.is-disabled) {
+  background: var(--tree-color-state-press-bg);
 }
 
 .t-menu-item:focus-visible {
@@ -1656,8 +1793,7 @@ a.t-brand-lockup:focus-visible {
 }
 
 .t-menu-item.is-disabled {
-  color: var(--tree-color-text-muted);
-  opacity: 0.65;
+  color: var(--tree-color-state-disabled-fg);
   cursor: not-allowed;
 }
 
@@ -1667,7 +1803,7 @@ a.t-brand-lockup:focus-visible {
 
 .t-menu-item--danger:hover:not(.is-disabled),
 .t-menu-item--danger:focus-visible {
-  background: color-mix(in srgb, var(--tree-color-status-error) 12%, var(--tree-color-bg-surface));
+  background: var(--tree-color-status-error-soft);
 }
 
 .t-menu-item__leading {
@@ -1866,7 +2002,7 @@ a.t-brand-lockup:focus-visible {
   width: 2.75rem;
   height: 2.75rem;
   border-radius: var(--tree-radius-pill);
-  background: color-mix(in srgb, var(--tree-color-status-error) 12%, var(--tree-color-bg-surface));
+  background: var(--tree-color-status-error-soft);
   color: var(--tree-color-status-error);
 }
 
@@ -2017,7 +2153,7 @@ a.t-brand-lockup:focus-visible {
   --tree-badge-ghost-text: var(--tree-color-text-muted);
   --tree-badge-soft-bg: var(--tree-color-brand-soft);
   --tree-badge-soft-text: var(--tree-color-brand-primary);
-  --tree-badge-danger-bg: color-mix(in srgb, var(--tree-color-status-error) 16%, var(--tree-color-bg-surface));
+  --tree-badge-danger-bg: var(--tree-color-status-error-soft);
   --tree-badge-danger-text: var(--tree-color-status-error);
   display: inline-flex;
   align-items: center;
@@ -2033,42 +2169,42 @@ a.t-brand-lockup:focus-visible {
 .t-badge--tone-success {
   --tree-badge-solid-bg: var(--tree-color-status-success);
   --tree-badge-outline-text: var(--tree-color-status-success);
-  --tree-badge-outline-border: color-mix(in srgb, var(--tree-color-status-success) 36%, var(--tree-color-border-default));
+  --tree-badge-outline-border: var(--tree-color-status-success-border);
   --tree-badge-ghost-text: var(--tree-color-status-success);
-  --tree-badge-soft-bg: color-mix(in srgb, var(--tree-color-status-success) 14%, var(--tree-color-bg-surface));
+  --tree-badge-soft-bg: var(--tree-color-status-success-soft);
   --tree-badge-soft-text: var(--tree-color-status-success);
-  --tree-badge-danger-bg: color-mix(in srgb, var(--tree-color-status-success) 18%, var(--tree-color-bg-surface));
+  --tree-badge-danger-bg: var(--tree-color-status-success-soft);
   --tree-badge-danger-text: var(--tree-color-status-success);
 }
 
 .t-badge--tone-warning {
   --tree-badge-solid-bg: var(--tree-color-status-warning);
   --tree-badge-outline-text: var(--tree-color-status-warning);
-  --tree-badge-outline-border: color-mix(in srgb, var(--tree-color-status-warning) 36%, var(--tree-color-border-default));
+  --tree-badge-outline-border: var(--tree-color-status-warning-border);
   --tree-badge-ghost-text: var(--tree-color-status-warning);
-  --tree-badge-soft-bg: color-mix(in srgb, var(--tree-color-status-warning) 14%, var(--tree-color-bg-surface));
+  --tree-badge-soft-bg: var(--tree-color-status-warning-soft);
   --tree-badge-soft-text: var(--tree-color-status-warning);
-  --tree-badge-danger-bg: color-mix(in srgb, var(--tree-color-status-warning) 18%, var(--tree-color-bg-surface));
+  --tree-badge-danger-bg: var(--tree-color-status-warning-soft);
   --tree-badge-danger-text: var(--tree-color-status-warning);
 }
 
 .t-badge--tone-danger {
   --tree-badge-solid-bg: var(--tree-color-status-error);
   --tree-badge-outline-text: var(--tree-color-status-error);
-  --tree-badge-outline-border: color-mix(in srgb, var(--tree-color-status-error) 36%, var(--tree-color-border-default));
+  --tree-badge-outline-border: var(--tree-color-status-error-border);
   --tree-badge-ghost-text: var(--tree-color-status-error);
-  --tree-badge-soft-bg: color-mix(in srgb, var(--tree-color-status-error) 14%, var(--tree-color-bg-surface));
+  --tree-badge-soft-bg: var(--tree-color-status-error-soft);
   --tree-badge-soft-text: var(--tree-color-status-error);
 }
 
 .t-badge--tone-info {
   --tree-badge-solid-bg: var(--tree-color-status-info);
   --tree-badge-outline-text: var(--tree-color-status-info);
-  --tree-badge-outline-border: color-mix(in srgb, var(--tree-color-status-info) 36%, var(--tree-color-border-default));
+  --tree-badge-outline-border: var(--tree-color-status-info-border);
   --tree-badge-ghost-text: var(--tree-color-status-info);
-  --tree-badge-soft-bg: color-mix(in srgb, var(--tree-color-status-info) 14%, var(--tree-color-bg-surface));
+  --tree-badge-soft-bg: var(--tree-color-status-info-soft);
   --tree-badge-soft-text: var(--tree-color-status-info);
-  --tree-badge-danger-bg: color-mix(in srgb, var(--tree-color-status-info) 18%, var(--tree-color-bg-surface));
+  --tree-badge-danger-bg: var(--tree-color-status-info-soft);
   --tree-badge-danger-text: var(--tree-color-status-info);
 }
 
@@ -2424,7 +2560,7 @@ a.t-brand-lockup:focus-visible {
 }
 
 .t-drawer__close:hover {
-  background: var(--tree-color-bg-subtle);
+  background: var(--tree-color-state-hover-bg);
   color: var(--tree-color-text-primary);
 }
 
@@ -2495,7 +2631,7 @@ a.t-brand-lockup:focus-visible {
 }
 
 .t-checkbox.is-disabled {
-  opacity: 0.65;
+  color: var(--tree-color-state-disabled-fg);
   cursor: not-allowed;
 }
 
@@ -2519,7 +2655,7 @@ a.t-brand-lockup:focus-visible {
   width: 1.25rem;
   height: 1.25rem;
   flex-shrink: 0;
-  border: var(--tree-border-width-subtle) solid var(--tree-color-border-default);
+  border: var(--tree-border-width-subtle) solid var(--tree-color-border-interactive);
   border-radius: var(--tree-radius-sm);
   background: var(--tree-color-bg-surface);
   color: var(--tree-color-brand-contrast);
@@ -2607,7 +2743,7 @@ a.t-brand-lockup:focus-visible {
 }
 
 .t-radio.is-disabled {
-  opacity: 0.65;
+  color: var(--tree-color-state-disabled-fg);
   cursor: not-allowed;
 }
 
@@ -2631,7 +2767,7 @@ a.t-brand-lockup:focus-visible {
   width: 1.25rem;
   height: 1.25rem;
   flex-shrink: 0;
-  border: var(--tree-border-width-subtle) solid var(--tree-color-border-default);
+  border: var(--tree-border-width-subtle) solid var(--tree-color-border-interactive);
   border-radius: var(--tree-radius-pill);
   background: var(--tree-color-bg-surface);
   transition:
@@ -2728,7 +2864,7 @@ a.t-brand-lockup:focus-visible {
 }
 
 .t-switch.is-disabled {
-  opacity: 0.65;
+  color: var(--tree-color-state-disabled-fg);
   cursor: not-allowed;
 }
 
@@ -2857,7 +2993,7 @@ a.t-brand-lockup:focus-visible {
   width: 100%;
   min-height: var(--tree-size-control-md);
   padding-inline: var(--tree-space-3);
-  border: var(--tree-border-width-subtle) solid var(--tree-color-border-default);
+  border: var(--tree-border-width-subtle) solid var(--tree-color-border-interactive);
   border-radius: var(--tree-radius-md);
   background: var(--tree-color-bg-surface);
   color: var(--tree-color-text-primary);
@@ -2886,7 +3022,9 @@ a.t-brand-lockup:focus-visible {
 }
 
 .t-combobox.is-disabled .t-combobox__control {
-  opacity: 0.68;
+  background: var(--tree-color-state-disabled-bg);
+  color: var(--tree-color-state-disabled-fg);
+  border-color: var(--tree-color-state-disabled-border);
   cursor: not-allowed;
 }
 
@@ -2976,7 +3114,7 @@ a.t-brand-lockup:focus-visible {
 }
 
 .t-combobox__option.is-disabled {
-  opacity: 0.5;
+  color: var(--tree-color-state-disabled-fg);
   cursor: not-allowed;
 }
 
@@ -3046,7 +3184,7 @@ a.t-brand-lockup:focus-visible {
   width: 100%;
   min-height: var(--tree-size-control-md);
   padding-inline: var(--tree-space-3);
-  border: var(--tree-border-width-subtle) solid var(--tree-color-border-default);
+  border: var(--tree-border-width-subtle) solid var(--tree-color-border-interactive);
   border-radius: var(--tree-radius-md);
   background: var(--tree-color-bg-surface);
   color: var(--tree-color-text-primary);
@@ -3079,7 +3217,9 @@ a.t-brand-lockup:focus-visible {
 }
 
 .t-select.is-disabled .t-select__trigger {
-  opacity: 0.68;
+  background: var(--tree-color-state-disabled-bg);
+  color: var(--tree-color-state-disabled-fg);
+  border-color: var(--tree-color-state-disabled-border);
   cursor: not-allowed;
 }
 
@@ -3177,7 +3317,7 @@ a.t-brand-lockup:focus-visible {
 }
 
 .t-select__option.is-disabled {
-  opacity: 0.5;
+  color: var(--tree-color-state-disabled-fg);
   cursor: not-allowed;
 }
 
@@ -3216,7 +3356,7 @@ a.t-brand-lockup:focus-visible {
 }
 
 .t-form-field.is-disabled {
-  opacity: 0.65;
+  opacity: var(--tree-opacity-disabled);
 }
 
 .t-form-field__label {
@@ -3331,29 +3471,29 @@ a.t-brand-lockup:focus-visible {
 }
 
 .t-alert--info {
-  --tree-alert-bg: color-mix(in srgb, var(--tree-color-status-info) 10%, var(--tree-color-bg-surface));
-  --tree-alert-border: color-mix(in srgb, var(--tree-color-status-info) 30%, var(--tree-color-border-default));
+  --tree-alert-bg: var(--tree-color-status-info-soft);
+  --tree-alert-border: var(--tree-color-status-info-border);
   --tree-alert-text: var(--tree-color-text-primary);
   --tree-alert-accent: var(--tree-color-status-info);
 }
 
 .t-alert--success {
-  --tree-alert-bg: color-mix(in srgb, var(--tree-color-status-success) 10%, var(--tree-color-bg-surface));
-  --tree-alert-border: color-mix(in srgb, var(--tree-color-status-success) 30%, var(--tree-color-border-default));
+  --tree-alert-bg: var(--tree-color-status-success-soft);
+  --tree-alert-border: var(--tree-color-status-success-border);
   --tree-alert-text: var(--tree-color-text-primary);
   --tree-alert-accent: var(--tree-color-status-success);
 }
 
 .t-alert--warning {
-  --tree-alert-bg: color-mix(in srgb, var(--tree-color-status-warning) 10%, var(--tree-color-bg-surface));
-  --tree-alert-border: color-mix(in srgb, var(--tree-color-status-warning) 30%, var(--tree-color-border-default));
+  --tree-alert-bg: var(--tree-color-status-warning-soft);
+  --tree-alert-border: var(--tree-color-status-warning-border);
   --tree-alert-text: var(--tree-color-text-primary);
   --tree-alert-accent: var(--tree-color-status-warning);
 }
 
 .t-alert--danger {
-  --tree-alert-bg: color-mix(in srgb, var(--tree-color-status-error) 10%, var(--tree-color-bg-surface));
-  --tree-alert-border: color-mix(in srgb, var(--tree-color-status-error) 30%, var(--tree-color-border-default));
+  --tree-alert-bg: var(--tree-color-status-error-soft);
+  --tree-alert-border: var(--tree-color-status-error-border);
   --tree-alert-text: var(--tree-color-text-primary);
   --tree-alert-accent: var(--tree-color-status-error);
 }
@@ -3413,7 +3553,7 @@ a.t-brand-lockup:focus-visible {
 
 .t-skeleton {
   display: inline-block;
-  background: color-mix(in srgb, var(--tree-color-text-primary) 12%, var(--tree-color-bg-surface));
+  background: var(--tree-color-state-press-bg);
   border-radius: var(--tree-radius-md);
   line-height: 1;
   overflow: hidden;
@@ -3446,7 +3586,7 @@ a.t-brand-lockup:focus-visible {
     opacity: 1;
   }
   50% {
-    opacity: 0.4;
+    opacity: 0.5;
   }
   100% {
     opacity: 1;
@@ -3539,28 +3679,28 @@ a.t-brand-lockup:focus-visible {
 
 .t-toast--info {
   --tree-toast-bg: var(--tree-color-bg-surface);
-  --tree-toast-border: color-mix(in srgb, var(--tree-color-status-info) 30%, var(--tree-color-border-default));
+  --tree-toast-border: var(--tree-color-status-info-border);
   --tree-toast-text: var(--tree-color-text-primary);
   --tree-toast-accent: var(--tree-color-status-info);
 }
 
 .t-toast--success {
   --tree-toast-bg: var(--tree-color-bg-surface);
-  --tree-toast-border: color-mix(in srgb, var(--tree-color-status-success) 30%, var(--tree-color-border-default));
+  --tree-toast-border: var(--tree-color-status-success-border);
   --tree-toast-text: var(--tree-color-text-primary);
   --tree-toast-accent: var(--tree-color-status-success);
 }
 
 .t-toast--warning {
   --tree-toast-bg: var(--tree-color-bg-surface);
-  --tree-toast-border: color-mix(in srgb, var(--tree-color-status-warning) 30%, var(--tree-color-border-default));
+  --tree-toast-border: var(--tree-color-status-warning-border);
   --tree-toast-text: var(--tree-color-text-primary);
   --tree-toast-accent: var(--tree-color-status-warning);
 }
 
 .t-toast--danger {
   --tree-toast-bg: var(--tree-color-bg-surface);
-  --tree-toast-border: color-mix(in srgb, var(--tree-color-status-error) 30%, var(--tree-color-border-default));
+  --tree-toast-border: var(--tree-color-status-error-border);
   --tree-toast-text: var(--tree-color-text-primary);
   --tree-toast-accent: var(--tree-color-status-error);
 }
@@ -3624,7 +3764,7 @@ a.t-brand-lockup:focus-visible {
 }
 
 .t-toast__close:hover {
-  background: var(--tree-color-bg-subtle);
+  background: var(--tree-color-state-hover-bg);
   color: var(--tree-color-text-primary);
 }
 
@@ -3710,8 +3850,12 @@ a.t-brand-lockup:focus-visible {
 }
 
 .t-pagination__button:hover:not(:disabled):not(.is-active) {
-  background: var(--tree-color-bg-subtle);
+  background: var(--tree-color-state-hover-bg);
   border-color: var(--tree-color-border-strong);
+}
+
+.t-pagination__button:active:not(:disabled):not(.is-active) {
+  background: var(--tree-color-state-press-bg);
 }
 
 .t-pagination__button:focus-visible {
@@ -3726,7 +3870,7 @@ a.t-brand-lockup:focus-visible {
 }
 
 .t-pagination__button:disabled {
-  opacity: 0.5;
+  color: var(--tree-color-state-disabled-fg);
   cursor: not-allowed;
 }
 
@@ -3788,7 +3932,7 @@ a.t-brand-lockup:focus-visible {
 /* ── Disabled state ── */
 
 .t-pagination.is-disabled {
-  opacity: 0.5;
+  opacity: var(--tree-opacity-disabled);
   pointer-events: none;
 }
 
@@ -3813,7 +3957,7 @@ a.t-brand-lockup:focus-visible {
   gap: var(--tree-space-2);
   min-height: var(--tree-size-control-md);
   padding-inline: var(--tree-space-3);
-  border: var(--tree-border-width-subtle) solid var(--tree-color-border-default);
+  border: var(--tree-border-width-subtle) solid var(--tree-color-border-interactive);
   border-radius: var(--tree-radius-md);
   background: var(--tree-color-bg-surface);
   color: var(--tree-color-text-primary);
@@ -3836,7 +3980,9 @@ a.t-brand-lockup:focus-visible {
 }
 
 .t-dropdown.is-disabled .t-dropdown__trigger {
-  opacity: 0.68;
+  background: var(--tree-color-state-disabled-bg);
+  color: var(--tree-color-state-disabled-fg);
+  border-color: var(--tree-color-state-disabled-border);
   cursor: not-allowed;
 }
 
@@ -3943,7 +4089,7 @@ a.t-brand-lockup:focus-visible {
 }
 
 .t-dropdown__item.is-disabled {
-  opacity: 0.5;
+  color: var(--tree-color-state-disabled-fg);
   cursor: not-allowed;
 }
 
@@ -4211,7 +4357,7 @@ a.t-brand-lockup:focus-visible {
 }
 
 .t-accordion__trigger:disabled {
-  opacity: 0.65;
+  color: var(--tree-color-state-disabled-fg);
   cursor: not-allowed;
 }
 
@@ -4236,7 +4382,7 @@ a.t-brand-lockup:focus-visible {
 }
 
 .t-accordion__item.is-disabled .t-accordion__trigger {
-  opacity: 0.65;
+  color: var(--tree-color-state-disabled-fg);
   cursor: not-allowed;
 }
 
@@ -4409,7 +4555,7 @@ a.t-brand-lockup:focus-visible {
 
 .t-tabs__tab.is-disabled,
 .t-tabs__tab[disabled] {
-  opacity: 0.5;
+  color: var(--tree-color-state-disabled-fg);
   cursor: not-allowed;
 }
 
@@ -4471,7 +4617,7 @@ a.t-brand-lockup:focus-visible {
 }
 
 .t-context-menu__item.is-disabled {
-  opacity: 0.5;
+  color: var(--tree-color-state-disabled-fg);
   cursor: not-allowed;
 }
 
@@ -4708,34 +4854,34 @@ a.t-brand-lockup:focus-visible {
 
 .t-tag--tone-success {
   --tree-tag-fg: var(--tree-color-status-success);
-  --tree-tag-surface: color-mix(in srgb, var(--tree-color-status-success) 14%, var(--tree-color-bg-surface));
+  --tree-tag-surface: var(--tree-color-status-success-soft);
   --tree-tag-solid: var(--tree-color-status-success);
   --tree-tag-on-solid: var(--tree-color-text-inverse);
-  --tree-tag-border: color-mix(in srgb, var(--tree-color-status-success) 36%, var(--tree-color-border-default));
+  --tree-tag-border: var(--tree-color-status-success-border);
 }
 
 .t-tag--tone-warning {
   --tree-tag-fg: var(--tree-color-status-warning);
-  --tree-tag-surface: color-mix(in srgb, var(--tree-color-status-warning) 14%, var(--tree-color-bg-surface));
+  --tree-tag-surface: var(--tree-color-status-warning-soft);
   --tree-tag-solid: var(--tree-color-status-warning);
   --tree-tag-on-solid: var(--tree-color-text-inverse);
-  --tree-tag-border: color-mix(in srgb, var(--tree-color-status-warning) 36%, var(--tree-color-border-default));
+  --tree-tag-border: var(--tree-color-status-warning-border);
 }
 
 .t-tag--tone-danger {
   --tree-tag-fg: var(--tree-color-status-error);
-  --tree-tag-surface: color-mix(in srgb, var(--tree-color-status-error) 14%, var(--tree-color-bg-surface));
+  --tree-tag-surface: var(--tree-color-status-error-soft);
   --tree-tag-solid: var(--tree-color-status-error);
   --tree-tag-on-solid: var(--tree-color-text-inverse);
-  --tree-tag-border: color-mix(in srgb, var(--tree-color-status-error) 36%, var(--tree-color-border-default));
+  --tree-tag-border: var(--tree-color-status-error-border);
 }
 
 .t-tag--tone-info {
   --tree-tag-fg: var(--tree-color-status-info);
-  --tree-tag-surface: color-mix(in srgb, var(--tree-color-status-info) 14%, var(--tree-color-bg-surface));
+  --tree-tag-surface: var(--tree-color-status-info-soft);
   --tree-tag-solid: var(--tree-color-status-info);
   --tree-tag-on-solid: var(--tree-color-text-inverse);
-  --tree-tag-border: color-mix(in srgb, var(--tree-color-status-info) 36%, var(--tree-color-border-default));
+  --tree-tag-border: var(--tree-color-status-info-border);
 }
 
 /* Label density (TREEUX-048). "Height = the control step" is right for a tag
@@ -4752,7 +4898,7 @@ a.t-brand-lockup:focus-visible {
 }
 
 .t-tag.is-disabled {
-  opacity: 0.5;
+  color: var(--tree-color-state-disabled-fg);
   cursor: not-allowed;
 }
 
@@ -4817,7 +4963,7 @@ a.t-brand-lockup:focus-visible {
 
 .t-tag__remove:disabled {
   cursor: not-allowed;
-  opacity: 0.4;
+  opacity: var(--tree-opacity-disabled);
 }
 
 /* ── Timeline ── */
@@ -5047,7 +5193,7 @@ a.t-brand-lockup:focus-visible {
 
 /* Unsorted columns keep the affordance visible but recessed. */
 .t-table__sort-icon.is-inactive {
-  opacity: 0.4;
+  opacity: 0.5;
 }
 
 .t-table__row {
@@ -5273,7 +5419,7 @@ a.t-brand-lockup:focus-visible {
 }
 
 .t-md-editor.is-disabled {
-  opacity: 0.55;
+  opacity: var(--tree-opacity-disabled);
   pointer-events: none;
 }
 
@@ -5333,7 +5479,7 @@ a.t-brand-lockup:focus-visible {
 }
 
 .t-md-editor__toolbar-btn:disabled {
-  opacity: 0.4;
+  opacity: var(--tree-opacity-disabled);
   cursor: not-allowed;
 }
 
@@ -5518,7 +5664,7 @@ a.t-brand-lockup:focus-visible {
 
 @keyframes t-md-editor-pulse {
   0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
+  50% { opacity: var(--tree-opacity-disabled); }
 }
 
 /* ── Sizes ── */
@@ -5581,22 +5727,22 @@ a.t-brand-lockup:focus-visible {
 
 .t-stat--success {
   --tree-stat-accent: var(--tree-color-status-success);
-  --tree-stat-soft: color-mix(in srgb, var(--tree-color-status-success) 14%, var(--tree-color-bg-surface));
+  --tree-stat-soft: var(--tree-color-status-success-soft);
 }
 
 .t-stat--warning {
   --tree-stat-accent: var(--tree-color-status-warning);
-  --tree-stat-soft: color-mix(in srgb, var(--tree-color-status-warning) 14%, var(--tree-color-bg-surface));
+  --tree-stat-soft: var(--tree-color-status-warning-soft);
 }
 
 .t-stat--danger {
   --tree-stat-accent: var(--tree-color-status-error);
-  --tree-stat-soft: color-mix(in srgb, var(--tree-color-status-error) 14%, var(--tree-color-bg-surface));
+  --tree-stat-soft: var(--tree-color-status-error-soft);
 }
 
 .t-stat--info {
   --tree-stat-accent: var(--tree-color-status-info);
-  --tree-stat-soft: color-mix(in srgb, var(--tree-color-status-info) 14%, var(--tree-color-bg-surface));
+  --tree-stat-soft: var(--tree-color-status-info-soft);
 }
 
 .t-stat__icon {
@@ -5718,7 +5864,7 @@ a.t-brand-lockup:focus-visible {
   align-items: stretch;
   width: 100%;
   min-height: var(--tree-size-control-md);
-  border: var(--tree-border-width-subtle) solid var(--tree-color-border-default);
+  border: var(--tree-border-width-subtle) solid var(--tree-color-border-interactive);
   border-radius: var(--tree-radius-md);
   background: var(--tree-color-bg-surface);
   color: var(--tree-color-text-primary);
@@ -5743,7 +5889,9 @@ a.t-brand-lockup:focus-visible {
 }
 
 .t-number-input.is-disabled {
-  opacity: 0.68;
+  background: var(--tree-color-state-disabled-bg);
+  color: var(--tree-color-state-disabled-fg);
+  border-color: var(--tree-color-state-disabled-border);
   cursor: not-allowed;
 }
 
@@ -5799,7 +5947,7 @@ a.t-brand-lockup:focus-visible {
 }
 
 .t-number-input__stepper:hover:not(:disabled) {
-  background: var(--tree-color-bg-subtle);
+  background: var(--tree-color-state-hover-bg);
   color: var(--tree-color-text-primary);
 }
 
@@ -5809,7 +5957,7 @@ a.t-brand-lockup:focus-visible {
 }
 
 .t-number-input__stepper:disabled {
-  opacity: 0.45;
+  opacity: var(--tree-opacity-disabled);
   cursor: not-allowed;
 }
 
@@ -5828,7 +5976,7 @@ a.t-brand-lockup:focus-visible {
   justify-content: center;
   min-height: var(--tree-size-control-md);
   padding-inline: var(--tree-space-4);
-  border: var(--tree-border-width-subtle) solid var(--tree-color-border-default);
+  border: var(--tree-border-width-subtle) solid var(--tree-color-border-interactive);
   border-radius: var(--tree-radius-md);
   background: var(--tree-color-bg-surface);
   color: var(--tree-color-text-primary);
@@ -5846,7 +5994,7 @@ a.t-brand-lockup:focus-visible {
 
 .t-toggle-group__item:hover:not(:disabled) {
   transform: translateY(-1px);
-  background: var(--tree-color-bg-subtle);
+  background: var(--tree-color-state-hover-bg);
 }
 
 .t-toggle-group__item:focus-visible {
@@ -5866,7 +6014,7 @@ a.t-brand-lockup:focus-visible {
 }
 
 .t-toggle-group--solid .t-toggle-group__item:not(.is-selected) {
-  background: color-mix(in srgb, var(--tree-color-text-primary) 8%, var(--tree-color-bg-surface));
+  background: var(--tree-color-state-hover-bg);
   border-color: transparent;
 }
 
@@ -5884,7 +6032,9 @@ a.t-brand-lockup:focus-visible {
 
 .t-toggle-group__item.is-disabled,
 .t-toggle-group__item:disabled {
-  opacity: 0.55;
+  background: var(--tree-color-state-disabled-bg);
+  color: var(--tree-color-state-disabled-fg);
+  border-color: var(--tree-color-state-disabled-border);
   cursor: not-allowed;
   transform: none;
 }
@@ -5924,7 +6074,7 @@ a.t-brand-lockup:focus-visible {
 
 .t-selectable-list__item:hover:not(:disabled) {
   transform: translateY(-1px);
-  background: var(--tree-color-bg-subtle);
+  background: var(--tree-color-state-hover-bg);
 }
 
 .t-selectable-list__item:focus-visible {
@@ -5939,7 +6089,7 @@ a.t-brand-lockup:focus-visible {
 
 .t-selectable-list__item.is-disabled,
 .t-selectable-list__item:disabled {
-  opacity: 0.5;
+  color: var(--tree-color-state-disabled-fg);
   cursor: not-allowed;
   transform: none;
 }
@@ -6059,16 +6209,18 @@ a.t-brand-lockup:focus-visible {
 }
 
 .t-steps__item.is-complete .t-steps__button {
-  border-color: color-mix(in srgb, var(--tree-color-status-success) 40%, var(--tree-color-border-default));
+  border-color: var(--tree-color-status-success-border);
 }
 
 .t-steps__item.is-error .t-steps__button {
-  border-color: color-mix(in srgb, var(--tree-color-status-error) 50%, var(--tree-color-border-default));
+  border-color: var(--tree-color-status-error-border);
 }
 
 .t-steps__button.is-disabled,
 .t-steps__button:disabled {
-  opacity: 0.6;
+  background: var(--tree-color-state-disabled-bg);
+  color: var(--tree-color-state-disabled-fg);
+  border-color: var(--tree-color-state-disabled-border);
   cursor: not-allowed;
   transform: none;
 }
@@ -6175,7 +6327,11 @@ a.t-brand-lockup:focus-visible {
 }
 
 .t-tree-view__row:hover {
-  background: var(--tree-color-bg-subtle);
+  background: var(--tree-color-state-hover-bg);
+}
+
+.t-tree-view__row:active {
+  background: var(--tree-color-state-press-bg);
 }
 
 .t-tree-view__row:focus-visible {
@@ -6187,7 +6343,7 @@ a.t-brand-lockup:focus-visible {
 }
 
 .t-tree-view__row.is-disabled {
-  opacity: 0.5;
+  color: var(--tree-color-state-disabled-fg);
   cursor: not-allowed;
 }
 
@@ -6212,7 +6368,7 @@ a.t-brand-lockup:focus-visible {
 }
 
 .t-tree-view__toggle:hover:not(:disabled) {
-  background: var(--tree-color-bg-subtle);
+  background: var(--tree-color-state-hover-bg);
   color: var(--tree-color-text-primary);
 }
 
@@ -6291,7 +6447,7 @@ a.t-brand-lockup:focus-visible {
   width: 100%;
   min-height: var(--tree-size-control-md);
   padding: var(--tree-space-2) var(--tree-space-3);
-  border: var(--tree-border-width-subtle) solid var(--tree-color-border-default);
+  border: var(--tree-border-width-subtle) solid var(--tree-color-border-interactive);
   border-radius: var(--tree-radius-md);
   background: var(--tree-color-bg-surface);
   color: var(--tree-color-text-primary);
@@ -6317,7 +6473,9 @@ a.t-brand-lockup:focus-visible {
 }
 
 .t-multi-select.is-disabled .t-multi-select__control {
-  opacity: 0.68;
+  background: var(--tree-color-state-disabled-bg);
+  color: var(--tree-color-state-disabled-fg);
+  border-color: var(--tree-color-state-disabled-border);
   cursor: not-allowed;
 }
 
@@ -6477,7 +6635,7 @@ a.t-brand-lockup:focus-visible {
 
 .t-multi-select__option.is-disabled,
 .t-multi-select__option:disabled {
-  opacity: 0.5;
+  color: var(--tree-color-state-disabled-fg);
   cursor: not-allowed;
 }
 
@@ -6773,7 +6931,7 @@ a.t-brand-lockup:focus-visible {
   inline-size: var(--tree-color-swatch-size);
   block-size: var(--tree-color-swatch-size);
   padding: 0;
-  border: var(--tree-border-width-subtle) solid var(--tree-color-border-default);
+  border: var(--tree-border-width-subtle) solid var(--tree-color-border-interactive);
   cursor: pointer;
 }
 
@@ -6800,7 +6958,7 @@ a.t-brand-lockup:focus-visible {
 
 .t-color-swatch__option:disabled,
 .t-color-swatch__custom:disabled {
-  opacity: 0.5;
+  opacity: var(--tree-opacity-disabled);
   cursor: not-allowed;
 }
 
@@ -7169,7 +7327,7 @@ a.t-brand-lockup:focus-visible {
 }
 
 .t-sidebar__toggle:hover {
-  background: var(--tree-color-bg-subtle);
+  background: var(--tree-color-state-hover-bg);
   color: var(--tree-color-text-primary);
 }
 
@@ -7223,8 +7381,12 @@ a.t-brand-lockup:focus-visible {
 }
 
 .t-nav-menu__item:hover:not(:disabled) {
-  background: var(--tree-color-bg-subtle);
+  background: var(--tree-color-state-hover-bg);
   transform: translateX(1px);
+}
+
+.t-nav-menu__item:active:not(:disabled) {
+  background: var(--tree-color-state-press-bg);
 }
 
 .t-nav-menu__item:focus-visible {
@@ -7239,7 +7401,7 @@ a.t-brand-lockup:focus-visible {
 
 .t-nav-menu__item.is-disabled,
 .t-nav-menu__item:disabled {
-  opacity: 0.5;
+  color: var(--tree-color-state-disabled-fg);
   cursor: not-allowed;
   transform: none;
 }
@@ -7416,7 +7578,7 @@ a.t-nav-menu__item.is-disabled {
 }
 
 .t-link.is-disabled {
-  opacity: 0.5;
+  color: var(--tree-color-state-disabled-fg);
   cursor: not-allowed;
   text-decoration: none;
 }
@@ -7585,7 +7747,7 @@ a.t-nav-menu__item.is-disabled {
 }
 
 .t-app-shell__menu-button:hover {
-  background: var(--tree-color-bg-subtle);
+  background: var(--tree-color-state-hover-bg);
 }
 
 .t-app-shell__menu-button:focus-visible {
@@ -7673,7 +7835,7 @@ body:has(.t-app-shell) {
 }
 
 .t-app-shell__collapse-button:hover {
-  background: var(--tree-color-bg-subtle);
+  background: var(--tree-color-state-hover-bg);
   color: var(--tree-color-text-primary);
 }
 
@@ -7806,7 +7968,7 @@ body:has(.t-app-shell) {
 }
 
 .t-app-shell__drawer-close:hover {
-  background: var(--tree-color-bg-subtle);
+  background: var(--tree-color-state-hover-bg);
   color: var(--tree-color-text-primary);
 }
 
@@ -7939,7 +8101,7 @@ body:has(.t-app-shell) {
 }
 
 .t-chart__bars:hover .t-chart__bar:not(.is-active) {
-  opacity: 0.55;
+  opacity: 0.45;
 }
 
 .t-chart__point {
@@ -8326,7 +8488,7 @@ body:has(.t-app-shell) {
   width: 100%;
   min-height: var(--tree-size-control-md);
   padding-inline: var(--tree-space-3);
-  border: var(--tree-border-width-subtle) solid var(--tree-color-border-default);
+  border: var(--tree-border-width-subtle) solid var(--tree-color-border-interactive);
   border-radius: var(--tree-radius-md);
   background: var(--tree-color-bg-surface);
   color: var(--tree-color-text-primary);
@@ -8359,7 +8521,9 @@ body:has(.t-app-shell) {
 }
 
 .t-language-select.is-disabled .t-language-select__trigger {
-  opacity: 0.68;
+  background: var(--tree-color-state-disabled-bg);
+  color: var(--tree-color-state-disabled-fg);
+  border-color: var(--tree-color-state-disabled-border);
   cursor: not-allowed;
 }
 
@@ -8457,7 +8621,7 @@ body:has(.t-app-shell) {
 }
 
 .t-language-select__option.is-disabled {
-  opacity: 0.5;
+  color: var(--tree-color-state-disabled-fg);
   cursor: not-allowed;
 }
 
@@ -8590,7 +8754,7 @@ body:has(.t-app-shell) {
   min-inline-size: 0;
   min-height: var(--tree-size-control-md);
   padding: var(--tree-space-1) var(--tree-space-2);
-  border: var(--tree-border-width-subtle) solid var(--tree-color-border-default);
+  border: var(--tree-border-width-subtle) solid var(--tree-color-border-interactive);
   border-radius: var(--tree-radius-md);
   background: var(--tree-color-bg-surface);
   color: var(--tree-color-text-primary);
@@ -8615,7 +8779,9 @@ body:has(.t-app-shell) {
 }
 
 .t-tag-input.is-disabled {
-  opacity: 0.68;
+  background: var(--tree-color-state-disabled-bg);
+  color: var(--tree-color-state-disabled-fg);
+  border-color: var(--tree-color-state-disabled-border);
   cursor: not-allowed;
 }
 
@@ -8673,7 +8839,7 @@ body:has(.t-app-shell) {
   min-inline-size: 0;
   min-height: var(--tree-size-control-md);
   padding: 0 var(--tree-space-3);
-  border: var(--tree-border-width-subtle) solid var(--tree-color-border-default);
+  border: var(--tree-border-width-subtle) solid var(--tree-color-border-interactive);
   border-radius: var(--tree-radius-md);
   background: var(--tree-color-bg-surface);
   color: var(--tree-color-text-primary);
@@ -8732,7 +8898,7 @@ body:has(.t-app-shell) {
 }
 
 .t-key-value-editor__remove:hover:not(:disabled) {
-  background: var(--tree-color-bg-subtle);
+  background: var(--tree-color-state-hover-bg);
   color: var(--tree-color-text-primary);
 }
 
@@ -8744,7 +8910,7 @@ body:has(.t-app-shell) {
 
 .t-key-value-editor__remove:disabled {
   cursor: not-allowed;
-  opacity: 0.6;
+  opacity: var(--tree-opacity-disabled);
 }
 
 .t-key-value-editor__row-error {
@@ -8775,7 +8941,7 @@ body:has(.t-app-shell) {
 }
 
 .t-key-value-editor__add:hover:not(:disabled) {
-  background: var(--tree-color-bg-subtle);
+  background: var(--tree-color-state-hover-bg);
 }
 
 .t-key-value-editor__add:focus-visible {
@@ -8786,11 +8952,11 @@ body:has(.t-app-shell) {
 
 .t-key-value-editor__add:disabled {
   cursor: not-allowed;
-  opacity: 0.6;
+  opacity: var(--tree-opacity-disabled);
 }
 
 .t-key-value-editor.is-disabled {
-  opacity: 0.68;
+  opacity: var(--tree-opacity-disabled);
 }
 
 /* `invalid` marks the WHOLE control (the aggregated TFormField summary), which
@@ -8828,28 +8994,28 @@ body:has(.t-app-shell) {
 .t-accent--success {
   --tree-color-accent-primary: var(--tree-color-status-success);
   --tree-color-accent-hover: var(--tree-color-status-success);
-  --tree-color-accent-soft: color-mix(in srgb, var(--tree-color-status-success) 14%, var(--tree-color-bg-surface));
+  --tree-color-accent-soft: var(--tree-color-status-success-soft);
   --tree-color-accent-contrast: var(--tree-color-text-inverse);
 }
 
 .t-accent--warning {
   --tree-color-accent-primary: var(--tree-color-status-warning);
   --tree-color-accent-hover: var(--tree-color-status-warning);
-  --tree-color-accent-soft: color-mix(in srgb, var(--tree-color-status-warning) 14%, var(--tree-color-bg-surface));
+  --tree-color-accent-soft: var(--tree-color-status-warning-soft);
   --tree-color-accent-contrast: var(--tree-color-text-inverse);
 }
 
 .t-accent--danger {
   --tree-color-accent-primary: var(--tree-color-status-error);
   --tree-color-accent-hover: var(--tree-color-status-error);
-  --tree-color-accent-soft: color-mix(in srgb, var(--tree-color-status-error) 14%, var(--tree-color-bg-surface));
+  --tree-color-accent-soft: var(--tree-color-status-error-soft);
   --tree-color-accent-contrast: var(--tree-color-text-inverse);
 }
 
 .t-accent--info {
   --tree-color-accent-primary: var(--tree-color-status-info);
   --tree-color-accent-hover: var(--tree-color-status-info);
-  --tree-color-accent-soft: color-mix(in srgb, var(--tree-color-status-info) 14%, var(--tree-color-bg-surface));
+  --tree-color-accent-soft: var(--tree-color-status-info-soft);
   --tree-color-accent-contrast: var(--tree-color-text-inverse);
 }
 
@@ -9203,35 +9369,53 @@ body:has(.t-page-surface) {
 
 .t-table__row.is-linked:hover,
 .t-table__row.is-activatable:hover {
-  background: var(--tree-color-bg-subtle);
+  background: var(--tree-color-state-hover-bg);
 }
 
-.t-table__row.is-activatable:focus-visible {
-  outline: none;
-  box-shadow: inset 0 0 0 2px var(--tree-color-focus-ring);
+.t-table__row.is-activatable:active {
+  background: var(--tree-color-state-press-bg);
 }
 
-.t-table__row-link {
+
+
+.t-table__row-link,
+.t-table__row-action {
   color: inherit;
   text-decoration: none;
 }
 
-.t-table__row-link::after {
+.t-table__row-action {
+  display: block;
+  inline-size: 100%;
+  padding: 0;
+  border: none;
+  background: none;
+  font: inherit;
+  text-align: inherit;
+  cursor: pointer;
+}
+
+.t-table__row-link::after,
+.t-table__row-action::after {
   content: '';
   position: absolute;
   inset: 0;
   z-index: 0;
 }
 
-.t-table__row-link:focus-visible::after {
+.t-table__row-link:focus-visible::after,
+.t-table__row-action:focus-visible::after {
   box-shadow: inset 0 0 0 2px var(--tree-color-focus-ring);
 }
 
-.t-table__row.is-linked .t-table__cell {
+/* The overlay's containing block has to be the `<tr>`. Positioning EVERY cell
+   made the first one the containing block, so `inset: 0` covered that cell
+   alone: the whole row showed pointer and hover while only the first cell
+   navigated. Only the cells AFTER the first are positioned — which is exactly
+   the set that needs raising above the overlay to stay clickable. */
+.t-table__row.is-linked .t-table__cell + .t-table__cell,
+.t-table__row.is-activatable .t-table__cell + .t-table__cell {
   position: relative;
-}
-
-.t-table__row.is-linked .t-table__cell + .t-table__cell {
   z-index: 1;
 }
 
@@ -9337,7 +9521,7 @@ body:has(.t-page-surface) {
 }
 
 .t-audio-player.is-disabled {
-  opacity: 0.65;
+  opacity: var(--tree-opacity-disabled);
 }
 
 .t-audio-player__toggle,
@@ -9614,4 +9798,11 @@ body:has(.t-page-surface) {
   block-size: 8px;
   border-radius: var(--tree-radius-pill);
   background: var(--tree-color-status-error);
+}
+
+/* The lane budget always declares what it hid (TREEUX-017). */
+.t-span-lanes__overflow {
+  margin: 0;
+  color: var(--tree-color-text-muted);
+  font-size: var(--tree-font-size-sm);
 }

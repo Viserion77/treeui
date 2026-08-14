@@ -1,5 +1,12 @@
 # @treeui/react
 
+## 0.4.1
+
+### Patch Changes
+
+- Updated dependencies [c619743]
+  - @treeui/tokens@0.31.0
+
 ## 0.4.0
 
 ### Minor Changes

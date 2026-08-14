@@ -1,5 +1,94 @@
 # @treeui/vue
 
+## 0.31.0
+
+### Minor Changes
+
+- c619743: `TCanvasSurface` and `useCanvasSurface` — the surface a diagram is drawn on.
+
+  The library had the decorative half of this: `useDecorativeCanvas`, an animation
+  loop that has to be talked out of running, gated by visibility, reduced motion
+  and pointer coarseness, and holding `pointer-events: none` so a click reaches
+  the button behind it. Every one of those decisions is right for an ornament and
+  wrong for a drawing that carries information.
+
+  A data-driven canvas fails three ways under that contract. It is never given a
+  box, so dropped into a layout primitive it measures 0×0 and paints nothing —
+  a blank box rather than a wrong one, which is why it goes unnoticed. It has no
+  way to be repainted, so the loop that saves a decoration's battery freezes a
+  diagram after one frame: a refetch, a locale switch or a theme flip never
+  arrives. And it must not take the pointer, when a node is exactly a thing to
+  click and hover.
+
+  `useCanvasSurface` is the sibling composable: it sizes the backing store from
+  the element at the device ratio, repaints on `requestRedraw()` coalesced to one
+  frame, and converts an event into the same CSS pixel space the draw callback
+  paints in, so hit-testing stops being arithmetic every consumer rewrites.
+  `TCanvasSurface` wraps it into a component that owns the box (`height`), carries
+  the affordance a stylesheet cannot know about (`cursor`, bound to whatever the
+  hit-test just decided), repaints on `redrawKey`, and takes the accessible form
+  of the drawing in its default slot — markup inside the `<canvas>` element, which
+  the browser exposes and never paints.
+
+  Where the nodes go is not part of this. A dependency graph, a state machine and
+  a floor plan disagree about layout, and that disagreement belongs to the
+  product: the library owns the surface and its lifecycle.
+
+- c619743: Axes for a page that is read rather than operated.
+
+  **`TSteps` has a static mode, and it is the default.** `interactive={false}`
+  already existed, but every step still rendered a `<button disabled>`: a
+  four-step "how it works" handed four dead controls to the accessibility tree,
+  washed out at 60% opacity, with the first step ringed as if the reader were
+  standing in it. Non-interactive now means inert boxes — no control, no disabled
+  wash, and no step elected current unless `modelValue`, `defaultValue` or an item
+  `status` says so. A wizard is unchanged: `interactive` still opens on the first
+  step and still emits `update:modelValue`. The box styles moved to
+  `.t-steps__box`, which the interactive element carries alongside
+  `.t-steps__button`, so existing selectors match exactly what they matched
+  before.
+
+  **`TSteps` takes `columns` and `minItemWidth`.** `flex: 1 1 14rem` was a
+  constant, so a strip could only wrap by available width and left the last step
+  alone on its own row. These are the axes `TGrid` already has, and they replace
+  the only workaround available: declaring the component twice inside
+  `TShow`/`THide`, which duplicates the copy in pre-rendered HTML.
+
+  **`TText` takes `align`.** `TStack align="center"` centres the box; this centres
+  the lines inside it. The two look identical while the box is narrow and diverge
+  the moment it spans the column, which is why a centred closing section reads
+  left-aligned on a phone. Logical values, and with a `measure` the capped block
+  centres too.
+
+  **`TStat` takes `emphasis`.** `label` stays the default — a dashboard reader is
+  scanning for what is measured. `value` leads with the figure for a marketing
+  band, and keeps a row of tiles on one baseline, since the labels no longer have
+  to be the same height. Visual order only: the DOM keeps label before value, so
+  the announcement is still "Requests served, 4.2M".
+
+  **`TGrid` takes `balance`.** `auto-fit` collapses a track only when it is empty
+  on every row, so five cards over four tracks leave three holes on the right, and
+  a hole reads as a card that failed to load. Balanced mode lays out as flex lines
+  so each line divides itself among the items it has: full rows are identical, the
+  remainder row is shared out. Ignored when `columns` is set.
+
+  **`TSparkline` takes `fluid`.** It fills the parent's width while keeping its
+  height, so a sparkline in a card that grows with the page no longer needs a full
+  `TChart` with axes, legend, tooltip and animation switched off. Strokes keep
+  their declared width — the path scales, the pen does not.
+
+  **`TListItem` keeps its leading slot on the first line.** Below 30rem the row
+  wraps so the meta can drop below it, but flex chooses line breaks from the
+  hypothetical main size, so a long content column moved down whole and stranded
+  the icon on the line above. The content is pinned to `flex-basis: 0` inside the
+  container query, so the break falls after it and the wrap does only the job it
+  was added for.
+
+### Patch Changes
+
+- Updated dependencies [c619743]
+  - @treeui/tokens@0.31.0
+
 ## 0.30.0
 
 ### Minor Changes

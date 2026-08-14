@@ -1,4 +1,4 @@
-// Quality gate for TREEUX-008/011.
+// Quality gate for the typed global-component surface.
 //
 // The GlobalComponents augmentation only reports a wrong prop when a consumer
 // turns on `vueCompilerOptions.strictTemplates` — and the first version of it

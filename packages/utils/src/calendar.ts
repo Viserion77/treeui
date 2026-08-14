@@ -1,8 +1,8 @@
 import { addDays, startOfDay, startOfMonth, startOfWeek } from './index';
 
 /**
- * Framework-agnostic calendar math for month grids and day/week time-grids
- * (TREEUX-016). Pure: dates and numbers in, structure out — no DOM, no Vue, no
+ * Framework-agnostic calendar math for month grids and day/week time-grids.
+ * Pure: dates and numbers in, structure out — no DOM, no Vue, no
  * locale dataset. `TCalendar` (and any future framework port) composes these.
  */
 

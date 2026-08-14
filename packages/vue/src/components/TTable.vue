@@ -60,7 +60,7 @@ const props = withDefaults(
      * `link`. A `<tr>` cannot BE an `<a>` — its only permitted content is
      * `<td>`/`<th>`, and the parser moves anything else out of the table — so
      * the stretched link is the only shape that keeps the grid intact.
-     * Mutually exclusive with `rowTo` and `@row-activate` (TREEUX-004).
+     * Mutually exclusive with `rowTo` and `@row-activate`.
      */
     rowHref?: (row: Record<string, unknown>, index: number) => string | undefined;
     /** Same as `rowHref`, resolved through the app's RouterLink. */

@@ -2,8 +2,8 @@ import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
 
-// Regression guard for the TButton `iconOnly` accessible-name warning
-// (TREEUX-001). The warning must ship as a BARE, inlined `process.env.NODE_ENV`
+// Regression guard for the TButton `iconOnly` accessible-name warning.
+// The warning must ship as a BARE, inlined `process.env.NODE_ENV`
 // compare so the consumer's bundler statically replaces it: it then runs in a
 // development build and is dead-code-eliminated — block and string literal —
 // from a production build.
@@ -31,7 +31,7 @@ function guardCode(): string {
     .join('\n');
 }
 
-describe('TButton iconOnly warning — consumer-bundle mechanism (TREEUX-001)', () => {
+describe('TButton iconOnly warning — consumer-bundle mechanism', () => {
   it('ships a bare, inlined process.env.NODE_ENV compare', () => {
     expect(guardCode()).toContain("if (process.env.NODE_ENV !== 'production')");
   });

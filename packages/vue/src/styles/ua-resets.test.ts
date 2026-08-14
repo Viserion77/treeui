@@ -1,7 +1,7 @@
 // @vitest-environment node
 //
-// Guards for the two user-agent boxes that leak through a polymorphic `as`
-// (TREEUX-044 / TREEUX-045). Neither is testable through jsdom — it has no
+// Guards for the two user-agent boxes that leak through a polymorphic `as`.
+// Neither is testable through jsdom — it has no
 // layout and ships no UA stylesheet, which is precisely why both defects
 // survived: a mounted component looks correct in a unit test and measures wrong
 // in a browser. So assert on the shipped rule instead.
@@ -20,7 +20,7 @@ const blockContaining = (needle: string) => {
   return stylesheet.slice(open + 1, close);
 };
 
-describe('list box on a layout primitive (TREEUX-044)', () => {
+describe('list box on a layout primitive', () => {
   const rule = ':where(ul, ol, menu):is(.t-stack, .t-grid, .t-split, .t-section__inner, .t-container)';
 
   it.each(['margin-block: 0', 'padding-inline-start: 0', 'list-style: none'])(
@@ -36,7 +36,7 @@ describe('list box on a layout primitive (TREEUX-044)', () => {
   });
 });
 
-describe('button box on a card (TREEUX-045)', () => {
+describe('button box on a card', () => {
   const block = () => blockContaining('button.t-card');
 
   it.each([
@@ -56,7 +56,7 @@ describe('button box on a card (TREEUX-045)', () => {
   });
 });
 
-describe('icon slot scale (TREEUX-010)', () => {
+describe('icon slot scale', () => {
   // A TIcon renders `size` as width/height ATTRIBUTES; CSS outranks those, so a
   // slotted icon with no `size` follows the component instead of entering at the
   // 20px default and standing taller than the line it sits on.
@@ -76,16 +76,16 @@ describe('icon slot scale (TREEUX-010)', () => {
 });
 
 describe('follow-ups from the 0.28 validation', () => {
-  it('soft tags carry the tone ring (TREEUX-048 b)', () => {
+  it('soft tags carry the tone ring', () => {
     expect(stylesheet).toContain(".t-tag--soft[class*='t-tag--tone-']");
   });
 
-  it('the empty-state frame has a width cap of its own (TREEUX-046)', () => {
+  it('the empty-state frame has a width cap of its own', () => {
     expect(stylesheet).toContain('.t-empty-state--frame-narrow');
   });
 });
 
-describe('TTable row overlay containing block (TREEUX-015)', () => {
+describe('TTable row overlay containing block', () => {
   // Not testable through jsdom — it has no layout — and that is exactly how it
   // shipped: the row showed pointer and hover while only the first cell
   // navigated, because a positioned first cell became the overlay's containing
@@ -100,7 +100,7 @@ describe('TTable row overlay containing block (TREEUX-015)', () => {
   });
 });
 
-describe('tone reaches every variant it claims (TREEUX-016)', () => {
+describe('tone reaches every variant it claims', () => {
   it.each(['outline', 'ghost', 'soft'])('%s', (variant) => {
     expect(stylesheet).toContain(`.t-button.has-tone.t-button--${variant}`);
   });

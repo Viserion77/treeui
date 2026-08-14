@@ -6,7 +6,7 @@ import TIcon from './TIcon.vue';
 export type TVoiceRecorderState = 'idle' | 'recording' | 'preview';
 
 /**
- * Voice-recorder states (TREEUX-019).
+ * Voice-recorder states.
  *
  * The library owns the STATES — the pulse, the mm:ss timer, the cap, and the
  * accessible names — not the capture. `MediaRecorder`/`getUserMedia` and the

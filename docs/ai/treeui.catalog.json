@@ -1,7 +1,7 @@
 {
-  "generatedAt": "0.29.0",
+  "generatedAt": "0.30.0",
   "packageName": "@treeui/vue",
-  "packageVersion": "0.29.0",
+  "packageVersion": "0.30.0",
   "decisionGuides": [
     {
       "id": "single-choice",
@@ -2220,7 +2220,7 @@
           "name": "href",
           "type": "string",
           "default": "undefined",
-          "note": "Anchor attributes (`href`, `target`, `rel`, `download`) are declared props and are only rendered when `as=\"a\"`. They were fallthrough before, which typechecked as an error in a consumer's `strictTemplates` build even though a link button is the documented use of `as` (TREEUX-011, group 1).\n"
+          "note": "Anchor attributes (`href`, `target`, `rel`, `download`) are declared props and are only rendered when `as=\"a\"`. They were fallthrough before, which typechecked as an error in a consumer's `strictTemplates` build even though a link button is the documented use of `as`.\n"
         },
         {
           "name": "target",
@@ -6605,7 +6605,7 @@
           "name": "modelValue",
           "type": "T",
           "default": "undefined",
-          "note": "Generic over `T extends string | number`, so a `ref<number>` binds without a cast and `update:modelValue` pays back a number. `<script setup>` was widening every model to `string | number`, which under a consumer's `strictTemplates` made a numeric field a type error at the call site with no correct way to write it (TREEUX-011, group 3). When `T` is `number` the component parses the raw input value and only falls back to the raw string when it does not parse.\n"
+          "note": "Generic over `T extends string | number`, so a `ref<number>` binds without a cast and `update:modelValue` pays back a number. `<script setup>` was widening every model to `string | number`, which under a consumer's `strictTemplates` made a numeric field a type error at the call site with no correct way to write it. When `T` is `number` the component parses the raw input value and only falls back to the raw string when it does not parse.\n"
         },
         {
           "name": "size",
@@ -7561,7 +7561,7 @@
       "kind": "overlay",
       "category": "Overlay",
       "status": "available",
-      "purpose": "Rich action menu in a popover — slot-driven compound with groups, icons, descriptions, meta, destructive items, link items, and a radio (workspace-switch) item, with roving focus and keyboard support. Built on TPopover, so anchoring and focus restore come from there (TREEUX-015).",
+      "purpose": "Rich action menu in a popover — slot-driven compound with groups, icons, descriptions, meta, destructive items, link items, and a radio (workspace-switch) item, with roving focus and keyboard support. Built on TPopover, so anchoring and focus restore come from there.",
       "sourceFile": "packages/vue/src/components/TMenu.vue",
       "storyFile": "apps/docs/src/stories/Menu.stories.ts",
       "storyTitle": "Components/Overlay/Menu",
@@ -11236,7 +11236,7 @@
           "name": "modelValue",
           "type": "T",
           "default": "undefined",
-          "note": "The value of the currently active tab; use with v-model. Generic over `T extends string`, so a `ref<'overview' | 'logs'>` keeps its literal union instead of being widened to `string` — under a consumer's `strictTemplates` that widening made the binding an error with no correct way to write it (TREEUX-011, group 3).\n"
+          "note": "The value of the currently active tab; use with v-model. Generic over `T extends string`, so a `ref<'overview' | 'logs'>` keeps its literal union instead of being widened to `string` — under a consumer's `strictTemplates` that widening made the binding an error with no correct way to write it.\n"
         },
         {
           "name": "defaultValue",
@@ -12022,7 +12022,7 @@
           "name": "modelValue",
           "type": "TToggleGroupModel<T, M> — `T` in single mode, `T[]` in multiple",
           "default": "undefined",
-          "note": "Generic over the option type AND the selection mode, so the model is the type the call site actually has: `<TToggleGroup v-model=\"view\">` with a `ref<'grid' | 'list'>` binds, and `selectionMode=\"multiple\"` binds a `('grid' | 'list')[]`. It was `string | string[]` in and `string | string[] | undefined` out, which no literal-union ref could bind under a consumer's `strictTemplates` — the same defect as TTabs/TInput (TREEUX-011, group 3), found by the gate once it ran on the same `vue-tsc` major consumers use. `undefined` was never actually emitted.\n"
+          "note": "Generic over the option type AND the selection mode, so the model is the type the call site actually has: `<TToggleGroup v-model=\"view\">` with a `ref<'grid' | 'list'>` binds, and `selectionMode=\"multiple\"` binds a `('grid' | 'list')[]`. It was `string | string[]` in and `string | string[] | undefined` out, which no literal-union ref could bind under a consumer's `strictTemplates` — the same defect as TTabs/TInput, found by the gate once it ran on the same `vue-tsc` major consumers use. `undefined` was never actually emitted.\n"
         },
         {
           "name": "options",

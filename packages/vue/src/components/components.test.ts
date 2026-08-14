@@ -1762,7 +1762,7 @@ describe('@treeui/vue', () => {
     expect(buttons[1].props('tone')).toBe('danger');
   });
 
-  it('emits no deprecation warning of its own (TREEUX-016)', () => {
+  it('emits no deprecation warning of its own', () => {
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
     mount(TConfirmDialog, { props: { defaultOpen: true, title: 'x' }, attachTo: document.body });
     expect(warn).not.toHaveBeenCalledWith(expect.stringContaining('variant="danger"'));
@@ -2573,7 +2573,7 @@ describe('@treeui/vue', () => {
     });
 
     expect(wrapper.classes()).toContain('t-language-select--icon-only');
-    // TREEUX-026: the value is kept in the DOM (accessible name) but visually
+    // the value is kept in the DOM (accessible name) but visually
     // hidden so it takes no space — not removed.
     const value = wrapper.find('.t-language-select__value');
     expect(value.exists()).toBe(true);
@@ -2582,7 +2582,7 @@ describe('@treeui/vue', () => {
     expect(wrapper.get('button').attributes('aria-label')).toBe('Page language');
   });
 
-  it('hides the visible name in an icon-only switcher even without a flag (TREEUX-026)', () => {
+  it('hides the visible name in an icon-only switcher even without a flag', () => {
     // Previously the name stayed VISIBLE without a flag (the bug 026 fixed) —
     // icon-only must collapse to a square regardless, keeping the name only as
     // the accessible name.
@@ -5077,8 +5077,8 @@ describe('TDonutChart', () => {
   });
 });
 
-describe('TREEUX round 1 — consumer contract hardening', () => {
-  describe('TButton icon-only (TREEUX-001)', () => {
+describe('Consumer contract hardening — batch 1', () => {
+  describe('TButton icon-only', () => {
     it('renders a square control, drops the label span and names it via `label`', () => {
       const wrapper = mount(TButton, {
         props: { iconOnly: true, label: 'Excluir' },
@@ -5101,7 +5101,7 @@ describe('TREEUX round 1 — consumer contract hardening', () => {
     });
   });
 
-  describe('TButton loading (TREEUX-013)', () => {
+  describe('TButton loading', () => {
     it('announces the loading state with the localized `loadingLabel`', () => {
       const wrapper = mount(TButton, {
         props: { loading: true, loadingLabel: 'Gerando resumo' },
@@ -5138,7 +5138,7 @@ describe('TREEUX round 1 — consumer contract hardening', () => {
     });
   });
 
-  describe('TText preserveWhitespace (TREEUX-003)', () => {
+  describe('TText preserveWhitespace', () => {
     it('preserves authored line breaks', () => {
       const wrapper = mount(TText, { props: { preserveWhitespace: true } });
       expect(wrapper.classes()).toContain('is-pre-wrap');
@@ -5151,7 +5151,7 @@ describe('TREEUX round 1 — consumer contract hardening', () => {
     });
   });
 
-  describe('TTable semantics (TREEUX-014)', () => {
+  describe('TTable semantics', () => {
     const columns = [{ key: 'name', label: 'Nome', sortable: true }];
     const rows = [{ name: 'Ana' }];
 
@@ -5187,7 +5187,7 @@ describe('TREEUX round 1 — consumer contract hardening', () => {
     });
   });
 
-  describe('internal glyphs resolve through the registry (TREEUX-010)', () => {
+  describe('internal glyphs resolve through the registry', () => {
     it('TTag remove button uses a registry icon', () => {
       const wrapper = mount(TTag, { props: { removable: true } });
       expect(wrapper.find('.t-tag__remove .t-icon').exists()).toBe(true);
@@ -5211,7 +5211,7 @@ describe('TREEUX round 1 — consumer contract hardening', () => {
     });
   });
 
-  describe('TAppShell immersive (TREEUX-005)', () => {
+  describe('TAppShell immersive', () => {
     it('hides the chrome while keeping the content slot mounted', () => {
       const wrapper = mount(TAppShell, {
         props: { mobile: false, immersive: true },
@@ -5275,8 +5275,8 @@ describe('TAppShell immersive + drawer interaction', () => {
   });
 });
 
-describe('TREEUX round 3 — closed-contract prop additions', () => {
-  describe('TButton icon-only dev warning (S7-001 / LSS-006)', () => {
+describe('Closed-contract prop additions — batch 3', () => {
+  describe('TButton icon-only dev warning', () => {
     it('warns when iconOnly has no accessible name', () => {
       const spy = vi.spyOn(console, 'warn').mockImplementation(() => {});
       mount(TButton, { props: { iconOnly: true }, slots: { icon: '<svg/>' } });
@@ -5303,7 +5303,7 @@ describe('TREEUX round 3 — closed-contract prop additions', () => {
     });
   });
 
-  describe('TStack fill (S7-006)', () => {
+  describe('TStack fill', () => {
     it('applies the viewport and parent fill modifiers', () => {
       expect(mount(TStack, { props: { fill: 'viewport' } }).classes()).toContain('t-stack--fill-viewport');
       expect(mount(TStack, { props: { fill: 'parent' } }).classes()).toContain('t-stack--fill-parent');
@@ -5315,7 +5315,7 @@ describe('TREEUX round 3 — closed-contract prop additions', () => {
     });
   });
 
-  describe('TPopover size (S7-004)', () => {
+  describe('TPopover size', () => {
     it('scales the content density by the shared size axis', () => {
       const wrapper = mount(TPopover, {
         props: { defaultOpen: true, size: 'sm' },
@@ -5325,7 +5325,7 @@ describe('TREEUX round 3 — closed-contract prop additions', () => {
     });
   });
 
-  describe('TText family (LSS-001)', () => {
+  describe('TText family', () => {
     it('maps mono to the mono family class', () => {
       expect(mount(TText, { props: { family: 'mono' } }).classes()).toContain('t-text--family-mono');
     });
@@ -5334,7 +5334,7 @@ describe('TREEUX round 3 — closed-contract prop additions', () => {
     });
   });
 
-  describe('TTable rowState + rowKey (LSS-012)', () => {
+  describe('TTable rowState + rowKey', () => {
     const columns = [{ key: 'name', label: 'Nome' }];
     const rows = [{ id: 'a', name: 'Ana' }, { id: 'b', name: 'Bruno' }];
 
@@ -5355,7 +5355,7 @@ describe('TREEUX round 3 — closed-contract prop additions', () => {
     });
   });
 
-  describe('TLink underline + weight (LSS-002)', () => {
+  describe('TLink underline + weight', () => {
     it('emits modifiers only for non-default underline/weight', () => {
       const plain = mount(TLink, { props: { underline: 'none', weight: 'semibold' }, slots: { default: 'x' } });
       expect(plain.classes()).toContain('t-link--underline-none');
@@ -5367,7 +5367,7 @@ describe('TREEUX round 3 — closed-contract prop additions', () => {
     });
   });
 
-  describe('TCard interactive (LSS-002)', () => {
+  describe('TCard interactive', () => {
     it('adds the interactive modifier and works as a link element', () => {
       const wrapper = mount(TCard, {
         props: { interactive: true, as: 'a' },
@@ -5380,7 +5380,7 @@ describe('TREEUX round 3 — closed-contract prop additions', () => {
     });
   });
 
-  describe('TAppShell header-end (LSS-007)', () => {
+  describe('TAppShell header-end', () => {
     it('renders the trailing region and flags the header', () => {
       const wrapper = mount(TAppShell, {
         props: { mobile: false },
@@ -5403,8 +5403,8 @@ describe('TREEUX round 3 — closed-contract prop additions', () => {
   });
 });
 
-describe('TREEUX round 5 — new components', () => {
-  describe('TBrandLockup (S7-009 / LSS-009)', () => {
+describe('New components — batch 5', () => {
+  describe('TBrandLockup', () => {
     it('renders logo slot, title and subtitle, preserving them as text', () => {
       const wrapper = mount(TBrandLockup, {
         props: { title: 'Orchard', subtitle: 'Tasks' },
@@ -5432,7 +5432,7 @@ describe('TREEUX round 5 — new components', () => {
     });
   });
 
-  describe('TCodeBlock (LSS-003)', () => {
+  describe('TCodeBlock', () => {
     it('renders content and a labelled scroll region', () => {
       const wrapper = mount(TCodeBlock, { props: { code: 'arn:aws:sqs:...', label: 'Lambda log' } });
       const pre = wrapper.find('.t-code-block__pre');
@@ -5464,7 +5464,7 @@ describe('TREEUX round 5 — new components', () => {
     });
   });
 
-  describe('TLinkTile (S7-008)', () => {
+  describe('TLinkTile', () => {
     it('renders a single link with leading, title and description', () => {
       const wrapper = mount(TLinkTile, {
         props: { title: 'Lambda', description: 'us-east-1', href: '/lambda' },
@@ -5489,8 +5489,8 @@ describe('TREEUX round 5 — new components', () => {
   });
 });
 
-describe('TREEUX round 6 — queue batch', () => {
-  describe('TPopover close() (TREEUX-015)', () => {
+describe('Queued contract items — batch 6', () => {
+  describe('TPopover close()', () => {
     it('exposes close() and closes via the default slot', async () => {
       const wrapper = mount(TPopover, {
         props: { defaultOpen: true },
@@ -5545,7 +5545,7 @@ describe('TREEUX round 6 — queue batch', () => {
     });
   });
 
-  describe('TList / TListItem (TREEUX-002)', () => {
+  describe('TList / TListItem', () => {
     it('renders ul/li with the region slots and no listbox semantics', () => {
       const wrapper = mount(TList, {
         props: { size: 'sm' },
@@ -5571,7 +5571,7 @@ describe('TREEUX round 6 — queue batch', () => {
     });
   });
 
-  describe('TDescriptionList / TDescriptionItem (TREEUX-005)', () => {
+  describe('TDescriptionList / TDescriptionItem', () => {
     it('renders dl/dt/dd with a value and actions', () => {
       const wrapper = mount(TDescriptionList, {
         slots: {
@@ -5590,7 +5590,7 @@ describe('TREEUX round 6 — queue batch', () => {
     });
   });
 
-  describe('TMenu compound (TREEUX-007)', () => {
+  describe('TMenu compound', () => {
     const openMenu = () =>
       mount(TMenu, {
         attachTo: document.body,
@@ -5658,7 +5658,7 @@ describe('TREEUX round 6 — queue batch', () => {
     });
   });
 
-  describe('TAppShell railBreakpoint (TREEUX-011)', () => {
+  describe('TAppShell railBreakpoint', () => {
     it('accepts railBreakpoint without breaking manual collapse', async () => {
       const wrapper = mount(TAppShell, {
         props: { mobile: false, collapsible: true, breakpoint: '1024px', railBreakpoint: '1280px' },
@@ -5672,7 +5672,7 @@ describe('TREEUX round 6 — queue batch', () => {
   });
 });
 
-describe('TREEUX-007 regression — TMenu opens via the trigger (Rodada 8)', () => {
+describe('TMenu opens via the trigger — regression', () => {
   it('opens on trigger click (uncontrolled) — the v-model-on-readonly-computed bug', async () => {
     const wrapper = mount(TMenu, {
       attachTo: document.body,
@@ -5717,7 +5717,7 @@ describe('TREEUX-007 regression — TMenu opens via the trigger (Rodada 8)', () 
   });
 });
 
-describe('TREEUX-018 — TPopover width', () => {
+describe('TPopover width', () => {
   it('emits a width modifier only for non-default widths', () => {
     const wide = mount(TPopover, {
       props: { defaultOpen: true, width: 'content' },
@@ -5740,7 +5740,7 @@ describe('TREEUX-018 — TPopover width', () => {
   });
 });
 
-describe('TREEUX-017 — TImage', () => {
+describe('TImage', () => {
   it('renders an img with required alt, lazy loading, fit and radius modifiers', () => {
     const wrapper = mount(TImage, { props: { src: '/a.png', alt: 'Diagram' } });
     const img = wrapper.find('img.t-image');
@@ -5764,7 +5764,7 @@ describe('TREEUX-017 — TImage', () => {
   });
 });
 
-describe('TREEUX-026 — TLanguageSelect icon-only hides the value name', () => {
+describe('TLanguageSelect icon-only hides the value name', () => {
   const options = [
     { label: 'English (US)', value: 'en' },
     { label: 'Português (Brasil)', value: 'pt' },
@@ -5791,7 +5791,7 @@ describe('TREEUX-026 — TLanguageSelect icon-only hides the value name', () => 
   });
 });
 
-describe('TREEUX 024/025/029 — TText marketing typography', () => {
+describe('TText marketing typography', () => {
   it('exposes display and 4xl/5xl sizes (024)', () => {
     expect(mount(TText, { props: { size: 'display' } }).classes()).toContain('t-text--size-display');
     expect(mount(TText, { props: { size: '4xl' } }).classes()).toContain('t-text--size-4xl');
@@ -5816,7 +5816,7 @@ describe('TREEUX 024/025/029 — TText marketing typography', () => {
   });
 });
 
-describe('TREEUX-001 — TTagInput (LSS)', () => {
+describe('TTagInput', () => {
   it('renders a removable chip per tag', () => {
     const wrapper = mount(TTagInput, { props: { modelValue: ['a', 'b'] } });
     expect(wrapper.findAll('.t-tag-input__tag')).toHaveLength(2);
@@ -5874,7 +5874,7 @@ describe('TREEUX-001 — TTagInput (LSS)', () => {
   });
 });
 
-describe('TREEUX-002 — TKeyValueEditor (LSS, phase 1)', () => {
+describe('TKeyValueEditor (phase 1)', () => {
   it('renders a row per entry with key and value', () => {
     const wrapper = mount(TKeyValueEditor, { props: { modelValue: { a: '1', b: '2' } } });
     expect(wrapper.findAll('.t-key-value-editor__row')).toHaveLength(2);
@@ -5928,7 +5928,7 @@ describe('TREEUX-002 — TKeyValueEditor (LSS, phase 1)', () => {
   });
 });
 
-describe('TREEUX-027 — TTag tone axis (S7)', () => {
+describe('TTag tone axis', () => {
   it('keeps the pre-tone classes when no tone is passed', () => {
     const wrapper = mount(TTag, { props: { variant: 'solid' } });
     expect(wrapper.classes()).toContain('t-tag--solid');
@@ -5950,7 +5950,7 @@ describe('TREEUX-027 — TTag tone axis (S7)', () => {
   });
 });
 
-describe('TREEUX-030 — TSection (S7)', () => {
+describe('TSection', () => {
   it('renders a section with the default rhythm and an inner container', () => {
     const wrapper = mount(TSection, { slots: { default: 'Body' } });
     expect(wrapper.element.tagName).toBe('SECTION');
@@ -5982,7 +5982,7 @@ describe('TREEUX-030 — TSection (S7)', () => {
   });
 });
 
-describe('TREEUX-031 — THero (S7)', () => {
+describe('THero', () => {
   it('renders the copy above an aria-hidden backdrop layer', () => {
     const wrapper = mount(THero, {
       slots: { default: 'Headline', backdrop: '<canvas />' },
@@ -6008,7 +6008,7 @@ describe('TREEUX-031 — THero (S7)', () => {
   });
 });
 
-describe('TREEUX-032 — TPageSurface (S7)', () => {
+describe('TPageSurface', () => {
   it('renders a page surface that is not the scroll host by default', () => {
     const wrapper = mount(TPageSurface, { slots: { default: 'Landing' } });
     expect(wrapper.classes()).toContain('t-page-surface');
@@ -6027,7 +6027,7 @@ describe('TREEUX-032 — TPageSurface (S7)', () => {
   });
 });
 
-describe('TREEUX-033 — TShow / THide (S7)', () => {
+describe('TShow / THide', () => {
   it('renders its children on the server side of the contract — always in the DOM', () => {
     const wrapper = mount(TShow, { props: { at: 'lg' }, slots: { default: 'Wide nav' } });
     expect(wrapper.text()).toContain('Wide nav');
@@ -6051,7 +6051,7 @@ describe('TREEUX-033 — TShow / THide (S7)', () => {
   });
 });
 
-describe('TREEUX-036 — TSkipLink (S7)', () => {
+describe('TSkipLink', () => {
   it('renders an anchor to the target with the product copy', () => {
     const wrapper = mount(TSkipLink, {
       props: { href: '#content' },
@@ -6105,7 +6105,7 @@ describe('TREEUX-036 — TSkipLink (S7)', () => {
   });
 });
 
-describe('TREEUX-038 — TColorSwatch readonly (S7)', () => {
+describe('TColorSwatch readonly', () => {
   const options = [
     { label: 'Ink', value: '#1f2328' },
     { label: 'Paper', value: '#ffffff' },
@@ -6131,7 +6131,7 @@ describe('TREEUX-038 — TColorSwatch readonly (S7)', () => {
   });
 });
 
-describe('TREEUX-020 — TTextarea maxRows (S7)', () => {
+describe('TTextarea maxRows', () => {
   const stubScrollHeight = (el: HTMLTextAreaElement, value: number) => {
     Object.defineProperty(el, 'scrollHeight', { configurable: true, get: () => value });
   };
@@ -6179,7 +6179,7 @@ describe('TREEUX-020 — TTextarea maxRows (S7)', () => {
   });
 });
 
-describe('TREEUX-023 — quiet accordion (S7)', () => {
+describe('quiet accordion', () => {
   const mountAccordion = (props: Record<string, unknown>) =>
     mount(TAccordion, {
       props,
@@ -6214,7 +6214,7 @@ describe('TREEUX-023 — quiet accordion (S7)', () => {
   });
 });
 
-describe('TREEUX-001 — TTagInput localizable chip copy (LSS)', () => {
+describe('TTagInput localizable chip copy', () => {
   it('forwards a localized remove label to every chip', () => {
     const wrapper = mount(TTagInput, {
       props: { modelValue: ['dynamodb', 'sqs'], removeLabel: 'Remover' },
@@ -6225,7 +6225,7 @@ describe('TREEUX-001 — TTagInput localizable chip copy (LSS)', () => {
   });
 });
 
-describe('TREEUX-002 — TKeyValueEditor, defects found in real adoption (LSS)', () => {
+describe('TKeyValueEditor, defects found in real adoption', () => {
   it('does not drop a row when the parent holds the map reactively', async () => {
     // The parent pattern that broke it: a `reactive()` object handed back as a
     // proxy, which is never `===` the raw record the editor emitted.
@@ -6306,7 +6306,7 @@ describe('TREEUX-002 — TKeyValueEditor, defects found in real adoption (LSS)',
   });
 });
 
-describe('TREEUX-001 — TTagInput, defects found in real adoption (LSS)', () => {
+describe('TTagInput, defects found in real adoption', () => {
   it('keeps repeated values when allowDuplicates is set', async () => {
     const wrapper = mount(TTagInput, {
       props: { modelValue: ['--param', 'a=1'], allowDuplicates: true },
@@ -6373,7 +6373,7 @@ describe('TREEUX-001 — TTagInput, defects found in real adoption (LSS)', () =>
   });
 });
 
-describe('TREEUX-043 / 047 — TText status tones and the break axis (S7 + LSS)', () => {
+describe('TText status tones and the break axis', () => {
   it.each(['danger', 'success', 'warning', 'info'] as const)('paints the %s tone', (tone) => {
     expect(mount(TText, { props: { tone } }).classes()).toContain(`t-text--${tone}`);
   });
@@ -6405,7 +6405,7 @@ describe('TREEUX-043 / 047 — TText status tones and the break axis (S7 + LSS)'
   });
 });
 
-describe('TREEUX-044 — list semantics on a layout primitive (S7)', () => {
+describe('list semantics on a layout primitive', () => {
   it.each([TStack, TGrid, TSplit, TContainer])(
     'restores role="list" when rendered as a ul',
     (component) => {
@@ -6423,7 +6423,7 @@ describe('TREEUX-044 — list semantics on a layout primitive (S7)', () => {
   });
 });
 
-describe('TREEUX-048 — TTag label density (S7)', () => {
+describe('TTag label density', () => {
   it('keeps the control height by default', () => {
     expect(mount(TTag).classes().some((c) => c.startsWith('t-tag--density-'))).toBe(false);
   });
@@ -6435,7 +6435,7 @@ describe('TREEUX-048 — TTag label density (S7)', () => {
   });
 });
 
-describe('TREEUX-050 — accordion heading wrapper (S7)', () => {
+describe('accordion heading wrapper', () => {
   const mountItem = (accordionProps: Record<string, unknown>, itemProps = {}) =>
     mount(TAccordion, {
       props: accordionProps,
@@ -6466,7 +6466,7 @@ describe('TREEUX-050 — accordion heading wrapper (S7)', () => {
   });
 });
 
-describe('TREEUX-046 / 038 — frame and plate geometry (S7)', () => {
+describe('frame and plate geometry', () => {
   it('gives TEmptyState a frame axis separate from its message size', () => {
     expect(mount(TEmptyState, { props: { frame: 'fill' } }).classes()).toContain(
       't-empty-state--frame-fill',
@@ -6495,7 +6495,7 @@ describe('TREEUX-046 / 038 — frame and plate geometry (S7)', () => {
   });
 });
 
-describe('TREEUX-005 / 007 — typographic and navigation axes (LSS)', () => {
+describe('typographic and navigation axes', () => {
   it('gives TLink the family and size vocabulary of TText', () => {
     const wrapper = mount(TLink, { props: { href: '#', family: 'mono', size: 'sm' } });
     expect(wrapper.classes()).toContain('t-link--family-mono');
@@ -6541,7 +6541,7 @@ describe('TREEUX-005 / 007 — typographic and navigation axes (LSS)', () => {
   });
 });
 
-describe('TREEUX-009 — labelling and identity in form controls (LSS)', () => {
+describe('labelling and identity in form controls', () => {
   it('names a TCheckbox from the label prop', () => {
     const wrapper = mount(TCheckbox, { props: { label: 'Ativar' } });
     expect(wrapper.get('.t-checkbox__label').text()).toBe('Ativar');
@@ -6618,7 +6618,7 @@ describe('TREEUX-009 — labelling and identity in form controls (LSS)', () => {
   });
 });
 
-describe('TREEUX-012 — TFormField only points `for` at something that exists (LSS)', () => {
+describe('TFormField only points `for` at something that exists', () => {
   it('labels a control that carries the id', () => {
     const wrapper = mount(TFormField, {
       props: { label: 'Chave' },
@@ -6666,7 +6666,7 @@ describe('TREEUX-012 — TFormField only points `for` at something that exists (
   });
 });
 
-describe('TREEUX-008 — tone axis on TButton (LSS)', () => {
+describe('tone axis on TButton', () => {
   it('leaves the button untouched without a tone', () => {
     const wrapper = mount(TButton, { props: { variant: 'ghost' } });
     expect(wrapper.classes()).toContain('t-button--ghost');
@@ -6688,7 +6688,7 @@ describe('TREEUX-008 — tone axis on TButton (LSS)', () => {
   });
 });
 
-describe('TREEUX-013 — TTagInput exposes the pending draft (LSS)', () => {
+describe('TTagInput exposes the pending draft', () => {
   it('emits update:draft as the user types, so a dirty count can see it', async () => {
     const wrapper = mount(TTagInput, { props: { modelValue: [] } });
     await wrapper.get('.t-tag-input__field').setValue('sqs');
@@ -6712,7 +6712,7 @@ describe('TREEUX-013 — TTagInput exposes the pending draft (LSS)', () => {
   });
 });
 
-describe('TREEUX-014 — TDropdown custom trigger and icon gutter (LSS)', () => {
+describe('TDropdown custom trigger and icon gutter', () => {
   it('hands the slotted trigger the ARIA the built-in one carries', () => {
     const wrapper = mount(TDropdown, {
       props: { defaultOpen: true, items: [{ label: 'A', value: 'a' }] },
@@ -6750,7 +6750,7 @@ describe('TREEUX-014 — TDropdown custom trigger and icon gutter (LSS)', () => 
   });
 });
 
-describe('TREEUX-041 — TPane (S7)', () => {
+describe('TPane', () => {
   it('anchors header and footer and scrolls only the middle', () => {
     const wrapper = mount(TPane, {
       slots: { header: 'Head', default: 'Body', footer: 'Composer' },
@@ -6768,7 +6768,7 @@ describe('TREEUX-041 — TPane (S7)', () => {
   });
 });
 
-describe('TREEUX-022/040 — TDropVeil (S7)', () => {
+describe('TDropVeil', () => {
   it('renders nothing until a drag is over the target', () => {
     expect(mount(TDropVeil).find('.t-drop-veil').exists()).toBe(false);
   });
@@ -6792,7 +6792,7 @@ describe('TREEUX-022/040 — TDropVeil (S7)', () => {
   });
 });
 
-describe('TREEUX-021 — TFileUpload trigger variant and localizable rejections (S7)', () => {
+describe('TFileUpload trigger variant and localizable rejections', () => {
   it('renders the slot as the only control, with no dropzone and no extra tab stop', () => {
     const wrapper = mount(TFileUpload, {
       props: { variant: 'trigger' },
@@ -6828,7 +6828,7 @@ describe('TREEUX-021 — TFileUpload trigger variant and localizable rejections 
   });
 });
 
-describe('TREEUX-002 fase 2 — TKeyValueEditor write-only mode (LSS)', () => {
+describe('TKeyValueEditor write-only mode', () => {
   const secrets = { API_KEY: { set: true }, DEBUG: { set: false } };
 
   it('shows key and state, and never a value input for an existing secret', () => {
@@ -6877,7 +6877,7 @@ describe('TREEUX-002 fase 2 — TKeyValueEditor write-only mode (LSS)', () => {
   });
 });
 
-describe('TREEUX-003 — TSpanLanes (LSS)', () => {
+describe('TSpanLanes', () => {
   const rows = [
     { label: 'auth', spans: [{ start: 0, end: 500 }, { start: 800, end: 1000, tone: 'danger' as const }] },
   ];
@@ -6911,7 +6911,7 @@ describe('TREEUX-003 — TSpanLanes (LSS)', () => {
   });
 });
 
-describe('TREEUX-019 — media primitives (S7)', () => {
+describe('media primitives', () => {
   it('TAudioPlayer names play and pause, and never fetches on its own', () => {
     const wrapper = mount(TAudioPlayer, {
       props: { src: 'blob:x', playLabel: 'Tocar', pauseLabel: 'Pausar', preload: 'none' },
@@ -6953,7 +6953,7 @@ describe('TREEUX-019 — media primitives (S7)', () => {
   });
 });
 
-describe('TREEUX-016 b/c/d — calendar (S7)', () => {
+describe('Calendar — month grid, time grid and placement', () => {
   const anchor = new Date(2026, 1, 15); // February 2026
   const items = [
     { id: 'a', start: new Date(2026, 1, 15, 9, 0), end: new Date(2026, 1, 15, 10, 0) },
@@ -7048,7 +7048,7 @@ describe('TREEUX-016 b/c/d — calendar (S7)', () => {
   });
 });
 
-describe('TREEUX-004 — TTable row activation and detail (LSS)', () => {
+describe('TTable row activation and detail', () => {
   const columns = [
     { key: 'name', label: 'Name' },
     { key: 'actions', label: '' },
@@ -7169,7 +7169,7 @@ describe('TREEUX-004 — TTable row activation and detail (LSS)', () => {
   });
 });
 
-describe('TREEUX-046/048 — follow-ups from the 0.28 validation (S7)', () => {
+describe('follow-ups from the 0.28 validation', () => {
   it('caps the FRAME with frame="narrow", which `fill` and `inline` do not', () => {
     expect(mount(TEmptyState, { props: { frame: 'narrow' } }).classes()).toContain(
       't-empty-state--frame-narrow',
@@ -7184,7 +7184,7 @@ describe('TREEUX-046/048 — follow-ups from the 0.28 validation (S7)', () => {
   });
 });
 
-describe('TREEUX-011 — element attributes and the generic model (LSS)', () => {
+describe('element attributes and the generic model', () => {
   it('forwards the input attributes it declares to the native field', () => {
     const wrapper = mount(TInput, {
       props: { type: 'number', min: 1, max: 65535, step: 1, inputmode: 'numeric', required: true },
@@ -7230,7 +7230,7 @@ describe('TREEUX-011 — element attributes and the generic model (LSS)', () => 
   });
 });
 
-describe('TREEUX-017 — chart copy and lane budget (LSS)', () => {
+describe('chart copy and lane budget', () => {
   it('lets the accessible table header be localized', () => {
     const wrapper = mount(TChart, {
       props: {

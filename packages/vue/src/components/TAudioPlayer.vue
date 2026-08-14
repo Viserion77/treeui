@@ -4,7 +4,7 @@ import type { TSize } from '../types/contracts';
 import TIcon from './TIcon.vue';
 
 /**
- * Compact audio chip (TREEUX-019): play/pause, duration and seek.
+ * Compact audio chip: play/pause, duration and seek.
  *
  * `src` is agnostic — the component fetches nothing and knows nothing about
  * where the audio came from. Waveform is deliberately absent: it needs Web

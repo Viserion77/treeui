@@ -8,7 +8,7 @@ import {
 } from './calendar';
 
 /**
- * Time grid (TREEUX-016 c): day columns, an hour ruler, an all-day band, and
+ * Time grid: day columns, an hour ruler, an all-day band, and
  * overlapping events placed side by side.
  *
  * The overlap algorithm and the vertical placement live in `@treeui/utils`

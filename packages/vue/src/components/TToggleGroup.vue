@@ -37,7 +37,7 @@ defineOptions({
  * `T[]`. Before this the model was `string | string[]` in and
  * `string | string[] | undefined` out, so a `ref<'grid' | 'list'>` could not be
  * bound at all under a consumer's `strictTemplates` — the same defect as
- * TTabs/TInput (TREEUX-011, group 3), and `undefined` was never actually
+ * TTabs/TInput, and `undefined` was never actually
  * emitted.
  */
 const props = withDefaults(
@@ -134,7 +134,7 @@ const rootClasses = computed(() => [
 const rootStyle = computed(() => attrs.style);
 
 // Like TRadioGroup: no single labellable element, so the TFormField id stays
-// unclaimed and the group names itself with the label's id (TREEUX-012).
+// unclaimed and the group names itself with the label's id.
 const { labelledBy, describedBy } = useFormFieldGroup(attrs);
 
 const rootAttrs = computed(() => {

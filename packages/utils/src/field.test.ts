@@ -7,7 +7,7 @@ import {
   waveAt,
 } from './field';
 
-describe('fieldNoise (TREEUX-039)', () => {
+describe('fieldNoise', () => {
   it('is deterministic, so a decoration survives hydration unchanged', () => {
     expect(fieldNoise(3, 7, 1)).toBe(fieldNoise(3, 7, 1));
     expect(fieldNoise(3, 7, 1)).not.toBe(fieldNoise(3, 7, 2));

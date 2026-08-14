@@ -36,7 +36,7 @@ const props = withDefaults(
      */
     family?: TTextareaFamily;
     /**
-     * Native attributes of the `<textarea>` this component IS (TREEUX-011) —
+     * Native attributes of the `<textarea>` this component IS —
      * declared so `strictTemplates` sees them instead of rejecting the reason
      * the component exists.
      */

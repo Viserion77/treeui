@@ -41,7 +41,7 @@ props:
       Anchor attributes (`href`, `target`, `rel`, `download`) are declared props
       and are only rendered when `as="a"`. They were fallthrough before, which
       typechecked as an error in a consumer's `strictTemplates` build even
-      though a link button is the documented use of `as` (TREEUX-011, group 1).
+      though a link button is the documented use of `as`.
   target:
     type: string
     default: undefined

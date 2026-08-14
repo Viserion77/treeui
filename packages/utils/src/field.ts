@@ -1,5 +1,5 @@
 /**
- * Decorative-field arithmetic (TREEUX-039 b).
+ * Decorative-field arithmetic.
  *
  * Pure functions behind a canvas ornament — a hero wave, a presence orb. Two
  * independent decorations in one repository converged on the same four shapes,

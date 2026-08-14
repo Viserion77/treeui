@@ -1,6 +1,6 @@
 // @vitest-environment node
 //
-// Drift guard for TREEUX-033. `TShow`/`THide` exist because a media query
+// Drift guard for the responsive-visibility axis. `TShow`/`THide` exist because
 // cannot resolve a custom property — `@media (min-width: var(--tree-breakpoint-lg))`
 // is invalid, since media queries are evaluated before the cascade exists. So
 // the stylesheet writes the breakpoints out as literals, and this test is the
@@ -20,7 +20,7 @@ const names = Object.keys(breakpoints) as Array<keyof typeof breakpoints>;
 /** The `max-width` sibling of a `min-width` breakpoint, just below it. */
 const belowOf = (px: number) => `${px - 0.02}px`;
 
-describe('TShow / THide breakpoints match the tokens (TREEUX-033)', () => {
+describe('TShow / THide breakpoints match the tokens', () => {
   it.each(names)('%s hides below the token value', (name) => {
     const px = Number.parseInt(breakpoints[name], 10);
     expect(px).toBeGreaterThan(0);

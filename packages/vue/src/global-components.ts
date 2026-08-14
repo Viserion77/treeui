@@ -2,7 +2,7 @@ import type { AriaAttributes } from 'vue';
 import type { TreeUIGlobalComponents } from './plugin';
 
 /**
- * Type the components `TreeUIPlugin` registers globally (TREEUX-008).
+ * Type the components `TreeUIPlugin` registers globally.
  *
  * Without this augmentation `vue-tsc` has nothing to check a globally
  * registered `<TTag>` against, so a prop that does not exist is not an error —
@@ -29,7 +29,7 @@ declare module 'vue' {
   export interface GlobalComponents extends TreeUIGlobalComponents {}
 
   /**
-   * Attributes any component may receive, on top of its own props (TREEUX-011).
+   * Attributes any component may receive, on top of its own props.
    *
    * `strictTemplates` rejects every attribute that is not a declared prop, and
    * that is too blunt for a library whose components forward `$attrs` to an

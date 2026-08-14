@@ -1,7 +1,7 @@
 import { computed, inject, type ComputedRef, type InjectionKey } from 'vue';
 
 /**
- * Identity a TFormField hands down to the control it labels (TREEUX-009/012).
+ * Identity a TFormField hands down to the control it labels.
  *
  * A `<label for>` has to name a real control, so the id has to exist on both
  * sides. Making the app invent and repeat it by hand is a silent failure mode:

@@ -39,7 +39,7 @@ export const Playground: Story = {
     template: `
       <TPageSurface v-bind="args">
         <THero glow>
-          <TText as="h1" size="display">Seventy Sete</TText>
+          <TText as="h1" size="display">One surface, every entry point</TText>
           <TText measure="lead" tone="muted" style="margin-block: 0.75rem 1.5rem;">
             An anonymous screen composes the same primitives as an authenticated one.
           </TText>

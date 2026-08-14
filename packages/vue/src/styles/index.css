@@ -71,7 +71,7 @@ table.t-visually-hidden {
 }
 
 .t-button {
-  /* Tone axis (TREEUX-008). The variants read an accent triple instead of
+  /* Tone axis. The variants read an accent triple instead of
      hard-coding the brand, so "destructive" composes with every variant —
      `variant="danger"` could only ever be a filled red button, and a quiet
      destructive action in a row of ghost buttons had no way to be expressed.
@@ -404,7 +404,7 @@ table.t-visually-hidden {
   justify-content: center;
 }
 
-/* Same scale contract as the tag's icon slot (TREEUX-010). */
+/* Same scale contract as the tag's icon slot. */
 .t-badge__icon > :where(svg) {
   inline-size: var(--tree-badge-icon-size, var(--tree-size-icon-sm));
   block-size: var(--tree-badge-icon-size, var(--tree-size-icon-sm));
@@ -996,7 +996,7 @@ table.t-visually-hidden {
 }
 
 /* The family lands on the field, not the label wrapper, because the wrapper
-   also holds the spinner (TREEUX-005). */
+   also holds the spinner. */
 .t-textarea--family-sans .t-textarea__field {
   font-family: var(--tree-font-family-sans);
 }
@@ -1412,7 +1412,7 @@ table.t-visually-hidden {
    centred, shrink-to-fit. Measured on the SAME card in a 900px parent:
    134.75px / 13.33px / center as a button against 900px / 16px / start as a
    div. Scoped to the element, so a card as `<a>` or `<div>` is untouched;
-   `type`, `disabled` and the focus ring are untouched either way (TREEUX-045). */
+   `type`, `disabled` and the focus ring are untouched either way. */
 button.t-card {
   appearance: none;
   inline-size: 100%;
@@ -2035,7 +2035,7 @@ a.t-brand-lockup:focus-visible {
   text-align: center;
 }
 
-/* Frame geometry (TREEUX-046). `size` is the message; `frame` is the box the
+/* Frame geometry. `size` is the message; `frame` is the box the
    message sits in — a board column, a side panel and a page are the same empty
    state with three geometries, and wrapping the component to supply them was
    the workaround in 9 files. */
@@ -2050,7 +2050,7 @@ a.t-brand-lockup:focus-visible {
   justify-self: start;
 }
 
-/* `narrow` caps the FRAME, not the message (TREEUX-046). The library already
+/* `narrow` caps the FRAME, not the message. The library already
    capped the inner content, but the dashed box still took the whole column, and
    in a 900px panel that reads as an enormous empty box. 26rem is the step the
    consumer's 28 identical `max-width: 420px` wrappers converge on. */
@@ -4039,9 +4039,9 @@ a.t-brand-lockup:focus-visible {
   right: 0;
 }
 
-/* An item with an icon or a selected mark still lays out as one row
-   (TREEUX-009). The gutter is RESERVED for every item as soon as ANY item has
-   an icon (TREEUX-014): without a fixed width the labels of the icon-less items
+/* An item with an icon or a selected mark still lays out as one row.
+   The gutter is RESERVED for every item as soon as ANY item has
+   an icon: without a fixed width the labels of the icon-less items
    slide left and the menu reads as two ragged columns. */
 .t-dropdown__item-icon {
   display: inline-flex;
@@ -4386,7 +4386,7 @@ a.t-brand-lockup:focus-visible {
   cursor: not-allowed;
 }
 
-/* Quiet variant (TREEUX-023) — the weight of a note attached to one item, not
+/* Quiet variant — the weight of a note attached to one item, not
    of a document section. The trigger shrinks to its content instead of spanning
    the reading column, the item rule disappears, and the panel indents to say
    "this belongs to the thing above it". The 44×44 hit area on
@@ -4758,7 +4758,7 @@ a.t-brand-lockup:focus-visible {
 /* ── Tag / Chip ── */
 
 .t-tag {
-  /* Tone axis (TREEUX-027). The defaults reproduce the pre-tone tag exactly —
+  /* Tone axis. The defaults reproduce the pre-tone tag exactly —
      brand solid, neutral outline and soft — so `tone` is purely additive. Each
      `t-tag--tone-*` block below remaps these five variables and the three
      variant rules read them, the same shape TBadge already uses. Closed axis:
@@ -4811,7 +4811,7 @@ a.t-brand-lockup:focus-visible {
   border: var(--tree-border-width-subtle) solid var(--tree-tag-border);
 }
 
-/* `soft` draws the tone's ring (TREEUX-048 b). Without it `--tree-tag-border`
+/* `soft` draws the tone's ring. Without it `--tree-tag-border`
    was computed and then thrown away in the one variant a label badge actually
    uses. Changed while the tone axis had two consumers, both of whom asked for
    it — a border on an existing look is not a change that can be made later. */
@@ -4842,7 +4842,7 @@ a.t-brand-lockup:focus-visible {
 }
 
 /* Reads the accent axis rather than a fixed colour, so a tag inside a
-   `TSection accent="success"` follows that surface (TREEUX-034). Unset, the
+   `TSection accent="success"` follows that surface. Unset, the
    axis is the secondary brand accent from @treeui/tokens. */
 .t-tag--tone-accent {
   --tree-tag-fg: var(--tree-color-accent-primary);
@@ -4884,7 +4884,7 @@ a.t-brand-lockup:focus-visible {
   --tree-tag-border: var(--tree-color-status-info-border);
 }
 
-/* Label density (TREEUX-048). "Height = the control step" is right for a tag
+/* Label density. "Height = the control step" is right for a tag
    that sits in a row of controls and wrong for a static label next to a
    heading: adopting `tone` on a hero badge took it from 26.25px to 40px (+52%),
    and stepping down to `size="sm"` fixed the height by shrinking the type from
@@ -4909,7 +4909,7 @@ a.t-brand-lockup:focus-visible {
   flex-shrink: 0;
 }
 
-/* The slot provides the scale (TREEUX-010). A TIcon renders its `size` prop as
+/* The slot provides the scale. A TIcon renders its `size` prop as
    width/height ATTRIBUTES, which CSS outranks — so a slotted icon with no
    `size` stops entering at the 20px default and lines up with the tag's own
    type instead. It was either that or a magic number at each call site: a
@@ -6962,7 +6962,7 @@ a.t-brand-lockup:focus-visible {
   cursor: not-allowed;
 }
 
-/* Read-only chip (TREEUX-038) — colour as evidence, not as a choice: inert,
+/* Read-only chip — colour as evidence, not as a choice: inert,
    not focusable, no selected state. The border is `border-strong`, not
    `border-default`, because half of these chips ARE background colours and in
    their own theme a weak border makes the chip vanish into the page. */
@@ -6973,7 +6973,7 @@ a.t-brand-lockup:focus-visible {
   border-radius: var(--tree-color-swatch-radius, var(--tree-radius-pill));
 }
 
-/* Plate geometry (TREEUX-038, second half). A round chip is right for a
+/* Plate geometry. A round chip is right for a
    picker and wrong for a brand manual, where the colour IS the subject:
    `shape="square"` swaps the radius, `block` lets the plate span its card
    instead of staying a fixed square. Height still comes from `size`. */
@@ -7175,7 +7175,7 @@ a.t-brand-lockup:focus-visible {
 }
 
 /* ------------------------------------------------------------------ *
- * List semantics on a layout primitive (TREEUX-044).
+ * List semantics on a layout primitive.
  *
  * A list of resources IS a `<ul>` — that is what a screen reader announces as
  * "list, 7 items". But swapping `div` for `ul` on a layout primitive brings the
@@ -7507,7 +7507,7 @@ a.t-nav-menu__item.is-disabled {
     text-decoration-color var(--tree-motion-duration-fast) var(--tree-motion-easing-standard);
 }
 
-/* Typographic axes, same vocabulary as TText (TREEUX-005). A link whose label
+/* Typographic axes, same vocabulary as TText. A link whose label
    is machine text needed a TText nested inside the anchor to get `mono`, and a
    disclosure link smaller than the body had no way to say so at all. */
 .t-link--family-sans {
@@ -8741,7 +8741,7 @@ body:has(.t-app-shell) {
 }
 
 /* ------------------------------------------------------------------ *
- * TTagInput (TREEUX-001) — free-string chips with an inline text field.
+ * TTagInput — free-string chips with an inline text field.
  * Reuses TTag for the chips; the control is the same bordered field
  * surface as the other form controls, with the focus glow on the box.
  * ------------------------------------------------------------------ */
@@ -8809,7 +8809,7 @@ body:has(.t-app-shell) {
 }
 
 /* ------------------------------------------------------------------ *
- * TKeyValueEditor (TREEUX-002) — rows of key/value inputs with per-row
+ * TKeyValueEditor — rows of key/value inputs with per-row
  * validation. Non-sensitive mode: the full value round-trips.
  * ------------------------------------------------------------------ */
 .t-key-value-editor {
@@ -8969,7 +8969,7 @@ body:has(.t-app-shell) {
 }
 
 /* ------------------------------------------------------------------ *
- * Accent axis (TREEUX-034) — a closed accent a surface can declare and
+ * Accent axis — a closed accent a surface can declare and
  * every descendant inherits. `--tree-color-accent-*` ships from
  * @treeui/tokens as the secondary brand accent; `t-accent--<tone>`
  * remaps the four variables to one of the closed tones, and anything
@@ -9020,7 +9020,7 @@ body:has(.t-app-shell) {
 }
 
 /* ------------------------------------------------------------------ *
- * TSection (TREEUX-030) — vertical rhythm plus an optional banded
+ * TSection — vertical rhythm plus an optional banded
  * background. The band is full-bleed for free: the section spans its
  * parent and carries the background, while the reading column is a
  * TContainer nested inside it. Nothing needs 100vw or a negative
@@ -9050,7 +9050,7 @@ body:has(.t-app-shell) {
 }
 
 /* ------------------------------------------------------------------ *
- * THero (TREEUX-031) — the one section with a layer behind the copy.
+ * THero — the one section with a layer behind the copy.
  * The library owns the box: stacking context, the clip that keeps an
  * oversized decoration inside the band, hero-scale padding, and
  * `pointer-events: none` on the backdrop so a click on the CTA never
@@ -9089,7 +9089,7 @@ body:has(.t-app-shell) {
 }
 
 /* ------------------------------------------------------------------ *
- * TPageSurface (TREEUX-032) — the page-level surface for screens with
+ * TPageSurface — the page-level surface for screens with
  * no app shell (landing, login, public status).
  * ------------------------------------------------------------------ */
 
@@ -9124,7 +9124,7 @@ body:has(.t-page-surface) {
 }
 
 /* ------------------------------------------------------------------ *
- * TShow / THide (TREEUX-033) — breakpoint visibility in pure CSS, so
+ * TShow / THide — breakpoint visibility in pure CSS, so
  * both branches render on the server and a crawler reads every link.
  * A media query cannot resolve a custom property (it is evaluated
  * before the cascade exists), so the breakpoints are written out as
@@ -9197,7 +9197,7 @@ body:has(.t-page-surface) {
 }
 
 /* ------------------------------------------------------------------ *
- * TSkipLink (TREEUX-036) — the one control that has to be hidden and
+ * TSkipLink — the one control that has to be hidden and
  * visible at the same time. `.t-visually-hidden` hides it forever,
  * which defeats the sighted keyboard user it exists for, so it parks
  * off-screen with a transform and rides back in on focus.
@@ -9244,7 +9244,7 @@ body:has(.t-page-surface) {
 }
 
 /* ------------------------------------------------------------------ *
- * TPane (TREEUX-041) — fill the parent, scroll only the middle.
+ * TPane — fill the parent, scroll only the middle.
  *
  * `min-block-size: 0` on the body is the line nobody gets right: without it a
  * flex child refuses to shrink below its content, so the middle never scrolls
@@ -9276,7 +9276,7 @@ body:has(.t-page-surface) {
 }
 
 /* ------------------------------------------------------------------ *
- * TDropVeil (TREEUX-022 / TREEUX-040) — the "let go here" surface.
+ * TDropVeil — the "let go here" surface.
  *
  * `pointer-events: none` is load-bearing: a veil that accepts the pointer
  * swallows the very `drop` it exists to announce.
@@ -9311,7 +9311,7 @@ body:has(.t-page-surface) {
 }
 
 /* ------------------------------------------------------------------ *
- * TFileUpload trigger variant (TREEUX-021).
+ * TFileUpload trigger variant.
  *
  * The dropzone widget is `width: 100%` with a padded dashed box, which is right
  * where the drop area IS the interface and wrong in a composer: measured at
@@ -9328,7 +9328,7 @@ body:has(.t-page-surface) {
   align-items: center;
 }
 
-/* Write-only rows (TREEUX-002 phase 2): the key is text, not a field, because
+/* Write-only rows: the key is text, not a field, because
    renaming a secret is a delete plus a create, not an edit. */
 .t-key-value-editor__secret-key {
   flex: 1 1 40%;
@@ -9352,7 +9352,7 @@ body:has(.t-page-surface) {
 }
 
 /* ------------------------------------------------------------------ *
- * TTable row activation (TREEUX-004).
+ * TTable row activation.
  *
  * A `<tr>` cannot be an `<a>` — its only permitted content is `<td>`/`<th>`,
  * and the parser hoists anything else out of the table — so the link lives in
@@ -9425,7 +9425,7 @@ body:has(.t-page-surface) {
 }
 
 /* ------------------------------------------------------------------ *
- * TSpanLanes (TREEUX-003) — one lane per subject on a shared time axis.
+ * TSpanLanes — one lane per subject on a shared time axis.
  *
  * The lane label takes a fixed reading column so the tracks line up; the track
  * is the positioning context every span is placed against. Colours come from
@@ -9492,7 +9492,7 @@ body:has(.t-page-surface) {
 }
 
 /* ------------------------------------------------------------------ *
- * TAudioPlayer / TVoiceRecorder (TREEUX-019).
+ * TAudioPlayer / TVoiceRecorder.
  *
  * The pulse is frozen under `prefers-reduced-motion` by default, not as an
  * opt-in: a recording indicator runs for as long as someone is talking, which
@@ -9597,7 +9597,7 @@ body:has(.t-page-surface) {
 }
 
 /* ------------------------------------------------------------------ *
- * Calendar surface (TREEUX-016 b/c/d).
+ * Calendar surface.
  *
  * Every vertical measurement derives from `--tree-calendar-hour-height`, which
  * the component sets from its `hourHeight` prop — the same number the maths in
@@ -9800,7 +9800,7 @@ body:has(.t-page-surface) {
   background: var(--tree-color-status-error);
 }
 
-/* The lane budget always declares what it hid (TREEUX-017). */
+/* The lane budget always declares what it hid. */
 .t-span-lanes__overflow {
   margin: 0;
   color: var(--tree-color-text-muted);

@@ -1054,7 +1054,7 @@ onBeforeUnmount(() => {
       wrapper around it, and therefore no nested interactive and no second tab
       stop — a composer's paperclip is already a TButton. Measured in a real
       composer at 1440x900, the dropzone widget ate the row and left the text
-      field 26px wide (TREEUX-021).
+      field 26px wide.
     -->
     <div
       v-if="variant === 'trigger'"

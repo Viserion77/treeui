@@ -44,7 +44,7 @@ const props = withDefaults(
      * between samples, which is wrong for a quantity that holds its value
      * across a bucket — concurrency, queue depth, a flag over time: a curve, or
      * even a diagonal, draws a state that never existed. `step` holds each
-     * value until the next sample and then jumps (TREEUX-003).
+     * value until the next sample and then jumps.
      */
     interpolation?: ChartInterpolation;
     /**
@@ -82,7 +82,7 @@ const props = withDefaults(
      * Header of the series column in the accessible data table. It was the one
      * string in the whole component with no way out — the empty state has a
      * slot, this had nothing — so in a multilingual UI it was the single label
-     * that could not go through the app's catalogue (TREEUX-017).
+     * that could not go through the app's catalogue.
      */
     seriesLabel?: string;
   }>(),

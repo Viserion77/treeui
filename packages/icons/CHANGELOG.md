@@ -4,7 +4,7 @@
 
 ### Minor Changes
 
-- 1a9d136: Ship the `skip-forward` icon (TREEUX-042) — transport, not navigation: the pair
+- 1a9d136: Ship the `skip-forward` icon — transport, not navigation: the pair
   of `play`/`pause`, for "end this phase now".
 
   It was added to the source in the 0.28 cycle but **no changeset ever named

@@ -1,5 +1,5 @@
 /**
- * Drag-and-drop arithmetic (TREEUX-022 / TREEUX-040).
+ * Drag-and-drop arithmetic.
  *
  * Pure, DOM-free, and framework-agnostic — the Vue composable that owns the
  * listeners builds on this, and a React one would reuse it unchanged. Two

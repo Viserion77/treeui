@@ -148,7 +148,7 @@
 
 - 1a9d136: Clears the entire accepted backlog from both consumer files in one release.
 
-  **Calendar (TREEUX-016 b/c/d)** — `TCalendarMonthGrid`, `TCalendarTimeGrid` and
+  **Calendar** — `TCalendarMonthGrid`, `TCalendarTimeGrid` and
   the `TCalendar` wrapper with `view`. The month grid CONSUMES `getMonthMatrix`
   and draws exactly the matrix it returns rather than recomputing the grid, which
   is the contract that keeps a consumer's fetch window and the days on screen from
@@ -157,13 +157,13 @@
   only in the current day's column; every `Intl` call is memoised per locale at
   render time, never at module scope.
 
-  **Media (TREEUX-019)** — `TAudioPlayer` (play/pause, duration, seek; `src` is
+  **Media** — `TAudioPlayer` (play/pause, duration, seek; `src` is
   agnostic and waveform is deliberately out of scope) and `TVoiceRecorder` (the
   record/recording/preview states, mm:ss timer, duration cap). The pulse is frozen
   under `prefers-reduced-motion` by default: a recording indicator runs for as
   long as someone is talking. Capture and upload stay with the product.
 
-  **File and drop (TREEUX-021, 022, 040)**
+  **File and drop**
 
   - `TFileUpload` gains `variant="trigger"` — the slot becomes the only control,
     with no dashed box, no `role="button"` wrapper and no second tab stop — and
@@ -177,7 +177,7 @@
   - The arithmetic is pure and framework-agnostic in `@treeui/utils`:
     `dragCarriesTypes`, `nextDragDepth`, `filesFromTransfer`, `payloadFromTransfer`.
 
-  **Canvas (TREEUX-039 a+b)** — `useDecorativeCanvas()` owns the lifecycle that
+  **Canvas** — `useDecorativeCanvas()` owns the lifecycle that
   two ornaments had each discovered by measuring: no frame while reduced-motion,
   coarse pointer, background tab or off-screen; backing store that follows the
   element with a pixel-ratio ceiling; never steals a pointer event; clean unmount.
@@ -185,7 +185,7 @@
   `canvasBackingSize`) is in `@treeui/utils` and is deterministic, so a
   pre-rendered decoration survives hydration unchanged.
 
-  **Layout and data (TREEUX-041, 003, 004, 002 phase 2)**
+  **Layout and data**
 
   - `TPane` — fill the parent, scroll only the middle, anchor header and footer.
     The `min-block-size: 0` nobody gets right the first time now lives here.
@@ -240,7 +240,7 @@ danger | info`), orthogonal to `variant` and using the same closed vocabulary
     has an `icon`, so the labels of the icon-less ones stop sliding left and
     reading as two ragged columns.
 - 1a9d136: Make the `GlobalComponents` typing actually reach a consumer, and actually
-  usable (TREEUX-008 / TREEUX-011).
+  usable.
 
   **It was unreachable.** `global-components.d.ts` shipped in `dist/` referenced
   by nothing: a bare side-effect import is elided from the emitted `index.d.ts`,
@@ -276,7 +276,7 @@ danger | info`), orthogonal to `variant` and using the same closed vocabulary
   `TSelect`, `TRadioGroup` or `TToggleGroup` produced a label pointing at an id no
   element on the page had. Before 0.28 the `for` was simply absent: the field was
   unnamed, but the markup was coherent. This made it incoherent, which an audit
-  tool flags (TREEUX-012).
+  tool flags.
 
   - `TSelect` now carries the id on its trigger button, so the label names it.
   - `TRadioGroup` and `TToggleGroup` release the id and name themselves with
@@ -296,7 +296,7 @@ danger | info`), orthogonal to `variant` and using the same closed vocabulary
 
 ### Minor Changes
 
-- ec31a47: Fixes for the two components the LSS dashboard rejected in validation.
+- ec31a47: Fixes for the two components that failed validation in a consumer app.
 
   **`TKeyValueEditor` — data loss under the idiomatic binding.** The watcher that
   rebuilt the rows from `modelValue` compared by REFERENCE, and a parent holding
@@ -333,7 +333,7 @@ danger | info`), orthogonal to `variant` and using the same closed vocabulary
     dropped it with no warning. `commit()` is exposed for an explicit flush.
   - Pasting a lone separator no longer strands the text in the field.
 
-- ec31a47: Labelling, identity and navigation in forms (TREEUX-007, 008, 009).
+- ec31a47: Labelling, identity and navigation in forms.
 
   - **`TFormField` generates the control id** and provides it to the TreeUI
     control nested inside, so `<label for>` and the control cannot drift.
@@ -363,7 +363,7 @@ danger | info`), orthogonal to `variant` and using the same closed vocabulary
     rendered — with no warning in dev, in build, or in `vue-tsc`.
 
 - ec31a47: The axes both consumers were hand-rolling in local CSS, and two user-agent boxes
-  that leaked through `as` (TREEUX-005, 043–050).
+  that leaked through `as`.
 
   **`TText`**
 
@@ -427,7 +427,7 @@ danger | info`), orthogonal to `variant` and using the same closed vocabulary
 
 ### Minor Changes
 
-- ddbbf86: Two chat-composer fixes (TREEUX-020, TREEUX-023):
+- ddbbf86: Two chat-composer fixes:
 
   - **`TTextarea` gains `maxRows`** — a ceiling for `autoGrow`, in lines. Without
     it the field grows forever and a composer eventually pushes the conversation
@@ -444,42 +444,41 @@ danger | info`), orthogonal to `variant` and using the same closed vocabulary
     are unchanged. It looks small; it is not small to hit.
 
 - ddbbf86: Closes the marketing surface — the batch of primitives a public site and 13
-  product landing pages were each re-solving in local CSS (TREEUX-027, 030–034,
-  036, 038).
+  product landing pages were each re-solving in local CSS.
 
   **New components**
 
-  - **`TSection`** (TREEUX-030) — page section with responsive vertical rhythm
+  - **`TSection`** — page section with responsive vertical rhythm
     (`rhythm="tight|default|loose"`) and an optional full-bleed band
     (`banded`), with the reading column delegated to a nested `TContainer`.
     The band is full-bleed because the section spans its parent and carries the
     background itself: no `100vw`, no negative margin, so it cannot overflow once
     the platform paints a classic scrollbar.
-  - **`THero`** (TREEUX-031) — the one section with a layer behind the copy. The
+  - **`THero`** — the one section with a layer behind the copy. The
     library owns the box (stacking context, the clip that keeps an oversized
     decoration inside the band, hero-scale padding) and guarantees the `#backdrop`
     layer is `pointer-events: none`, so a click on the CTA never dies in the
     ornament. `glow` draws the one part of a hero backdrop that is 100% tokens.
-  - **`TPageSurface`** (TREEUX-032) — the page-level surface for screens with no
+  - **`TPageSurface`** — the page-level surface for screens with no
     app shell. Zeroes the user-agent body margin (previously only handled for
     `body:has(.t-app-shell)`) and, with `overlay`, takes the viewport and becomes
     the scroll host with contained scroll chaining, so a landing rendered over a
     mounted SPA stops dragging the screen behind it.
-  - **`TShow` / `THide`** (TREEUX-033) — breakpoint visibility in pure CSS
+  - **`TShow` / `THide`** — breakpoint visibility in pure CSS
     (`at`/`below`, combinable into a band). Both branches render, so a
     pre-rendered page keeps every link; a `matchMedia` composable cannot, because
     there is no `window` while the HTML is written. It is also something a
     consumer cannot write: `@media (min-width: var(--tree-breakpoint-lg))` is
     invalid, so the pixel gets hardcoded per app. A unit test fails the build if
     the stylesheet literals drift from `--tree-breakpoint-*`.
-  - **`TSkipLink`** (TREEUX-036) — the one control that must be hidden and visible
+  - **`TSkipLink`** — the one control that must be hidden and visible
     at the same time. It parks off-screen and returns on `:focus-visible`, and it
     prepares its own target (`tabindex="-1"` plus the ring suppression), which
     retires the loose `#content:focus { outline: none }` from consumer
     stylesheets. `TAppShell` gains `skipLinkLabel` to close the same hole for
     authenticated screens — opt-in only because the label is product copy.
 
-  **Accent axis and elevation (TREEUX-034 / TREEUX-027)**
+  **Accent axis and elevation**
 
   - `@treeui/tokens` gains a **secondary brand accent** with a measured light/dark
     pair (`--tree-color-accent-primary` / `-hover` / `-soft` / `-contrast`), AA on
@@ -498,7 +497,7 @@ danger | info`), orthogonal to `variant` and using the same closed vocabulary
 
   **Existing components**
 
-  - **`TColorSwatch`** gains `readonly` (TREEUX-038): colour as evidence rather
+  - **`TColorSwatch`** gains `readonly`: colour as evidence rather
     than as a choice — inert `role="img"` chips with a `border-strong` outline, so
     a chip that IS a background colour stays visible in its own theme.
   - **`TTag`** gains `removeLabel`, so the remove button's accessible name can be
@@ -514,15 +513,15 @@ danger | info`), orthogonal to `variant` and using the same closed vocabulary
 
 ### Minor Changes
 
-- 184914c: Two new data-entry components for the LSS dashboard:
+- 184914c: Two new data-entry components for dashboard-style forms:
 
-  - **`TTagInput`** (TREEUX-001) — edit a list of free-text strings as
+  - **`TTagInput`** — edit a list of free-text strings as
     addable/removable chips. `v-model` is `string[]`; Enter and comma confirm the
     current tag, Backspace on an empty field removes the last, pasted
     comma-separated text splits into tags, and values are trimmed and deduped
     silently. Chips reuse `TTag`. For selection from a fixed set, keep
     `TMultiSelect`/`TCombobox`.
-  - **`TKeyValueEditor`** (TREEUX-002, phase 1) — edit a `Record<string, string>`
+  - **`TKeyValueEditor`** — edit a `Record<string, string>`
     as key/value rows with inline per-row validation (empty and duplicate keys are
     flagged and blocked from commit without blocking typing) plus a
     `validity-change` event for an aggregated `TFormField` summary. Copy is
@@ -532,7 +531,7 @@ danger | info`), orthogonal to `variant` and using the same closed vocabulary
 - 184914c: `TText` gains `size="title"` — a responsive section-heading step (clamp
   xl→4xl, tight line-height and tracking) that stays below `size="display"` at
   every viewport width, so a section heading never out-sizes the page's hero on a
-  narrow screen (TREEUX-024). Marketing surfaces drop their hand-written
+  narrow screen. Marketing surfaces drop their hand-written
   `clamp()` section-title class.
 
 ### Patch Changes
@@ -546,11 +545,11 @@ danger | info`), orthogonal to `variant` and using the same closed vocabulary
 
 - 2628793: Extend `TText` for marketing surfaces and fix two `TLanguageSelect` bugs.
 
-  - **TText display/heading sizes (TREEUX-024)**: `size` gains `4xl`, `5xl`, and `display` — a responsive hero step (`clamp(3xl→5xl)` with compact line-height and tight tracking), so a landing hero scales with the viewport without a consumer `clamp()`.
-  - **TText overline (TREEUX-025)**: `size="overline"` — a closed eyebrow style (xs, semibold, uppercase, wide tracking) that leaves colour to the `tone` axis (brand on a site, muted on a product LP).
-  - **TText reading measure (TREEUX-029)**: `measure="lead" | "prose"` caps line length in `ch` (58 / 68) and renders block, so every surface uses the same measure without hardcoding `ch`.
-  - **TLanguageSelect SSR fix (TREEUX-028)**: the outside-click listener bound in an `immediate` watcher touched `document` during setup and crashed server rendering (`nuxt generate`). The client-only side effect moved to `onMounted`; a `renderToString` smoke test now guards the overlay/select components against DOM access during setup.
-  - **TLanguageSelect icon-only fix (TREEUX-026)**: `icon-only` (switcher) now visually hides the language name (kept as the accessible name) and collapses the trigger to a square, instead of only tightening padding — so a narrow navbar no longer shows the full endonym.
+  - **TText display/heading sizes**: `size` gains `4xl`, `5xl`, and `display` — a responsive hero step (`clamp(3xl→5xl)` with compact line-height and tight tracking), so a landing hero scales with the viewport without a consumer `clamp()`.
+  - **TText overline**: `size="overline"` — a closed eyebrow style (xs, semibold, uppercase, wide tracking) that leaves colour to the `tone` axis (brand on a site, muted on a product LP).
+  - **TText reading measure**: `measure="lead" | "prose"` caps line length in `ch` (58 / 68) and renders block, so every surface uses the same measure without hardcoding `ch`.
+  - **TLanguageSelect SSR fix**: the outside-click listener bound in an `immediate` watcher touched `document` during setup and crashed server rendering (`nuxt generate`). The client-only side effect moved to `onMounted`; a `renderToString` smoke test now guards the overlay/select components against DOM access during setup.
+  - **TLanguageSelect icon-only fix**: `icon-only` (switcher) now visually hides the language name (kept as the accessible name) and collapses the trigger to a square, instead of only tightening padding — so a narrow navbar no longer shows the full endonym.
 
 ### Patch Changes
 
@@ -561,7 +560,7 @@ danger | info`), orthogonal to `variant` and using the same closed vocabulary
 
 ### Minor Changes
 
-- 2a5c192: Add `TImage` — a content-image primitive (TREEUX-017).
+- 2a5c192: Add `TImage` — a content-image primitive.
 
   Renders a native `<img>` with token-driven corners (`radius`: none/sm/md/lg/pill), `object-fit` (`fit`: cover/contain), optional `ratio` (CSS aspect-ratio), lazy loading by default, and a **required** `alt` so an unnamed content image can't ship by accident. Display only — it never fetches or transforms the source. Zoom/lightbox is deliberately not built in: compose `TImage` inside `TModal` (recipe `image-zoom`), keeping the trigger a product decision.
 
@@ -574,7 +573,7 @@ danger | info`), orthogonal to `variant` and using the same closed vocabulary
 
 ### Minor Changes
 
-- 93f5454: Add `TPopover` `width` and fix rich panels collapsing / overflowing the viewport (TREEUX-018).
+- 93f5454: Add `TPopover` `width` and fix rich panels collapsing / overflowing the viewport.
 
   The panel content now sizes to its intrinsic width (`width: max-content`), so a grid or flex panel (e.g. an app-launcher `TGrid` whose columns have a near-zero min-content) no longer shrink-to-fits down to the `min-width`. The new `width` prop caps how wide it may grow — `sm` (18rem), `md` (24rem, base), `lg` (40rem), or `content` (no rem cap, viewport only). Width and height are always clamped to the viewport (`calc(100vw - space-8)` / `calc(100dvh - space-16)`) and the panel gets its own scroll, so a tall/wide panel never runs off-screen. `TMenu` forwards `width` too. This removes the need for consumers to reach into `:deep(.t-popover__content)` for width/overflow.
 
@@ -590,25 +589,25 @@ danger | info`), orthogonal to `variant` and using the same closed vocabulary
 
 ### Minor Changes
 
-- 3138497: Clear the remaining queued TREEUX items in one batch: the popover close contract, two new list primitives, the rich menu compound, and the responsive-rail policy.
+- 3138497: Clear the remaining queued contract items in one batch: the popover close contract, two new list primitives, the rich menu compound, and the responsive-rail policy.
 
-  **TPopover — `close()` method + slot arg (TREEUX-015)**
+  **TPopover — `close()` method + slot arg**
 
   `close(options?)` is exposed via template ref and passed to the default slot, so content dismisses the panel after a navigation or action without a v-model watcher or manual focus handling. Focus restore follows a heuristic: without options it returns focus to the trigger only if focus is inside the panel at close time; `restoreFocus: true/false` forces or suppresses it; an external v-model change follows the same heuristic; an outside pointer never steals focus; Escape always restores. Replaces the consumer's `useTriggerFocusRestore`.
 
-  **TList + TListItem (TREEUX-002)**
+  **TList + TListItem**
 
   A non-selectable content list: plain `<ul>`/`<li>` with `leading`/`default`/`meta`/`actions` regions and a `size` scale. Unlike TSelectableList (role=listbox), the rows carry no selection semantics, so the `actions` region holds real interactive controls. On a narrow container `meta` drops below the content while `actions` stay visible — the list never owns or auto-collapses an overflow.
 
-  **TMenu + TMenuGroup + TMenuItem (TREEUX-007)**
+  **TMenu + TMenuGroup + TMenuItem**
 
   A slot-driven rich action menu built on TPopover, coexisting with TDropdown (which stays the data-driven lightweight menu). `role="menu"` with the header rendered outside it; `TMenuGroup` adds a non-focusable labelled group; `TMenuItem` supports action / `href` / `to` link items, icon + description + meta, a `danger` variant (the label text carries the meaning, not colour alone), and a `menuitemradio` mode via `checked` for a workspace switch. Roving focus (arrows/Home/End, skipping disabled), Escape and item selection close through TPopover's `close()` — one focus-restore contract, reused, not duplicated.
 
-  **TDescriptionList + TDescriptionItem (TREEUX-005)**
+  **TDescriptionList + TDescriptionItem**
 
   A key/value list with real `<dl>`/`<dt>`/`<dd>` semantics and per-row `actions` (e.g. copy) as siblings of the value. On a narrow container the label moves above the value — right for long values like ARNs. Distinct from TList: a description list announces label/value pairs.
 
-  **TAppShell — `railBreakpoint` responsive policy (TREEUX-011)**
+  **TAppShell — `railBreakpoint` responsive policy**
 
   The responsive policy now measures the shell root via ResizeObserver (not the viewport, not the content panel — avoiding the feedback loop the panel would cause). `railBreakpoint` enables three states: drawer below `breakpoint`, auto-forced collapsed rail between `breakpoint` and `railBreakpoint`, and the user's manual collapse preference at/above it. The auto-rail band never mutates the manual preference and emits no `update:collapsed`/`collapse-change`; the preference returns when the width grows back. `breakpoint` now accepts px/rem/em and is the drawer boundary.
 
@@ -618,17 +617,17 @@ danger | info`), orthogonal to `variant` and using the same closed vocabulary
 
 ### Minor Changes
 
-- 47d5166: Fix the `TButton` `iconOnly` dev warning and add three new components agreed with the S7 and LSS consumer apps.
+- 47d5166: Fix the `TButton` `iconOnly` dev warning and add three new components agreed with consumer apps.
 
-  **Fix — TButton `iconOnly` accessible-name warning (TREEUX-001, rejected in validation)**
+  **Fix — TButton `iconOnly` accessible-name warning**
 
   The 0.20.0 warning never fired in a real browser dev build: the `typeof process !== 'undefined'` guard is `false` in the browser (no `process` global), and wrapping the check in a function made it opaque to tree-shaking, so the block and its strings survived into production bundles. The guard is now a bare, inlined `process.env.NODE_ENV !== 'production'` compare, which the consumer's bundler statically replaces: it runs in their development build and is dead-code-eliminated — block and string literal — from production. A regression test asserts the source keeps the bare pattern (no `typeof` guard, no function wrapper).
 
-  **TBrandLockup** (TREEUX-009) — a generic product brand lockup: a `logo` slot kept at its intrinsic aspect ratio (never cropped, unlike TAvatar), a truncating `title` and optional `subtitle`, a `collapsed` mode for a shell's collapsed rail, and an optional home link (`href`/`to`, router-aware). Ships no identity — the asset and strings belong to the consumer.
+  **TBrandLockup** — a generic product brand lockup: a `logo` slot kept at its intrinsic aspect ratio (never cropped, unlike TAvatar), a truncating `title` and optional `subtitle`, a `collapsed` mode for a shell's collapsed rail, and an optional home link (`href`/`to`, router-aware). Ships no identity — the asset and strings belong to the consumer.
 
-  **TCodeBlock** (TREEUX-003) — a scrollable monospace surface for logs, JSON and ARNs. `wrap` toggles between horizontal-scroll (logs) and wrapping (JSON), `maxBlockSize` caps the height, and the `<pre>` is a labelled keyboard-scrollable `role="region"`. Optional built-in copy button (`copyable` + `code`). No syntax highlighting or virtualization by design. For inline code use `TText family="mono"`.
+  **TCodeBlock** — a scrollable monospace surface for logs, JSON and ARNs. `wrap` toggles between horizontal-scroll (logs) and wrapping (JSON), `maxBlockSize` caps the height, and the `<pre>` is a labelled keyboard-scrollable `role="region"`. Optional built-in copy button (`copyable` + `code`). No syntax highlighting or virtualization by design. For inline code use `TText family="mono"`.
 
-  **TLinkTile** (TREEUX-008) — an interactive navigational tile: a single link surface (`href`/`to`) with `leading`/`title`/`description` regions, a closed `tone` accent axis (status/brand tokens, soft tint derived via color-mix), and `current` → `aria-current="page"`. Owns hover/focus/sizing but no grid — compose collections with TGrid.
+  **TLinkTile** — an interactive navigational tile: a single link surface (`href`/`to`) with `leading`/`title`/`description` regions, a closed `tone` accent axis (status/brand tokens, soft tint derived via color-mix), and `current` → `aria-current="page"`. Owns hover/focus/sizing but no grid — compose collections with TGrid.
 
   Practice conformance updated in `docs/ai/practices.json`: `TLinkTile` → interaction-feedback, accessible-by-default, token-driven; `TCodeBlock` → accessible-by-default, token-driven; `TBrandLockup` → content-alignment, token-driven.
 
@@ -636,33 +635,33 @@ danger | info`), orthogonal to `variant` and using the same closed vocabulary
 
 ### Minor Changes
 
-- 6b228cd: Ship the round-3 contract items agreed with the S7 and LSS consumer apps — all additive prop/slot surface on existing components.
+- 6b228cd: Ship the round-3 contract items agreed with consumer apps — all additive prop/slot surface on existing components.
 
-  **TButton — dev-only accessible-name warning for `iconOnly`** (S7-001, LSS-006)
+  **TButton — dev-only accessible-name warning for `iconOnly`**
 
   An `iconOnly` button with no `label` / `aria-label` / `aria-labelledby` now logs a console warning in development. The check is guarded by `process.env.NODE_ENV`, which the vue package's build keeps as a runtime reference (via a vite `define`) so the consumer's bundler resolves it — the warning fires in their dev build and tree-shakes out of production. Completes the item's exit criterion without a separate `TIconButton`.
 
-  **TStack — `fill="viewport" | "parent"`** (S7-006)
+  **TStack — `fill="viewport" | "parent"`**
 
   Gives the stack a floor height (`100dvh` / `100%`) so a centered child fills the screen or its parent with no local height CSS. Composes with `align`/`justify="center"` and with `TContainer`/`TPage`. Distinct from `grow`, which fills a flex parent's main axis.
 
-  **TPopover — `size`** (S7-004)
+  **TPopover — `size`**
 
   `size` (`sm | md | lg`) scales the content padding via the shared size tokens, so a compact rich panel uses a prop instead of overriding `.t-popover__content`. This is the `size` axis, not a density prop. Compact menus of actions still belong in `TDropdown`.
 
-  **TText — `family="sans" | "mono"`** (LSS-001)
+  **TText — `family="sans" | "mono"`**
 
   `mono` maps to `--tree-font-family-mono`, the token-driven way to render inline code, IDs, and ARNs without a local monospace class.
 
-  **TLink — `underline` and `weight`; TCard — `interactive`** (LSS-002)
+  **TLink — `underline` and `weight`; TCard — `interactive`**
 
   `TLink` gains `underline` (`always | hover | none`) and `weight` (`regular | medium | semibold`); `variant` stays a pure emphasis axis (no `plain`). For wrapping a whole card/button in a link, `TCard` gains `interactive` — hover elevation + focus-visible ring + cleared decoration — so `<TCard as="a" interactive>` is a real link surface without an inner `TLink` underlining the card's text.
 
-  **TTable — `rowState` and `rowKey`** (LSS-012)
+  **TTable — `rowState` and `rowKey`**
 
   `rowState(row, index) => 'default' | 'muted'` applies a per-row visual state by data, not position, so it survives sorting; `rowKey` gives rows stable identity. `muted` is written at compound specificity so it beats the zebra/hover rules. Dimming is documented as a non-sole signal — pair it with a status cell or hidden text.
 
-  **TAppShell — `header-end` slot** (LSS-007)
+  **TAppShell — `header-end` slot**
 
   A trailing header region pinned to the far end of the row, so brand-at-start / actions-at-end no longer needs a consumer `TStack` wrapper inside `#header`. Works in the plain flex header, the `has-start` grid (as a content-sized third column), and the mobile fallback.
 

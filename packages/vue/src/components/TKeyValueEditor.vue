@@ -36,7 +36,7 @@ export interface TKeyValueEditorLabels {
 }
 
 /**
- * Write-only mode (TREEUX-002 phase 2). The VALUE never reaches the client —
+ * Write-only mode. The VALUE never reaches the client —
  * the API returns only which keys exist — so the model cannot be
  * `Record<string, string>`: there is nothing to read. Each row shows the key
  * and whether it is set, with an affordance to replace or clear.
@@ -351,7 +351,7 @@ const fieldAttrs = computed(() => {
       Write-only mode: the value never reaches the client, so there is nothing
       to render and nothing to bind. The row is the key plus "set / not set",
       with replace and clear — reading the current value is not an affordance
-      that exists here, by design (TREEUX-002 phase 2).
+      that exists here, by design.
     -->
     <div
       v-if="mode === 'secret'"

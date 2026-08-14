@@ -24,7 +24,7 @@ export const UserMenu: Story = {
       const current = ref('acme');
       const spaces = [
         { id: 'acme', name: 'Acme Corp' },
-        { id: 's7', name: 'S7 Tasks' },
+        { id: 'atlas', name: 'Atlas Tasks' },
       ];
       return { args, current, spaces };
     },

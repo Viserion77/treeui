@@ -9,7 +9,7 @@ import {
 
 const file = (name: string, type: string) => new File(['x'], name, { type });
 
-describe('dragCarriesTypes (TREEUX-022/040)', () => {
+describe('dragCarriesTypes', () => {
   it('accepts a file drag through the browser type name', () => {
     expect(dragCarriesFiles({ types: ['Files'] })).toBe(true);
     expect(dragCarriesTypes({ types: ['Files'] }, ['Files'])).toBe(true);

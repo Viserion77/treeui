@@ -1,6 +1,6 @@
 // @vitest-environment node
 //
-// SSR smoke test (TREEUX-028). Runs in the `node` environment — NO `document`,
+// SSR smoke test. Runs in the `node` environment — NO `document`,
 // NO `window` — so `renderToString` exercises the real server path. Any
 // component that touches the DOM during setup (e.g. a `document` call in an
 // `immediate` watcher) throws here, exactly as it does in a consumer's
@@ -39,7 +39,7 @@ const cases: Array<{ name: string; component: Component; props?: Record<string, 
   { name: 'TModal', component: TModal, props: { open: false } },
   { name: 'TDrawer', component: TDrawer, props: { open: false } },
   { name: 'TTooltip', component: TTooltip },
-  // The marketing surface (TREEUX-030…036) exists for pre-rendered pages, so
+  // The marketing surface exists for pre-rendered pages, so
   // rendering on the server is the point, not an edge case. TSkipLink resolves
   // its target in `onMounted` precisely so it never reaches for `document` here.
   { name: 'TPageSurface', component: TPageSurface },
@@ -50,7 +50,7 @@ const cases: Array<{ name: string; component: Component; props?: Record<string, 
   { name: 'TSkipLink', component: TSkipLink, props: { href: '#content' } },
 ];
 
-describe('SSR smoke — components render to string without a DOM (TREEUX-028)', () => {
+describe('SSR smoke — components render to string without a DOM', () => {
   it('has no document/window globals in this environment', () => {
     expect(typeof document).toBe('undefined');
     expect(typeof window).toBe('undefined');

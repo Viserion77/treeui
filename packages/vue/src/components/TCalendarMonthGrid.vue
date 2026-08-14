@@ -9,7 +9,7 @@ import {
 } from './calendar';
 
 /**
- * Month grid (TREEUX-016 b).
+ * Month grid.
  *
  * It CONSUMES `getMonthMatrix` and draws exactly the matrix that function
  * returns — it does not recompute the grid with a rule of its own. That is the

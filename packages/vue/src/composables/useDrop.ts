@@ -7,7 +7,7 @@ import {
 import { computed, onBeforeUnmount, onMounted, ref, type Ref } from 'vue';
 
 /**
- * Drop target for a page or a region (TREEUX-022 / TREEUX-040).
+ * Drop target for a page or a region.
  *
  * One mechanism, two scopes, because the browser is the same in both. What the
  * library owns is the part every consumer got wrong the same way:

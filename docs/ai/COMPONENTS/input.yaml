@@ -14,7 +14,7 @@ props:
       a cast and `update:modelValue` pays back a number. `<script setup>` was
       widening every model to `string | number`, which under a consumer's
       `strictTemplates` made a numeric field a type error at the call site with
-      no correct way to write it (TREEUX-011, group 3). When `T` is `number` the
+      no correct way to write it. When `T` is `number` the
       component parses the raw input value and only falls back to the raw string
       when it does not parse.
   size:
@@ -57,7 +57,7 @@ element_attributes:
     fallthrough. Fallthrough works at RUNTIME but is invisible to `vue-tsc`
     under `strictTemplates`, so a consumer writing `<TInput :max="10" />` in a
     typechecked app got an error with no correct alternative — the shape a
-    number field needs was untypeable (TREEUX-011, group 1).
+    number field needs was untypeable.
   declared: [min, max, step, minlength, maxlength, pattern, inputmode, autocomplete, name, required, readonly]
   inputmode_values: [none, text, decimal, numeric, tel, search, email, url]
 

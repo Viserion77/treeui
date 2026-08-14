@@ -1,7 +1,7 @@
 import { contrastRatio, parseHex, treeThemes, treeTokens } from './index';
 
 /**
- * TREEUX-027 / TREEUX-034. The consumers asked for an accent because a raw
+ * Consumers asked for an accent because a raw
  * secondary brand colour failed AA on the light surface (`#A16CFF` measured
  * 3.23:1). Shipping a token instead of a hex is only an improvement if the
  * token is measured, so the pair is pinned here: the accent has to be at least
@@ -53,7 +53,7 @@ describe('marketing-scale elevation', () => {
   });
 });
 
-describe('type scale (TREEUX-049)', () => {
+describe('type scale', () => {
   // `2xl` used to repeat `xl` verbatim, which made every `clamp(xl … 2xl)` a
   // constant — 12 of them in one consumer's landing pages. A scale with two
   // equal steps is a scale with a missing step; this keeps it monotonic.

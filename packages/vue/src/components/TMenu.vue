@@ -120,7 +120,7 @@ const move = (direction: 1 | -1) => {
 };
 
 // Escape is intentionally not handled here: it bubbles to the popover content,
-// which closes and restores focus to the trigger (TREEUX-015).
+// which closes and restores focus to the trigger.
 const onKeydown = (event: KeyboardEvent) => {
   switch (event.key) {
     case 'ArrowDown':

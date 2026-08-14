@@ -25,7 +25,7 @@ const props = withDefaults(
      * between samples, which is wrong for a quantity that holds its value
      * across a bucket — concurrency, queue depth, a flag over time: a curve, or
      * even a diagonal, draws a state that never existed. `step` holds each
-     * value until the next sample and then jumps (TREEUX-003).
+     * value until the next sample and then jumps.
      */
     interpolation?: ChartInterpolation;
     /** Line thickness in px (line/area only). */

@@ -20,7 +20,7 @@ export interface TSpanLane {
 }
 
 /**
- * Horizontal lanes on a shared time axis (TREEUX-003).
+ * Horizontal lanes on a shared time axis.
  *
  * One row per subject, N bars positioned by start/duration inside the same
  * `from`/`to` window — which is how "what ran in parallel" becomes legible.
@@ -49,8 +49,7 @@ const props = withDefaults(
      * Cap on how many lanes are drawn. A live window over a large stack can
      * produce hundreds; slicing in the consumer hides data WITHOUT SAYING SO,
      * which is worse than a long list. So the cap is the library's, and it
-     * always renders a footer declaring how many lanes it left out
-     * (TREEUX-017).
+     * always renders a footer declaring how many lanes it left out.
      */
     maxRows?: number;
     /**

@@ -10,7 +10,7 @@ const props = withDefaults(
   defineProps<{
     /**
      * Generic over the tab id, so a `ref<'overview' | 'logs'>` gets its own
-     * literal union back instead of a widened `string` (TREEUX-011, group 3).
+     * literal union back instead of a widened `string`.
      */
     modelValue?: T;
     defaultValue?: T;

@@ -65,7 +65,7 @@ defineSlots<{
    * (`aria-haspopup`, `aria-expanded`, `aria-controls`) plus `disabled`.
    * Without it a custom trigger announced only "button" — it did not say it
    * opens a menu, nor whether the menu was open — and the fix at the call site
-   * was three attributes replicated per consumer (TREEUX-014).
+   * was three attributes replicated per consumer.
    */
   trigger(props: {
     isOpen: boolean;

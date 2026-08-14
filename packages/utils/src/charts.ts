@@ -105,7 +105,7 @@ const controlPoint = (
 };
 
 /**
- * How consecutive points are joined (TREEUX-003).
+ * How consecutive points are joined.
  *
  * `linear` and `smooth` both INTERPOLATE between samples. That is wrong for a
  * quantity that holds its value across a bucket — concurrency, queue depth, a

@@ -6,7 +6,7 @@
 
 - 1a9d136: Clears the entire accepted backlog from both consumer files in one release.
 
-  **Calendar (TREEUX-016 b/c/d)** — `TCalendarMonthGrid`, `TCalendarTimeGrid` and
+  **Calendar** — `TCalendarMonthGrid`, `TCalendarTimeGrid` and
   the `TCalendar` wrapper with `view`. The month grid CONSUMES `getMonthMatrix`
   and draws exactly the matrix it returns rather than recomputing the grid, which
   is the contract that keeps a consumer's fetch window and the days on screen from
@@ -15,13 +15,13 @@
   only in the current day's column; every `Intl` call is memoised per locale at
   render time, never at module scope.
 
-  **Media (TREEUX-019)** — `TAudioPlayer` (play/pause, duration, seek; `src` is
+  **Media** — `TAudioPlayer` (play/pause, duration, seek; `src` is
   agnostic and waveform is deliberately out of scope) and `TVoiceRecorder` (the
   record/recording/preview states, mm:ss timer, duration cap). The pulse is frozen
   under `prefers-reduced-motion` by default: a recording indicator runs for as
   long as someone is talking. Capture and upload stay with the product.
 
-  **File and drop (TREEUX-021, 022, 040)**
+  **File and drop**
 
   - `TFileUpload` gains `variant="trigger"` — the slot becomes the only control,
     with no dashed box, no `role="button"` wrapper and no second tab stop — and
@@ -35,7 +35,7 @@
   - The arithmetic is pure and framework-agnostic in `@treeui/utils`:
     `dragCarriesTypes`, `nextDragDepth`, `filesFromTransfer`, `payloadFromTransfer`.
 
-  **Canvas (TREEUX-039 a+b)** — `useDecorativeCanvas()` owns the lifecycle that
+  **Canvas** — `useDecorativeCanvas()` owns the lifecycle that
   two ornaments had each discovered by measuring: no frame while reduced-motion,
   coarse pointer, background tab or off-screen; backing store that follows the
   element with a pixel-ratio ceiling; never steals a pointer event; clean unmount.
@@ -43,7 +43,7 @@
   `canvasBackingSize`) is in `@treeui/utils` and is deterministic, so a
   pre-rendered decoration survives hydration unchanged.
 
-  **Layout and data (TREEUX-041, 003, 004, 002 phase 2)**
+  **Layout and data**
 
   - `TPane` — fill the parent, scroll only the middle, anchor header and footer.
     The `min-block-size: 0` nobody gets right the first time now lives here.
@@ -77,7 +77,7 @@
 
 ### Minor Changes
 
-- 184914c: Calendar math fixes from real adoption (TREEUX-016 etapa a):
+- 184914c: Calendar math fixes from real adoption:
 
   - `placeInDay` no longer lets `minHeight` push a block past the day's end. A
     short event near midnight (e.g. 3 minutes at 23:55) was floored to the minimum
@@ -92,7 +92,7 @@
 
 ### Minor Changes
 
-- 2a5c192: Add framework-agnostic calendar math for the upcoming `TCalendar` (TREEUX-016, step a).
+- 2a5c192: Add framework-agnostic calendar math for the upcoming `TCalendar`.
 
   New pure functions in `@treeui/utils` (no DOM, no Vue, no bundled locale data): `getMonthMatrix(anchor, weekStartsOn)` (complete-week month grid, padded from adjacent months), `placeInDay(item, day, { hourHeight, minHeight })` (time-grid top/height with midnight clamp + min height), `layoutDayColumns(items)` (interval-graph greedy column placement for overlapping events, returning `{ columnIndex, columnCount }` per id — index and cluster count, not a width, so the consumer owns the measurement), and `weekStartForLocale(locale)` (via native `Intl.Locale` week info, falling back to Monday). This is the portable core the Vue `TCalendarMonthGrid` / `TCalendarTimeGrid` will compose.
 

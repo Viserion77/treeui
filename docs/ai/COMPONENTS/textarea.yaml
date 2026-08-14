@@ -86,5 +86,5 @@ example: |
   />
 
 element_attributes:
-  note: "Same reason as TInput — see `input.yaml` -> `element_attributes` (TREEUX-011, group 1)."
+  note: "Same reason as TInput — see `input.yaml` -> `element_attributes`."
   declared: [readonly, minlength, maxlength, name, required, autocomplete]

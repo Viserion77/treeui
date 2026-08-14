@@ -61,7 +61,7 @@ const focusedIndex = ref(-1);
 const dropUp = ref(false);
 
 // The trigger is a real `<button>`, so this control CAN carry a TFormField's id
-// and be the target of its `<label for>` (TREEUX-012).
+// and be the target of its `<label for>`.
 const { controlId, describedBy } = useFormFieldIdentity(attrs);
 
 const triggerAttrs = computed(() => {

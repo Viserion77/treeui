@@ -2,7 +2,7 @@ import { canvasBackingSize } from '@treeui/utils';
 import { onBeforeUnmount, onMounted, ref, type Ref } from 'vue';
 
 /**
- * Lifecycle of a decorative canvas (TREEUX-039 a).
+ * Lifecycle of a decorative canvas.
  *
  * Two independent ornaments in one repository — a hero wave and a presence orb —
  * discovered the same ~90 lines of trap by measuring. None of it is about
@@ -24,7 +24,7 @@ import { onBeforeUnmount, onMounted, ref, type Ref } from 'vue';
  * SSR-safe by construction: nothing here touches `matchMedia`,
  * `IntersectionObserver` or `document` outside `onMounted`, because the surface
  * that needs it most is pre-rendered — the gating running at import is exactly
- * the bug TREEUX-028 closed.
+ * the bug the SSR smoke test closed.
  */
 export interface DecorativeCanvasFrame {
   context: CanvasRenderingContext2D;

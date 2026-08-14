@@ -823,7 +823,7 @@ const directGeometry = (name: string): TIconNodes | undefined => {
     case 'play': return glyph(polygon('6,3.75 20.25,12 6,20.25'), circle(6, 12, 0.55));
     case 'pause': return glyph(rect(5.25, 3.5, 4.5, 17, 1.5), rect(14.25, 3.5, 4.5, 17, 1.5));
     // Transport, not navigation: the pair of play/pause. A chevron says "next
-    // page"; this says "end this phase now" (TREEUX-042).
+    // page"; this says "end this phase now".
     case 'skip-forward': return glyph(polygon('5.5,4 16,12 5.5,20'), rect(17.5, 4, 2.5, 16, 1.25));
     case 'play-circle': return glyph(circle(12, 12, 9.25), polygon('9.5,7.75 17,12 9.5,16.25'));
     case 'pause-circle': return glyph(circle(12, 12, 9.25), line(9.5, 8, 9.5, 16), line(14.5, 8, 14.5, 16));

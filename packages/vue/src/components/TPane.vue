@@ -2,7 +2,7 @@
 import { computed } from 'vue';
 
 /**
- * Docked pane (TREEUX-041): fill the parent's height, scroll only the middle,
+ * Docked pane: fill the parent's height, scroll only the middle,
  * keep header and footer anchored.
  *
  * The recipe is four lines, and one of them is the reason this is a component:

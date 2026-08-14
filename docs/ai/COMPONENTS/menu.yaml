@@ -3,7 +3,7 @@ source_file: packages/vue/src/components/TMenu.vue
 package: "@treeui/vue"
 kind: overlay
 status: available
-purpose: "Rich action menu in a popover — slot-driven compound with groups, icons, descriptions, meta, destructive items, link items, and a radio (workspace-switch) item, with roving focus and keyboard support. Built on TPopover, so anchoring and focus restore come from there (TREEUX-015)."
+purpose: "Rich action menu in a popover — slot-driven compound with groups, icons, descriptions, meta, destructive items, link items, and a radio (workspace-switch) item, with roving focus and keyboard support. Built on TPopover, so anchoring and focus restore come from there."
 
 subcomponents: [TMenuGroup, TMenuItem]
 

@@ -57,7 +57,7 @@ const props = withDefaults(
      */
     to?: string | Record<string, unknown>;
     /**
-     * Anchor attributes, for `as="a"` (TREEUX-011). Declared rather than left
+     * Anchor attributes, for `as="a"`. Declared rather than left
      * to `$attrs` so `strictTemplates` sees them; they are simply absent from
      * the rendered element when the button is not an anchor.
      */

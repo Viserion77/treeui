@@ -73,7 +73,7 @@
 ### Minor Changes
 
 - ec31a47: The axes both consumers were hand-rolling in local CSS, and two user-agent boxes
-  that leaked through `as` (TREEUX-005, 043–050).
+  that leaked through `as`.
 
   **`TText`**
 
@@ -133,42 +133,41 @@
 ### Minor Changes
 
 - ddbbf86: Closes the marketing surface — the batch of primitives a public site and 13
-  product landing pages were each re-solving in local CSS (TREEUX-027, 030–034,
-  036, 038).
+  product landing pages were each re-solving in local CSS.
 
   **New components**
 
-  - **`TSection`** (TREEUX-030) — page section with responsive vertical rhythm
+  - **`TSection`** — page section with responsive vertical rhythm
     (`rhythm="tight|default|loose"`) and an optional full-bleed band
     (`banded`), with the reading column delegated to a nested `TContainer`.
     The band is full-bleed because the section spans its parent and carries the
     background itself: no `100vw`, no negative margin, so it cannot overflow once
     the platform paints a classic scrollbar.
-  - **`THero`** (TREEUX-031) — the one section with a layer behind the copy. The
+  - **`THero`** — the one section with a layer behind the copy. The
     library owns the box (stacking context, the clip that keeps an oversized
     decoration inside the band, hero-scale padding) and guarantees the `#backdrop`
     layer is `pointer-events: none`, so a click on the CTA never dies in the
     ornament. `glow` draws the one part of a hero backdrop that is 100% tokens.
-  - **`TPageSurface`** (TREEUX-032) — the page-level surface for screens with no
+  - **`TPageSurface`** — the page-level surface for screens with no
     app shell. Zeroes the user-agent body margin (previously only handled for
     `body:has(.t-app-shell)`) and, with `overlay`, takes the viewport and becomes
     the scroll host with contained scroll chaining, so a landing rendered over a
     mounted SPA stops dragging the screen behind it.
-  - **`TShow` / `THide`** (TREEUX-033) — breakpoint visibility in pure CSS
+  - **`TShow` / `THide`** — breakpoint visibility in pure CSS
     (`at`/`below`, combinable into a band). Both branches render, so a
     pre-rendered page keeps every link; a `matchMedia` composable cannot, because
     there is no `window` while the HTML is written. It is also something a
     consumer cannot write: `@media (min-width: var(--tree-breakpoint-lg))` is
     invalid, so the pixel gets hardcoded per app. A unit test fails the build if
     the stylesheet literals drift from `--tree-breakpoint-*`.
-  - **`TSkipLink`** (TREEUX-036) — the one control that must be hidden and visible
+  - **`TSkipLink`** — the one control that must be hidden and visible
     at the same time. It parks off-screen and returns on `:focus-visible`, and it
     prepares its own target (`tabindex="-1"` plus the ring suppression), which
     retires the loose `#content:focus { outline: none }` from consumer
     stylesheets. `TAppShell` gains `skipLinkLabel` to close the same hole for
     authenticated screens — opt-in only because the label is product copy.
 
-  **Accent axis and elevation (TREEUX-034 / TREEUX-027)**
+  **Accent axis and elevation**
 
   - `@treeui/tokens` gains a **secondary brand accent** with a measured light/dark
     pair (`--tree-color-accent-primary` / `-hover` / `-soft` / `-contrast`), AA on
@@ -187,7 +186,7 @@
 
   **Existing components**
 
-  - **`TColorSwatch`** gains `readonly` (TREEUX-038): colour as evidence rather
+  - **`TColorSwatch`** gains `readonly`: colour as evidence rather
     than as a choice — inert `role="img"` chips with a `border-strong` outline, so
     a chip that IS a background colour stays visible in its own theme.
   - **`TTag`** gains `removeLabel`, so the remove button's accessible name can be
@@ -198,7 +197,7 @@
 
 ### Minor Changes
 
-- 2628793: Add letter-spacing (tracking) tokens (TREEUX-035): `--tree-font-tracking-tight` (-0.02em), `--tree-font-tracking-normal` (0), `--tree-font-tracking-wide` (0.08em). Tracking was the only typographic axis without a token scale; the display and overline text styles consume it.
+- 2628793: Add letter-spacing (tracking) tokens: `--tree-font-tracking-tight` (-0.02em), `--tree-font-tracking-normal` (0), `--tree-font-tracking-wide` (0.08em). Tracking was the only typographic axis without a token scale; the display and overline text styles consume it.
 
 ## 0.15.0
 

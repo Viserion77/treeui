@@ -6,7 +6,7 @@ import TCalendarTimeGrid from './TCalendarTimeGrid.vue';
 import { workweekDays, type TCalendarItem, type TCalendarLabels, type TCalendarView } from './calendar';
 
 /**
- * Full-screen calendar (TREEUX-016 d): the four views behind one `view` prop.
+ * Full-screen calendar: the four views behind one `view` prop.
  *
  * A thin wrapper on purpose — month is `TCalendarMonthGrid`, the other three
  * are `TCalendarTimeGrid` with a different set of day columns. What this adds

@@ -170,7 +170,7 @@ const selectedOption = computed(() =>
 const selectedLabel = computed(() => selectedOption.value?.label ?? '');
 
 // In `switcher` + `iconOnly` the visible name is dropped so the trigger is a
-// compact square (TREEUX-026). The label is not removed — it is visually hidden,
+// compact square. The label is not removed — it is visually hidden,
 // so it stays the trigger's accessible name whether or not a flag is present.
 const valueHidden = computed(() => isSwitcher.value && props.iconOnly);
 
@@ -326,7 +326,7 @@ watch(isOpen, bindOpenState);
 // A listbox already open on mount (`defaultOpen`, or a controlled `open` that
 // starts true) still needs the outside-click listener and drop-direction
 // measurement — but on the CLIENT only. This ran in an `immediate` watcher
-// before, which touches `document` during setup and crashed SSR (TREEUX-028);
+// before, which touches `document` during setup and crashed SSR;
 // onMounted never runs on the server, so the same effect is now SSR-safe.
 onMounted(() => {
   if (isOpen.value) bindOpenState(true);

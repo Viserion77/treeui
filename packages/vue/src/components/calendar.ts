@@ -1,5 +1,5 @@
 /**
- * Shared contract for the calendar surface (TREEUX-016 b/c/d).
+ * Shared contract for the calendar surface.
  *
  * Domain-agnostic by design: an item is an id and an interval, and the product
  * renders its own content through the slots. The library never fetches, never

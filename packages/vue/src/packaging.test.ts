@@ -6,7 +6,7 @@
 // published `global-components.d.ts` sat in `dist/` referenced by nothing and
 // the augmentation never reached a single consumer. Nothing else in the gates
 // covers that: the source typechecks, the tests pass, the file is in the
-// tarball, and it is inert (TREEUX-008).
+// tarball, and it is inert.
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';

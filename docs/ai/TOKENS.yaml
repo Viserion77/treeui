@@ -136,7 +136,7 @@ semantic_color_roles:
   accent:
     roles: [primary, hover, soft, contrast]
     semantics:
-      primary: "The secondary brand accent — the closed accent axis (TREEUX-027/034)."
+      primary: "The secondary brand accent — the closed accent axis."
       hover: "Hover/active step of the accent."
       soft: "Low-emphasis accent tint used as a background."
       contrast: "Text color that is legible ON `accent-primary`."

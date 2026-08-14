@@ -12,7 +12,7 @@ const props = withDefaults(
   defineProps<{
     /**
      * Generic over the bound type, so the value the field EMITS is the type the
-     * ref holds (TREEUX-011, group 3). Accepting `string | number` while always
+     * ref holds. Accepting `string | number` while always
      * emitting `string` made every `ref<number>` a compile error under
      * `strictTemplates` — and, underneath the type, actually put a string into
      * that ref at runtime.
@@ -30,7 +30,7 @@ const props = withDefaults(
     readonly?: boolean;
     /**
      * Native constraint and behaviour attributes of the `<input>` this
-     * component IS (TREEUX-011). `ComponentCustomProps` covers what ANY
+     * component IS. `ComponentCustomProps` covers what ANY
      * component accepts; these are what THIS one accepts by being an input —
      * `min` on a number field is not a typo, it is the reason the field exists.
      * They are declared rather than left to `$attrs` so `strictTemplates` sees

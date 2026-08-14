@@ -14,7 +14,7 @@ props:
       `T extends string`, so a `ref<'overview' | 'logs'>` keeps its literal
       union instead of being widened to `string` — under a consumer's
       `strictTemplates` that widening made the binding an error with no correct
-      way to write it (TREEUX-011, group 3).
+      way to write it.
   defaultValue:
     type: T
     default: undefined

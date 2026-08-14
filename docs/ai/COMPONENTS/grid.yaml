@@ -30,12 +30,25 @@ props:
   dense:
     type: boolean
     default: false
+  balance:
+    type: boolean
+    default: false
+    note: >
+      Let the last row divide itself among the items it has instead of leaving
+      empty tracks to its right — five cards over four tracks read as "one card
+      failed to load". `auto-fit` cannot do it: it collapses a track only when
+      that track is empty on EVERY row, so the remainder row keeps the widths of
+      the rows above it. Balanced mode lays out with flex, where each line sizes
+      itself: full rows are identical to the grid, only the remainder is shared
+      out. Ignored when `columns` is set, since a declared track count already
+      answers the same question.
 
 slots:
   - default
 
 behavior:
   semantic_element_controlled_by_as: true
+  balance_shares_the_last_row_instead_of_leaving_holes: true
   fixed_columns_supported: true
   auto_fit_columns_supported: true
   dense_mode_uses_grid_auto_flow_dense: true

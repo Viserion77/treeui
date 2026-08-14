@@ -81,3 +81,25 @@ export const InlineText: Story = {
     `,
   }),
 };
+
+export const Fluid: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'A sparkline in a card that grows with the page is a shape, not a fixed asset. `fluid` drops the intrinsic width and fills the parent; the height stays, because a band that grows in both directions becomes a chart that lies about its precision. Strokes keep their declared width — the path scales, the pen does not.',
+      },
+    },
+  },
+  render: () => ({
+    components: { TSparkline },
+    setup: () => ({ sample }),
+    template: `
+      <div style="display: grid; gap: 1rem; max-width: 40rem;">
+        <div style="border: var(--tree-border-width-subtle) solid var(--tree-color-border-default); border-radius: var(--tree-radius-lg); padding: var(--tree-space-4);">
+          <TSparkline :data="sample" type="area" fluid :height="56" show-last-point />
+        </div>
+      </div>
+    `,
+  }),
+};

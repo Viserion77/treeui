@@ -790,7 +790,9 @@
         "TSkipLink",
         "TAppShell",
         "TCheckbox",
-        "TText"
+        "TText",
+        "TSteps",
+        "TCanvasSurface"
       ]
     },
     {
@@ -869,7 +871,12 @@
         "TPageSurface",
         "TShow",
         "THide",
-        "TEmptyState"
+        "TEmptyState",
+        "TText",
+        "TStat",
+        "TSparkline",
+        "TSteps",
+        "TCanvasSurface"
       ]
     },
     {
@@ -2636,6 +2643,116 @@
       "practices": []
     },
     {
+      "name": "TCanvasSurface",
+      "aliases": [],
+      "package": "@treeui/vue",
+      "kind": "data-display",
+      "category": "Data Display",
+      "status": "available",
+      "purpose": "A sized, repaintable, hit-testable canvas for a data-driven drawing — a diagram, a graph, a custom plot.",
+      "sourceFile": "packages/vue/src/components/TCanvasSurface.vue",
+      "storyFile": "apps/docs/src/stories/CanvasSurface.stories.ts",
+      "storyTitle": "Components/Data Display/Canvas Surface",
+      "manifestFile": "docs/ai/COMPONENTS/canvas-surface.yaml",
+      "props": [
+        {
+          "name": "draw",
+          "type": "(frame: CanvasSurfaceFrame) => void",
+          "required": true,
+          "note": "Paints the whole surface. Called on mount, on resize and on every `redraw()`. The context arrives already scaled to CSS pixels, so the drawing never does device-ratio arithmetic; it is expected to clear what it does not repaint.\n"
+        },
+        {
+          "name": "height",
+          "type": "number | string",
+          "default": "320",
+          "note": "Number is px, string is any CSS length. A diagram has no intrinsic height, so it is declared."
+        },
+        {
+          "name": "cursor",
+          "type": "string",
+          "default": "undefined",
+          "note": "Pointer over the surface. This cannot come from a stylesheet: the sensitive area is a rectangle inside the bitmap and no selector knows where it is. Bind it to whatever the consumer's hit-test just decided.\n"
+        },
+        {
+          "name": "maxPixelRatio",
+          "type": "number",
+          "default": "2"
+        },
+        {
+          "name": "ariaLabel",
+          "type": "string",
+          "default": "undefined",
+          "note": "Sets role=img. A bitmap says nothing on its own."
+        },
+        {
+          "name": "redrawKey",
+          "type": "unknown",
+          "default": "undefined",
+          "note": "Repaint whenever this changes — pass the data, a version counter, or the theme. Deep-watched."
+        }
+      ],
+      "events": [],
+      "slots": [
+        {
+          "name": "default",
+          "description": "The long form of the drawing — a list, a table, the same data as markup. It lives inside the `<canvas>` element, which the browser exposes to assistive technology and never paints.\n"
+        }
+      ],
+      "a11y": [
+        "Give it an ariaLabel; a canvas is opaque to assistive technology.",
+        "Put the same information in the default slot as markup — it is the accessible form, not a fallback.",
+        "Anything clickable inside the drawing needs a real control elsewhere, or a keyboard user cannot reach it."
+      ],
+      "behavior": [
+        "repaints_on_demand_not_on_a_clock: true",
+        "backing_store_follows_the_element: true",
+        "pointer_events_reach_the_canvas: true",
+        "ssr_safe: Nothing touches the DOM outside onMounted."
+      ],
+      "selection": {
+        "keywords": [
+          "canvas",
+          "diagram",
+          "graph",
+          "node and edge",
+          "custom drawing",
+          "plot",
+          "topology",
+          "map",
+          "hit testing"
+        ],
+        "useWhen": [
+          "The drawing is data-driven and no chart primitive expresses it — nodes and edges, a topology, a custom plot.",
+          "Parts of the drawing are click or hover targets.",
+          "It must repaint when the data, the locale or the theme changes."
+        ],
+        "avoidWhen": [
+          "A line, area or bar chart says it — use TChart, which brings axes, legend, tooltip and an accessible table.",
+          "The drawing is ornament — use useDecorativeCanvas, which gates the loop on visibility and reduced motion.",
+          "The shape is an inline trend — use TSparkline."
+        ],
+        "alternatives": [
+          {
+            "component": "TChart",
+            "when": "The data fits axes and categories."
+          },
+          {
+            "component": "useDecorativeCanvas",
+            "when": "It is decoration, not information."
+          }
+        ]
+      },
+      "setup": {
+        "required": [],
+        "notes": []
+      },
+      "recipes": [],
+      "practices": [
+        "accessible-by-default",
+        "content-alignment"
+      ]
+    },
+    {
       "name": "TCard",
       "aliases": [],
       "package": "@treeui/vue",
@@ -2936,7 +3053,7 @@
         ],
         "avoidWhen": [
           "A single value tells the story — use TStat.",
-          "You only need an inline trend with no axes — use TSparkline.",
+          "You only need an inline trend with no axes — use TSparkline (`fluid` fills the card width).",
           "The data is a part-of-whole breakdown — use TDonutChart."
         ],
         "alternatives": [
@@ -5773,6 +5890,12 @@
           "name": "dense",
           "type": "boolean",
           "default": "false"
+        },
+        {
+          "name": "balance",
+          "type": "boolean",
+          "default": "false",
+          "note": "Let the last row divide itself among the items it has instead of leaving empty tracks to its right — five cards over four tracks read as \"one card failed to load\". `auto-fit` cannot do it: it collapses a track only when that track is empty on EVERY row, so the remainder row keeps the widths of the rows above it. Balanced mode lays out with flex, where each line sizes itself: full rows are identical to the grid, only the remainder is shared out. Ignored when `columns` is set, since a declared track count already answers the same question.\n"
         }
       ],
       "events": [],
@@ -5786,6 +5909,7 @@
       ],
       "behavior": [
         "semantic_element_controlled_by_as: true",
+        "balance_shares_the_last_row_instead_of_leaving_holes: true",
         "fixed_columns_supported: true",
         "auto_fit_columns_supported: true",
         "dense_mode_uses_grid_auto_flow_dense: true"
@@ -7398,7 +7522,7 @@
         "not_selectable: For a single-select list of options use TSelectableList instead."
       ],
       "behavior": [
-        "responsive: On a container narrower than 30rem the row wraps: meta drops below the content while actions stay visible inline. Actions are NEVER hidden or auto-collapsed into an overflow menu — compose a TMenu inside the actions slot deliberately if an overflow is wanted (uses a CSS container query; the list sets container-type).",
+        "responsive: On a container narrower than 30rem the row wraps: meta drops below the content while actions stay visible inline, and the leading slot stays on the first line of the content — the wrap is for the meta only. Actions are NEVER hidden or auto-collapsed into an overflow menu — compose a TMenu inside the actions slot deliberately if an overflow is wanted (uses a CSS container query; the list sets container-type).",
         "no_overflow_ownership: TList does not create, own, or collapse an actions overflow."
       ],
       "selection": {
@@ -10369,6 +10493,12 @@
           "note": "Marker on the final point (line/area)."
         },
         {
+          "name": "fluid",
+          "type": "boolean",
+          "default": "false",
+          "note": "Fill the parent's width; `width` stays the viewBox. The height is unchanged on purpose — a sparkline is a band, and growing in both directions turns it into a chart that lies about its precision. Strokes use `non-scaling-stroke`, so the pen keeps its declared width.\n"
+        },
+        {
           "name": "ariaLabel",
           "type": "string",
           "default": "Trend sparkline"
@@ -10383,7 +10513,8 @@
       "behavior": [
         "no_axes_or_legend: true",
         "flat_series_renders_centered: true",
-        "scales_to_intrinsic_width_and_height: true"
+        "scales_to_intrinsic_width_and_height: true",
+        "fluid_fills_parent_width: true"
       ],
       "selection": {
         "keywords": [
@@ -10423,7 +10554,9 @@
       "recipes": [
         "metric-dashboard"
       ],
-      "practices": []
+      "practices": [
+        "content-alignment"
+      ]
     },
     {
       "name": "TSpinner",
@@ -10828,6 +10961,16 @@
           "name": "loading",
           "type": "boolean",
           "default": "false"
+        },
+        {
+          "name": "emphasis",
+          "type": "TStatEmphasis",
+          "default": "label",
+          "values": [
+            "label",
+            "value"
+          ],
+          "note": "Which half leads. `label` is the dashboard reading — the eye is scanning for what is measured. `value` puts the figure first, for a marketing band where the number IS the argument; it also keeps a row of figures on one baseline, because the labels above them no longer have to be the same height. Visual order only: the DOM keeps label before value, so the announcement stays \"Requests served, 4.2M\".\n"
         }
       ],
       "events": [],
@@ -10854,6 +10997,7 @@
       ],
       "behavior": [
         "value_and_trend_are_optional: true",
+        "emphasis_reorders_visually_not_in_the_dom: true",
         "icon_slot_adds_visual_emphasis: true",
         "trend_indicator_changes_with_direction: true",
         "loading_renders_internal_skeleton_placeholders: true"
@@ -10891,6 +11035,7 @@
         "metric-dashboard"
       ],
       "practices": [
+        "content-alignment",
         "token-driven"
       ]
     },
@@ -10903,7 +11048,7 @@
       "kind": "navigation",
       "category": "Navigation",
       "status": "available",
-      "purpose": "Stepper component for visualizing workflow progress, with optional interactive selection.",
+      "purpose": "Ordered sequence — a wizard to operate, or a described flow to read.",
       "sourceFile": "packages/vue/src/components/TSteps.vue",
       "storyFile": "apps/docs/src/stories/Steps.stories.ts",
       "storyTitle": "Components/Navigation/Steps",
@@ -10947,7 +11092,20 @@
         {
           "name": "interactive",
           "type": "boolean",
-          "default": "false"
+          "default": "false",
+          "note": "Whether a step can be picked. False — the default — renders inert boxes: no button in the accessibility tree, no disabled wash, and no step elected current unless `modelValue`/`defaultValue` or an item `status` says so. A described sequence used to render one dead control per step, at 60% opacity, with the first step ringed as if the reader were standing on it.\n"
+        },
+        {
+          "name": "columns",
+          "type": "number",
+          "default": "undefined",
+          "note": "Fixed steps per row, horizontal only. Use for a sequence with a shape (3 + 3)."
+        },
+        {
+          "name": "minItemWidth",
+          "type": "string",
+          "default": "14rem",
+          "note": "Width at which a step stops shrinking and the strip wraps. Same axis as TGrid."
         }
       ],
       "events": [
@@ -10963,10 +11121,13 @@
       "a11y": [
         "semantic_root: ol",
         "current_step_uses_aria_current_step: true",
-        "interactive_variant_uses_buttons: true"
+        "interactive_variant_uses_buttons: true",
+        "static_variant_emits_no_control: true"
       ],
       "behavior": [
         "can_be_controlled_or_uncontrolled: true",
+        "static_variant_elects_no_current_step: true",
+        "shared_box_class_is_t_steps_box: true",
         "status_can_be_explicit_or_computed: true",
         "alias_export_available: true"
       ],
@@ -10997,7 +11158,10 @@
         ]
       },
       "recipes": [],
-      "practices": []
+      "practices": [
+        "accessible-by-default",
+        "content-alignment"
+      ]
     },
     {
       "name": "TSwitch",
@@ -11664,6 +11828,17 @@
           "note": "Break axis for a string with no break opportunity — an id, ARN, API key or hash is one long word, so it overflows its box. `truncate` is the wrong answer when the string IS what the reader came to copy: an ellipsis makes an id useless. `anywhere` breaks at any character (and sets `min-inline-size: 0`, without which a flex or grid child still refuses to shrink below its longest word and never breaks); `break-word` only breaks a word that would otherwise overflow. Ignored when `truncate` is set.\n"
         },
         {
+          "name": "align",
+          "type": "TTextAlign",
+          "default": "undefined",
+          "values": [
+            "start",
+            "center",
+            "end"
+          ],
+          "note": "How the LINES sit inside the box, which is the other half of `TStack align` — that one centres the box, and a centred box only looks centred while it is narrow: at full width the paragraph inside reads left-aligned. Renders block, because `text-align` does nothing on an inline box that shrink-wraps its content. Logical values, so `start`/`end` follow the writing direction. Combined with `measure`, `center` also centres the capped block itself.\n"
+        },
+        {
           "name": "balance",
           "type": "boolean",
           "default": "false",
@@ -11724,6 +11899,7 @@
       "practices": [
         "accessible-by-default",
         "predictable-api",
+        "content-alignment",
         "token-driven"
       ]
     },
@@ -13272,25 +13448,25 @@
     {
       "cssVar": "--tree-color-status-success",
       "path": "color.status.success",
-      "value": "#1a7f37",
+      "value": "#197d36",
       "category": "color",
       "derived": false,
       "description": "Themed semantic color, resolved per [data-tree-theme].",
       "themeValues": {
-        "light": "#1a7f37",
-        "dark": "#59ac5c"
+        "light": "#197d36",
+        "dark": "#5bae5e"
       }
     },
     {
       "cssVar": "--tree-color-status-warning",
       "path": "color.status.warning",
-      "value": "#956400",
+      "value": "#946300",
       "category": "color",
       "derived": false,
       "description": "Themed semantic color, resolved per [data-tree-theme].",
       "themeValues": {
-        "light": "#956400",
-        "dark": "#c69026"
+        "light": "#946300",
+        "dark": "#c99227"
       }
     },
     {
@@ -13596,25 +13772,25 @@
     {
       "cssVar": "--tree-color-status-success-hover",
       "path": "color.status.success-hover",
-      "value": "#15682d",
+      "value": "#15672c",
       "category": "color",
       "derived": true,
       "description": "Themed semantic color, resolved per [data-tree-theme]. Derived by the library from the semantic layer — read it, do not override it.",
       "themeValues": {
-        "light": "#15682d",
-        "dark": "#77bb79"
+        "light": "#15672c",
+        "dark": "#79bd7b"
       }
     },
     {
       "cssVar": "--tree-color-status-success-press",
       "path": "color.status.success-press",
-      "value": "#125625",
+      "value": "#115525",
       "category": "color",
       "derived": true,
       "description": "Themed semantic color, resolved per [data-tree-theme]. Derived by the library from the semantic layer — read it, do not override it.",
       "themeValues": {
-        "light": "#125625",
-        "dark": "#8ec790"
+        "light": "#115525",
+        "dark": "#8fc892"
       }
     },
     {
@@ -13626,31 +13802,31 @@
       "description": "Themed semantic color, resolved per [data-tree-theme]. Derived by the library from the semantic layer — read it, do not override it.",
       "themeValues": {
         "light": "#dfede3",
-        "dark": "#2a3a34"
+        "dark": "#2a3a35"
       }
     },
     {
       "cssVar": "--tree-color-status-success-soft-hover",
       "path": "color.status.success-soft-hover",
-      "value": "#c3decb",
+      "value": "#c3ddcb",
       "category": "color",
       "derived": true,
       "description": "Themed semantic color, resolved per [data-tree-theme]. Derived by the library from the semantic layer — read it, do not override it.",
       "themeValues": {
-        "light": "#c3decb",
-        "dark": "#314a3a"
+        "light": "#c3ddcb",
+        "dark": "#314a3b"
       }
     },
     {
       "cssVar": "--tree-color-status-success-border",
       "path": "color.status.success-border",
-      "value": "#419559",
+      "value": "#419359",
       "category": "color",
       "derived": true,
       "description": "Themed semantic color, resolved per [data-tree-theme]. Derived by the library from the semantic layer — read it, do not override it.",
       "themeValues": {
-        "light": "#419559",
-        "dark": "#4d9052"
+        "light": "#419359",
+        "dark": "#4f9154"
       }
     },
     {
@@ -13668,49 +13844,49 @@
     {
       "cssVar": "--tree-color-status-success-on-soft",
       "path": "color.status.success-on-soft",
-      "value": "#197934",
+      "value": "#187733",
       "category": "color",
       "derived": true,
       "description": "Themed semantic color, resolved per [data-tree-theme]. Derived by the library from the semantic layer — read it, do not override it.",
       "themeValues": {
-        "light": "#197934",
-        "dark": "#61b064"
+        "light": "#187733",
+        "dark": "#63b266"
       }
     },
     {
       "cssVar": "--tree-color-status-success-on-soft-hover",
       "path": "color.status.success-on-soft-hover",
-      "value": "#15672d",
+      "value": "#156b2e",
       "category": "color",
       "derived": true,
       "description": "Themed semantic color, resolved per [data-tree-theme]. Derived by the library from the semantic layer — read it, do not override it.",
       "themeValues": {
-        "light": "#15672d",
-        "dark": "#85c287"
+        "light": "#156b2e",
+        "dark": "#80c082"
       }
     },
     {
       "cssVar": "--tree-color-status-warning-hover",
       "path": "color.status.warning-hover",
-      "value": "#7a5200",
+      "value": "#795100",
       "category": "color",
       "derived": true,
       "description": "Themed semantic color, resolved per [data-tree-theme]. Derived by the library from the semantic layer — read it, do not override it.",
       "themeValues": {
-        "light": "#7a5200",
-        "dark": "#d0a44d"
+        "light": "#795100",
+        "dark": "#d3a64e"
       }
     },
     {
       "cssVar": "--tree-color-status-warning-press",
       "path": "color.status.warning-press",
-      "value": "#654400",
+      "value": "#654300",
       "category": "color",
       "derived": true,
       "description": "Themed semantic color, resolved per [data-tree-theme]. Derived by the library from the semantic layer — read it, do not override it.",
       "themeValues": {
-        "light": "#654400",
-        "dark": "#d8b46b"
+        "light": "#654300",
+        "dark": "#dab56c"
       }
     },
     {
@@ -13740,13 +13916,13 @@
     {
       "cssVar": "--tree-color-status-warning-border",
       "path": "color.status.warning-border",
-      "value": "#a77f2c",
+      "value": "#a67e2c",
       "category": "color",
       "derived": true,
       "description": "Themed semantic color, resolved per [data-tree-theme]. Derived by the library from the semantic layer — read it, do not override it.",
       "themeValues": {
-        "light": "#a77f2c",
-        "dark": "#a37a28"
+        "light": "#a67e2c",
+        "dark": "#a57b29"
       }
     },
     {
@@ -13764,25 +13940,25 @@
     {
       "cssVar": "--tree-color-status-warning-on-soft",
       "path": "color.status.warning-on-soft",
-      "value": "#8e5f00",
+      "value": "#8d5e00",
       "category": "color",
       "derived": true,
       "description": "Themed semantic color, resolved per [data-tree-theme]. Derived by the library from the semantic layer — read it, do not override it.",
       "themeValues": {
-        "light": "#8e5f00",
-        "dark": "#c99631"
+        "light": "#8d5e00",
+        "dark": "#cc9732"
       }
     },
     {
       "cssVar": "--tree-color-status-warning-on-soft-hover",
       "path": "color.status.warning-on-soft-hover",
-      "value": "#805600",
+      "value": "#7f5500",
       "category": "color",
       "derived": true,
       "description": "Themed semantic color, resolved per [data-tree-theme]. Derived by the library from the semantic layer — read it, do not override it.",
       "themeValues": {
-        "light": "#805600",
-        "dark": "#d5ad5f"
+        "light": "#7f5500",
+        "dark": "#d5ab58"
       }
     },
     {

@@ -105,3 +105,25 @@ export const Loading: Story = {
     `,
   }),
 };
+
+export const FigureLeads: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'On a dashboard the label leads: the reader is scanning for what is measured. On a marketing band the figure IS the argument, and `emphasis="value"` puts it first. It also keeps a row of figures on one baseline, because the labels above them no longer have to be the same height — which is what makes a band of four tiles look ragged. Visual order only: the DOM keeps label before value, so a screen reader still announces "Requests served, 4.2M".',
+      },
+    },
+  },
+  render: () => ({
+    components: { TStat },
+    template: `
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr)); gap: 1rem;">
+        <TStat emphasis="value" value="4.2M" label="Requests served" meta="last 30 days" />
+        <TStat emphasis="value" value="99.98%" label="Uptime" meta="rolling quarter" />
+        <TStat emphasis="value" value="120ms" label="Median response" meta="p50, all regions" />
+        <TStat emphasis="value" value="24" label="Regions" meta="and counting" />
+      </div>
+    `,
+  }),
+};

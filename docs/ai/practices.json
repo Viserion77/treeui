@@ -81,7 +81,9 @@
         "TSkipLink",
         "TAppShell",
         "TCheckbox",
-        "TText"
+        "TText",
+        "TSteps",
+        "TCanvasSurface"
       ]
     },
     {
@@ -163,7 +165,12 @@
         "TPageSurface",
         "TShow",
         "THide",
-        "TEmptyState"
+        "TEmptyState",
+        "TText",
+        "TStat",
+        "TSparkline",
+        "TSteps",
+        "TCanvasSurface"
       ]
     },
     {

@@ -105,3 +105,32 @@ describe('tone reaches every variant it claims', () => {
     expect(stylesheet).toContain(`.t-button.has-tone.t-button--${variant}`);
   });
 });
+
+/**
+ * A wrap that wrapped one thing too many.
+ *
+ * Below 30rem the list item wraps so the meta can drop to its own line. Flex
+ * picks its line breaks from the HYPOTHETICAL main size, so a long content
+ * column with `flex-basis: auto` moved down whole and left the leading icon
+ * alone on the line above it — visible only under 30rem AND with long content,
+ * which is the combination nobody tries first. jsdom has no layout and no
+ * container queries, so the guard is on the shipped rule.
+ */
+describe('list item keeps its leading on the first line', () => {
+  const narrowBlock = () => {
+    const query = stylesheet.indexOf('@container (max-width: 30rem)');
+    expect(query, 'the narrow list-item container query is gone').toBeGreaterThan(-1);
+    const close = stylesheet.indexOf('\n}', query);
+    return stylesheet.slice(query, close);
+  };
+
+  it('still drops the meta to its own line', () => {
+    expect(narrowBlock()).toContain('flex-basis: 100%');
+  });
+
+  it('pins the content to basis 0, so the break falls after it', () => {
+    const block = narrowBlock();
+    expect(block).toContain('.t-list-item__content');
+    expect(block).toMatch(/\.t-list-item__content\s*{[^}]*flex-basis:\s*0/);
+  });
+});

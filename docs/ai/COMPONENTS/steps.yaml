@@ -3,7 +3,7 @@ source_file: packages/vue/src/components/TSteps.vue
 package: "@treeui/vue"
 kind: navigation
 status: available
-purpose: "Stepper component for visualizing workflow progress, with optional interactive selection."
+purpose: "Ordered sequence — a wizard to operate, or a described flow to read."
 
 aliases:
   - TStepper
@@ -30,6 +30,20 @@ props:
   interactive:
     type: boolean
     default: false
+    note: >
+      Whether a step can be picked. False — the default — renders inert boxes:
+      no button in the accessibility tree, no disabled wash, and no step elected
+      current unless `modelValue`/`defaultValue` or an item `status` says so. A
+      described sequence used to render one dead control per step, at 60%
+      opacity, with the first step ringed as if the reader were standing on it.
+  columns:
+    type: number
+    default: undefined
+    note: "Fixed steps per row, horizontal only. Use for a sequence with a shape (3 + 3)."
+  minItemWidth:
+    type: string
+    default: "14rem"
+    note: "Width at which a step stops shrinking and the strip wraps. Same axis as TGrid."
 
 events:
   - update:modelValue
@@ -41,9 +55,12 @@ a11y:
   semantic_root: ol
   current_step_uses_aria_current_step: true
   interactive_variant_uses_buttons: true
+  static_variant_emits_no_control: true
 
 behavior:
   can_be_controlled_or_uncontrolled: true
+  static_variant_elects_no_current_step: true
+  shared_box_class_is_t_steps_box: true
   status_can_be_explicit_or_computed: true
   alias_export_available: true
 

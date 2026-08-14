@@ -76,18 +76,25 @@ export const treePrimitives = {
     800: '#332e4a',
   },
 
+  /**
+   * The status hues carry the narrowest margin in the palette, because the band
+   * they have to clear is `bg.subtle` — the secondary surface a status line
+   * usually lands on (inside a card, under a field), not the primary one they
+   * are easy to calibrate against. Each of these three was a step away from the
+   * floor and is now a step above it; `status.test.ts` holds the headroom, and
+   * the contract validator holds the floor.
+   */
   green: {
-    400: '#59ac5c',
-    500: '#1a7f37',
+    400: '#5bae5e',
+    500: '#197d36',
   },
 
   amber: {
-    400: '#c69026',
-    500: '#956400',
+    400: '#c99227',
+    500: '#946300',
   },
 
   red: {
-    /** Landed on 4.50:1 against the dark subtle band; nudged for headroom. */
     400: '#f5766e',
     500: '#d1242f',
   },

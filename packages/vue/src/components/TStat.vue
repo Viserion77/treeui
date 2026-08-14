@@ -8,9 +8,14 @@ defineOptions({
 
 const _treeStatTones = ['neutral', 'success', 'warning', 'danger', 'info'] as const;
 const _treeStatTrendDirections = ['up', 'down', 'neutral'] as const;
+// Which half of the tile leads. In a dashboard the label leads, because the
+// reader is scanning for WHAT is measured; on a marketing band the figure is
+// the argument and the label explains it afterwards.
+const _treeStatEmphases = ['label', 'value'] as const;
 
 export type TStatTone = (typeof _treeStatTones)[number];
 export type TStatTrendDirection = (typeof _treeStatTrendDirections)[number];
+export type TStatEmphasis = (typeof _treeStatEmphases)[number];
 
 const props = withDefaults(
   defineProps<{
@@ -21,6 +26,14 @@ const props = withDefaults(
     tone?: TStatTone;
     trendDirection?: TStatTrendDirection;
     loading?: boolean;
+    /**
+     * Which half leads. `label` (default) is the dashboard reading: the reader
+     * is scanning for what is measured. `value` puts the figure first, for a
+     * marketing band where the number IS the argument — and it keeps the
+     * figures of a row on one baseline, because the labels above them no longer
+     * have to be the same height.
+     */
+    emphasis?: TStatEmphasis;
   }>(),
   {
     label: '',
@@ -30,6 +43,7 @@ const props = withDefaults(
     tone: 'neutral',
     trendDirection: 'neutral',
     loading: false,
+    emphasis: 'label',
   },
 );
 
@@ -47,6 +61,7 @@ const slots = useSlots();
 const rootClasses = computed(() => [
   't-stat',
   `t-stat--${props.tone}`,
+  `t-stat--emphasis-${props.emphasis}`,
   {
     'has-icon': Boolean(slots.icon) && !props.loading,
     'is-loading': props.loading,

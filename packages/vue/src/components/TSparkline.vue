@@ -13,7 +13,10 @@ const props = withDefaults(
     type?: TSparklineType;
     /** Mark color. Any CSS color; defaults to the first chart token. */
     color?: string;
-    /** Intrinsic width in px. */
+    /**
+     * Intrinsic width in px, and the coordinate system the shape is drawn in.
+     * With `fluid` it stops being the rendered width and stays the viewBox.
+     */
     width?: number;
     /** Intrinsic height in px. */
     height?: number;
@@ -36,6 +39,15 @@ const props = withDefaults(
     max?: number;
     /** Draw a filled marker on the last point (line/area only). */
     showLastPoint?: boolean;
+    /**
+     * Fill the width of the parent instead of measuring 120px. A sparkline in a
+     * card that grows with the page is a shape, not a fixed asset — without
+     * this the only way to get one was a full `TChart` with axes, legend,
+     * tooltip and animation all switched off. The height is unchanged: a
+     * sparkline is a band, and letting it grow in both directions turns it into
+     * a chart that lies about its precision.
+     */
+    fluid?: boolean;
     /** Accessible label. Falls back to a generic trend description. */
     ariaLabel?: string;
   }>(),
@@ -51,6 +63,7 @@ const props = withDefaults(
     min: undefined,
     max: undefined,
     showLastPoint: false,
+    fluid: false,
     ariaLabel: undefined,
   },
 );
@@ -117,9 +130,11 @@ const resolvedLabel = computed(() => props.ariaLabel ?? 'Trend sparkline');
 <template>
   <svg
     class="t-sparkline"
-    :width="width"
+    :class="{ 'is-fluid': fluid }"
+    :width="fluid ? undefined : width"
     :height="height"
     :viewBox="`0 0 ${width} ${height}`"
+    :preserveAspectRatio="fluid ? 'none' : undefined"
     role="img"
     :aria-label="resolvedLabel"
     :style="{ color }"

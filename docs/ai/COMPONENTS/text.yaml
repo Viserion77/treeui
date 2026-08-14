@@ -58,6 +58,18 @@ props:
       `min-inline-size: 0`, without which a flex or grid child still refuses to
       shrink below its longest word and never breaks); `break-word` only breaks a
       word that would otherwise overflow. Ignored when `truncate` is set.
+  align:
+    type: TTextAlign
+    default: undefined
+    values: [start, center, end]
+    note: >
+      How the LINES sit inside the box, which is the other half of `TStack
+      align` — that one centres the box, and a centred box only looks centred
+      while it is narrow: at full width the paragraph inside reads left-aligned.
+      Renders block, because `text-align` does nothing on an inline box that
+      shrink-wraps its content. Logical values, so `start`/`end` follow the
+      writing direction. Combined with `measure`, `center` also centres the
+      capped block itself.
   balance:
     type: boolean
     default: false

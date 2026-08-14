@@ -92,6 +92,9 @@ import TCalendarTimeGrid from './TCalendarTimeGrid.vue';
 import TKeyValueEditor from './TKeyValueEditor.vue';
 import TChart from './TChart.vue';
 import TSparkline from './TSparkline.vue';
+import TSteps from './TSteps.vue';
+import TStat from './TStat.vue';
+import TCanvasSurface from './TCanvasSurface.vue';
 import TDonutChart from './TDonutChart.vue';
 import TLink from './TLink.vue';
 import TNavMenu from './TNavMenu.vue';
@@ -7264,5 +7267,156 @@ describe('chart copy and lane budget', () => {
       props: { rows: [{ label: 'a', spans: [] }], from: 0, to: 1, maxRows: 5 },
     });
     expect(wrapper.find('.t-span-lanes__overflow').exists()).toBe(false);
+  });
+});
+
+describe('Reading a sequence instead of operating one', () => {
+  const items = [
+    { label: 'Connect', value: 'connect', description: 'Point it at your account.' },
+    { label: 'Pick', value: 'pick' },
+    { label: 'Ship', value: 'ship' },
+  ];
+
+  it('emits no control when the steps are not interactive', () => {
+    const wrapper = mount(TSteps, { props: { items } });
+    // Four dead buttons in the accessibility tree is what a marketing "how it
+    // works" section used to hand a screen-reader user.
+    expect(wrapper.findAll('button')).toHaveLength(0);
+    expect(wrapper.findAll('.t-steps__box')).toHaveLength(3);
+  });
+
+  it('elects no current step on its own when it is not interactive', () => {
+    const wrapper = mount(TSteps, { props: { items } });
+    expect(wrapper.find('.t-steps__item.is-current').exists()).toBe(false);
+    expect(wrapper.find('[aria-current="step"]').exists()).toBe(false);
+  });
+
+  it('still honours a step the consumer marks explicitly', () => {
+    const wrapper = mount(TSteps, { props: { items, modelValue: 'pick' } });
+    expect(wrapper.get('[aria-current="step"]').text()).toContain('Pick');
+  });
+
+  it('does not wash a static step out as unavailable', () => {
+    const wrapper = mount(TSteps, { props: { items: [{ ...items[0], disabled: true }] } });
+    // `disabled` is a control state; there is no control here to disable.
+    expect(wrapper.find('.is-disabled').exists()).toBe(false);
+    expect(wrapper.find('[disabled]').exists()).toBe(false);
+  });
+
+  it('is still a wizard when asked to be one', async () => {
+    const wrapper = mount(TSteps, { props: { items, interactive: true } });
+    expect(wrapper.findAll('button')).toHaveLength(3);
+    // A wizard opens on its first step, which is the behaviour that was wrong
+    // only because it applied to everything else too.
+    expect(wrapper.get('[aria-current="step"]').text()).toContain('Connect');
+    await wrapper.findAll('button')[1].trigger('click');
+    expect(wrapper.emitted('update:modelValue')?.[0]?.[0]).toBe('pick');
+  });
+
+  it('takes a column count so the last row is not an orphan', () => {
+    const wrapper = mount(TSteps, { props: { items, columns: 3 } });
+    expect(wrapper.classes()).toContain('has-columns');
+    expect(wrapper.attributes('style')).toContain('--tree-steps-columns: 3');
+  });
+
+  it('takes the wrap width as an axis instead of a constant', () => {
+    const wrapper = mount(TSteps, { props: { items, minItemWidth: '20rem' } });
+    expect(wrapper.attributes('style')).toContain('--tree-steps-min-item-width: 20rem');
+  });
+});
+
+describe('Marketing axes on text and figures', () => {
+  it('aligns the lines, not the box', () => {
+    const wrapper = mount(TText, { props: { align: 'center' }, slots: { default: 'Centred' } });
+    expect(wrapper.classes()).toContain('t-text--align-center');
+  });
+
+  it('leaves alignment off unless it is asked for', () => {
+    const wrapper = mount(TText, { slots: { default: 'Plain' } });
+    expect(wrapper.classes().some((name) => name.startsWith('t-text--align-'))).toBe(false);
+  });
+
+  it('lets the figure lead without touching the reading order', () => {
+    const wrapper = mount(TStat, { props: { label: 'Requests served', value: '4.2M', emphasis: 'value' } });
+    expect(wrapper.classes()).toContain('t-stat--emphasis-value');
+    // The DOM order is the announcement order, and it stays label-first: the
+    // label is what makes the number mean anything.
+    const text = wrapper.get('.t-stat__body').text();
+    expect(text.indexOf('Requests served')).toBeLessThan(text.indexOf('4.2M'));
+  });
+
+  it('keeps the dashboard reading as the default', () => {
+    const wrapper = mount(TStat, { props: { label: 'Uptime', value: '99.9%' } });
+    expect(wrapper.classes()).toContain('t-stat--emphasis-label');
+  });
+
+  it('shares the last row out instead of leaving tracks empty', () => {
+    const wrapper = mount(TGrid, { props: { balance: true } });
+    expect(wrapper.classes()).toContain('is-balanced');
+    expect(wrapper.attributes('style')).toContain('--tree-grid-min-item-width: 16rem');
+    // Flex is what makes a line divide itself; the grid path would keep the hole.
+    expect(wrapper.attributes('style')).not.toContain('grid-template-columns');
+  });
+
+  it('lets a declared column count win over balancing', () => {
+    const wrapper = mount(TGrid, { props: { balance: true, columns: 3 } });
+    expect(wrapper.classes()).not.toContain('is-balanced');
+    expect(wrapper.attributes('style')).toContain('grid-template-columns: repeat(3');
+  });
+
+  it('lets a sparkline fill its card', () => {
+    const wrapper = mount(TSparkline, { props: { data: [1, 4, 2, 6], fluid: true } });
+    expect(wrapper.classes()).toContain('is-fluid');
+    expect(wrapper.attributes('width')).toBeUndefined();
+    // The viewBox is still the coordinate system the path was built in.
+    expect(wrapper.attributes('viewBox')).toBe('0 0 120 32');
+    expect(wrapper.attributes('preserveAspectRatio')).toBe('none');
+  });
+
+  it('keeps the fixed sparkline exactly as it was', () => {
+    const wrapper = mount(TSparkline, { props: { data: [1, 4, 2, 6] } });
+    expect(wrapper.attributes('width')).toBe('120');
+    expect(wrapper.attributes('preserveAspectRatio')).toBeUndefined();
+  });
+});
+
+describe('Canvas surface for a diagram', () => {
+  it('gives the canvas a box, so it is not measured at zero', () => {
+    const wrapper = mount(TCanvasSurface, { props: { draw: () => {}, height: 240 } });
+    expect(wrapper.classes()).toContain('t-canvas-surface');
+    expect(wrapper.attributes('style')).toContain('block-size: 240px');
+  });
+
+  it('takes a CSS length for the box as readily as a number', () => {
+    const wrapper = mount(TCanvasSurface, { props: { draw: () => {}, height: '20rem' } });
+    expect(wrapper.attributes('style')).toContain('block-size: 20rem');
+  });
+
+  it('carries the affordance the stylesheet cannot know about', () => {
+    const wrapper = mount(TCanvasSurface, { props: { draw: () => {}, cursor: 'pointer' } });
+    expect(wrapper.attributes('style')).toContain('cursor: pointer');
+  });
+
+  it('describes itself, because a bitmap says nothing on its own', () => {
+    const wrapper = mount(TCanvasSurface, {
+      props: { draw: () => {}, ariaLabel: 'Service dependencies' },
+      slots: { default: '<ul><li>api → queue</li></ul>' },
+    });
+    expect(wrapper.attributes('role')).toBe('img');
+    expect(wrapper.attributes('aria-label')).toBe('Service dependencies');
+    // The long form lives inside the element: exposed, never painted.
+    expect(wrapper.html()).toContain('api → queue');
+  });
+
+  it('exposes the repaint and the hit-test the consumer would otherwise write', () => {
+    const wrapper = mount(TCanvasSurface, { props: { draw: () => {} } });
+    const api = wrapper.vm as unknown as {
+      redraw: () => void;
+      point: (event: { clientX: number; clientY: number }) => { x: number; y: number } | null;
+    };
+    expect(typeof api.redraw).toBe('function');
+    // jsdom has no layout, so the rect is all zeros: the arithmetic is what is
+    // being pinned here, not the geometry.
+    expect(api.point({ clientX: 12, clientY: 8 })).toEqual({ x: 12, y: 8 });
   });
 });

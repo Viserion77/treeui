@@ -228,6 +228,26 @@ component_profiles:
       - component: TStack
         when: "The main need is spacing between children."
 
+  TCanvasSurface:
+    keywords: [canvas, diagram, graph, node and edge, custom drawing, plot, topology, map, hit testing]
+    use_when:
+      - "The drawing is data-driven and no chart primitive expresses it — nodes and edges, a topology, a custom plot."
+      - "Parts of the drawing are click or hover targets."
+      - "It must repaint when the data, the locale or the theme changes."
+    avoid_when:
+      - "A line, area or bar chart says it — use TChart, which brings axes, legend, tooltip and an accessible table."
+      - "The drawing is ornament — use useDecorativeCanvas, which gates the loop on visibility and reduced motion."
+      - "The shape is an inline trend — use TSparkline."
+    note: >
+      The component owns the surface and its lifecycle: box, backing store,
+      repaint, hit-test coordinates, and the accessible long form in its default
+      slot. Where the nodes GO is domain logic and stays in the product.
+    alternatives:
+      - component: TChart
+        when: "The data fits axes and categories."
+      - component: useDecorativeCanvas
+        when: "It is decoration, not information."
+
   TChart:
     keywords: [chart, graph, line chart, area chart, bar chart, plot, dashboard, time series, analytics]
     use_when:
@@ -235,7 +255,7 @@ component_profiles:
       - "One or more series share a set of category labels."
     avoid_when:
       - "A single value tells the story — use TStat."
-      - "You only need an inline trend with no axes — use TSparkline."
+      - "You only need an inline trend with no axes — use TSparkline (`fluid` fills the card width)."
       - "The data is a part-of-whole breakdown — use TDonutChart."
     alternatives:
       - component: TSparkline

@@ -1718,6 +1718,16 @@ a.t-brand-lockup:focus-visible {
   .t-list-item {
     flex-wrap: wrap;
   }
+  /* The break has to fall AFTER the content, never between the leading and the
+     first line it belongs to. Flex chooses line breaks from the HYPOTHETICAL
+     main size — the size before shrinking — so a long content column with
+     `flex-basis: auto` moves to the next line whole and strands the icon alone
+     above it. Basis 0 makes the content unbreakable by size while it still
+     takes the room that is left, so `flex-wrap` only does the job it was added
+     for: dropping the meta. */
+  .t-list-item__content {
+    flex-basis: 0;
+  }
   .t-list-item__meta {
     order: 1;
     flex-basis: 100%;
@@ -5768,6 +5778,26 @@ a.t-brand-lockup:focus-visible {
   min-width: 0;
 }
 
+/* Figure first — a visual swap, and deliberately only that. The DOM keeps
+   label before value, so a screen reader still announces "Requests served,
+   4.2M": the label is what makes the number mean anything, and that stays true
+   whichever one the eye meets first. Safe to reorder visually here because
+   nothing inside a stat is focusable, so no tab order disagrees with the page. */
+.t-stat--emphasis-value .t-stat__content {
+  grid-row: 1;
+}
+
+.t-stat--emphasis-value .t-stat__topline {
+  grid-row: 2;
+}
+
+/* With the figure leading, the label below it is supporting copy, not a
+   heading: it stops competing with the number for weight. */
+.t-stat--emphasis-value .t-stat__label {
+  color: var(--tree-color-text-muted);
+  font-weight: var(--tree-font-weight-regular);
+}
+
 .t-stat__loading {
   display: grid;
   gap: var(--tree-space-3);
@@ -6162,15 +6192,32 @@ a.t-brand-lockup:focus-visible {
 }
 
 .t-steps__item {
-  flex: 1 1 14rem;
+  /* The basis is an axis, not a constant: a strip that can only wrap by width
+     leaves the last step alone on its own row, and the consumer's only fix was
+     to declare the whole component twice inside TShow/THide — which duplicates
+     the copy in the pre-rendered HTML of the one surface that gets crawled. */
+  flex: 1 1 var(--tree-steps-min-item-width, 14rem);
   list-style: none;
+}
+
+/* Fixed shape ("3 + 3"): the row count is declared, and the basis becomes the
+   share of the row minus its gaps, so the last row matches the ones above it. */
+.t-steps.has-columns .t-steps__item {
+  flex: 1 1
+    calc(
+      (100% - (var(--tree-steps-columns) - 1) * var(--tree-space-3)) / var(--tree-steps-columns)
+    );
+  max-inline-size: 100%;
 }
 
 .t-steps--vertical .t-steps__item {
   flex-basis: auto;
 }
 
-.t-steps__button {
+/* The box is the same in both modes; only the interactive one is a control.
+   `t-steps__button` stays on the button so existing selectors and consumer
+   overrides keep matching exactly what they always matched. */
+.t-steps__box {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
@@ -6203,16 +6250,16 @@ a.t-brand-lockup:focus-visible {
   box-shadow: 0 0 0 var(--tree-focus-ring-width) var(--tree-color-focus-ring);
 }
 
-.t-steps__item.is-current .t-steps__button {
+.t-steps__item.is-current .t-steps__box {
   border-color: var(--tree-color-brand-primary);
   box-shadow: 0 0 0 1px var(--tree-color-brand-primary) inset;
 }
 
-.t-steps__item.is-complete .t-steps__button {
+.t-steps__item.is-complete .t-steps__box {
   border-color: var(--tree-color-status-success-border);
 }
 
-.t-steps__item.is-error .t-steps__button {
+.t-steps__item.is-error .t-steps__box {
   border-color: var(--tree-color-status-error-border);
 }
 
@@ -6812,6 +6859,30 @@ a.t-brand-lockup:focus-visible {
   align-content: start;
 }
 
+/* Balanced last row.
+ *
+ * `auto-fit` collapses a track only when it holds no item on ANY row, so a
+ * remainder row always keeps the full-width tracks of the rows above it and
+ * leaves the hole on the right. Flex lines size themselves: every line divides
+ * itself among the items it actually has, so a full row is identical to the
+ * grid and the remainder row is simply wider items rather than empty tracks.
+ *
+ * The children are styled by the container because a layout primitive that
+ * requires the consumer to also style each child is not absorbing the work. */
+.t-grid.is-balanced {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.t-grid.is-balanced > * {
+  flex: 1 1 var(--tree-grid-min-item-width, 16rem);
+  /* Never wider than the row: a single item on the last line fills it, and a
+     `min-inline-size: 0` keeps a long unbroken string from pushing the line
+     past its container. */
+  max-inline-size: 100%;
+  min-inline-size: 0;
+}
+
 /* ── Stack ────────────────────────────────────────────── */
 
 .t-stack {
@@ -7172,6 +7243,33 @@ a.t-brand-lockup:focus-visible {
 
 .t-text.is-balanced {
   text-wrap: balance;
+}
+
+/* Alignment axis. `display: block` is part of the contract, not a side effect:
+   the default `span` shrink-wraps its content, and `text-align` on a box that
+   is exactly as wide as its text has nothing to move. Centring the box is
+   `TStack align`; this centres the LINES inside the box, which is what a
+   paragraph that spans the column actually needs. Logical values, so `start`
+   and `end` follow the writing direction. */
+.t-text--align-start,
+.t-text--align-center,
+.t-text--align-end {
+  display: block;
+}
+.t-text--align-start {
+  text-align: start;
+}
+.t-text--align-center {
+  text-align: center;
+}
+.t-text--align-end {
+  text-align: end;
+}
+
+/* A measure caps the width; centring a capped block also centres the block
+   itself, otherwise the text centres inside a column parked on the left. */
+.t-text--align-center:is(.t-text--measure-headline, .t-text--measure-lead, .t-text--measure-prose) {
+  margin-inline: auto;
 }
 
 /* ------------------------------------------------------------------ *
@@ -8011,11 +8109,43 @@ body:has(.t-app-shell) {
    2px surface gaps/rings, values in text tokens (never the series color).
    ========================================================================= */
 
+/* ── Canvas surface ───────────────────────────────────── */
+
+/* The box a diagram is drawn in. A bare `<canvas>` is `inline` with an
+   intrinsic 300×150, which inside a flex or grid parent means it neither fills
+   the row nor keeps its own height — and a canvas measured at 0 paints nothing
+   at all, so the failure is a blank box rather than a wrong one. The height is
+   a prop because a diagram has no intrinsic one; the width is always the
+   parent's, because that is the only number the layout knows. */
+.t-canvas-surface {
+  display: block;
+  inline-size: 100%;
+  max-inline-size: 100%;
+}
+
 .t-sparkline {
   display: inline-block;
   overflow: visible;
   vertical-align: middle;
   color: var(--tree-color-chart-1);
+}
+
+/* Fluid: the shape stretches to the parent's width while the band keeps its
+   height. `preserveAspectRatio: none` is what allows that, and it would also
+   stretch the stroke — a 2px line drawn in a 120-wide viewBox rendered at 600
+   would come out 10px thick horizontally and 2px vertically. `non-scaling-stroke`
+   keeps the pen the width it was declared, in screen pixels, so only the path
+   scales. */
+.t-sparkline.is-fluid {
+  display: block;
+  inline-size: 100%;
+}
+
+.t-sparkline.is-fluid .t-sparkline__line,
+.t-sparkline.is-fluid .t-sparkline__area,
+.t-sparkline.is-fluid .t-sparkline__bar,
+.t-sparkline.is-fluid .t-sparkline__point {
+  vector-effect: non-scaling-stroke;
 }
 
 .t-sparkline__line {

@@ -32,7 +32,25 @@ const props = withDefaults(
     items?: TStepItem[];
     size?: TSize;
     orientation?: TStepOrientation;
+    /**
+     * Whether a step can be picked. When false — the default — the sequence is
+     * something to READ: it renders inert `<li>` boxes, emits no control into
+     * the accessibility tree, and elects no step as current on its own. Set it
+     * true for a wizard, where each step is a destination.
+     */
     interactive?: boolean;
+    /**
+     * Fixed number of steps per row, horizontal only. Use it when the sequence
+     * has a shape ("3 + 3"): a strip that only ever wraps by available width
+     * leaves the last step alone on its own row.
+     */
+    columns?: number;
+    /**
+     * Width at which a step stops shrinking and the strip wraps instead.
+     * Same axis as `TGrid`, same default reasoning: it is the item that decides
+     * how many fit, never the consumer counting them.
+     */
+    minItemWidth?: string;
   } & TModelModifiers>(),
   {
     modelModifiers: () => ({}),
@@ -42,6 +60,8 @@ const props = withDefaults(
     size: 'md',
     orientation: 'horizontal',
     interactive: false,
+    columns: undefined,
+    minItemWidth: '14rem',
   },
 );
 
@@ -59,13 +79,20 @@ defineSlots<{
 }>();
 
 const attrs = useAttrs();
-const internalValue = ref(props.defaultValue || props.items[0]?.value || '');
+// A wizard opens on its first step; a described sequence has no "you are here"
+// until someone says so. Electing index 0 anyway is what made a marketing
+// "how it works" section render the visitor's progress through a page.
+const internalValue = ref(props.defaultValue || (props.interactive ? (props.items[0]?.value ?? '') : ''));
 
 const activeValue = computed(() => props.modelValue ?? internalValue.value);
 
 const currentIndex = computed(() => {
   const activeIndex = props.items.findIndex((item) => item.value === activeValue.value);
-  return activeIndex >= 0 ? activeIndex : 0;
+  if (activeIndex >= 0) {
+    return activeIndex;
+  }
+
+  return props.interactive ? 0 : -1;
 });
 
 const rootClasses = computed(() => [
@@ -74,11 +101,22 @@ const rootClasses = computed(() => [
   `t-steps--${props.orientation}`,
   {
     'is-interactive': props.interactive,
+    'has-columns': props.orientation === 'horizontal' && typeof props.columns === 'number' && props.columns > 0,
   },
   attrs.class,
 ]);
 
-const rootStyle = computed(() => attrs.style);
+const rootStyle = computed(() => [
+  props.orientation === 'horizontal'
+    ? {
+        '--tree-steps-min-item-width': props.minItemWidth,
+        ...(typeof props.columns === 'number' && props.columns > 0
+          ? { '--tree-steps-columns': String(props.columns) }
+          : {}),
+      }
+    : null,
+  attrs.style,
+]);
 
 const rootAttrs = computed(() => {
   const { class: _class, style: _style, ...rest } = attrs;
@@ -118,7 +156,9 @@ watch(
   (items) => {
     const hasCurrentItem = items.some((item) => item.value === activeValue.value);
 
-    if (!hasCurrentItem && items[0] && props.modelValue === undefined) {
+    // Same rule as the initial value: only a wizard falls back to the first
+    // step, or a static sequence would elect one the moment its items change.
+    if (!hasCurrentItem && items[0] && props.modelValue === undefined && props.interactive) {
       internalValue.value = items[0].value;
     }
   },
@@ -138,14 +178,16 @@ watch(
       class="t-steps__item"
       :class="`is-${resolveStatus(item, index)}`"
     >
-      <button
-        type="button"
-        class="t-steps__button"
+      <component
+        :is="interactive ? 'button' : 'div'"
+        :type="interactive ? 'button' : undefined"
+        class="t-steps__box"
         :class="{
+          't-steps__button': interactive,
           'is-current': resolveStatus(item, index) === 'current',
-          'is-disabled': item.disabled,
+          'is-disabled': interactive && item.disabled,
         }"
-        :disabled="!interactive || item.disabled"
+        :disabled="interactive && item.disabled ? true : undefined"
         :aria-current="resolveStatus(item, index) === 'current' ? 'step' : undefined"
         @click="selectStep(item)"
       >
@@ -185,7 +227,7 @@ watch(
             {{ item.meta }}
           </span>
         </slot>
-      </button>
+      </component>
     </li>
   </ol>
 </template>

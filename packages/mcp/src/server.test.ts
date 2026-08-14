@@ -156,9 +156,10 @@ describe('@treeui/mcp server', () => {
 
     expect(byNameText).toContain('--tree-color-status-success');
     // A themed token reports both theme values so an agent can pick the right one.
-    expect(byNameText).toContain('light #1a7f37');
-    // Nudged from #57ab5a, which measured 4.48:1 on the dark subtle band.
-    expect(byNameText).toContain('dark #59ac5c');
+    expect(byNameText).toContain('light #197d36');
+    // Both hues carry headroom on bg-subtle, the band a status line lands on:
+    // the floor is the contract's job, the margin is `status.test.ts`.
+    expect(byNameText).toContain('dark #5bae5e');
     expect(byValueText).toContain('--tree-color-brand-primary');
   });
 

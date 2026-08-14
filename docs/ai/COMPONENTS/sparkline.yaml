@@ -40,6 +40,14 @@ props:
     type: boolean
     default: false
     note: "Marker on the final point (line/area)."
+  fluid:
+    type: boolean
+    default: false
+    note: >
+      Fill the parent's width; `width` stays the viewBox. The height is
+      unchanged on purpose — a sparkline is a band, and growing in both
+      directions turns it into a chart that lies about its precision. Strokes
+      use `non-scaling-stroke`, so the pen keeps its declared width.
   ariaLabel:
     type: string
     default: "Trend sparkline"
@@ -48,6 +56,7 @@ behavior:
   no_axes_or_legend: true
   flat_series_renders_centered: true
   scales_to_intrinsic_width_and_height: true
+  fluid_fills_parent_width: true
 
 a11y:
   - "Renders role=img with an aria-label; pass a specific one for meaningful trends."

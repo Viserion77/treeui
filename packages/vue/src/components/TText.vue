@@ -22,6 +22,10 @@ const _treeTextWeights = ['regular', 'medium', 'semibold', 'bold'] as const;
 const _treeTextFamilies = ['sans', 'mono'] as const;
 const _treeTextMeasures = ['headline', 'lead', 'prose'] as const;
 const _treeTextWraps = ['anywhere', 'break-word'] as const;
+// Logical, not physical: `start`/`end` follow the writing direction, so a
+// centred closing section stays centred and an end-aligned figure flips with
+// the document instead of stranding itself in RTL.
+const _treeTextAligns = ['start', 'center', 'end'] as const;
 
 export type TTextSize = (typeof _treeTextSizes)[number];
 export type TTextTone = (typeof _treeTextTones)[number];
@@ -29,6 +33,7 @@ export type TTextWeight = (typeof _treeTextWeights)[number];
 export type TTextFamily = (typeof _treeTextFamilies)[number];
 export type TTextMeasure = (typeof _treeTextMeasures)[number];
 export type TTextWrap = (typeof _treeTextWraps)[number];
+export type TTextAlign = (typeof _treeTextAligns)[number];
 
 const props = withDefaults(
   defineProps<{
@@ -73,6 +78,14 @@ const props = withDefaults(
      * do not support it simply wrap normally.
      */
     balance?: boolean;
+    /**
+     * How the lines sit inside the box. `TStack align="center"` centres the
+     * BOX, which looks centred only while the box is narrow: at full width the
+     * paragraph inside it reads left-aligned. This is the other half of that
+     * pair, and it renders block, because `text-align` does nothing on an
+     * inline box that shrink-wraps its content.
+     */
+    align?: TTextAlign;
   }>(),
   {
     as: 'span',
@@ -85,6 +98,7 @@ const props = withDefaults(
     measure: undefined,
     wrap: undefined,
     balance: false,
+    align: undefined,
   },
 );
 
@@ -96,6 +110,7 @@ const classes = computed(() => [
   props.family ? `t-text--family-${props.family}` : null,
   props.measure ? `t-text--measure-${props.measure}` : null,
   props.wrap && !props.truncate ? `t-text--wrap-${props.wrap}` : null,
+  props.align ? `t-text--align-${props.align}` : null,
   {
     'is-truncated': props.truncate,
     'is-pre-wrap': props.preserveWhitespace && !props.truncate,

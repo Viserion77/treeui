@@ -164,6 +164,7 @@ export type { PricingPlan as TPricingPlan } from './TPricing.vue';
 export { default as TPricingCard } from './TPricingCard.vue';
 export type { PricingFeature } from './TPricingCard.vue';
 export { default as TMarkdownEditor } from './TMarkdownEditor.vue';
+export { default as TCanvasSurface } from './TCanvasSurface.vue';
 export { default as TChart } from './TChart.vue';
 export type { TChartType, TChartSeries, TChartActivePayload } from './TChart.vue';
 export { default as TSparkline } from './TSparkline.vue';

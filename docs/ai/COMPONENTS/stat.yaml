@@ -29,6 +29,17 @@ props:
   loading:
     type: boolean
     default: false
+  emphasis:
+    type: TStatEmphasis
+    default: label
+    values: [label, value]
+    note: >
+      Which half leads. `label` is the dashboard reading — the eye is scanning
+      for what is measured. `value` puts the figure first, for a marketing band
+      where the number IS the argument; it also keeps a row of figures on one
+      baseline, because the labels above them no longer have to be the same
+      height. Visual order only: the DOM keeps label before value, so the
+      announcement stays "Requests served, 4.2M".
 
 slots:
   - icon
@@ -39,6 +50,7 @@ slots:
 
 behavior:
   value_and_trend_are_optional: true
+  emphasis_reorders_visually_not_in_the_dom: true
   icon_slot_adds_visual_emphasis: true
   trend_indicator_changes_with_direction: true
   loading_renders_internal_skeleton_placeholders: true

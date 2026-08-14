@@ -72,3 +72,23 @@ export const FormLayout: Story = {
     `,
   }),
 };
+
+export const BalancedLastRow: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Five cards over four tracks leave three holes on the right, and a hole reads as a card that failed to load. `auto-fit` cannot help: it collapses a track only when that track is empty on every row. With `balance` the layout lays out as flex lines, and a line divides itself among the items it actually has — full rows are identical to the grid, only the remainder is shared out. The alternative it replaces is calibrating `min-item-width` until the track count divides the item count, which ties the copy to the geometry.',
+      },
+    },
+  },
+  render: () => ({
+    components: { TGrid, TCard },
+    setup: () => ({ items: ['Ingest', 'Normalise', 'Enrich', 'Score', 'Route'] }),
+    template: `
+      <TGrid balance min-item-width="14rem">
+        <TCard v-for="item in items" :key="item" variant="outline">{{ item }}</TCard>
+      </TGrid>
+    `,
+  }),
+};

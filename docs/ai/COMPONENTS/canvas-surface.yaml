@@ -1,0 +1,90 @@
+name: TCanvasSurface
+source_file: packages/vue/src/components/TCanvasSurface.vue
+package: "@treeui/vue"
+kind: data-display
+status: available
+purpose: "A sized, repaintable, hit-testable canvas for a data-driven drawing — a diagram, a graph, a custom plot."
+
+props:
+  draw:
+    type: "(frame: CanvasSurfaceFrame) => void"
+    required: true
+    note: >
+      Paints the whole surface. Called on mount, on resize and on every
+      `redraw()`. The context arrives already scaled to CSS pixels, so the
+      drawing never does device-ratio arithmetic; it is expected to clear what
+      it does not repaint.
+  height:
+    type: "number | string"
+    default: 320
+    note: "Number is px, string is any CSS length. A diagram has no intrinsic height, so it is declared."
+  cursor:
+    type: string
+    default: undefined
+    note: >
+      Pointer over the surface. This cannot come from a stylesheet: the
+      sensitive area is a rectangle inside the bitmap and no selector knows
+      where it is. Bind it to whatever the consumer's hit-test just decided.
+  maxPixelRatio:
+    type: number
+    default: 2
+  ariaLabel:
+    type: string
+    default: undefined
+    note: "Sets role=img. A bitmap says nothing on its own."
+  redrawKey:
+    type: unknown
+    default: undefined
+    note: "Repaint whenever this changes — pass the data, a version counter, or the theme. Deep-watched."
+
+slots:
+  - name: default
+    description: >
+      The long form of the drawing — a list, a table, the same data as markup.
+      It lives inside the `<canvas>` element, which the browser exposes to
+      assistive technology and never paints.
+
+exposed:
+  redraw: "() => void — repaint once, on the next frame. Coalesced."
+  point: "(event: { clientX, clientY }) => { x, y } | null — event coordinates in the space `draw` paints in."
+  size: "Ref<{ width, height }> — current size in CSS pixels."
+
+behavior:
+  repaints_on_demand_not_on_a_clock: true
+  backing_store_follows_the_element: true
+  pointer_events_reach_the_canvas: true
+  ssr_safe: "Nothing touches the DOM outside onMounted."
+
+a11y:
+  - "Give it an ariaLabel; a canvas is opaque to assistive technology."
+  - "Put the same information in the default slot as markup — it is the accessible form, not a fallback."
+  - "Anything clickable inside the drawing needs a real control elsewhere, or a keyboard user cannot reach it."
+
+related:
+  useCanvasSurface: "The composable behind it, for a drawing that needs its own element."
+  useDecorativeCanvas: >
+    The other half of the pair, and a different job: an animation loop that is
+    gated by visibility, reduced-motion and pointer coarseness, and that never
+    takes the pointer. Use that one for ornament, this one for information.
+
+not_this_component:
+  node_and_edge_layout: >
+    Where the nodes GO is domain logic — a dependency graph, a state machine and
+    a floor plan disagree about it. The library owns the surface and its
+    lifecycle; the product owns the layout and the drawing.
+
+example: |
+  <TCanvasSurface
+    ref="surface"
+    :draw="drawGraph"
+    :redraw-key="nodes"
+    :height="360"
+    :cursor="hovered ? 'pointer' : undefined"
+    aria-label="Service dependencies"
+    @pointermove="onMove"
+    @click="onClick"
+  >
+    <ul>
+      <li v-for="edge in edges" :key="edge.id">{{ edge.from }} → {{ edge.to }}</li>
+    </ul>
+  </TCanvasSurface>

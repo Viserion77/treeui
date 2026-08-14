@@ -27,6 +27,13 @@ export type {
   UseDecorativeCanvasOptions,
   UseDecorativeCanvasReturn,
 } from './composables/useDecorativeCanvas';
+export { useCanvasSurface } from './composables/useCanvasSurface';
+export type {
+  CanvasSurfaceFrame,
+  CanvasSurfacePoint,
+  UseCanvasSurfaceOptions,
+  UseCanvasSurfaceReturn,
+} from './composables/useCanvasSurface';
 export { useToast } from './composables/useToast';
 export type { ToastVariant, ToastPosition, ToastOptions, ToastItem } from './composables/useToast';
 

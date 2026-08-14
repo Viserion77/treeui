@@ -199,3 +199,34 @@ export const ResponsiveSteps: Story = {
     `,
   }),
 };
+
+export const Alignment: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '`TStack align="center"` centres the BOX; this centres the LINES inside it. The difference is invisible while the box is narrow and obvious once it spans the column — which is why a centred closing section reads left-aligned on a phone. Logical values: `start` and `end` follow the writing direction. With a `measure`, `center` also centres the capped block.',
+      },
+    },
+  },
+  render: () => ({
+    components: { TText },
+    template: `
+      <div style="display: grid; gap: 1.5rem;">
+        <div style="border: 1px dashed var(--tree-color-border-default); padding: 1rem;">
+          <TText as="p" measure="prose">
+            Without the axis: the box is centred by the layout, the lines are not.
+          </TText>
+        </div>
+        <div style="border: 1px dashed var(--tree-color-border-default); padding: 1rem;">
+          <TText as="p" measure="prose" align="center">
+            With align="center": the lines centre too, and the capped block centres with them, at any width.
+          </TText>
+        </div>
+        <div style="border: 1px dashed var(--tree-color-border-default); padding: 1rem;">
+          <TText as="p" align="end">Aligned to the end of the writing direction.</TText>
+        </div>
+      </div>
+    `,
+  }),
+};

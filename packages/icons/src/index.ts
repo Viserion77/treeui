@@ -17,3 +17,11 @@ export {
 } from './registry';
 
 export { builtinTreeIconNodes } from './icons';
+
+export {
+  treeIconCategories,
+  treeIconCategory,
+  treeIconCategoryLabels,
+  treeIconCategoryOrder,
+  type TIconCategory,
+} from './categories';

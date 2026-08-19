@@ -6,6 +6,8 @@ import {
   type TIconNodes,
 } from '@treeui/vue';
 
+import IconGallery from '../blocks/IconGallery.vue';
+
 import { practiceNote } from './practice-refs';
 
 // Derived, never transcribed. A hardcoded list drifts the moment an icon is
@@ -59,36 +61,21 @@ type Story = StoryObj<typeof meta>;
 
 export const Playground: Story = {};
 
-/** Every icon the library ships, with the name a consumer needs to copy. */
+/**
+ * The browsable catalog: grouped by subject, filtered by name, with a drawer
+ * that hands you the line of code for whichever icon you pick.
+ *
+ * The grouping is real metadata, not a heuristic over name prefixes — see
+ * `treeIconCategories` in `@treeui/vue`, which an application can use to build
+ * its own picker.
+ */
 export const Gallery: Story = {
-  // The global `centered` layout shrink-wraps the story, which turns 364 icons
-  // into three tall columns. The gallery wants the full canvas.
+  // The global `centered` layout shrink-wraps the story, which turns the
+  // catalog into three tall columns. The gallery wants the full canvas.
   parameters: { layout: 'fullscreen' },
   render: () => ({
-    components: { TIcon },
-    setup: () => ({ iconNames }),
-    template: `
-      <div style="display: grid; gap: var(--tree-space-4);">
-        <p style="margin: 0; font-size: var(--tree-font-size-sm); color: var(--tree-color-text-muted);">
-          {{ iconNames.length }} original TreeUI icons, using descriptive kebab-case names.
-          Click a name to select it.
-        </p>
-        <div
-          style="display: grid; grid-template-columns: repeat(auto-fill, minmax(calc(var(--tree-space-16) * 2), 1fr)); gap: var(--tree-space-2);"
-        >
-          <div
-            v-for="name in iconNames"
-            :key="name"
-            style="display: flex; flex-direction: column; align-items: center; justify-content: flex-start; gap: var(--tree-space-2); padding: var(--tree-space-3) var(--tree-space-2); border: var(--tree-border-width-subtle) solid var(--tree-color-border-default); border-radius: var(--tree-radius-md); background: var(--tree-color-bg-surface);"
-          >
-            <TIcon :name="name" :size="28" />
-            <code
-              style="font-family: var(--tree-font-family-mono); font-size: var(--tree-font-size-xs); line-height: var(--tree-font-lineHeight-tight); color: var(--tree-color-text-muted); text-align: center; overflow-wrap: anywhere; user-select: all;"
-            >{{ name }}</code>
-          </div>
-        </div>
-      </div>
-    `,
+    components: { IconGallery },
+    template: '<IconGallery />',
   }),
 };
 

@@ -326,6 +326,10 @@ If you *want* the uncorrected behaviour — an icon that thickens with its box, 
 | `treeIcons` | `Record<TIconName, Component>` | Lazy name-to-component map of the whole registry. |
 | `treeIconDefaults` | `{ size: 20, strokeWidth: 2, absoluteStrokeWidth: true }` | The prop defaults, for components that re-expose them. |
 | `builtinTreeIconNodes` | `Record<string, TIconNodes>` | The **geometry** of the 365 built-ins — raw `[tag, attrs]` data, not components. Read it to inspect or re-draw an icon; it is not a component map. |
+| `treeIconCategories` | `Record<TIconCategory, readonly TIconName[]>` | The catalog grouped by subject. Iterate it to build a picker. |
+| `treeIconCategoryOrder` | `readonly TIconCategory[]` | The order to present categories in. |
+| `treeIconCategoryLabels` | `Record<TIconCategory, string>` | Human-readable name for each category. |
+| `treeIconCategory` | `(name: string) => TIconCategory \| undefined` | Reverse lookup, for a details panel. Builds its index on first call. |
 | `TIconNode` | `[tag: string, attrs: Record<string, string \| number>]` | One child of an icon's `<svg>`. |
 | `TIconNodes` | `TIconNode[]` | An icon's geometry: all children of its `<svg>`. |
 | `TIconRegistry` | `interface` | The augmentable set of icon names. |
@@ -352,6 +356,34 @@ const iconComponent = computed(() => resolveTreeIcon(props.icon));
 ```
 
 Passing the raw string through would not work: Vue resolves a string `is` as a *globally registered component name*, so `"cpu"` would look for a component called `cpu` and render nothing.
+
+## Browsing the catalog
+
+365 names sorted alphabetically is a list you can only use if you already know
+what you want. The package therefore ships a taxonomy alongside the geometry:
+
+```ts
+import {
+  treeIconCategories,
+  treeIconCategoryLabels,
+  treeIconCategoryOrder,
+} from '@treeui/vue';
+
+for (const category of treeIconCategoryOrder) {
+  console.log(treeIconCategoryLabels[category], treeIconCategories[category].length);
+  // Actions 44 · Navigation 31 · Status & feedback 30 · Files & storage 40 · …
+}
+```
+
+Fifteen categories, every icon in exactly one, held by `categories.test.ts` — a
+new icon cannot ship without a home. It is curated rather than derived: a
+classifier over name prefixes puts `route` under "navigation" and `scale` under
+"security", and gets `draw`, `trail` and `story` wrong every time.
+
+`treeIconCategory(name)` is the reverse lookup, for the panel that has to say
+what the icon you just clicked is about. Storybook's own icon gallery
+(`Components/Data Display/Icon` → Gallery) is built on these three exports; an
+application building its own picker uses the same ones.
 
 ## Branchline — the drawing contract
 

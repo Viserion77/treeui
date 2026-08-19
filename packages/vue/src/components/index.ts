@@ -193,10 +193,15 @@ export {
   registerTreeIcons,
   resetTreeIcons,
   resolveTreeIcon,
+  treeIconCategories,
+  treeIconCategory,
+  treeIconCategoryLabels,
+  treeIconCategoryOrder,
   treeIconDefaults,
   treeIcons,
 } from '@treeui/icons';
 export type {
+  TIconCategory,
   TIconDefinition,
   TIconInput,
   TIconName,

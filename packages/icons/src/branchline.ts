@@ -56,16 +56,26 @@ export const BRANCHLINE = {
   keylineTolerance: 1.5,
 
   /**
-   * Corner-modifier territory. The badge is not a sticker: the base glyph opens
-   * a hole for it, so the two never share a stroke.
+   * Corner-modifier territory, mirroring `TREE_CORNER_MARK` in `icons.ts`.
+   *
+   * The modifier is not a sticker laid over the base. It claims a corner, and
+   * the base is redrawn with that corner interrupted, so the two never share a
+   * stroke and a unit of empty canvas sits between their inks.
+   *
+   * `reach` is how far the mark itself extends from that centre; `clearRadius`
+   * is how far the base must stay away. Nothing may sit between the two.
    */
-  badge: {
-    center: 17.4,
-    radius: 3.75,
-    /** The mark inside the badge, e.g. the bar of a plus. */
-    minMarkSize: 3,
-    /** Gap knocked out of the base glyph around the badge. */
-    clearance: 1,
+  cornerMark: {
+    x: 18.5,
+    y: 18.5,
+    span: 5.5,
+    /**
+     * How far the mark itself reaches. Measured, not derived from `span`: a
+     * plus stops at half its span, but the corners of `lock` and the points of
+     * `star` push out to 3.95u.
+     */
+    reach: 4,
+    clearRadius: 5.5,
   },
 
   /** Corner radii come from a short scale so frames feel related. */
@@ -457,6 +467,87 @@ export const nodePoints = ([tag, attrs]: TIconNode): TPoint[] => {
   }
 };
 
+/**
+ * Dense points along a node's outline, not just its corners.
+ *
+ * `nodePoints` answers "how far does this reach", which a bounding box needs.
+ * Clearance asks a different question — "does this stroke pass through here" —
+ * and a bounding box is the wrong shape for it: the corners of a circle's box
+ * are the two places the circle definitely is not.
+ */
+export const nodeSamples = (node: TIconNode, step = 0.25): TPoint[] => {
+  const [tag, attrs] = node;
+  const value = (key: string) => num(attrs[key] as string | number);
+  const along = (points: TPoint[], close = false) => {
+    const ring = close && points.length > 1 ? [...points, points[0]] : points;
+    const out: TPoint[] = [];
+
+    for (let i = 0; i + 1 < ring.length; i += 1) {
+      const from = ring[i];
+      const to = ring[i + 1];
+      const span = Math.hypot(to.x - from.x, to.y - from.y);
+      const steps = Math.max(1, Math.ceil(span / step));
+
+      for (let s = 0; s <= steps; s += 1) {
+        out.push({
+          x: from.x + ((to.x - from.x) * s) / steps,
+          y: from.y + ((to.y - from.y) * s) / steps,
+        });
+      }
+    }
+
+    return out.length > 0 ? out : ring;
+  };
+  const ellipseRing = (cx: number, cy: number, rx: number, ry: number) => {
+    const steps = Math.max(24, Math.ceil((2 * Math.PI * Math.max(rx, ry)) / step));
+
+    return Array.from({ length: steps + 1 }, (_, i) => {
+      const angle = (i / steps) * 2 * Math.PI;
+
+      return { x: cx + rx * Math.cos(angle), y: cy + ry * Math.sin(angle) };
+    });
+  };
+
+  switch (tag) {
+    case 'path':
+      // Already flattened to points by the path reader.
+      return along(flattenPath(String(attrs.d ?? '')));
+    case 'polyline':
+      return along(parsePoints(String(attrs.points ?? '')));
+    case 'polygon':
+      return along(parsePoints(String(attrs.points ?? '')), true);
+    case 'line':
+      return along([
+        { x: value('x1'), y: value('y1') },
+        { x: value('x2'), y: value('y2') },
+      ]);
+    case 'circle':
+      return ellipseRing(value('cx'), value('cy'), value('r'), value('r'));
+    case 'ellipse':
+      return ellipseRing(value('cx'), value('cy'), value('rx'), value('ry'));
+    case 'rect': {
+      const x = value('x');
+      const y = value('y');
+      const w = value('width');
+      const h = value('height');
+
+      // Corner radius is ignored: it only ever pulls the outline inwards, so
+      // treating the rect as square-cornered is the conservative answer.
+      return along(
+        [
+          { x, y },
+          { x: x + w, y },
+          { x: x + w, y: y + h },
+          { x, y: y + h },
+        ],
+        true,
+      );
+    }
+    default:
+      return [];
+  }
+};
+
 /** Bounding box of a whole glyph, ignoring stroke width. */
 export const iconBox = (nodes: TIconNodes): TBox => {
   const points = nodes.flatMap((node) => nodePoints(node));
@@ -719,6 +810,47 @@ export const checkNaming = (
   }
 
   return violations;
+};
+
+/**
+ * Checks that a corner modifier has the canvas around it to itself.
+ *
+ * The rule is a ring: the mark lives inside `reach`, the base lives outside
+ * `clearRadius`, and the space between them is empty. Anything found in that
+ * ring is the base crowding the mark — which is what made `globe-check` read as
+ * a globe with a scribble over it rather than a globe and a tick.
+ */
+export const checkCornerClearance = (
+  name: string,
+  nodes: TIconNodes,
+): TBranchlineViolation[] => {
+  const { x, y, reach, clearRadius } = BRANCHLINE.cornerMark;
+  // `reach` is already rounded up past the widest mark, so only floating point
+  // needs slack here.
+  const inner = reach + 0.01;
+  let worst: { distance: number; tag: string } | undefined;
+
+  for (const node of nodes) {
+    for (const point of nodeSamples(node)) {
+      const distance = Math.hypot(point.x - x, point.y - y);
+
+      if (distance <= inner || distance >= clearRadius) continue;
+      if (!worst || distance < worst.distance) {
+        worst = { distance, tag: node[0] };
+      }
+    }
+  }
+
+  if (!worst) return [];
+
+  return [
+    {
+      subject: name,
+      rule: 'modificador-tem-territorio',
+      severity: 'error',
+      message: `has a <${worst.tag}> ${worst.distance.toFixed(2)}u from the corner mark, inside its ${clearRadius}u clearance; the base must be interrupted around the mark`,
+    },
+  ];
 };
 
 /** Formats findings for a terminal report. */

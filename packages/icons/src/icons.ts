@@ -625,20 +625,131 @@ const INTERIOR_MARKS: Record<
     span: 5,
     frame: () => glyph(path('M3 7h18v3a2 2 0 0 0 0 4v3H3v-3a2 2 0 0 0 0-4z')),
   },
+  // These three read wrong with a corner mark, and right with an inner one: a
+  // verified badge carries its tick inside the seal, a checkbox inside the box,
+  // and a search with no result crosses out the lens rather than the handle.
+  badge: {
+    x: 12,
+    y: 11.5,
+    span: 6,
+    frame: () =>
+      glyph(path('M12 2.75 15 5l3.75-.25.75 3.75 2.5 2.75-2.5 2.75-.75 3.75-3.75-.25-3 2.25-3-2.25-3.75.25-.75-3.75L2 11.25 4.5 8.5l.75-3.75L9 5z')),
+  },
+  square: { x: 12, y: 12, span: 8 },
+  search: {
+    x: 10.25,
+    y: 10.25,
+    span: 5,
+    frame: () =>
+      glyph(circle(10.25, 10.25, 6.75), line(15.25, 15.25, 20.75, 20.75)),
+  },
 };
 
 /**
- * How far a base steps aside when the modifier has to sit in the corner.
+ * The corner the modifier claims, and the margin it keeps around itself.
  *
- * The corner mark needs a clear quadrant, and most bases fill the canvas, so
- * the base is redrawn smaller rather than the mark being shrunk to fit around
- * it. Shrinking the mark instead is what produced the unreadable badge this
- * replaced.
+ * `clearRadius` is the rule: no base geometry may come closer than this to the
+ * mark's centre, which leaves roughly a unit of empty canvas between the two
+ * inks. `branchline.test.ts` measures it.
+ *
+ * The base is *not* scaled down to make that room. Shrinking it — the first
+ * attempt at this — left `globe-check` visibly smaller than `globe`, so a row
+ * of related icons stopped looking like one size. Instead each base that
+ * reaches into the corner has a cleared variant below: the same drawing at the
+ * same size, interrupted where the mark sits, the way a line break is drawn
+ * around a label on a map.
  */
-const CORNER_MARK = { x: 18, y: 18, span: 5.5, baseScale: 0.75 };
+export const TREE_CORNER_MARK = { x: 18.5, y: 18.5, span: 5.5, clearRadius: 5.5 };
+
+/**
+ * Icons composed as "full-size base plus a mark in the cleared corner".
+ *
+ * Recorded as the catalog is built so `branchline.test.ts` can hold each one to
+ * `TREE_CORNER_MARK.clearRadius` without re-deriving which names took that
+ * route from their spelling.
+ */
+const cornerMarked = new Set<string>();
+
+export const TREE_CORNER_MARKED: ReadonlySet<string> = cornerMarked;
+
+/**
+ * Full-size bases with the corner interrupted.
+ *
+ * Written out rather than clipped programmatically: a computed clip has to
+ * flatten curves into line segments to cut them, which both bloats the geometry
+ * and decides for itself where a stroke should stop. Where a shape ends is a
+ * drawing decision.
+ */
+const CLEARED_BASES: Record<string, () => TIconNodes> = {
+  mail: () =>
+    glyph(
+      path('M13 18.75H3.25V6.25h17.5v7'),
+      path('m3.75 7 7.05 6.1a1.8 1.8 0 0 0 2.4 0L20.25 7'),
+    ),
+  user: () =>
+    glyph(circle(12, 7.5, 3.25), path('M4.75 20a7.25 7.25 0 0 1 10.75-6.25')),
+  globe: () =>
+    glyph(
+      path('M13.25 21.25A9.25 9.25 0 1 1 21.25 13.25'),
+      path('M12 2.75A4 9.25 0 0 0 12 21.25'),
+      path('M12 2.75A4 9.25 0 0 1 16 13.25'),
+      line(3, 12, 21, 12),
+      path('M5.25 7.5h13.5M5.25 16.5h8'),
+    ),
+  image: () =>
+    glyph(
+      path('M13 20.75H6a2.75 2.75 0 0 1-2.75-2.75V6A2.75 2.75 0 0 1 6 3.25h12a2.75 2.75 0 0 1 2.75 2.75v7'),
+      circle(8.25, 8.25, 1.5),
+      polyline('4.5,18.5 9.5,12.5 12.75,16.25 15,13.75'),
+    ),
+  'hard-drive': () =>
+    glyph(
+      path('M13 19H5.5a2.25 2.25 0 0 1-2.25-2.25V7.25A2.25 2.25 0 0 1 5.5 5h13a2.25 2.25 0 0 1 2.25 2.25v6'),
+      line(3.25, 11.5, 20.75, 11.5),
+      circle(7, 15.25, 0.65),
+      line(11, 15.25, 14, 15.25),
+    ),
+  bot: () =>
+    glyph(
+      path('M13 19H7a3 3 0 0 1-3-3V9.5a3 3 0 0 1 3-3h10a3 3 0 0 1 3 3v3.5'),
+      circle(9, 12, 1),
+      circle(15, 12, 1),
+      line(9, 16, 13.5, 16),
+      line(12, 3, 12, 6.5),
+      circle(12, 3, 0.75),
+    ),
+  clock: () =>
+    glyph(
+      path('M13.5 21.25A9.25 9.25 0 1 1 21.25 13.5'),
+      path('M12 7v5l3 1.75'),
+    ),
+  send: () =>
+    glyph(polygon('2.75,4 20.25,11.5 2.75,19 6,11.5'), line(6, 11.5, 15, 11.5)),
+  lightbulb: () =>
+    glyph(
+      path('M4.5 14.5a6.25 6.25 0 1 1 9.5 0L12.25 17H6.25z'),
+      line(6.75, 20.5, 11.75, 20.5),
+    ),
+  plug: () =>
+    glyph(
+      path('M8 3.25v5M16 3.25v5'),
+      path('M5.5 8.25h13v2.75'),
+      path('M5.5 8.25v3.5a6.5 6.5 0 0 0 7.25 6.45'),
+      path('M12 18.25v3'),
+    ),
+  brain: () =>
+    glyph(
+      path('M12 6a3.75 3.75 0 0 0-7 1.75 3.5 3.5 0 0 0 .25 6.25A3.75 3.75 0 0 0 12 18M12 6a3.75 3.75 0 0 1 7 1.75 3.5 3.5 0 0 1-2.75 5.15M12 6v12M8.5 9l3.5 2.25M15.5 9 12 11.25M8.5 15l3.5-2.25'),
+    ),
+};
 
 /** Composes a base glyph with a modifier, in whichever territory is free. */
-const modifiedGlyph = (base: TIconNodes, baseName: string, modifier: TModifier): TIconNodes => {
+const modifiedGlyph = (
+  name: string,
+  base: TIconNodes,
+  baseName: string,
+  modifier: TModifier,
+): TIconNodes => {
   const interior = INTERIOR_MARKS[baseName];
 
   if (interior) {
@@ -648,9 +759,11 @@ const modifiedGlyph = (base: TIconNodes, baseName: string, modifier: TModifier):
     );
   }
 
+  cornerMarked.add(name);
+
   return glyph(
-    ...scaleNodes(base, CORNER_MARK.baseScale, 0, 0),
-    ...markAt(modifier, CORNER_MARK.x, CORNER_MARK.y, CORNER_MARK.span),
+    ...(CLEARED_BASES[baseName]?.() ?? base),
+    ...markAt(modifier, TREE_CORNER_MARK.x, TREE_CORNER_MARK.y, TREE_CORNER_MARK.span),
   );
 };
 
@@ -672,7 +785,7 @@ const calendarFrame = (): TIconNodes =>
   );
 
 const clockFrame = (): TIconNodes =>
-  glyph(path('M12 2.75a9.25 9.25 0 1 0 8.5 5.6'), path('M12 7v5l3.75 2.25'), circle(20.25, 5.75, 0.65));
+  glyph(circle(12, 12, 9.25), path('M12 7v5l3.75 2.25'));
 
 const mailFrame = (): TIconNodes =>
   glyph(
@@ -701,12 +814,12 @@ const shieldFrame = (): TIconNodes =>
 const fileMark = (kind: string): TIconNodes => {
   switch (kind) {
     case 'archive':
-      // Zip teeth read as an archive at any size. The box this replaced was
-      // the same rectangle `file-video` draws, one row down.
+      // A drawer with a pull. The zip teeth this replaced were a bare vertical
+      // stroke, which is the same mark `file-warning` draws.
       return glyph(
-        line(12, 9.5, 12, 11),
-        line(12, 12.5, 12, 14),
-        rect(10.5, 15.5, 3, 3.5, 0.75),
+        rect(7.5, 10.5, 9, 3, 1),
+        rect(8.75, 13.5, 6.5, 5, 1),
+        line(11, 15.5, 13, 15.5),
       );
     case 'audio':
       return glyph(path('M8 15h2l3 2.25v-8.5L10 11H8z'), path('M15 11.2a3 3 0 0 1 0 3.6'));
@@ -717,7 +830,9 @@ const fileMark = (kind: string): TIconNodes => {
     case 'image':
       return glyph(circle(9, 11.5, 1.2), polyline('7.5,17 11,13.5 13.25,15.5 15,13.75 17,16'));
     case 'pdf':
-      return glyph(path('M8 16.75v-5h2.25a1.75 1.75 0 0 1 0 3.5H8M13 11.75v5M13 14.25h2.5M17 16.75v-5h2'));
+      // Three letterforms inside a 9u box cannot be read at 16px. A label band
+      // with ruled text behind it can.
+      return glyph(rect(7, 12, 10, 6, 1), line(9.5, 14.25, 14.5, 14.25), line(9.5, 16, 12.5, 16));
     case 'scan':
       return glyph(path('M8 13v-2h2M16 13v-2h-2M8 15v2h2M16 15v2h-2'));
     case 'text':
@@ -852,11 +967,14 @@ const familyUser = (name: string): TIconNodes => {
   const base = userFrame(name.startsWith('users'));
 
   if (name === 'users-round') {
+    // Two avatars, the second showing only its edge behind the first. Two
+    // heads and two bodies inside one ring read as eyes and a mouth — the
+    // drawing turned into a face, whatever the name said.
     return glyph(
-      circle(12, 12, 9.25),
-      circle(9.25, 8.75, 2.25),
-      circle(16.25, 9.5, 1.75),
-      path('M5.25 18a4.5 4.5 0 0 1 8 0M13.25 15.25a4 4 0 0 1 5.5 2.75'),
+      circle(9.5, 12, 7.5),
+      circle(9.5, 9.75, 2.5),
+      path('M5 17.25a5 5 0 0 1 9 0'),
+      path('M15.75 5.75a7.5 7.5 0 0 1 0 12.5'),
     );
   }
   if (name.endsWith('round')) return glyph(circle(12, 12, 9.25), circle(12, 8.5, 2.5), path('M6.5 18a6.25 6.25 0 0 1 11 0'));
@@ -923,7 +1041,8 @@ const productGeometry = (name: string): TIconNodes => {
     case 'storage': return glyph(frame, ellipse(12, 8.5, 5, 1.75), path('M7 8.5v6c0 1 2.25 1.75 5 1.75s5-.75 5-1.75v-6'));
     case 'draw': return glyph(frame, path('m8 16 1-4 6-6 3 3-6 6z'), line(7, 17.5, 14, 17.5));
     case 'market': return glyph(frame, path('M7 9h10l-1 8H8z'), path('M9 9a3 3 0 0 1 6 0'));
-    case 'support': return glyph(frame, circle(12, 12, 5), circle(12, 12, 2), line(8.5, 8.5, 10.5, 10.5), line(13.5, 13.5, 15.5, 15.5));
+    // A headset is the settled picture for support; the spiral read as a target.
+    case 'support': return glyph(frame, path('M7.5 14.5v-2a4.5 4.5 0 0 1 9 0v2'), rect(6, 13.5, 2.5, 4, 1), rect(15.5, 13.5, 2.5, 4, 1));
     case 'catalog': return glyph(frame, rect(6.5, 6.5, 4.25, 4.25, 1), rect(13.25, 6.5, 4.25, 4.25, 1), rect(6.5, 13.25, 4.25, 4.25, 1), rect(13.25, 13.25, 4.25, 4.25, 1));
     case 'companion': return glyph(frame, path('M12 17c-5-2.6-6-7.1-3.4-8.6A3.3 3.3 0 0 1 12 9.5a3.3 3.3 0 0 1 3.4-1.1C18 9.9 17 14.4 12 17Z'));
     case 'llm': return glyph(frame, circle(8, 9, 1), circle(16, 9, 1), circle(12, 16, 1), path('M8.8 9.5 11.4 15M15.2 9.5 12.6 15M9 9h6'));
@@ -949,7 +1068,9 @@ const directionGeometry = (name: string): TIconNodes | undefined => {
     case 'chevron-right': return glyph(polyline('8.5,4.5 16,12 8.5,19.5'), circle(16, 12, 0.55));
     case 'chevron-up': return glyph(polyline('4.5,15.5 12,8 19.5,15.5'), circle(12, 8, 0.55));
     case 'chevron-down': return glyph(polyline('4.5,8.5 12,16 19.5,8.5'), circle(12, 16, 0.55));
-    case 'chevrons-up-down': return glyph(polyline('6,9.5 12,3.5 18,9.5'), polyline('6,14.5 12,20.5 18,14.5'), circle(12, 12, 0.6));
+    // Two chevrons, which is what the name says. The dot between them closed
+    // the shape into a diamond the name never mentions.
+    case 'chevrons-up-down': return glyph(polyline('6.5,9.5 12,4 17.5,9.5'), polyline('6.5,14.5 12,20 17.5,14.5'));
     case 'maximize-2': return glyph(path('M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5'), circle(12, 12, 0.7));
     case 'minimize-2': return glyph(path('M9 4v5H4M20 9h-5V4M15 20v-5h5M4 15h5v5'), circle(12, 12, 0.7));
     default: return undefined;
@@ -978,9 +1099,13 @@ const directGeometry = (name: string): TIconNodes | undefined => {
     case 'circle-x': return glyph(circle(12, 12, 9.25), line(8.5, 8.5, 15.5, 15.5), line(15.5, 8.5, 8.5, 15.5));
     case 'circle-dot': return glyph(circle(12, 12, 9.25), circle(12, 12, 2.1), circle(12, 12, 0.5));
     case 'alert-circle': return glyph(circle(12, 12, 9.25), line(12, 6.75, 12, 13.25), circle(12, 17, 0.65));
-    case 'circle-alert': return glyph(path('M12 2.75a9.25 9.25 0 1 1-6.8 3'), polygon('12,6.25 16,14.75 8,14.75'), circle(12, 17.25, 0.55));
+    // A circled alert carries an exclamation. A triangle inside a circle
+    // stacks two alert metaphors and reads as neither.
+    case 'circle-alert': return glyph(circle(12, 12, 9.25), line(12, 7, 12, 13), circle(12, 16.25, 0.65));
     case 'circle-help': return glyph(circle(12, 12, 9.25), path('M8.75 9a3.5 3.5 0 1 1 4.75 3.25c-1 .55-1.5 1.2-1.5 2.25'), circle(12, 17.75, 0.5));
-    case 'info': return glyph(path('M12 2.75a9.25 9.25 0 1 0 7.4 3.7'), line(12, 10.5, 12, 17), circle(12, 7, 0.65), circle(20.25, 5, 0.55));
+    // Closed ring: `info` carried the same broken circle and floating dot the
+    // clock did, which reads as a notification rather than an "i".
+    case 'info': return glyph(circle(12, 12, 9.25), line(12, 11, 12, 17), circle(12, 7.75, 0.65));
     case 'triangle-alert': return glyph(polygon('12,2.75 21,20.5 3,20.5'), line(12, 8, 12, 14), circle(12, 17.5, 0.55));
     case 'octagon-x': return glyph(polygon('8,2.75 16,2.75 21.25,8 21.25,16 16,21.25 8,21.25 2.75,16 2.75,8'), line(8.5, 8.5, 15.5, 15.5), line(15.5, 8.5, 8.5, 15.5));
     case 'ban': return glyph(circle(12, 12, 9.25), line(5.5, 5.5, 18.5, 18.5));
@@ -1137,7 +1262,9 @@ const directGeometry = (name: string): TIconNodes | undefined => {
     case 'upload-cloud': return glyph(path('M6.5 18.5h11a4 4 0 0 0 .5-7.95A6 6 0 0 0 6.55 9a4.75 4.75 0 0 0-.05 9.5Z'), line(12, 20.75, 12, 11.5), polyline('8.75,14.75 12,11.5 15.25,14.75'));
     case 'wand-sparkles': return glyph(path('M3.25 18.25 15.75 5.75l2.5 2.5L5.75 20.75z'), line(13.75, 7.75, 16.25, 10.25), path('M7 3v4M5 5h4M19 14v5M16.5 16.5h5'), circle(20, 4, 0.65));
     case 'workspace': return glyph(rect(2.75, 3.25, 18.5, 17.5, 2.5), line(2.75, 8, 21.25, 8), line(8.25, 8, 8.25, 20.75), rect(11, 11, 7, 6, 1.25), circle(5.5, 5.6, 0.5));
-    case 'wrench-zap': return glyph(path('M13.5 5.25A5 5 0 0 0 7.5 11.5L3 16l5 5 4.5-4.5a5 5 0 0 0 6.25-6l-3-3-3 3-2-2 3-3Z'), polygon('17.5,13 14.5,18 17.5,18 16,22 21,16.25h-3z'));
+    // The bolt sat inside the wrench's own outline, so the two names shared a
+    // silhouette. It now has the lower-right corner to itself.
+    case 'wrench-zap': return glyph(path('M11.75 6.5A4.25 4.25 0 0 0 6.5 11.75L2.75 15.5l4.25 4.25 3.75-3.75a4.25 4.25 0 0 0 5.25-5.25l-2.5-2.5-2.5 2.5-1.75-1.75 2.5-2.5z'), polygon('18,12 15,17.25 17.75,17.25 16.75,21.25 21.25,15.75 18.5,15.75'));
     case 'zap': return glyph(polygon('13.5,2.75 5.25,13.25 11.25,13.25 10.5,21.25 18.75,10.25 12.75,10.25'), circle(5.25, 13.25, 0.55));
     case 'calendar-clock': return glyph(...calendarFrame(), circle(14.5, 14.5, 3.75), path('M14.5 12.25v2.5l1.75 1'));
     case 'image-up': return glyph(rect(3.25, 3.25, 17.5, 17.5, 2.75), circle(8.25, 8.25, 1.5), polyline('4.5,18 9.5,12.5 12.25,15.25'), line(16.5, 18, 16.5, 10.5), polyline('13.5,13.5 16.5,10.5 19.5,13.5'));
@@ -1174,6 +1301,9 @@ const directGeometry = (name: string): TIconNodes | undefined => {
     case 'store': return glyph(path('M4.25 9.25v11.5h15.5V9.25'), path('M3 9.25 5 3.25h14l2 6a3 3 0 0 1-4.5 2.6A3 3 0 0 1 12 11.5a3 3 0 0 1-4.5.35A3 3 0 0 1 3 9.25Z'), rect(9, 14, 6, 6.75, 1));
     case 'code-2': return glyph(rect(3.25, 3.25, 17.5, 17.5, 2.75), polyline('9,7.5 5.5,12 9,16.5'), polyline('15,7.5 18.5,12 15,16.5'), line(13.5, 6.5, 10.5, 17.5));
     case 'embed-code': return glyph(path('M3.25 6.25h17.5v12.5H3.25z'), polyline('9.5,9 6.5,12 9.5,15'), polyline('14.5,9 17.5,12 14.5,15'), line(13, 8.5, 11, 15.5));
+    // Brackets around an endpoint. A corner modifier is not available here:
+    // the right-hand chevron fills exactly the corner a mark would need.
+    case 'code-api': return glyph(polyline('7.5,6.5 2.75,12 7.5,17.5'), polyline('16.5,6.5 21.25,12 16.5,17.5'), circle(12, 12, 2.25));
     case 'lock-keyhole': return glyph(path('M7 10V7a5 5 0 0 1 10 0v3'), rect(4.25, 10, 15.5, 11, 2.5), circle(12, 14.5, 1.5), path('M11.25 15.75 10.75 18h2.5l-.5-2.25'));
     case 'timer': return glyph(circle(12, 13, 8), line(12, 13, 16, 10), line(12, 13, 12, 8), path('M9 2.75h6M12 2.75V5M18.25 5.75l1.5-1.5'), circle(12, 13, 0.7));
     case 'magic-wand': return glyph(path('M3.25 18.25 15.75 5.75l2.5 2.5L5.75 20.75z'), line(13.75, 7.75, 16.25, 10.25), path('M7 3v4M5 5h4M19 14v5M16.5 16.5h5'));
@@ -1205,7 +1335,7 @@ const coreGeometry = (name: string): TIconNodes => {
     const [ending, modifier] = suffix;
     const baseName = name.slice(0, -ending.length);
 
-    return modifiedGlyph(coreGeometry(baseName), baseName, modifier);
+    return modifiedGlyph(name, coreGeometry(baseName), baseName, modifier);
   }
 
   if (name === 'file' || name.startsWith('file-')) return familyFile(name);
@@ -1222,8 +1352,8 @@ const coreGeometry = (name: string): TIconNodes => {
   if (name === 'gauge' || name.startsWith('gauge-')) return familyGauge(name);
   if (name === 'database' || name === 'hard-drive' || name.startsWith('hard-drive-') || name === 'server' || name.startsWith('server-')) return storageFrame(name);
   if (name === 'monitor-smartphone' || name === 'monitor-home' || name === 'smartphone' || name === 'laptop' || name.startsWith('laptop-')) return deviceFrame(name);
-  if (name.startsWith('image-')) return modifiedGlyph(directGeometry('image')!, 'image', name.endsWith('minus') ? 'minus' : name.endsWith('plus') ? 'plus' : 'sparkles');
-  if (name.startsWith('ticket')) return name.endsWith('plus') ? modifiedGlyph(directGeometry('ticket')!, 'ticket', 'plus') : directGeometry('ticket')!;
+  if (name.startsWith('image-')) return modifiedGlyph(name, directGeometry('image')!, 'image', name.endsWith('minus') ? 'minus' : name.endsWith('plus') ? 'plus' : 'sparkles');
+  if (name.startsWith('ticket')) return name.endsWith('plus') ? modifiedGlyph(name, directGeometry('ticket')!, 'ticket', 'plus') : directGeometry('ticket')!;
   if (name === 'brain-circuit') {
     return glyph(
       path('M12 6a3.75 3.75 0 0 0-7 1.75 3.5 3.5 0 0 0 .25 6.25A3.75 3.75 0 0 0 12 18M12 6a3.75 3.75 0 0 1 7 1.75 3.5 3.5 0 0 1-.25 6.25A3.75 3.75 0 0 1 12 18M12 6v12'),
@@ -1233,8 +1363,21 @@ const coreGeometry = (name: string): TIconNodes => {
       path('M8.75 9.5H12M8.75 15H12M15.25 12.25H12'),
     );
   }
-  if (name.startsWith('bot-')) return modifiedGlyph(directGeometry('bot')!, 'bot', name.endsWith('users') ? 'plus' : 'star');
-  if (name.startsWith('plug-')) return modifiedGlyph(directGeometry('plug')!, 'plug', name.endsWith('plus') ? 'plus' : 'sparkles');
+  if (name === 'bot-users') {
+    // The bot and the person it serves. A bot with a plus beside it said
+    // "add a bot", which is not what the name means.
+    return glyph(
+      path('M11.5 16.5h-5a2.5 2.5 0 0 1-2.5-2.5v-4a2.5 2.5 0 0 1 2.5-2.5h6A2.5 2.5 0 0 1 15 10v1.5'),
+      circle(7.25, 11.75, 0.85),
+      circle(11.75, 11.75, 0.85),
+      line(9.5, 4.5, 9.5, 7.5),
+      circle(9.5, 4.5, 0.75),
+      circle(17.5, 13.5, 2.25),
+      path('M13.5 21.25a4.5 4.5 0 0 1 8 0'),
+    );
+  }
+  if (name.startsWith('bot-')) return modifiedGlyph(name, directGeometry('bot')!, 'bot', 'star');
+  if (name.startsWith('plug-')) return modifiedGlyph(name, directGeometry('plug')!, 'plug', name.endsWith('plus') ? 'plus' : 'sparkles');
   if (name.startsWith('repeat-')) {
     const loop = directGeometry('repeat')!;
 
@@ -1245,7 +1388,7 @@ const coreGeometry = (name: string): TIconNodes => {
 
     return glyph(...loop, circle(12, 12, 2.25), path('M12 10.5V12h1.25'));
   }
-  if (name.startsWith('code-') || name === 'embed-code' || name === 'code-api') return modifiedGlyph(directGeometry('code')!, 'code', name.includes('api') ? 'star' : 'plus');
+  if (name.startsWith('code-')) return modifiedGlyph(name, directGeometry('code')!, 'code', 'plus');
   if (name.startsWith('layout-') || name.startsWith('panel') || name === 'apps-grid' || name === 'grid') {
     return glyph(rect(3.25, 3.25, 17.5, 17.5, 2.5), line(9, 3.25, 9, 20.75), line(9, 11, 20.75, 11), circle(15, 16, 1.2));
   }

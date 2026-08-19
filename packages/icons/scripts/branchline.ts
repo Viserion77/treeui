@@ -12,6 +12,7 @@
 
 import {
   BRANCHLINE,
+  checkCornerClearance,
   checkIconGeometry,
   checkNaming,
   iconBox,
@@ -22,7 +23,7 @@ import {
   checkDeadNodes,
   checkDistinguishable,
 } from '../src/branchline-raster';
-import { TREE_ICON_ALIASES, builtinTreeIconNodes } from '../src/icons';
+import { TREE_CORNER_MARKED, TREE_ICON_ALIASES, builtinTreeIconNodes } from '../src/icons';
 import type { TIconNodes } from '../src/registry';
 
 const args = process.argv.slice(2);
@@ -50,6 +51,9 @@ const violations: TBranchlineViolation[] = [];
 for (const name of selected) {
   violations.push(...checkIconGeometry(name, catalog[name]));
   violations.push(...checkDeadNodes(name, catalog[name]));
+  if (TREE_CORNER_MARKED.has(name)) {
+    violations.push(...checkCornerClearance(name, catalog[name]));
+  }
 }
 
 // Naming and collisions are properties of the set, so they only make sense over

@@ -228,7 +228,7 @@
         "One grid: a 24x24 canvas with geometry inside a 1.5-22.5 trim area, so a 2u stroke never clips; four keylines carry the set — square 17.5, circle 18.5 diameter, wide 18x14, tall 14x18 — and positions land on a 0.25u step.",
         "One weight: 2u stroke, round caps and joins, currentColor and fill=none, all declared on the root <svg>. A child that sets stroke or fill breaks absoluteStrokeWidth and fails the build.",
         "Legible at the size it ships at: every pair of canonical icons is rendered at 16px and must differ by at least 5% of its ink. The rule is measured by branchline.test.ts, not judged by eye.",
-        "A modifier gets territory of its own: it is drawn inside bases that enclose space (shield, file, folder, calendar, ticket, message) and in a cleared corner otherwise, with the base redrawn at 75% so the two never share a stroke.",
+        "A modifier gets territory of its own, and the base keeps its size: it is drawn inside bases that enclose space (shield, file, folder, calendar, ticket, message, square, badge, search) and in a cleared corner otherwise, where the base is redrawn at full size with that corner interrupted so 5.5u of canvas stays clear around the mark.",
         "Every shape earns its place: each node is removed and re-rendered, and a node that changes less than 1% of the glyph's ink fails the build. Geometry is never derived from the icon's name.",
         "A family shares one base, drawn once and reused literally; a variant changes exactly one thing, in one place, by one rule.",
         "The metaphor is the conventional one — an icon is not the place to be original. A concept with no settled picture composes one from Branchline primitives, drawn deliberately rather than generated.",

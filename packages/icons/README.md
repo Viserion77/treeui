@@ -374,6 +374,7 @@ The rules, and which ones fail a build:
 | `peso-unico` | `stroke-width`, `stroke-linecap`, `stroke-linejoin`, `stroke` and `fill` are owned by the root `<svg>`; only the seven allowed primitives are used | error |
 | `legivel-a-16px` | Every pair of canonical icons differs by at least **5% of its ink at 16px** | error |
 | `toda-forma-significa-algo` | Every node changes at least **1% of the glyph's ink**; nothing is drawn for technical reasons | error |
+| `modificador-tem-territorio` | A corner modifier keeps **5.5u** of clear canvas around it; the base is interrupted, never crowded | error |
 | `um-conceito-um-nome` | An alias shares its target's geometry exactly, and no two canonical names share a drawing | error |
 
 The two "measured" rules render the glyph rather than reading its coordinates, because
@@ -395,14 +396,22 @@ There is one closed vocabulary — `plus`, `minus`, `check`, `x`, `alert`, `lock
 same plus wherever it lands. Where it lands depends on the base:
 
 - **Inside**, for bases that enclose space: `shield`, `file`, `folder`, `calendar`,
-  `ticket`, `message-square`. This is both the conventional picture and far more legible.
-- **In a cleared corner** otherwise, at `18,18` across `5.5u`, with the base redrawn at
-  75% so the two never share a stroke.
+  `ticket`, `message-square`, `square`, `badge`, `search`. This is both the conventional
+  picture and far more legible.
+- **In a cleared corner** otherwise, at `18.5,18.5` across `5.5u`. The base keeps its full
+  size and is redrawn with that corner interrupted, so `globe` and `globe-check` are the
+  same globe — one of them simply stops short where the tick goes.
+
+Two rules hold that corner. The mark reaches `4u` from its centre; no base geometry may
+come within `5.5u`. `checkCornerClearance` measures the ring between them and fails the
+build if anything is in it.
 
 A circled corner badge is not an option, and the reason is arithmetic: at 16px one grid
 unit is 0.67px, so a mark small enough to sit inside a badge renders as roughly one pixel.
 Measured at 16px, an interior mark separates `shield-check` from `shield-x` by 15% of
-their ink; the circled badge this replaced managed 0.6%.
+their ink; the circled badge this replaced managed 0.6%. Shrinking the base to make room
+for a bigger mark was the next attempt and was also wrong — it left `globe-check` visibly
+smaller than `globe`, which is why the base is now interrupted rather than scaled.
 
 ### Checking an icon you register yourself
 

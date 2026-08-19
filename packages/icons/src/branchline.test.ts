@@ -1,6 +1,7 @@
 /// <reference types="vitest/globals" />
 import {
   BRANCHLINE,
+  checkCornerClearance,
   checkIconGeometry,
   checkNaming,
   flattenPath,
@@ -9,7 +10,7 @@ import {
   type TBranchlineViolation,
 } from './branchline';
 import { checkDeadNodes, checkDistinguishable, rasterize, rasterDistance } from './branchline-raster';
-import { TREE_ICON_ALIASES, builtinTreeIconNodes } from './icons';
+import { TREE_CORNER_MARKED, TREE_ICON_ALIASES, builtinTreeIconNodes } from './icons';
 import type { TIconNodes } from './registry';
 
 const catalog = builtinTreeIconNodes as Record<string, TIconNodes>;
@@ -28,6 +29,15 @@ const expectClean = (violations: TBranchlineViolation[]) => {
 describe('branchline geometry rules', () => {
   it('draws every built-in icon inside the trim area, on allowed primitives', () => {
     expectClean(entries.flatMap(([name, nodes]) => checkIconGeometry(name, nodes)));
+  });
+
+  it('gives every corner modifier its clearance', () => {
+    expect(TREE_CORNER_MARKED.size).toBeGreaterThan(0);
+    expectClean(
+      [...TREE_CORNER_MARKED].flatMap((name) =>
+        checkCornerClearance(name, catalog[name]),
+      ),
+    );
   });
 
   it('keeps one concept to one name and one drawing', () => {

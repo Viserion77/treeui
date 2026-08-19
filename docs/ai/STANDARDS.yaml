@@ -267,12 +267,20 @@ icons:
       rule: >
         Drawn once on a canonical 6u square and placed, so `plus` is the same
         plus everywhere. Bases that enclose space (shield, file, folder,
-        calendar, ticket, message-square) take the mark inside; every other base
-        is redrawn at 75% and the mark takes the cleared corner at 18,18 / 5.5u.
+        calendar, ticket, message-square, square, badge, search) take the mark
+        inside. Every other base keeps its full size and is redrawn with the
+        corner interrupted, and the mark takes that corner at 18.5,18.5 / 5.5u.
+      clearance: >
+        No base geometry may come within 5.5u of the mark's centre, and the mark
+        itself reaches 4u, so a clear ring sits between the two. Enforced as an
+        error over every icon in TREE_CORNER_MARKED.
       why: >
         A circled corner badge cannot work at these sizes. At 16px one grid unit
         is 0.67px, so the 1.2u mark the badge used to hold rendered as roughly
         one pixel and left mail-check, mail-plus and mail-warning identical.
+        Shrinking the base to make room was the next attempt and was also wrong:
+        it left globe-check visibly smaller than globe, so a row of related
+        icons stopped reading as one size.
 
     measured-rules:
       pair-distance:

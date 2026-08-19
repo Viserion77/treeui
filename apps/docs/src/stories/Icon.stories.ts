@@ -6,6 +6,8 @@ import {
   type TIconNodes,
 } from '@treeui/vue';
 
+import { practiceNote } from './practice-refs';
+
 // Derived, never transcribed. A hardcoded list drifts the moment an icon is
 // added to @treeui/icons — this file used to omit `languages` for exactly that
 // reason. `listTreeIcons()` is the registry's own answer, already sorted.
@@ -33,6 +35,9 @@ const meta = {
   title: 'Components/Data Display/Icon',
   component: TIcon,
   tags: ['autodocs'],
+  parameters: {
+    docs: { description: { component: practiceNote('TIcon') } },
+  },
   args: {
     name: 'info',
     size: 24,

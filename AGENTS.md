@@ -96,6 +96,11 @@ changes, update `docs/ai/practices.json`.
 
 ### Shared contracts
 
+- **Icons**: every built-in glyph is drawn to the **Branchline** contract — see
+  `packages/icons/README.md` and `docs/ai/STANDARDS.yaml` → `icons.branchline`. The rules
+  are enforced by rendering, not by review: `branchline.test.ts` fails a build when two
+  icons differ by less than 5% of their ink at 16px, or when any node changes less than 1%
+  of a glyph's ink. Never derive geometry from an icon's name.
 - **Sizes**: `sm | md | lg` — shared across most components.
 - **Action variants**: `solid | outline | ghost | soft | danger`.
 - **Card variants**: `outline | soft | inset` — a surface scale, not action variants. `solid` is
@@ -159,6 +164,12 @@ pnpm build:site    # what CI builds: packages + landing + both Storybooks + exam
 pnpm test:e2e      # Playwright; optional locally, required in CI
 ```
 
+When touching icon geometry, the report is faster than the suite:
+
+```bash
+pnpm --filter @treeui/icons branchline --warn   # errors, guidance, keyline census
+```
+
 `pnpm build` is the fast inner loop (packages + Vue Storybook only) and does not
 cover the landing page, the React Storybook, or the examples.
 
@@ -208,6 +219,8 @@ In this repository, Claude Code loads the server through
 - Reintroduce `Tree<Name>` component aliases — the public API is `T<Name>` only.
 - Introduce framework-specific code in `tokens` or `utils`. (`icons` is Vue-coupled
   today — see `docs/ai/DECISIONS.md` → "Portability Boundary".)
+- Draw an icon that only differs from a sibling by a detail smaller than ~2u — it will not
+  survive 16px, and the Branchline gate will reject it.
 - Skip contract file updates when the public API changes.
 - Leave `docs/ai/practices.json` stale when a component's practice conformance changes.
 - Add runtime dependencies to `@treeui/tokens` or `@treeui/utils` — they must stay dependency-free.

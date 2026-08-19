@@ -39,6 +39,11 @@ const ROOT_ONLY_ATTRS = [
 ];
 
 const MIGRATION_ALIASES = {
+  microphone: 'mic',
+  house: 'home',
+  'paper-plane': 'send',
+  'alert-circle': 'circle-alert',
+  'check-circle': 'circle-check',
   grid: 'layout-grid',
   share: 'share-nodes',
   'chevron-updown': 'chevrons-up-down',
@@ -165,7 +170,7 @@ describe('@treeui/icons registry', () => {
   });
 
   it('makes documented migration aliases reuse the canonical node array', () => {
-    expect(Object.keys(MIGRATION_ALIASES)).toHaveLength(12);
+    expect(Object.keys(MIGRATION_ALIASES)).toHaveLength(17);
 
     for (const [alias, canonical] of Object.entries(MIGRATION_ALIASES)) {
       expect(
@@ -483,43 +488,18 @@ describe('treeIcons view', () => {
 describe('builtin icon geometry', () => {
   const entries = Object.entries(builtinTreeIconNodes) as [string, TIconNodes][];
 
-  it('gives all 353 canonical icons unique geometry fingerprints', () => {
-    const canonicalEntries = entries.filter(
+  // Uniqueness used to be asserted here by comparing serialised geometry.
+  // That measured byte uniqueness rather than whether two icons look alike:
+  // geometry generated from a hash of the name satisfied it while drawing
+  // nothing, and true synonyms were forbidden from sharing one glyph. The rule
+  // now lives in `branchline.test.ts`, which renders each pair at 16px.
+  it('keeps the catalog split between canonical names and aliases', () => {
+    const canonical = entries.filter(
       ([name]) => !Object.prototype.hasOwnProperty.call(MIGRATION_ALIASES, name),
     );
-    const namesByFingerprint = new Map<string, string[]>();
 
-    for (const [name, nodes] of canonicalEntries) {
-      // Child order affects paint order but must not be the only distinction
-      // between two outline glyphs. Attribute insertion order is likewise not
-      // visual, so normalize both out of the fingerprint.
-      const fingerprint = JSON.stringify(
-        nodes
-          .map(([tag, attrs]) =>
-            JSON.stringify([
-              tag,
-              Object.fromEntries(
-                Object.entries(attrs).sort(([left], [right]) =>
-                  left.localeCompare(right),
-                ),
-              ),
-            ]),
-          )
-          .sort(),
-      );
-      const names = namesByFingerprint.get(fingerprint) ?? [];
-
-      names.push(name);
-      namesByFingerprint.set(fingerprint, names);
-    }
-
-    const duplicateNames = [...namesByFingerprint.values()].filter(
-      (names) => names.length > 1,
-    );
-
-    expect(canonicalEntries).toHaveLength(353);
-    expect(namesByFingerprint.size).toBe(353);
-    expect(duplicateNames).toEqual([]);
+    expect(canonical).toHaveLength(348);
+    expect(entries).toHaveLength(BUILTIN_COUNT);
   });
 
   it('ships the expected number of icons under sorted kebab-case keys', () => {

@@ -1,6 +1,6 @@
 # @treeui/icons
 
-The icon registry behind TreeUI's Vue components, with a curated built-in catalog of 364 names.
+The icon registry behind TreeUI's Vue components, with a curated built-in catalog of 365 names, drawn to the [Branchline contract](#branchline--the-drawing-contract).
 
 Icons are looked up **by name**, and applications extend the registry with their own icons rather than importing a second icon package. Three ways in:
 
@@ -185,7 +185,7 @@ shared structural frames, and consistent modifiers for status and actions.
 
 Call `registerTreeIcons` once near the application root. Registered names then work everywhere a built-in name works. Registering later is fine too: lookups are reactive, so an icon registered by a lazily loaded route appears in components that already rendered.
 
-Pick a name the built-in set does not already use. Registration is an upsert, not an add: any of the 364 names above will be **replaced** app-wide, which is a legitimate thing to do deliberately and a confusing one to do by accident.
+Pick a name the built-in set does not already use. Registration is an upsert, not an add: any of the 365 names above will be **replaced** app-wide, which is a legitimate thing to do deliberately and a confusing one to do by accident.
 
 ### Geometry form
 
@@ -325,7 +325,7 @@ If you *want* the uncorrected behaviour — an icon that thickens with its box, 
 | `listTreeIcons` | `() => TIconName[]` | Every registered name, sorted — built-ins plus your own. |
 | `treeIcons` | `Record<TIconName, Component>` | Lazy name-to-component map of the whole registry. |
 | `treeIconDefaults` | `{ size: 20, strokeWidth: 2, absoluteStrokeWidth: true }` | The prop defaults, for components that re-expose them. |
-| `builtinTreeIconNodes` | `Record<string, TIconNodes>` | The **geometry** of the 364 built-ins — raw `[tag, attrs]` data, not components. Read it to inspect or re-draw an icon; it is not a component map. |
+| `builtinTreeIconNodes` | `Record<string, TIconNodes>` | The **geometry** of the 365 built-ins — raw `[tag, attrs]` data, not components. Read it to inspect or re-draw an icon; it is not a component map. |
 | `TIconNode` | `[tag: string, attrs: Record<string, string \| number>]` | One child of an icon's `<svg>`. |
 | `TIconNodes` | `TIconNode[]` | An icon's geometry: all children of its `<svg>`. |
 | `TIconRegistry` | `interface` | The augmentable set of icon names. |
@@ -353,9 +353,67 @@ const iconComponent = computed(() => resolveTreeIcon(props.icon));
 
 Passing the raw string through would not work: Vue resolves a string `is` as a *globally registered component name*, so `"cpu"` would look for a component called `cpu` and render nothing.
 
+## Branchline — the drawing contract
+
+Every built-in icon is drawn to a contract called **Branchline**. It is checked rather
+than reviewed: `src/branchline.ts` is the rule engine, `src/branchline.test.ts` is the
+gate that runs in CI, and there is a report for while you are drawing:
+
+```bash
+pnpm --filter @treeui/icons branchline          # errors only
+pnpm --filter @treeui/icons branchline --warn   # plus guidance and a keyline census
+pnpm --filter @treeui/icons branchline shield   # only names containing "shield"
+```
+
+The rules, and which ones fail a build:
+
+| Rule | What it holds | Severity |
+|---|---|---|
+| `grade-e-area-viva` | Geometry stays inside the **1.5–22.5** trim area, so a 2u stroke never paints past the canvas | error |
+| | Positions land on a **0.25u** step, and glyphs sit on one of four keylines — square **17.5**, circle **⌀18.5**, wide **18×14**, tall **14×18** | guidance |
+| `peso-unico` | `stroke-width`, `stroke-linecap`, `stroke-linejoin`, `stroke` and `fill` are owned by the root `<svg>`; only the seven allowed primitives are used | error |
+| `legivel-a-16px` | Every pair of canonical icons differs by at least **5% of its ink at 16px** | error |
+| `toda-forma-significa-algo` | Every node changes at least **1% of the glyph's ink**; nothing is drawn for technical reasons | error |
+| `um-conceito-um-nome` | An alias shares its target's geometry exactly, and no two canonical names share a drawing | error |
+
+The two "measured" rules render the glyph rather than reading its coordinates, because
+that is the only honest way to ask them. A dot beside a stroke and a dot inside one have
+almost the same coordinates and opposite answers, and two icons are confusable when they
+*look* alike, not when their path data is similar.
+
+### Why the square keyline is smaller than the circle
+
+A square reads larger than a circle of the same measure, so `17.5` against `⌀18.5` is the
+optical correction that makes them feel the same size. Both numbers were measured off the
+shipped catalog rather than chosen: 46 square glyphs already sat at exactly 17.5u and 18
+circular ones at exactly ⌀18.5u.
+
+### Modifier marks
+
+There is one closed vocabulary — `plus`, `minus`, `check`, `x`, `alert`, `lock`, `star`,
+`sparkles` — drawn once on a canonical 6u square and moved into place, so `plus` is the
+same plus wherever it lands. Where it lands depends on the base:
+
+- **Inside**, for bases that enclose space: `shield`, `file`, `folder`, `calendar`,
+  `ticket`, `message-square`. This is both the conventional picture and far more legible.
+- **In a cleared corner** otherwise, at `18,18` across `5.5u`, with the base redrawn at
+  75% so the two never share a stroke.
+
+A circled corner badge is not an option, and the reason is arithmetic: at 16px one grid
+unit is 0.67px, so a mark small enough to sit inside a badge renders as roughly one pixel.
+Measured at 16px, an interior mark separates `shield-check` from `shield-x` by 15% of
+their ink; the circled badge this replaced managed 0.6%.
+
+### Checking an icon you register yourself
+
+The rule engine is not exported from the package entry point — it is dev-only tooling and
+never reaches your bundle — but it is plain TypeScript you can import from source if you
+vendor the repo, and the report accepts any name in the catalog. When drawing a new icon,
+the fastest loop is to add it and run the report.
+
 ## Behaviour notes
 
-- **Unused icons stay as data.** Geometry is stored as `[tag, attrs]` arrays and turned into a component on first lookup, then cached, so importing the package does not instantiate 364 components. It does not make them free: the registry seeds itself with `new Map(Object.entries(builtinTreeIconNodes))` at module scope, which holds a live reference to all 364, so the geometry is in your bundle whether or not you render it. `sideEffects: false` does not change that. What is lazy is component construction, not bytes shipped.
+- **Unused icons stay as data.** Geometry is stored as `[tag, attrs]` arrays and turned into a component on first lookup, then cached, so importing the package does not instantiate 365 components. It does not make them free: the registry seeds itself with `new Map(Object.entries(builtinTreeIconNodes))` at module scope, which holds a live reference to all 365, so the geometry is in your bundle whether or not you render it. `sideEffects: false` does not change that. What is lazy is component construction, not bytes shipped.
 - **Unknown names fail soft.** `resolveTreeIcon` returns `undefined` and logs a `console.warn` listing every valid name. The dedupe key is the **name**, so each bad name warns exactly once and a miss inside a render loop will not flood the console. It warns in production too — that is deliberate: a missing icon is a misconfiguration worth hearing about, and sniffing `process.env.NODE_ENV` reads as `undefined` in most browser bundles. `TNavMenu` falls back to its letter marker.
 - **Registration is live.** Lookups read a version counter, so an icon resolved inside a `computed` or a render function re-resolves after a later registration. `TIcon` resolves per render, so an icon registered by a lazily loaded route appears in components that already mounted.
 - **The registry is global.** State is anchored on `Symbol.for('@treeui/icons.registry')`, so two copies of the package in one app share one registry instead of each getting its own.

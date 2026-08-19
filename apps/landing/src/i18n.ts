@@ -206,6 +206,11 @@ const pt: LandingMessages = {
     followedBy: 'Componentes que seguem',
     more: 'Todas as práticas, com regras e demos ao vivo dos componentes, no Storybook →',
     copyById: {
+      'branchline-icons': {
+        title: 'Ícones desenhados sob contrato',
+        summary:
+          'Branchline é o contrato de desenho por trás de cada ícone: uma grade, um peso, um vocabulário fechado de modificadores. Ele é verificado, não revisado — o build renderiza cada glifo e falha quando dois nomes se parecem a 16px ou quando uma forma não desenha nada.',
+      },
       'interaction-feedback': {
         title: 'Feedback visual de interação',
         summary:
@@ -322,6 +327,11 @@ const es: LandingMessages = {
     followedBy: 'Componentes que la siguen',
     more: 'Cada práctica, con sus reglas y demos en vivo de los componentes, en Storybook →',
     copyById: {
+      'branchline-icons': {
+        title: 'Iconos dibujados bajo contrato',
+        summary:
+          'Branchline es el contrato de dibujo detrás de cada icono: una retícula, un grosor, un vocabulario cerrado de modificadores. Se verifica, no se revisa — la compilación renderiza cada glifo y falla cuando dos nombres se parecen a 16px o cuando una forma no dibuja nada.',
+      },
       'interaction-feedback': {
         title: 'Feedback visual de interacción',
         summary:

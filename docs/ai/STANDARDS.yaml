@@ -231,6 +231,70 @@ icons:
     - "24×24 default bounding box"
     - "Use currentColor for fills"
 
+  # ── Branchline: the drawing contract for @treeui/icons ──
+  # Checked, not reviewed. `packages/icons/src/branchline.ts` is the rule engine,
+  # `branchline.test.ts` is the gate, and `pnpm --filter @treeui/icons branchline`
+  # is the report. Practice id: `branchline-icons` in practices.json.
+  branchline:
+    grid:
+      canvas: "24×24"
+      position-step: "0.25u (guidance; radii are sized optically and exempt)"
+      trim-area: >
+        1.5–22.5. Geometry outside it paints past the canvas once the 2u stroke
+        is applied. Enforced as an error.
+      keylines:
+        square: "17.5 × 17.5"
+        circle: "⌀18.5"
+        wide:   "18 × 14"
+        tall:   "14 × 18"
+        note: >
+          The square keyline is smaller than the circle on purpose: a square
+          reads larger than a circle of the same measure. Deviation beyond 1.5u
+          is reported as guidance, not failed.
+
+    stroke:
+      owned-by: "the root <svg>"
+      rule: >
+        stroke-width, stroke-linecap, stroke-linejoin, stroke and fill are set
+        once on the root. A child element that sets any of them defeats
+        absoluteStrokeWidth, so the glyph changes weight when it is resized.
+        Enforced as an error.
+
+    primitives: ["path", "circle", "rect", "line", "polyline", "polygon", "ellipse"]
+
+    modifiers:
+      vocabulary: ["plus", "minus", "check", "x", "alert", "lock", "star", "sparkles"]
+      rule: >
+        Drawn once on a canonical 6u square and placed, so `plus` is the same
+        plus everywhere. Bases that enclose space (shield, file, folder,
+        calendar, ticket, message-square) take the mark inside; every other base
+        is redrawn at 75% and the mark takes the cleared corner at 18,18 / 5.5u.
+      why: >
+        A circled corner badge cannot work at these sizes. At 16px one grid unit
+        is 0.67px, so the 1.2u mark the badge used to hold rendered as roughly
+        one pixel and left mail-check, mail-plus and mail-warning identical.
+
+    measured-rules:
+      pair-distance:
+        threshold: "5% of the inkier glyph, rendered at 16px"
+        rationale: >
+          Badge collisions in the pre-Branchline catalog measured 0.0–0.2%,
+          while genuinely close neighbours such as `list` and `list-rule`
+          measured 4.5%, so the threshold separates "same picture" from
+          "same family".
+      node-ink-share:
+        threshold: "1% of the glyph's ink, rendered at 32px"
+        rationale: >
+          Each node is removed and the glyph re-rendered. This is the only
+          honest test of whether a shape draws anything: a dot beside a stroke
+          and a dot inside one have similar coordinates and opposite answers.
+
+    naming:
+      rule: >
+        One concept, one canonical name, one drawing. A synonym is an alias in
+        TREE_ICON_ALIASES sharing its target's node array. Two canonical names
+        with identical geometry fail — one of them should have been an alias.
+
   touch-targets:
     rule: >
       Even if icon is 20px, interactive area must be at least

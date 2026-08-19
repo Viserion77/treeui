@@ -414,84 +414,244 @@ const ellipse = (cx: number, cy: number, rx: number, ry: number): TIconNode => [
 ];
 const glyph = (...nodes: TIconNode[]): TIconNodes => nodes;
 
-const hashName = (name: string): number => {
-  let hash = 2166136261;
 
-  for (const character of name) {
-    hash ^= character.charCodeAt(0);
-    hash = Math.imul(hash, 16777619);
-  }
-
-  return hash >>> 0;
+/**
+ * Uniform scale plus translation, applied to geometry rather than to the
+ * rendered `<svg>`.
+ *
+ * An SVG `transform` would scale the stroke along with the shape, which is
+ * exactly what `absoluteStrokeWidth` exists to prevent — a scaled base would
+ * come out lighter than the mark beside it. Rewriting the coordinates keeps one
+ * weight across the whole glyph.
+ *
+ * Results are snapped back to the grid: the largest error that introduces is
+ * half a grid step, or about a tenth of a pixel at the default render, and it
+ * keeps a derived glyph as grid-true as a hand-drawn one.
+ */
+const PATH_ARGUMENTS: Record<string, number> = {
+  m: 2, l: 2, h: 1, v: 1, c: 6, s: 4, q: 4, t: 2, a: 7, z: 0,
 };
 
-const branchMark = (
-  name: string,
-  centerX = 12,
-  centerY = 12,
-  radius = 5.25,
-): TIconNodes => {
-  const terminals = [
-    [0, -1],
-    [0.72, -0.72],
-    [1, 0],
-    [0.72, 0.72],
-    [0, 1],
-    [-0.72, 0.72],
-    [-1, 0],
-    [-0.72, -0.72],
-  ] as const;
-  const hash = hashName(name);
-  const indices = [hash % 8, (hash >>> 5) % 8, (hash >>> 11) % 8];
+const snap = (value: number) =>
+  Number((Math.round(value / 0.25) * 0.25).toFixed(2));
 
-  if (indices[1] === indices[0]) indices[1] = (indices[1] + 3) % 8;
-  while (indices[2] === indices[0] || indices[2] === indices[1]) {
-    indices[2] = (indices[2] + 1) % 8;
+const scalePath = (d: string, scale: number, tx: number, ty: number): string => {
+  const tokens = d.match(/[a-zA-Z]|-?\d*\.?\d+/g) ?? [];
+  const out: string[] = [];
+  let command = '';
+  let index = 0;
+
+  while (index < tokens.length) {
+    if (/[a-zA-Z]/.test(tokens[index])) {
+      command = tokens[index];
+      out.push(command);
+      index += 1;
+    } else if (command === 'M') {
+      // Extra coordinate pairs after a moveto are implicit linetos, and stay
+      // implicit in the output.
+      command = 'L';
+    } else if (command === 'm') {
+      command = 'l';
+    }
+
+    const lower = command.toLowerCase();
+    const count = PATH_ARGUMENTS[lower] ?? 0;
+
+    if (count === 0) continue;
+
+    const args = tokens.slice(index, index + count).map(Number);
+    const relative = command === lower;
+
+    index += count;
+
+    if (lower === 'a') {
+      // Radii scale; the x-axis rotation and the two flags are not lengths.
+      out.push(
+        String(snap(args[0] * scale)),
+        String(snap(args[1] * scale)),
+        String(args[2]),
+        String(args[3]),
+        String(args[4]),
+        String(snap(args[5] * scale + (relative ? 0 : tx))),
+        String(snap(args[6] * scale + (relative ? 0 : ty))),
+      );
+    } else if (lower === 'h') {
+      out.push(String(snap(args[0] * scale + (relative ? 0 : tx))));
+    } else if (lower === 'v') {
+      out.push(String(snap(args[0] * scale + (relative ? 0 : ty))));
+    } else {
+      for (let pair = 0; pair < args.length; pair += 2) {
+        out.push(
+          String(snap(args[pair] * scale + (relative ? 0 : tx))),
+          String(snap(args[pair + 1] * scale + (relative ? 0 : ty))),
+        );
+      }
+    }
   }
 
-  const points = indices.map((index) => {
-    const [x, y] = terminals[index];
+  return out.join(' ');
+};
 
-    return [
-      Number((centerX + x * radius).toFixed(2)),
-      Number((centerY + y * radius).toFixed(2)),
-    ] as const;
+const scalePoints = (points: string, scale: number, tx: number, ty: number) =>
+  (points.match(/-?\d*\.?\d+/g) ?? [])
+    .map(Number)
+    .reduce<string[]>((acc, value, position) => {
+      const moved = value * scale + (position % 2 === 0 ? tx : ty);
+
+      if (position % 2 === 0) acc.push(String(snap(moved)));
+      else acc[acc.length - 1] += `,${snap(moved)}`;
+
+      return acc;
+    }, [])
+    .join(' ');
+
+const scaleNodes = (
+  nodes: TIconNodes,
+  scale: number,
+  tx: number,
+  ty: number,
+): TIconNodes =>
+  nodes.map(([tag, attrs]): TIconNode => {
+    const x = (value: string | number) => snap(Number(value) * scale + tx);
+    const y = (value: string | number) => snap(Number(value) * scale + ty);
+    const size = (value: string | number) => snap(Number(value) * scale);
+
+    switch (tag) {
+      case 'path':
+        return path(scalePath(String(attrs.d), scale, tx, ty));
+      case 'polyline':
+        return polyline(scalePoints(String(attrs.points), scale, tx, ty));
+      case 'polygon':
+        return polygon(scalePoints(String(attrs.points), scale, tx, ty));
+      case 'line':
+        return line(x(attrs.x1), y(attrs.y1), x(attrs.x2), y(attrs.y2));
+      case 'circle':
+        return circle(x(attrs.cx), y(attrs.cy), size(attrs.r));
+      case 'ellipse':
+        return ellipse(x(attrs.cx), y(attrs.cy), size(attrs.rx), size(attrs.ry));
+      case 'rect':
+        return rect(
+          x(attrs.x),
+          y(attrs.y),
+          size(attrs.width),
+          size(attrs.height),
+          size(attrs.rx ?? 0),
+        );
+      default:
+        return [tag, attrs];
+    }
   });
-  const routes = points
-    .map(([x, y]) => `M${centerX} ${centerY}L${x} ${y}`)
-    .join('');
 
-  return glyph(
-    path(routes),
-    circle(centerX, centerY, 1.15),
-    ...points.map(([x, y]) => circle(x, y, 0.78)),
+/**
+ * The modifier vocabulary, drawn once on a canonical 6u square at the centre of
+ * the canvas and moved into place by `markAt`.
+ *
+ * Drawing each mark once is what makes the vocabulary closed: `plus` is the
+ * same plus whether it lands inside a folder or beside a person, so the set
+ * teaches itself.
+ */
+const MARK_SPAN = 6;
+
+const markGlyph = (modifier: TModifier): TIconNodes => {
+  switch (modifier) {
+    case 'plus':
+      return glyph(line(12, 9, 12, 15), line(9, 12, 15, 12));
+    case 'minus':
+      return glyph(line(9, 12, 15, 12));
+    case 'x':
+      return glyph(line(9.75, 9.75, 14.25, 14.25), line(14.25, 9.75, 9.75, 14.25));
+    case 'check':
+      return glyph(polyline('9,12 11,14 15,9.5'));
+    case 'alert':
+      return glyph(line(12, 9, 12, 13), circle(12, 14.75, 0.6));
+    case 'lock':
+      return glyph(
+        path('M10.25 12v-1.25a1.75 1.75 0 0 1 3.5 0V12'),
+        rect(9.5, 12, 5, 3.5, 0.75),
+      );
+    case 'star':
+      return glyph(
+        polygon('12,9 13.1,11.2 15.5,11.55 13.75,13.25 14.2,15.6 12,14.5 9.8,15.6 10.25,13.25 8.5,11.55 10.9,11.2'),
+      );
+    case 'sparkles':
+      return glyph(
+        path('M12 9v6M9 12h6'),
+        path('M9.9 9.9l4.2 4.2M14.1 9.9l-4.2 4.2'),
+      );
+  }
+};
+
+/** Places a modifier mark at a given centre and span. */
+const markAt = (
+  modifier: TModifier,
+  centerX: number,
+  centerY: number,
+  span: number,
+): TIconNodes => {
+  const scale = span / MARK_SPAN;
+
+  return scaleNodes(
+    markGlyph(modifier),
+    scale,
+    centerX - 12 * scale,
+    centerY - 12 * scale,
   );
 };
 
-const badge = (modifier: TModifier): TIconNodes => {
-  const frame = circle(18, 18, 3.35);
+/**
+ * Bases that enclose usable space, and where the modifier therefore goes.
+ *
+ * A shield, a page, a folder and a calendar all have a middle, and a mark drawn
+ * in it is both the conventional picture and far easier to read than a corner
+ * mark: measured at 16px, an interior mark separates `shield-check` from
+ * `shield-x` by 15% of their ink, where the corner badge this replaced managed
+ * 0.6%.
+ */
+const INTERIOR_MARKS: Record<
+  string,
+  { x: number; y: number; span: number; frame?: () => TIconNodes }
+> = {
+  shield: { x: 12, y: 12, span: 6 },
+  file: { x: 12, y: 14.5, span: 6 },
+  folder: { x: 12, y: 13.5, span: 5.5 },
+  // These three carry contents of their own — ruled lines, speech dots, a
+  // tear line. The modifier takes that space rather than sitting on top of it,
+  // so the variant reads as one drawing instead of two overlaid.
+  calendar: { x: 12, y: 14, span: 5, frame: () => calendarFrame() },
+  'message-square': { x: 12, y: 11.5, span: 5.5, frame: () => messageFrame() },
+  ticket: {
+    x: 12,
+    y: 12,
+    span: 5,
+    frame: () => glyph(path('M3 7h18v3a2 2 0 0 0 0 4v3H3v-3a2 2 0 0 0 0-4z')),
+  },
+};
 
-  switch (modifier) {
-    case 'check':
-      return glyph(frame, polyline('16.4,18.1 17.55,19.25 19.8,16.7'));
-    case 'minus':
-      return glyph(frame, line(16.35, 18, 19.65, 18));
-    case 'plus':
-      return glyph(frame, line(18, 16.3, 18, 19.7), line(16.3, 18, 19.7, 18));
-    case 'x':
-      return glyph(frame, line(16.65, 16.65, 19.35, 19.35), line(19.35, 16.65, 16.65, 19.35));
-    case 'alert':
-      return glyph(frame, line(18, 15.95, 18, 18.25), circle(18, 20, 0.35));
-    case 'lock':
-      return glyph(
-        path('M16.5 17v-1a1.5 1.5 0 0 1 3 0v1'),
-        rect(15.75, 17, 4.5, 3.5, 1),
-      );
-    case 'sparkles':
-      return glyph(path('M18 14.8v6.4M14.8 18h6.4M15.3 15.3l5.4 5.4M20.7 15.3l-5.4 5.4'));
-    case 'star':
-      return glyph(polygon('18,14.8 19,16.9 21.3,17.2 19.6,18.8 20,21.1 18,20 16,21.1 16.4,18.8 14.7,17.2 17,16.9'));
+/**
+ * How far a base steps aside when the modifier has to sit in the corner.
+ *
+ * The corner mark needs a clear quadrant, and most bases fill the canvas, so
+ * the base is redrawn smaller rather than the mark being shrunk to fit around
+ * it. Shrinking the mark instead is what produced the unreadable badge this
+ * replaced.
+ */
+const CORNER_MARK = { x: 18, y: 18, span: 5.5, baseScale: 0.75 };
+
+/** Composes a base glyph with a modifier, in whichever territory is free. */
+const modifiedGlyph = (base: TIconNodes, baseName: string, modifier: TModifier): TIconNodes => {
+  const interior = INTERIOR_MARKS[baseName];
+
+  if (interior) {
+    return glyph(
+      ...(interior.frame?.() ?? base),
+      ...markAt(modifier, interior.x, interior.y, interior.span),
+    );
   }
+
+  return glyph(
+    ...scaleNodes(base, CORNER_MARK.baseScale, 0, 0),
+    ...markAt(modifier, CORNER_MARK.x, CORNER_MARK.y, CORNER_MARK.span),
+  );
 };
 
 const documentFrame = (): TIconNodes =>
@@ -541,7 +701,13 @@ const shieldFrame = (): TIconNodes =>
 const fileMark = (kind: string): TIconNodes => {
   switch (kind) {
     case 'archive':
-      return glyph(rect(8, 11.25, 8, 5.75, 1.25), line(8, 13.25, 16, 13.25), line(11, 10, 13, 10));
+      // Zip teeth read as an archive at any size. The box this replaced was
+      // the same rectangle `file-video` draws, one row down.
+      return glyph(
+        line(12, 9.5, 12, 11),
+        line(12, 12.5, 12, 14),
+        rect(10.5, 15.5, 3, 3.5, 0.75),
+      );
     case 'audio':
       return glyph(path('M8 15h2l3 2.25v-8.5L10 11H8z'), path('M15 11.2a3 3 0 0 1 0 3.6'));
     case 'code':
@@ -583,7 +749,7 @@ const familyFolder = (name: string): TIconNodes => {
     case 'shared':
       return glyph(...base, circle(9, 14, 1.25), circle(15.5, 12.5, 1.25), path('M10.2 13.7 14.3 12.8M10 15l4.6 1.5'), circle(16, 17, 1.25));
     case 'input':
-      return glyph(...base, path('M12 12v5M9.75 14.75 12 17l2.25-2.25'));
+      return glyph(...base, path('M12 10.5v5.5M9.5 13.5 12 16l2.5-2.5'), path('M8.25 16.5v2h7.5v-2'));
     default:
       return base;
   }
@@ -599,7 +765,9 @@ const familyCalendar = (name: string): TIconNodes => {
     case 'days':
       return glyph(...base, circle(8, 12.5, 0.6), circle(12, 12.5, 0.6), circle(16, 12.5, 0.6), circle(8, 16.5, 0.6), circle(12, 16.5, 0.6));
     case 'dot':
-      return glyph(...base, circle(12, 14.5, 1.3));
+      // Offset to a cell rather than centred: a centred dot has the same mass
+      // and the same position as the `plus` and `x` marks.
+      return glyph(...base, circle(8, 16, 1.75), line(12.5, 12.5, 17, 12.5), line(12.5, 16, 17, 16));
     case 'range':
       return glyph(...base, circle(7.5, 14.5, 0.75), line(8.5, 14.5, 15.5, 14.5), circle(16.5, 14.5, 0.75));
     default:
@@ -646,11 +814,16 @@ const familyList = (name: string): TIconNodes => {
     } else if (name.includes('checks') || name.includes('todo')) {
       nodes.push(polyline(`3.5,${y} 4.5,${y + 1} 6,${y - 1}`));
     } else if (name === 'list-rule') {
-      nodes.push(circle(4.75, y, index === 1 ? 1 : 0.55));
+      // The rule is what the name is about: the middle row is a divider across
+      // the whole glyph, with no bullet of its own.
+      if (index === 1) nodes.push(line(3.25, 12, 20.75, 12));
+      else nodes.push(circle(4.75, y, 0.55));
     } else {
       nodes.push(circle(4.75, y, 0.55));
     }
-    nodes.push(line(8, y, index === 1 && name === 'list-todo' ? 17 : 20.5, y));
+    if (!(name === 'list-rule' && index === 1)) {
+      nodes.push(line(8, y, index === 1 && name === 'list-todo' ? 17 : 20.5, y));
+    }
   }
 
   return nodes;
@@ -755,8 +928,8 @@ const productGeometry = (name: string): TIconNodes => {
     case 'companion': return glyph(frame, path('M12 17c-5-2.6-6-7.1-3.4-8.6A3.3 3.3 0 0 1 12 9.5a3.3 3.3 0 0 1 3.4-1.1C18 9.9 17 14.4 12 17Z'));
     case 'llm': return glyph(frame, circle(8, 9, 1), circle(16, 9, 1), circle(12, 16, 1), path('M8.8 9.5 11.4 15M15.2 9.5 12.6 15M9 9h6'));
     case 'window': return glyph(frame, line(3, 8, 21, 8), circle(6.25, 5.5, 0.5), circle(9, 5.5, 0.5), rect(7, 11, 10, 6, 1.25));
-    case 'ai-studio': return glyph(frame, ...branchMark(name, 12, 12, 4.75));
-    case 'assistant': return glyph(frame, rect(7, 8, 10, 8, 2), circle(10, 12, 0.7), circle(14, 12, 0.7), line(10, 15, 14, 15), line(12, 6, 12, 8), circle(12, 5.5, 0.55));
+    case 'ai-studio': return glyph(frame, path('M12 6.5v11M6.5 12h11'), path('M8.5 8.5l7 7M15.5 8.5l-7 7'));
+    case 'assistant': return glyph(frame, rect(7, 8.5, 10, 8, 2), circle(10, 12.5, 0.7), circle(14, 12.5, 0.7), line(10, 15, 14, 15), line(12, 5.5, 12, 8.5), circle(12, 4.5, 0.75));
     case 'contentpilot': return glyph(frame, path('M6.5 10h3l7-3v9l-7-3h-3z'), path('M9.5 13l1.25 4h2.5'), path('M18 5v3M16.5 6.5h3'));
     case 'trail': return glyph(frame, circle(7.5, 16, 1.25), circle(16.5, 8, 1.25), path('M8.75 15.5c5-.5 2-6.5 6.5-7'));
     default: throw new Error(`Missing TreeUI product icon geometry: ${name}`);
@@ -842,7 +1015,12 @@ const directGeometry = (name: string): TIconNodes | undefined => {
     case 'shuffle': return glyph(path('M3.25 6h2.5c5 0 7 12 12 12h3M17.5 15l3 3-3 3M3.25 18h2.5c2.2 0 3.8-2.3 5.4-4.9M14.5 6h6M17.5 3l3 3-3 3'));
     case 'history': return glyph(path('M4.25 7.5A9 9 0 1 1 3.5 15M4.25 3v4.5H8.5'), path('M12 7v5l3.5 2'));
     case 'filter': return glyph(path('M3 4h18l-7 8v6l-4 2v-8z'), circle(12, 4, 0.55));
-    case 'settings': return glyph(circle(12, 12, 3), path('M12 2.75v3M12 18.25v3M2.75 12h3M18.25 12h3M5.45 5.45l2.1 2.1M16.45 16.45l2.1 2.1M18.55 5.45l-2.1 2.1M7.55 16.45l-2.1 2.1'));
+    // A toothed ring, not radiating spokes: the eight detached rays this
+    // replaced read as brightness rather than as a gear.
+    case 'settings': return glyph(
+      polygon('9.98,3.23 14.02,3.23 14.13,5.44 15.13,5.85 16.77,4.37 19.63,7.23 18.15,8.87 18.56,9.87 20.77,9.98 20.77,14.02 18.56,14.13 18.15,15.13 19.63,16.77 16.77,19.63 15.13,18.15 14.13,18.56 14.02,20.77 9.98,20.77 9.87,18.56 8.87,18.15 7.23,19.63 4.37,16.77 5.85,15.13 5.44,14.13 3.23,14.02 3.23,9.98 5.44,9.87 5.85,8.87 4.37,7.23 7.23,4.37 8.87,5.85 9.87,5.44'),
+      circle(12, 12, 3),
+    );
     case 'settings-2': return glyph(line(4, 6, 20, 6), line(4, 12, 20, 12), line(4, 18, 20, 18), circle(8, 6, 1.75), circle(16, 12, 1.75), circle(10, 18, 1.75));
     case 'sliders-horizontal': return glyph(line(3, 6, 21, 6), line(3, 12, 21, 12), line(3, 18, 21, 18), circle(7, 6, 1.5), circle(15, 12, 1.5), circle(10, 18, 1.5));
     case 'cloud': return glyph(path('M6.5 19h11a4 4 0 0 0 .5-7.95A6 6 0 0 0 6.55 9.5 4.75 4.75 0 0 0 6.5 19Z'), circle(6.55, 9.5, 0.5));
@@ -859,11 +1037,11 @@ const directGeometry = (name: string): TIconNodes | undefined => {
     case 'cube': return glyph(polygon('12,2.75 20.25,7.5 20.25,16.5 12,21.25 3.75,16.5 3.75,7.5'), polyline('3.75,7.5 12,12.25 20.25,7.5'), line(12, 12.25, 12, 21.25));
     case 'layers': return glyph(polygon('12,3 21,8 12,13 3,8'), polyline('3,12 12,17 21,12'), polyline('3,16 12,21 21,16'));
     case 'boxes': return glyph(rect(3.25, 3.25, 7.25, 7.25, 1.5), rect(13.5, 3.25, 7.25, 7.25, 1.5), rect(8.4, 13.5, 7.25, 7.25, 1.5), path('M10.5 7h3M12 10.5v3'));
-    case 'brain': return glyph(path('M12 5.5a4.25 4.25 0 0 0-8 2 3.75 3.75 0 0 0 .25 7A4.25 4.25 0 0 0 12 18.5M12 5.5a4.25 4.25 0 0 1 8 2 3.75 3.75 0 0 1-.25 7A4.25 4.25 0 0 1 12 18.5M12 5.5v13M8 8.5l4 2.5M16 8.5 12 11M8 15.5l4-2.5M16 15.5 12 13'));
+    case 'brain': return glyph(path('M12 6a3.75 3.75 0 0 0-7 1.75 3.5 3.5 0 0 0 .25 6.25A3.75 3.75 0 0 0 12 18M12 6a3.75 3.75 0 0 1 7 1.75 3.5 3.5 0 0 1-.25 6.25A3.75 3.75 0 0 1 12 18M12 6v12M8.5 9l3.5 2.25M15.5 9 12 11.25M8.5 15l3.5-2.25M15.5 15 12 12.75'));
     case 'bot': return glyph(rect(4, 6.5, 16, 12.5, 3), circle(9, 12, 1), circle(15, 12, 1), line(9, 16, 15, 16), line(12, 3, 12, 6.5), circle(12, 3, 0.75));
     case 'rocket': return glyph(path('M8 16c-2.5-4 0-9 7.5-13.25 3.25 7 1.5 12-2.5 14.5z'), path('M8 16 4 17l-1 4 4-1 1-4M13 17.25l1 3.75 3-3.75'), circle(13.5, 8.5, 1.5));
     case 'leaf': return glyph(path('M20.75 3.25C10 3.25 4.5 7.5 4.5 14a6.5 6.5 0 0 0 6.5 6.5c6.5 0 9.75-6.5 9.75-17.25Z'), path('M4.5 20.5c3.5-6 7.5-9.5 13.25-13'));
-    case 'lightbulb': return glyph(path('M7.25 14.5a6.25 6.25 0 1 1 9.5 0L15 17H9z'), line(9.5, 20.5, 14.5, 20.5), line(9, 17, 15, 17));
+    case 'lightbulb': return glyph(path('M7.25 14.5a6.25 6.25 0 1 1 9.5 0L15 17H9z'), line(9.5, 20.5, 14.5, 20.5));
     case 'wrench': return glyph(path('M14.5 5.5a5 5 0 0 0-6.25 6.25L3 17l4 4 5.25-5.25A5 5 0 0 0 18.5 9.5l-3-3-3 3-2-2 3-3z'));
     case 'gavel': return glyph(path('m9 4 7 7M6.5 6.5l5-5 3 3-5 5zM13.5 13.5l5-5 3 3-5 5zM3 20.5h12M8 16l-3 3'));
     case 'crown': return glyph(path('M3 7.5 7.5 12 12 4l4.5 8L21 7.5l-2 11H5z'), line(6, 15.5, 18, 15.5));
@@ -936,7 +1114,7 @@ const directGeometry = (name: string): TIconNodes | undefined => {
     case 'human-lock': return glyph(circle(9.25, 7.25, 3), path('M3.5 19.75a5.75 5.75 0 0 1 11.5 0'), path('M15.5 15.25v-1a2.5 2.5 0 0 1 5 0v1'), rect(14.5, 15.25, 7, 5.75, 1.5), circle(18, 18, 0.65));
     case 'install': return glyph(rect(3.25, 3.25, 17.5, 17.5, 2.5), line(12, 5.5, 12, 14.5), polyline('8.5,11 12,14.5 15.5,11'), path('M7 18h10'));
     case 'languages': return glyph(path('M3.25 19.75 8.5 4.25l5.25 15.5M5.25 14h7'), circle(17.25, 10, 4), path('M14.25 10h6M17.25 6a10 10 0 0 1 0 8M15 16.75l4.5 4'));
-    case 'library-books': return glyph(rect(3.25, 4, 4.5, 16.75, 1), rect(9.75, 3, 4.5, 17.75, 1), path('m16.25 4 4-1 2.5 16.75-4 1z'), line(4.75, 8, 6.25, 8), line(11.25, 7, 12.75, 7), line(17.5, 8, 20, 7.5));
+    case 'library-books': return glyph(rect(3, 4, 4.5, 16.75, 1), rect(9.25, 3, 4.5, 17.75, 1), path('m15.75 4 3.5-1 2.25 16.75-3.5 1z'), line(4.5, 8, 6, 8), line(10.75, 7, 12.25, 7), line(17, 8, 19.25, 7.5));
     case 'line-width': return glyph(line(4, 5, 20, 5), line(4, 9.5, 17.5, 9.5), line(4, 14, 14.5, 14), line(4, 18.5, 11, 18.5), circle(20, 5, 0.55), circle(17.5, 9.5, 0.55));
     case 'log-in': return glyph(path('M13 3.25h7.75v17.5H13'), line(3.25, 12, 15.5, 12), polyline('10.75,7.25 15.5,12 10.75,16.75'));
     case 'log-out': return glyph(path('M11 3.25H3.25v17.5H11'), line(8.5, 12, 20.75, 12), polyline('16,7.25 20.75,12 16,16.75'));
@@ -947,7 +1125,7 @@ const directGeometry = (name: string): TIconNodes | undefined => {
     case 'pipette': return glyph(path('m14.25 3.25 6.5 6.5-2.5 2.5-1.5-1.5-7.5 7.5-4.5 1 1-4.5 7.5-7.5-1.5-1.5z'), line(12.75, 4.75, 19.25, 11.25), circle(4.25, 20.25, 0.55));
     case 'plugin': return glyph(path('M7 3.25v5M13 3.25v5M4.5 8.25h11v3a5.5 5.5 0 0 1-5.5 5.5v4'), rect(15.5, 13, 5.25, 5.25, 1.25), line(18.1, 10.75, 18.1, 13), line(13.25, 15.6, 15.5, 15.6));
     case 'publish': return glyph(line(12, 20.75, 12, 6), polyline('7.25,10.75 12,6 16.75,10.75'), path('M5.25 16.75a7.25 7.25 0 0 1 13.5 0M2.75 14a10 10 0 0 1 18.5 0'), circle(12, 20.75, 0.55));
-    case 'send-request': return glyph(polygon('2.75,4 21.25,12 2.75,20 6,12'), line(6, 12, 13, 12), circle(17.25, 17.25, 3.25), path('M15.75 16.25a1.5 1.5 0 1 1 2 1.4c-.4.2-.5.45-.5.8'), circle(17.25, 19.5, 0.35));
+    case 'send-request': return glyph(polygon('2,3.5 16.25,9.5 2,15.5 4.5,9.5'), line(4.5, 9.5, 10, 9.5), path('M15.5 16a2.5 2.5 0 1 1 3.25 2.4c-.5.25-.75.75-.75 1.35'), circle(18, 21.25, 0.75));
     case 'share-nodes': return glyph(line(8.25, 10.25, 16.25, 6.5), line(8.25, 13.75, 16.25, 17.5), circle(5.5, 12, 2.75), circle(18.5, 5.5, 2.75), circle(18.5, 18.5, 2.75));
     case 'square-terminal': return glyph(rect(3.25, 3.25, 17.5, 17.5, 3), line(3.25, 8, 20.75, 8), polyline('7,11 9.75,13.5 7,16'), line(12.5, 16, 17, 16));
     case 'sticker': return glyph(path('M5.25 3.25h13.5a2 2 0 0 1 2 2v9l-6.5 6.5h-9a2 2 0 0 1-2-2V5.25a2 2 0 0 1 2-2Z'), path('M14.25 20.75v-4.5a2 2 0 0 1 2-2h4.5'), circle(8.25, 9, 0.6), circle(13, 9, 0.6), path('M8 13a4.5 4.5 0 0 0 5.5 0'));
@@ -1025,7 +1203,9 @@ const coreGeometry = (name: string): TIconNodes => {
   const suffix = modifierSuffixes.find(([ending]) => name.endsWith(ending));
   if (suffix) {
     const [ending, modifier] = suffix;
-    return glyph(...coreGeometry(name.slice(0, -ending.length)), ...badge(modifier));
+    const baseName = name.slice(0, -ending.length);
+
+    return modifiedGlyph(coreGeometry(baseName), baseName, modifier);
   }
 
   if (name === 'file' || name.startsWith('file-')) return familyFile(name);
@@ -1042,33 +1222,127 @@ const coreGeometry = (name: string): TIconNodes => {
   if (name === 'gauge' || name.startsWith('gauge-')) return familyGauge(name);
   if (name === 'database' || name === 'hard-drive' || name.startsWith('hard-drive-') || name === 'server' || name.startsWith('server-')) return storageFrame(name);
   if (name === 'monitor-smartphone' || name === 'monitor-home' || name === 'smartphone' || name === 'laptop' || name.startsWith('laptop-')) return deviceFrame(name);
-  if (name.startsWith('image-')) return glyph(...directGeometry('image')!, ...badge(name.endsWith('minus') ? 'minus' : name.endsWith('plus') ? 'plus' : 'sparkles'));
-  if (name.startsWith('ticket')) return glyph(...directGeometry('ticket')!, ...(name.endsWith('plus') ? badge('plus') : []));
-  if (name.startsWith('brain-')) return glyph(...directGeometry('brain')!, ...branchMark(name, 17.5, 17.5, 2.25));
-  if (name.startsWith('bot-')) return glyph(...directGeometry('bot')!, ...badge(name.endsWith('users') ? 'plus' : 'star'));
-  if (name.startsWith('plug-')) return glyph(...directGeometry('plug')!, ...badge(name.endsWith('plus') ? 'plus' : 'sparkles'));
-  if (name.startsWith('repeat-')) return glyph(...directGeometry('repeat')!, ...branchMark(name, 12, 12, 2.5));
-  if (name.startsWith('code-') || name === 'embed-code' || name === 'code-api') return glyph(...directGeometry('code')!, ...badge(name.includes('api') ? 'star' : 'plus'));
+  if (name.startsWith('image-')) return modifiedGlyph(directGeometry('image')!, 'image', name.endsWith('minus') ? 'minus' : name.endsWith('plus') ? 'plus' : 'sparkles');
+  if (name.startsWith('ticket')) return name.endsWith('plus') ? modifiedGlyph(directGeometry('ticket')!, 'ticket', 'plus') : directGeometry('ticket')!;
+  if (name === 'brain-circuit') {
+    return glyph(
+      path('M12 6a3.75 3.75 0 0 0-7 1.75 3.5 3.5 0 0 0 .25 6.25A3.75 3.75 0 0 0 12 18M12 6a3.75 3.75 0 0 1 7 1.75 3.5 3.5 0 0 1-.25 6.25A3.75 3.75 0 0 1 12 18M12 6v12'),
+      circle(7.5, 9.5, 1.25),
+      circle(7.5, 15, 1.25),
+      circle(16.5, 12.25, 1.25),
+      path('M8.75 9.5H12M8.75 15H12M15.25 12.25H12'),
+    );
+  }
+  if (name.startsWith('bot-')) return modifiedGlyph(directGeometry('bot')!, 'bot', name.endsWith('users') ? 'plus' : 'star');
+  if (name.startsWith('plug-')) return modifiedGlyph(directGeometry('plug')!, 'plug', name.endsWith('plus') ? 'plus' : 'sparkles');
+  if (name.startsWith('repeat-')) {
+    const loop = directGeometry('repeat')!;
+
+    // Each variant says what is different about the repeat: how many times,
+    // what happens when it fails, how often.
+    if (name === 'repeat-2') return glyph(...loop, line(12, 10.25, 12, 13.75));
+    if (name === 'repeat-fallback') return glyph(...loop, path('M10.5 10.5 13.5 13.5M13.5 10.5 10.5 13.5'));
+
+    return glyph(...loop, circle(12, 12, 2.25), path('M12 10.5V12h1.25'));
+  }
+  if (name.startsWith('code-') || name === 'embed-code' || name === 'code-api') return modifiedGlyph(directGeometry('code')!, 'code', name.includes('api') ? 'star' : 'plus');
   if (name.startsWith('layout-') || name.startsWith('panel') || name === 'apps-grid' || name === 'grid') {
     return glyph(rect(3.25, 3.25, 17.5, 17.5, 2.5), line(9, 3.25, 9, 20.75), line(9, 11, 20.75, 11), circle(15, 16, 1.2));
   }
   if (name.startsWith('chart-') || name === 'trend-up' || name.includes('chart-up')) {
     return glyph(path('M3.25 3.25v17.5h17.5'), polyline('6,16 10,11 13,14 19,7'), circle(10, 11, 0.6), circle(19, 7, 0.6));
   }
-  if (name === 'network' || name.includes('network') || name === 'workflow' || name === 'hierarchy' || name === 'git-branch' || name === 'git-fork' || name === 'route' || name === 'timeline') {
-    return branchMark(name, 12, 12, 8);
+  // Eight names that used to be generated from a hash of the name itself.
+  // Each has a settled convention in the tools people already use, so the job
+  // was to draw the expected picture rather than invent one.
+  switch (name) {
+    case 'network':
+      return glyph(
+        rect(9, 2.75, 6, 5, 1.5),
+        rect(3, 16.25, 6, 5, 1.5),
+        rect(15, 16.25, 6, 5, 1.5),
+        path('M12 7.75v6M6 13.75h12M6 13.75v2.5M18 13.75v2.5'),
+      );
+    case 'network-nodes':
+      return glyph(
+        circle(12, 12, 2.5),
+        circle(4.75, 4.75, 2),
+        circle(19.25, 4.75, 2),
+        circle(4.75, 19.25, 2),
+        circle(19.25, 19.25, 2),
+        path('M6.25 6.25 10.25 10.25M17.75 6.25 13.75 10.25M6.25 17.75 10.25 13.75M17.75 17.75 13.75 13.75'),
+      );
+    case 'workflow':
+      return glyph(
+        rect(3, 3.25, 7, 6, 1.5),
+        rect(14, 14.75, 7, 6, 1.5),
+        path('M10 6.25h3.5a2 2 0 0 1 2 2v6.5'),
+      );
+    case 'hierarchy':
+      return glyph(
+        rect(9, 2.75, 6, 4.5, 1),
+        rect(3, 16.75, 5, 4.5, 1),
+        rect(9.5, 16.75, 5, 4.5, 1),
+        rect(16, 16.75, 5, 4.5, 1),
+        path('M12 7.25v7M5.5 14.25h13M5.5 14.25v2.5M12 14.25v2.5M18.5 14.25v2.5'),
+      );
+    case 'git-branch':
+      return glyph(
+        line(6, 4.25, 6, 15.25),
+        circle(6, 18, 2.75),
+        circle(18, 6, 2.75),
+        path('M18 8.75a9 9 0 0 1-9 9'),
+      );
+    case 'git-fork':
+      return glyph(
+        circle(6, 6, 2.75),
+        circle(18, 6, 2.75),
+        circle(12, 18, 2.75),
+        path('M6 8.75v1.5a1.5 1.5 0 0 0 1.5 1.5h9a1.5 1.5 0 0 0 1.5-1.5V8.75'),
+        line(12, 11.75, 12, 15.25),
+      );
+    case 'route':
+      return glyph(
+        circle(6, 18.5, 2.75),
+        rect(15.25, 3, 5.75, 5.75, 1.5),
+        path('M8.75 18.5h8.5a3.5 3.5 0 0 0 0-7H6.75a3.5 3.5 0 0 1 0-7h8.5'),
+      );
+    case 'timeline':
+      return glyph(
+        line(5.5, 3.5, 5.5, 20.5),
+        circle(5.5, 7.5, 2),
+        circle(5.5, 16.5, 2),
+        line(10, 7.5, 20.5, 7.5),
+        line(10, 16.5, 20.5, 16.5),
+      );
   }
   if (name === 'cpu' || name.startsWith('cpu-') || name === 'memory-stick') {
     return glyph(rect(5.25, 5.25, 13.5, 13.5, 2.5), rect(9, 9, 6, 6, 1.25), path('M8 2.75v2.5M12 2.75v2.5M16 2.75v2.5M8 18.75v2.5M12 18.75v2.5M16 18.75v2.5M2.75 8h2.5M2.75 12h2.5M2.75 16h2.5M18.75 8h2.5M18.75 12h2.5M18.75 16h2.5'));
   }
   if (name === 'browser' || name === 'page-snapshot') {
-    return glyph(rect(3.25, 3.25, 17.5, 17.5, 2.5), line(3.25, 8, 20.75, 8), circle(6.25, 5.75, 0.5), circle(9, 5.75, 0.5), ...branchMark(name, 12, 14, 4));
+    const chrome = glyph(
+      rect(3.25, 3.25, 17.5, 17.5, 2.5),
+      line(3.25, 8, 20.75, 8),
+      circle(6.25, 5.75, 0.55),
+      circle(9, 5.75, 0.55),
+    );
+
+    // A browser shows a page; a snapshot shows that page pinned down.
+    return name === 'page-snapshot'
+      ? glyph(...chrome, rect(6.75, 10.75, 10.5, 7, 1), path('M9.25 15.5 11.5 13.25l1.75 1.75 2-2 2.5 2.5'))
+      : glyph(...chrome, line(6.75, 11.5, 17.25, 11.5), line(6.75, 14.5, 14.25, 14.5), line(6.75, 17.5, 11.25, 17.5));
   }
   if (name === 'badge' || name.startsWith('badge-') || name === 'id-badge') {
     return glyph(path('M12 2.75 15 5l3.75-.25.75 3.75 2.5 2.75-2.5 2.75-.75 3.75-3.75-.25-3 2.25-3-2.25-3.75.25-.75-3.75L2 11.25 4.5 8.5l.75-3.75L9 5z'), circle(12, 11.25, 2));
   }
   if (name === 'lock' || name.startsWith('lock-') || name === 'vault') {
-    return glyph(path('M7 10V7a5 5 0 0 1 10 0v3'), rect(4.25, 10, 15.5, 11, 2.5), circle(12, 15, 1.25), line(12, 16.25, 12, 18.25));
+    const body = glyph(path('M7 10V7a5 5 0 0 1 10 0v3'), rect(4.25, 10, 15.5, 11, 2.5));
+
+    // A plain padlock has no keyhole: that detail is what `lock-keyhole` is
+    // named for, and drawing it on both left nothing between the two names.
+    return name === 'vault'
+      ? glyph(...body, circle(12, 15.5, 2.75), path('M12 12.75v1.25M12 17v1.25M9.25 15.5h1.25M13.5 15.5h1.25'))
+      : body;
   }
   if (name.includes('shopping') || name === 'store' || name === 'price-tag' || name === 'receipt' || name.startsWith('dollar') || name === 'piggy-bank') {
     return glyph(path('M4 8h16l-1.5 11h-13z'), path('M7 8a5 5 0 0 1 10 0'), line(8, 12, 16, 12), line(8, 16, 13, 16));
@@ -1078,7 +1352,22 @@ const coreGeometry = (name: string): TIconNodes => {
   throw new Error(`Missing TreeUI icon geometry: ${name}`);
 };
 
-const TREE_ICON_ALIASES = {
+/**
+ * Names that are a second word for an existing icon, not a second drawing.
+ *
+ * Exported so the Branchline validator can hold each one to its target's
+ * geometry: an alias that drifts into its own drawing is the "one concept, one
+ * name" rule breaking silently.
+ */
+export const TREE_ICON_ALIASES = {
+  // Same concept, same drawing. These five used to be separate canonical
+  // names, each with its own geometry, because the old uniqueness test forbade
+  // two names from sharing a glyph — which is exactly what a synonym is.
+  microphone: 'mic',
+  house: 'home',
+  'paper-plane': 'send',
+  'alert-circle': 'circle-alert',
+  'check-circle': 'circle-check',
   grid: 'layout-grid',
   share: 'share-nodes',
   'chevron-updown': 'chevrons-up-down',

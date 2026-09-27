@@ -45,6 +45,7 @@ const BUILTIN_ICON_NAMES = [
   'brain',
   'brain-circuit',
   'brain-lock',
+  'briefcase',
   'browser',
   'brush',
   'brush-stroke',
@@ -59,6 +60,7 @@ const BUILTIN_ICON_NAMES = [
   'calendar-plus',
   'calendar-range',
   'calendar-x',
+  'car',
   'carousel',
   'catalog',
   'chart-column',
@@ -157,6 +159,7 @@ const BUILTIN_ICON_NAMES = [
   'git-fork',
   'globe',
   'globe-check',
+  'graduation-cap',
   'grid',
   'grip-vertical',
   'hand-check',
@@ -187,6 +190,7 @@ const BUILTIN_ICON_NAMES = [
   'key',
   'key-off',
   'key-round',
+  'landmark',
   'languages',
   'laptop',
   'laptop-bridge',
@@ -309,6 +313,7 @@ const BUILTIN_ICON_NAMES = [
   'shield-lock',
   'shield-question',
   'shield-x',
+  'shirt',
   'shopping-basket',
   'shopping-cart',
   'shuffle',
@@ -342,13 +347,12 @@ const BUILTIN_ICON_NAMES = [
   'tickets',
   'timeline',
   'timer',
-  'toggle-left',
-  'toggle-right',
   'token-input',
   'token-output',
   'trail',
   'trash-2',
   'trend-up',
+  'trending-up',
   'triangle-alert',
   'type',
   'unlink',
@@ -364,6 +368,7 @@ const BUILTIN_ICON_NAMES = [
   'user-x',
   'users',
   'users-round',
+  'utensils',
   'vault',
   'volume-2',
   'wallet',
@@ -1014,7 +1019,15 @@ const storageFrame = (name: string): TIconNodes => {
   return glyph(rect(3.25, 5, 17.5, 14, 2.25), line(3.25, 11.5, 20.75, 11.5), circle(7, 15.25, 0.65), line(11, 15.25, 17.5, 15.25));
 };
 
-const TREEUI_PRODUCT_ICON_NAMES = new Set<string>([
+/**
+ * Glyphs drawn inside a rounded-square container.
+ *
+ * A shared drawing treatment, not a namespace. These were once filed as
+ * "TreeUI product icons", which put a consumer's decision inside the library:
+ * whether `market` is a product mark or just a shop front is decided by whoever
+ * renders it, so the catalog files each one by what it draws.
+ */
+const FRAMED_GLYPH_NAMES = new Set<string>([
   'account',
   'ai-studio',
   'app-window',
@@ -1031,7 +1044,7 @@ const TREEUI_PRODUCT_ICON_NAMES = new Set<string>([
   'trail',
 ]);
 
-const productGeometry = (name: string): TIconNodes => {
+const framedGlyph = (name: string): TIconNodes => {
   const frame = rect(3, 3, 18, 18, 4.25);
   const kind = name === 'app-window' ? 'window' : name;
 
@@ -1051,7 +1064,7 @@ const productGeometry = (name: string): TIconNodes => {
     case 'assistant': return glyph(frame, rect(7, 8.5, 10, 8, 2), circle(10, 12.5, 0.7), circle(14, 12.5, 0.7), line(10, 15, 14, 15), line(12, 5.5, 12, 8.5), circle(12, 4.5, 0.75));
     case 'contentpilot': return glyph(frame, path('M6.5 10h3l7-3v9l-7-3h-3z'), path('M9.5 13l1.25 4h2.5'), path('M18 5v3M16.5 6.5h3'));
     case 'trail': return glyph(frame, circle(7.5, 16, 1.25), circle(16.5, 8, 1.25), path('M8.75 15.5c5-.5 2-6.5 6.5-7'));
-    default: throw new Error(`Missing TreeUI product icon geometry: ${name}`);
+    default: throw new Error(`Missing framed glyph geometry: ${name}`);
   }
 };
 
@@ -1080,6 +1093,14 @@ const directionGeometry = (name: string): TIconNodes | undefined => {
 const directGeometry = (name: string): TIconNodes | undefined => {
   switch (name) {
     case 'activity': return glyph(polyline('2.75,13 6.5,13 9,6 13,18 15.5,11 21.25,11'), circle(9, 6, 0.55), circle(13, 18, 0.55));
+    // Everyday-life subjects: what money is spent on, which the catalog had no
+    // way to draw. `wealth-ui` was falling back to `price-tag` for all of them.
+    case 'briefcase': return glyph(rect(2.75, 7.5, 18.5, 12.75, 2), path('M8.5 7.5V6a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2v1.5'), line(2.75, 12.75, 21.25, 12.75));
+    case 'car': return glyph(path('M3.5 13.5 5.25 8.75A2 2 0 0 1 7.15 7.5h9.7a2 2 0 0 1 1.9 1.25l1.75 4.75'), rect(2.75, 13.5, 18.5, 4.5, 1.5), circle(7, 18, 1.75), circle(17, 18, 1.75));
+    case 'graduation-cap': return glyph(path('M12 4.25 22 9l-10 4.75L2 9z'), path('M6 11.25v4.5c0 1.5 2.7 2.75 6 2.75s6-1.25 6-2.75v-4.5'), line(21, 9.5, 21, 14.5));
+    case 'landmark': return glyph(path('M2.75 9.75 12 4.5l9.25 5.25'), line(4.5, 11.5, 19.5, 11.5), line(6.5, 11.5, 6.5, 18), line(10.25, 11.5, 10.25, 18), line(13.75, 11.5, 13.75, 18), line(17.5, 11.5, 17.5, 18), line(3.25, 20.25, 20.75, 20.25));
+    case 'shirt': return glyph(path('M7.5 3.5 4 5.25 2.75 9.5l3.25 1.25V20.5h12V10.75l3.25-1.25L20 5.25 16.5 3.5a4.5 4.5 0 0 1-9 0z'));
+    case 'utensils': return glyph(path('M7 2.75v6.5a2.5 2.5 0 0 0 5 0V2.75'), line(9.5, 11.75, 9.5, 21.25), path('M17.75 2.75c1.5 2.25 2.25 5 2.25 7.75 0 1.5-1 2.75-2.25 3v7.75'));
     case 'align-left': return glyph(line(4, 5, 20, 5), line(4, 10, 15, 10), line(4, 15, 18, 15), line(4, 20, 12, 20));
     case 'plus': return glyph(line(12, 3.5, 12, 20.5), line(3.5, 12, 20.5, 12), circle(12, 12, 0.8));
     case 'minus': return glyph(line(3.5, 12, 20.5, 12), circle(12, 12, 0.8));
@@ -1214,8 +1235,6 @@ const directGeometry = (name: string): TIconNodes | undefined => {
     case 'inbox-empty': return glyph(path('M3.25 4.5h17.5v15H3.25z'), line(8, 12, 16, 12), circle(12, 16, 0.6));
     case 'archive': return glyph(rect(3.25, 6.5, 17.5, 13.75, 2), rect(2.75, 3.25, 18.5, 4.25, 1.5), line(9, 11.5, 15, 11.5));
     case 'clipboard-list': return glyph(path('M6 4.5H4v16.25h16V4.5h-2'), rect(8, 2.75, 8, 4, 1.5), line(8, 11, 16, 11), line(8, 15, 16, 15), circle(6, 11, 0.5), circle(6, 15, 0.5));
-    case 'toggle-left': return glyph(rect(2.75, 7, 18.5, 10, 5), circle(8, 12, 3.25));
-    case 'toggle-right': return glyph(rect(2.75, 7, 18.5, 10, 5), circle(16, 12, 3.25));
     case 'plug': return glyph(path('M8 3.25v5M16 3.25v5M5.5 8.25h13v3.5a6.5 6.5 0 0 1-13 0zM12 18.25v3'));
     case 'unplug': return glyph(path('M8 3.25v5M16 3.25v5M5.5 8.25h13v3.5a6.5 6.5 0 0 1-2 4.75M12 18.25v3'), line(3.25, 3.25, 20.75, 20.75));
     case 'send': return glyph(polygon('2.75,4 21.25,12 2.75,20 6,12'), line(6, 12, 15.5, 12));
@@ -1324,7 +1343,7 @@ const coreGeometry = (name: string): TIconNodes => {
   const direct = directGeometry(name);
   if (direct) return direct;
 
-  if (TREEUI_PRODUCT_ICON_NAMES.has(name)) return productGeometry(name);
+  if (FRAMED_GLYPH_NAMES.has(name)) return framedGlyph(name);
 
   if (name.endsWith('-off')) {
     return glyph(...coreGeometry(name.slice(0, -4)), line(3.25, 3.25, 20.75, 20.75));
@@ -1506,6 +1525,8 @@ export const TREE_ICON_ALIASES = {
   // Same concept, same drawing. These five used to be separate canonical
   // names, each with its own geometry, because the old uniqueness test forbade
   // two names from sharing a glyph — which is exactly what a synonym is.
+  // The spelling every Lucide-shaped codebase reaches for first.
+  'trending-up': 'trend-up',
   microphone: 'mic',
   house: 'home',
   'paper-plane': 'send',

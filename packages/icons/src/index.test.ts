@@ -39,6 +39,7 @@ const ROOT_ONLY_ATTRS = [
 ];
 
 const MIGRATION_ALIASES = {
+  'trending-up': 'trend-up',
   microphone: 'mic',
   house: 'home',
   'paper-plane': 'send',
@@ -81,8 +82,8 @@ afterEach(() => {
 describe('@treeui/icons registry', () => {
   // The one place the shipped set's size is pinned. Update it when adding an
   // icon — the change should be deliberate, not incidental.
-  it('ships 365 built-in icons', () => {
-    expect(Object.keys(builtinTreeIconNodes)).toHaveLength(365);
+  it('ships 370 built-in icons', () => {
+    expect(Object.keys(builtinTreeIconNodes)).toHaveLength(370);
   });
 
   it('lists every built-in icon name in sorted order', () => {
@@ -170,7 +171,7 @@ describe('@treeui/icons registry', () => {
   });
 
   it('makes documented migration aliases reuse the canonical node array', () => {
-    expect(Object.keys(MIGRATION_ALIASES)).toHaveLength(17);
+    expect(Object.keys(MIGRATION_ALIASES)).toHaveLength(18);
 
     for (const [alias, canonical] of Object.entries(MIGRATION_ALIASES)) {
       expect(
@@ -498,7 +499,7 @@ describe('builtin icon geometry', () => {
       ([name]) => !Object.prototype.hasOwnProperty.call(MIGRATION_ALIASES, name),
     );
 
-    expect(canonical).toHaveLength(348);
+    expect(canonical).toHaveLength(352);
     expect(entries).toHaveLength(BUILTIN_COUNT);
   });
 

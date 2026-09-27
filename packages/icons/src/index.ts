@@ -19,9 +19,13 @@ export {
 export { builtinTreeIconNodes } from './icons';
 
 export {
+  treeIconAliases,
   treeIconCategories,
   treeIconCategory,
   treeIconCategoryLabels,
   treeIconCategoryOrder,
+  treeIconFamilies,
+  treeIconFamily,
   type TIconCategory,
+  type TIconFamily,
 } from './categories';

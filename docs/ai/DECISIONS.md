@@ -92,3 +92,35 @@ The example dashboards label their `size` control "Density" because that is the 
 - `docs/ai` is the compact contract layer for tooling and automation
 - Root markdown files explain repository structure and contributor workflow
 - When public behavior changes, the matching contract files should change in the same patch
+
+## What Is Not an Icon
+
+Two kinds of name were removed from the icon catalog, for the same reason: each
+put a decision inside the library that belongs to the product using it.
+
+**An interactive control is a component, not a glyph.** `toggle-left` and
+`toggle-right` drew a switch. TreeUI ships `TSwitch`, which is a switch — with
+keyboard operation, `role="switch"`, focus-visible treatment and a 44×44 target.
+A picture of one has none of that, and shipping it invites
+`<TIcon name="toggle-right" />` where `<TSwitch>` was meant. The rule: if the
+thing depicted is a control the library already builds, the catalog does not
+draw it. The same test applies to any future request for a checkbox, a radio, a
+slider or a progress bar as an icon.
+
+The rule is about *depicting the control itself*, not about the concepts those
+controls express. `check`, `circle-check` and `square-check` stay: a tick is a
+statement about state, drawn in running text, in a list, on a badge. It is
+`TCheckbox` that owns "a box the user can click".
+
+**A category describes what an icon draws, not who uses it.** There was a
+`product` category holding sixteen glyphs — `market`, `storage`, `tasks`,
+`trail` and the rest. Whether `market` is a product mark or just a shop front is
+decided by whoever renders it, so filing it under "products" recorded a consumer
+decision as library metadata, and made those sixteen unfindable by anyone
+searching for what they actually show. They are now filed by subject: `market`
+under commerce, `storage` under data, `assistant` under ai, `trail` under
+navigation.
+
+They still share a rounded-square container, which is a drawing treatment and
+stays — `FRAMED_GLYPH_NAMES` in `icons.ts` is where that treatment is applied,
+and its name says what it is rather than who it is for.

@@ -1,6 +1,6 @@
 # @treeui/icons
 
-The icon registry behind TreeUI's Vue components, with a curated built-in catalog of 365 names, drawn to the [Branchline contract](#branchline--the-drawing-contract).
+The icon registry behind TreeUI's Vue components, with a curated built-in catalog of 370 names, drawn to the [Branchline contract](#branchline--the-drawing-contract).
 
 Icons are looked up **by name**, and applications extend the registry with their own icons rather than importing a second icon package. Three ways in:
 
@@ -66,55 +66,53 @@ Prefer the name over a component here. A string is never made reactive, whereas 
 
 Names use TreeUI's descriptive kebab-case vocabulary, so related concepts remain predictable across components.
 
-The catalog covers application chrome, actions, status, files, products, and product-specific workflows. Company logos are not built-ins; when one is needed, register its official SVG as an app-owned component.
+The 352 canonical names below cover application chrome, actions, status, files, communication, and everyday subjects. Company logos are not built-ins; when one is needed, register its official SVG as an app-owned component.
 
 | | | | |
 |---|---|---|---|
-| `account` | `activity` | `ai-studio` | `alert-circle` |
-| `align-left` | `app-window` | `apps-grid` | `archive` |
-| `archive-restore` | `arrow-down` | `arrow-left` | `arrow-left-right` |
-| `arrow-right` | `arrow-up` | `arrow-up-right` | `assistant` |
-| `automation-key` | `automations` | `badge` | `badge-check` |
-| `badge-star` | `ban` | `bell` | `book-open` |
-| `bookmark` | `bot` | `bot-badge` | `bot-users` |
-| `boxes` | `boxes-model` | `braces` | `brackets` |
-| `brain` | `brain-circuit` | `brain-lock` | `browser` |
-| `brush` | `brush-stroke` | `bug` | `building-2` |
-| `calculator` | `calendar` | `calendar-clock` | `calendar-day` |
-| `calendar-days` | `calendar-dot` | `calendar-plus` | `calendar-range` |
-| `calendar-x` | `carousel` | `catalog` | `chart-column` |
-| `chart-line` | `chart-pie` | `chat` | `check` |
-| `check-circle` | `check-square` | `chevron-down` | `chevron-left` |
-| `chevron-right` | `chevron-up` | `chevron-updown` | `chevrons-up-down` |
+| `account` | `activity` | `ai-studio` | `align-left` |
+| `app-window` | `apps-grid` | `archive` | `archive-restore` |
+| `arrow-down` | `arrow-left` | `arrow-left-right` | `arrow-right` |
+| `arrow-up` | `arrow-up-right` | `assistant` | `automation-key` |
+| `badge` | `badge-check` | `badge-star` | `ban` |
+| `bell` | `book-open` | `bookmark` | `bot` |
+| `bot-badge` | `bot-users` | `boxes` | `boxes-model` |
+| `braces` | `brackets` | `brain` | `brain-circuit` |
+| `brain-lock` | `briefcase` | `browser` | `brush` |
+| `brush-stroke` | `bug` | `building-2` | `calculator` |
+| `calendar` | `calendar-clock` | `calendar-day` | `calendar-days` |
+| `calendar-dot` | `calendar-plus` | `calendar-range` | `calendar-x` |
+| `car` | `carousel` | `catalog` | `chart-column` |
+| `chart-line` | `chart-pie` | `check` | `chevron-down` |
+| `chevron-left` | `chevron-right` | `chevron-up` | `chevrons-up-down` |
 | `circle-alert` | `circle-check` | `circle-dot` | `circle-help` |
 | `circle-x` | `clipboard-list` | `clock` | `clock-alert` |
-| `clock-sparkles` | `clock-x` | `close` | `cloud` |
-| `cloud-off` | `code` | `code-2` | `code-api` |
-| `coins` | `comment` | `companion` | `compass` |
-| `connections` | `contentpilot` | `copy` | `cpu` |
-| `cpu-chip` | `credit-card` | `crosshair` | `crown` |
-| `cube` | `database` | `developer-settings` | `device-link` |
-| `dollar-circle` | `dollar-limit` | `download` | `download-video` |
-| `draw` | `droplet` | `ellipsis` | `ellipsis-vertical` |
-| `embed-code` | `eraser` | `extension` | `external-link` |
-| `eye` | `eye-off` | `file` | `file-archive` |
-| `file-audio` | `file-code` | `file-edit` | `file-image` |
-| `file-pdf` | `file-plus` | `file-scan` | `file-text` |
-| `file-video` | `file-warning` | `files` | `film` |
-| `filter` | `filter-capabilities` | `fingerprint` | `flag` |
-| `flask-play` | `folder` | `folder-input` | `folder-kanban` |
-| `folder-open` | `folder-plus` | `folder-shared` | `folder-tree` |
-| `folder-x` | `folders` | `gauge` | `gauge-high` |
-| `gauge-low` | `gauge-medium` | `gavel` | `git-branch` |
-| `git-fork` | `globe` | `globe-check` | `grid` |
-| `grip-vertical` | `hand-check` | `hard-drive` | `hard-drive-alert` |
-| `hard-drive-off` | `hash` | `heart` | `heart-chart-up` |
-| `heart-pulse` | `help` | `hierarchy` | `history` |
-| `home` | `hourglass` | `house` | `human-lock` |
-| `id-badge` | `image` | `image-minus` | `image-plus` |
-| `image-up` | `inbox` | `inbox-empty` | `info` |
-| `install` | `journal` | `key` | `key-off` |
-| `key-round` | `languages` | `laptop` | `laptop-bridge` |
+| `clock-sparkles` | `clock-x` | `cloud` | `cloud-off` |
+| `code` | `code-2` | `code-api` | `coins` |
+| `companion` | `compass` | `contentpilot` | `copy` |
+| `cpu` | `cpu-chip` | `credit-card` | `crosshair` |
+| `crown` | `cube` | `database` | `developer-settings` |
+| `device-link` | `dollar-circle` | `dollar-limit` | `download` |
+| `download-video` | `draw` | `droplet` | `ellipsis` |
+| `ellipsis-vertical` | `embed-code` | `eraser` | `extension` |
+| `external-link` | `eye` | `eye-off` | `file` |
+| `file-archive` | `file-audio` | `file-code` | `file-edit` |
+| `file-image` | `file-pdf` | `file-plus` | `file-scan` |
+| `file-text` | `file-video` | `file-warning` | `files` |
+| `film` | `filter` | `filter-capabilities` | `fingerprint` |
+| `flag` | `flask-play` | `folder` | `folder-input` |
+| `folder-kanban` | `folder-open` | `folder-plus` | `folder-shared` |
+| `folder-tree` | `folder-x` | `folders` | `gauge` |
+| `gauge-high` | `gauge-low` | `gauge-medium` | `gavel` |
+| `git-branch` | `git-fork` | `globe` | `globe-check` |
+| `graduation-cap` | `grip-vertical` | `hand-check` | `hard-drive` |
+| `hard-drive-alert` | `hard-drive-off` | `hash` | `heart` |
+| `heart-chart-up` | `heart-pulse` | `hierarchy` | `history` |
+| `home` | `hourglass` | `human-lock` | `id-badge` |
+| `image` | `image-minus` | `image-plus` | `image-up` |
+| `inbox` | `inbox-empty` | `info` | `install` |
+| `journal` | `key` | `key-off` | `key-round` |
+| `landmark` | `languages` | `laptop` | `laptop-bridge` |
 | `layers` | `layout-dashboard` | `layout-grid` | `layout-kanban` |
 | `leaf` | `library-books` | `life-buoy` | `lightbulb` |
 | `lightbulb-sparkles` | `line-width` | `link` | `link-2` |
@@ -125,55 +123,57 @@ The catalog covers application chrome, actions, status, files, products, and pro
 | `mail-open` | `mail-plus` | `mail-warning` | `mails` |
 | `market` | `maximize-2` | `megaphone` | `memory-stick` |
 | `menu` | `message-circle` | `message-square` | `message-square-plus` |
-| `messages-square` | `mic` | `microphone` | `minimize-2` |
-| `minus` | `minus-square` | `monitor-home` | `monitor-smartphone` |
-| `moon` | `more-horizontal` | `mouse-pointer-2` | `move-horizontal` |
-| `network` | `network-nodes` | `newsletter` | `newspaper` |
-| `octagon-x` | `package` | `package-download` | `page-snapshot` |
-| `palette` | `panel-left` | `panel-right` | `panels-top-left` |
-| `paper-plane` | `paperclip` | `pause` | `pause-circle` |
-| `pencil` | `persona` | `piggy-bank` | `pipette` |
-| `play` | `play-circle` | `plug` | `plug-cloud` |
-| `plug-off` | `plug-plus` | `plugin` | `plus` |
-| `price-tag` | `publish` | `quote` | `radio` |
-| `radio-tower` | `receipt` | `refresh` | `refresh-cw` |
+| `messages-square` | `mic` | `minimize-2` | `minus` |
+| `minus-square` | `monitor-home` | `monitor-smartphone` | `moon` |
+| `more-horizontal` | `mouse-pointer-2` | `move-horizontal` | `network` |
+| `network-nodes` | `newsletter` | `newspaper` | `octagon-x` |
+| `package` | `package-download` | `page-snapshot` | `palette` |
+| `panel-left` | `panel-right` | `panels-top-left` | `paperclip` |
+| `pause` | `pause-circle` | `pencil` | `piggy-bank` |
+| `pipette` | `play` | `play-circle` | `plug` |
+| `plug-cloud` | `plug-off` | `plug-plus` | `plugin` |
+| `plus` | `price-tag` | `publish` | `quote` |
+| `radio` | `radio-tower` | `receipt` | `refresh-cw` |
 | `refresh-cw-off` | `repeat` | `repeat-2` | `repeat-fallback` |
 | `repeat-interval` | `responses-list` | `rocket` | `rotate-ccw` |
 | `rotate-cw` | `route` | `rss` | `save` |
 | `scale` | `scan` | `search` | `search-x` |
 | `send` | `send-check` | `send-request` | `server` |
 | `server-api` | `server-environment` | `settings` | `settings-2` |
-| `share` | `share-nodes` | `shield` | `shield-check` |
-| `shield-lock` | `shield-question` | `shield-x` | `shopping-basket` |
+| `share-nodes` | `shield` | `shield-check` | `shield-lock` |
+| `shield-question` | `shield-x` | `shirt` | `shopping-basket` |
 | `shopping-cart` | `shuffle` | `signal` | `signal-high` |
 | `signal-low` | `signal-medium` | `signal-off` | `siren` |
-| `sliders-horizontal` | `smartphone` | `sparkles` | `square` |
-| `square-check` | `square-plus` | `square-terminal` | `star` |
-| `sticker` | `storage` | `store` | `story` |
-| `sun` | `support` | `target` | `target-choice` |
-| `tasks` | `terminal` | `ticket` | `ticket-plus` |
-| `tickets` | `timeline` | `timer` | `toggle-left` |
-| `toggle-right` | `token-input` | `token-output` | `trail` |
-| `trash-2` | `trend-up` | `triangle-alert` | `type` |
-| `unlink` | `unplug` | `upload` | `upload-cloud` |
-| `user` | `user-check` | `user-cog` | `user-minus` |
-| `user-plus` | `user-round` | `user-x` | `users` |
-| `users-round` | `vault` | `volume-2` | `wallet` |
+| `skip-forward` | `sliders-horizontal` | `smartphone` | `sparkles` |
+| `square` | `square-check` | `square-plus` | `square-terminal` |
+| `star` | `sticker` | `storage` | `store` |
+| `story` | `sun` | `support` | `target` |
+| `target-choice` | `tasks` | `terminal` | `ticket` |
+| `ticket-plus` | `tickets` | `timeline` | `timer` |
+| `token-input` | `token-output` | `trail` | `trash-2` |
+| `trend-up` | `triangle-alert` | `type` | `unlink` |
+| `unplug` | `upload` | `upload-cloud` | `user` |
+| `user-check` | `user-cog` | `user-minus` | `user-plus` |
+| `user-round` | `user-x` | `users` | `users-round` |
+| `utensils` | `vault` | `volume-2` | `wallet` |
 | `wand-sparkles` | `warehouse` | `workflow` | `workspace` |
 | `wrench` | `wrench-zap` | `x` | `zap` |
 
 `listTreeIcons()` returns this list at runtime, including anything you have registered.
 
-Twelve compatibility names preserve the migration vocabulary without duplicating a visual:
+These 18 names are a second word for a drawing already above. They resolve to the same geometry, so the catalog lists each picture once:
 
 | Alias | Canonical name | Alias | Canonical name |
 |---|---|---|---|
-| `grid` | `layout-grid` | `share` | `share-nodes` |
-| `chevron-updown` | `chevrons-up-down` | `refresh` | `refresh-cw` |
-| `comment` | `message-circle` | `chat` | `message-circle` |
-| `check-square` | `square-check` | `help` | `circle-help` |
-| `automations` | `zap` | `connections` | `external-link` |
-| `persona` | `user-round` | `close` | `x` |
+| `alert-circle` | `circle-alert` | `automations` | `zap` |
+| `chat` | `message-circle` | `check-circle` | `circle-check` |
+| `check-square` | `square-check` | `chevron-updown` | `chevrons-up-down` |
+| `close` | `x` | `comment` | `message-circle` |
+| `connections` | `external-link` | `grid` | `layout-grid` |
+| `help` | `circle-help` | `house` | `home` |
+| `microphone` | `mic` | `paper-plane` | `send` |
+| `persona` | `user-round` | `refresh` | `refresh-cw` |
+| `share` | `share-nodes` | `trending-up` | `trend-up` |
 
 Every glyph inherits the surrounding text colour through the root `currentColor` stroke. Company logos are not built-ins; import the official SVG as an app-owned component and register it under the name your application uses.
 
@@ -185,7 +185,7 @@ shared structural frames, and consistent modifiers for status and actions.
 
 Call `registerTreeIcons` once near the application root. Registered names then work everywhere a built-in name works. Registering later is fine too: lookups are reactive, so an icon registered by a lazily loaded route appears in components that already rendered.
 
-Pick a name the built-in set does not already use. Registration is an upsert, not an add: any of the 365 names above will be **replaced** app-wide, which is a legitimate thing to do deliberately and a confusing one to do by accident.
+Pick a name the built-in set does not already use. Registration is an upsert, not an add: any of the 370 names above will be **replaced** app-wide, which is a legitimate thing to do deliberately and a confusing one to do by accident.
 
 ### Geometry form
 
@@ -325,11 +325,14 @@ If you *want* the uncorrected behaviour — an icon that thickens with its box, 
 | `listTreeIcons` | `() => TIconName[]` | Every registered name, sorted — built-ins plus your own. |
 | `treeIcons` | `Record<TIconName, Component>` | Lazy name-to-component map of the whole registry. |
 | `treeIconDefaults` | `{ size: 20, strokeWidth: 2, absoluteStrokeWidth: true }` | The prop defaults, for components that re-expose them. |
-| `builtinTreeIconNodes` | `Record<string, TIconNodes>` | The **geometry** of the 365 built-ins — raw `[tag, attrs]` data, not components. Read it to inspect or re-draw an icon; it is not a component map. |
-| `treeIconCategories` | `Record<TIconCategory, readonly TIconName[]>` | The catalog grouped by subject. Iterate it to build a picker. |
+| `builtinTreeIconNodes` | `Record<string, TIconNodes>` | The **geometry** of the 370 built-ins — raw `[tag, attrs]` data, not components. Read it to inspect or re-draw an icon; it is not a component map. |
+| `treeIconFamilies` | `Record<TIconCategory, readonly TIconFamily[]>` | The catalog, two levels deep: subject → family → icons in meaning order. Iterate it to build a picker. |
+| `treeIconCategories` | `Record<TIconCategory, readonly TIconName[]>` | The same icons flattened per category, when the families do not matter. |
 | `treeIconCategoryOrder` | `readonly TIconCategory[]` | The order to present categories in. |
 | `treeIconCategoryLabels` | `Record<TIconCategory, string>` | Human-readable name for each category. |
-| `treeIconCategory` | `(name: string) => TIconCategory \| undefined` | Reverse lookup, for a details panel. Builds its index on first call. |
+| `treeIconAliases` | `Record<string, TIconName>` | Second names for an icon already in the catalog: `close` → `x`. |
+| `treeIconCategory` | `(name: string) => TIconCategory \| undefined` | Reverse lookup, aliases included. Builds its index on first call. |
+| `treeIconFamily` | `(name: string) => string \| undefined` | The family base a name belongs to, aliases included. |
 | `TIconNode` | `[tag: string, attrs: Record<string, string \| number>]` | One child of an icon's `<svg>`. |
 | `TIconNodes` | `TIconNode[]` | An icon's geometry: all children of its `<svg>`. |
 | `TIconRegistry` | `interface` | The augmentable set of icon names. |
@@ -359,31 +362,48 @@ Passing the raw string through would not work: Vue resolves a string `is` as a *
 
 ## Browsing the catalog
 
-365 names sorted alphabetically is a list you can only use if you already know
-what you want. The package therefore ships a taxonomy alongside the geometry:
+A list of names sorted alphabetically is only usable by someone who already
+knows the name. The package therefore ships the catalog's own structure
+alongside the geometry — fifteen subjects, each split into families:
 
 ```ts
-import {
-  treeIconCategories,
-  treeIconCategoryLabels,
-  treeIconCategoryOrder,
-} from '@treeui/vue';
+import { treeIconFamilies, treeIconCategoryLabels, treeIconCategoryOrder } from '@treeui/vue';
 
 for (const category of treeIconCategoryOrder) {
-  console.log(treeIconCategoryLabels[category], treeIconCategories[category].length);
-  // Actions 44 · Navigation 31 · Status & feedback 30 · Files & storage 40 · …
+  for (const family of treeIconFamilies[category]) {
+    console.log(treeIconCategoryLabels[category], family.id, family.icons);
+  }
 }
+// Status & feedback  signal  ['signal', 'signal-off', 'signal-low', 'signal-medium', 'signal-high']
+// Navigation         chevron ['chevron-up', 'chevron-down', 'chevron-left', 'chevron-right', 'chevrons-up-down']
 ```
 
-Fifteen categories, every icon in exactly one, held by `categories.test.ts` — a
-new icon cannot ship without a home. It is curated rather than derived: a
-classifier over name prefixes puts `route` under "navigation" and `scale` under
-"security", and gets `draw`, `trail` and `story` wrong every time.
+Three rules make that structure worth shipping rather than deriving:
 
-`treeIconCategory(name)` is the reverse lookup, for the panel that has to say
-what the icon you just clicked is about. Storybook's own icon gallery
-(`Components/Data Display/Icon` → Gallery) is built on these three exports; an
-application building its own picker uses the same ones.
+**A family lists its variants by meaning, not alphabetically.** A strength scale
+reads `off`, `low`, `medium`, `high`; a direction set reads `up`, `down`,
+`left`, `right`. Sorted alphabetically, `gauge-high` comes before `gauge-low`,
+which is the wrong answer to every question a person has while scanning.
+
+**An icon with no relatives is a family of one**, named after itself. A consumer
+can therefore render every group the same way and show a heading only when
+`icons.length > 1`.
+
+**Only canonical names appear.** `close` and `x` are one drawing under two
+names, so the catalog lists it once, and `treeIconAliases` says what else to
+call it — enough for a picker to match "close" in a search and offer it as a
+synonym rather than showing the same picture twice. `treeIconCategory` and
+`treeIconFamily` resolve aliases, so `treeIconFamily('chevron-updown')` is
+`'chevron'`.
+
+It is curated rather than computed: a classifier over name prefixes files
+`route` under navigation and `scale` under security, splits `hard-drive-alert`
+away from `hard-drive`, and has no way to know that `off` comes before `low`.
+`categories.test.ts` holds all three rules, so a new icon cannot ship without a
+family and a family cannot drift out of order.
+
+Storybook's icon gallery (`Components/Data Display/Icon` → Gallery) is built on
+these exports; an application building its own picker uses the same ones.
 
 ## Branchline — the drawing contract
 
@@ -454,7 +474,7 @@ the fastest loop is to add it and run the report.
 
 ## Behaviour notes
 
-- **Unused icons stay as data.** Geometry is stored as `[tag, attrs]` arrays and turned into a component on first lookup, then cached, so importing the package does not instantiate 365 components. It does not make them free: the registry seeds itself with `new Map(Object.entries(builtinTreeIconNodes))` at module scope, which holds a live reference to all 365, so the geometry is in your bundle whether or not you render it. `sideEffects: false` does not change that. What is lazy is component construction, not bytes shipped.
+- **Unused icons stay as data.** Geometry is stored as `[tag, attrs]` arrays and turned into a component on first lookup, then cached, so importing the package does not instantiate 370 components. It does not make them free: the registry seeds itself with `new Map(Object.entries(builtinTreeIconNodes))` at module scope, which holds a live reference to all 370, so the geometry is in your bundle whether or not you render it. `sideEffects: false` does not change that. What is lazy is component construction, not bytes shipped.
 - **Unknown names fail soft.** `resolveTreeIcon` returns `undefined` and logs a `console.warn` listing every valid name. The dedupe key is the **name**, so each bad name warns exactly once and a miss inside a render loop will not flood the console. It warns in production too — that is deliberate: a missing icon is a misconfiguration worth hearing about, and sniffing `process.env.NODE_ENV` reads as `undefined` in most browser bundles. `TNavMenu` falls back to its letter marker.
 - **Registration is live.** Lookups read a version counter, so an icon resolved inside a `computed` or a render function re-resolves after a later registration. `TIcon` resolves per render, so an icon registered by a lazily loaded route appears in components that already mounted.
 - **The registry is global.** State is anchored on `Symbol.for('@treeui/icons.registry')`, so two copies of the package in one app share one registry instead of each getting its own.

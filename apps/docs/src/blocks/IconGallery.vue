@@ -1,10 +1,11 @@
 <script setup lang="ts">
 // IconGallery block — the browsable catalog behind Components/Data Display/Icon.
 //
-// A flat grid of 365 names is a list you can only use if you already know what
-// you are looking for. This groups by subject, filters by name, and opens a
-// bottom drawer with the one thing a consumer actually leaves with: the line of
-// code that renders the icon they picked.
+// A flat list of names is only usable by someone who already knows the name.
+// This shows the catalog the way it is actually organised: fifteen subjects,
+// each split into families, each family in meaning order — `signal` before its
+// four strengths, `chevron` before its four directions. Picking an icon opens a
+// drawer with the one thing a consumer leaves with: the line of code.
 //
 // Built entirely from TreeUI components, so the gallery is also a working
 // example of the library documenting itself.
@@ -20,19 +21,32 @@ import {
   TTag,
   TText,
   TToggleGroup,
-  listTreeIcons,
+  treeIconAliases,
   treeIconCategories,
   treeIconCategory,
   treeIconCategoryLabels,
   treeIconCategoryOrder,
+  treeIconFamilies,
+  treeIconFamily,
   type TIconCategory,
   type TIconName,
 } from '@treeui/vue';
 
-const allNames = listTreeIcons();
+const catalogSize = treeIconCategoryOrder.reduce(
+  (total, id) => total + treeIconCategories[id].length,
+  0,
+);
+
+/** Synonyms, keyed by the canonical name they point at. */
+const synonymsOf = new Map<string, string[]>();
+
+for (const [alias, target] of Object.entries(treeIconAliases)) {
+  synonymsOf.set(target, [...(synonymsOf.get(target) ?? []), alias]);
+}
 
 const query = ref('');
 const category = ref<TIconCategory | 'all'>('all');
+const family = ref('all');
 const previewSize = ref('24');
 const selected = ref<TIconName | undefined>();
 const detailSize = ref(48);
@@ -40,7 +54,7 @@ const detailStroke = ref(2);
 const detailAbsolute = ref(true);
 
 const categoryOptions = [
-  { label: `All ${allNames.length}`, value: 'all' as const },
+  { label: `All ${catalogSize}`, value: 'all' as const },
   ...treeIconCategoryOrder.map((id) => ({
     label: `${treeIconCategoryLabels[id]} ${treeIconCategories[id].length}`,
     value: id,
@@ -54,9 +68,44 @@ const sizeOptions = [
 ];
 
 /**
- * Groups matching icons under their category heading.
+ * The families a chosen category offers, as a second filter.
  *
- * Searching keeps the grouping rather than flattening: "where does this icon
+ * Only families with more than one member: a chip that filters 348 icons down
+ * to one is a worse way to find that icon than typing its name.
+ */
+const familyOptions = computed(() => {
+  if (category.value === 'all') return [];
+
+  const groups = treeIconFamilies[category.value].filter(
+    (entry) => entry.icons.length > 1,
+  );
+
+  if (groups.length === 0) return [];
+
+  return [
+    { label: 'All', value: 'all' },
+    ...groups.map((entry) => ({
+      label: `${entry.id} ${entry.icons.length}`,
+      value: entry.id,
+    })),
+  ];
+});
+
+// A family chosen inside one category means nothing in the next one.
+watch(category, () => {
+  family.value = 'all';
+});
+
+/** An icon matches on its own name, or on any synonym pointing at it. */
+const matches = (name: string, needle: string) =>
+  needle === '' ||
+  name.includes(needle) ||
+  (synonymsOf.get(name) ?? []).some((alias) => alias.includes(needle));
+
+/**
+ * Matching icons, kept in their category and family structure.
+ *
+ * Searching narrows the tree rather than flattening it: "where does this icon
  * live" is part of the answer, and a flat result list throws it away.
  */
 const groups = computed(() => {
@@ -65,21 +114,44 @@ const groups = computed(() => {
     category.value === 'all' ? treeIconCategoryOrder : [category.value];
 
   return wanted
-    .map((id) => ({
-      id,
-      label: treeIconCategoryLabels[id],
-      icons: treeIconCategories[id].filter(
-        (name) =>
-          needle === '' ||
-          name.includes(needle) ||
-          treeIconCategoryLabels[id].toLowerCase().includes(needle),
-      ),
-    }))
-    .filter((group) => group.icons.length > 0);
+    .map((id) => {
+      const visible = treeIconFamilies[id]
+        .filter((entry) => family.value === 'all' || entry.id === family.value)
+        .map((entry) => ({
+          id: entry.id,
+          named: entry.icons.length > 1,
+          icons: entry.icons.filter((name) => matches(name, needle)),
+        }))
+        .filter((entry) => entry.icons.length > 0);
+
+      // Icons with no relatives flow together in one unlabelled grid. Giving
+      // each its own row — which is what a family of one literally is — turned
+      // a category into a column of single cells.
+      const standalone = visible
+        .filter((entry) => !entry.named)
+        .flatMap((entry) => entry.icons);
+
+      return {
+        id,
+        label: treeIconCategoryLabels[id],
+        families: [
+          ...(standalone.length > 0
+            ? [{ id: '', named: false, icons: standalone }]
+            : []),
+          ...visible.filter((entry) => entry.named),
+        ],
+      };
+    })
+    .filter((group) => group.families.length > 0);
 });
 
 const matchCount = computed(() =>
-  groups.value.reduce((total, group) => total + group.icons.length, 0),
+  groups.value.reduce(
+    (total, group) =>
+      total +
+      group.families.reduce((sum, entry) => sum + entry.icons.length, 0),
+    0,
+  ),
 );
 
 const open = computed({
@@ -91,6 +163,23 @@ const open = computed({
 
 const selectedCategory = computed(() =>
   selected.value ? treeIconCategory(selected.value) : undefined,
+);
+
+/** The other icons in the selected icon's family, for the "see also" row. */
+const siblings = computed(() => {
+  const name = selected.value;
+  const inCategory = selectedCategory.value;
+
+  if (!name || !inCategory) return [];
+
+  const base = treeIconFamily(name);
+  const entry = treeIconFamilies[inCategory].find((item) => item.id === base);
+
+  return entry && entry.icons.length > 1 ? entry.icons : [];
+});
+
+const synonyms = computed(() =>
+  selected.value ? (synonymsOf.get(selected.value) ?? []) : [],
 );
 
 // Each visit starts from the defaults, so the panel always shows what a
@@ -122,7 +211,9 @@ const importSnippet = "import { TIcon } from '@treeui/vue';";
 const move = (offset: number) => {
   if (!selected.value) return;
 
-  const flat = groups.value.flatMap((group) => group.icons);
+  const flat = groups.value.flatMap((group) =>
+    group.families.flatMap((entry) => entry.icons),
+  );
   const at = flat.indexOf(selected.value);
 
   if (at === -1) return;
@@ -138,7 +229,7 @@ const move = (offset: number) => {
         v-model="query"
         class="icon-gallery__search"
         type="search"
-        placeholder="Search 365 icons by name…"
+        :placeholder="`Search ${catalogSize} icons by name…`"
         width="md"
         aria-label="Search icons by name"
       >
@@ -163,8 +254,18 @@ const move = (offset: number) => {
       :options="categoryOptions"
       size="sm"
       variant="soft"
-      class="icon-gallery__categories"
+      class="icon-gallery__chips"
       aria-label="Filter by category"
+    />
+
+    <TToggleGroup
+      v-if="familyOptions.length > 0"
+      v-model="family"
+      :options="familyOptions"
+      size="sm"
+      variant="soft"
+      class="icon-gallery__chips icon-gallery__chips--family"
+      aria-label="Filter by family"
     />
 
     <TEmptyState
@@ -202,30 +303,40 @@ const move = (offset: number) => {
           >
             {{ group.label }}
           </TText>
-          <TTag
-            size="sm"
-            tone="neutral"
-          >
-            {{ group.icons.length }}
-          </TTag>
         </header>
 
-        <div class="icon-gallery__grid">
-          <button
-            v-for="name in group.icons"
-            :key="name"
-            type="button"
-            class="icon-gallery__cell"
-            :class="{ 'is-selected': name === selected }"
-            :aria-pressed="name === selected"
-            @click="selected = name"
+        <div
+          v-for="entry in group.families"
+          :key="`${group.id}:${entry.id}`"
+          class="icon-gallery__family"
+        >
+          <TText
+            v-if="entry.named"
+            class="icon-gallery__family-name"
+            size="xs"
+            tone="muted"
+            family="mono"
           >
-            <TIcon
-              :name="name"
-              :size="Number(previewSize)"
-            />
-            <span class="icon-gallery__name">{{ name }}</span>
-          </button>
+            {{ entry.id }}
+          </TText>
+
+          <div class="icon-gallery__grid">
+            <button
+              v-for="name in entry.icons"
+              :key="name"
+              type="button"
+              class="icon-gallery__cell"
+              :class="{ 'is-selected': name === selected }"
+              :aria-pressed="name === selected"
+              @click="selected = name"
+            >
+              <TIcon
+                :name="name"
+                :size="Number(previewSize)"
+              />
+              <span class="icon-gallery__name">{{ name }}</span>
+            </button>
+          </div>
         </div>
       </section>
     </template>
@@ -273,13 +384,23 @@ const move = (offset: number) => {
 
         <div class="icon-detail__controls">
           <div class="icon-detail__meta">
-            <TTag
-              v-if="selectedCategory"
-              size="sm"
-              tone="accent"
-            >
-              {{ treeIconCategoryLabels[selectedCategory] }}
-            </TTag>
+            <div class="icon-detail__tags">
+              <TTag
+                v-if="selectedCategory"
+                size="sm"
+                tone="accent"
+              >
+                {{ treeIconCategoryLabels[selectedCategory] }}
+              </TTag>
+              <TTag
+                v-for="alias in synonyms"
+                :key="alias"
+                size="sm"
+                tone="neutral"
+              >
+                also {{ alias }}
+              </TTag>
+            </div>
             <div class="icon-detail__nav">
               <TButton
                 variant="soft"
@@ -307,6 +428,36 @@ const move = (offset: number) => {
                   />
                 </template>
               </TButton>
+            </div>
+          </div>
+
+          <div
+            v-if="siblings.length > 0"
+            class="icon-detail__siblings"
+          >
+            <TText
+              size="xs"
+              tone="muted"
+              family="mono"
+            >
+              {{ treeIconFamily(selected) }} family
+            </TText>
+            <div class="icon-detail__sibling-row">
+              <button
+                v-for="name in siblings"
+                :key="name"
+                type="button"
+                class="icon-detail__sibling"
+                :class="{ 'is-selected': name === selected }"
+                :aria-pressed="name === selected"
+                :title="name"
+                @click="selected = name"
+              >
+                <TIcon
+                  :name="name"
+                  :size="20"
+                />
+              </button>
             </div>
           </div>
 
@@ -392,13 +543,28 @@ const move = (offset: number) => {
   flex: 1 1 16rem;
 }
 
-.icon-gallery__categories {
+.icon-gallery__chips {
   flex-wrap: wrap;
+}
+
+/* The family row is a sub-filter of the category above it, and is indented so
+   it reads as one, not as a second set of top-level chips. */
+.icon-gallery__chips--family {
+  margin-inline-start: var(--tree-space-4);
 }
 
 .icon-gallery__group {
   display: grid;
-  gap: var(--tree-space-2);
+  gap: var(--tree-space-3);
+}
+
+.icon-gallery__family {
+  display: grid;
+  gap: var(--tree-space-1);
+}
+
+.icon-gallery__family-name {
+  padding-inline-start: var(--tree-space-1);
 }
 
 .icon-gallery__group-head {
@@ -508,6 +674,49 @@ const move = (offset: number) => {
   align-items: center;
   justify-content: space-between;
   gap: var(--tree-space-2);
+}
+
+.icon-detail__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--tree-space-1);
+}
+
+.icon-detail__siblings {
+  display: grid;
+  gap: var(--tree-space-1);
+}
+
+.icon-detail__sibling-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--tree-space-1);
+}
+
+.icon-detail__sibling {
+  display: grid;
+  place-items: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border: var(--tree-border-width-subtle) solid var(--tree-color-border-default);
+  border-radius: var(--tree-radius-sm);
+  background: var(--tree-color-bg-surface);
+  color: var(--tree-color-text-primary);
+  cursor: pointer;
+}
+
+.icon-detail__sibling:hover {
+  background: var(--tree-color-bg-subtle);
+}
+
+.icon-detail__sibling:focus-visible {
+  outline: var(--tree-focus-ring-width) solid var(--tree-color-border-focus);
+  outline-offset: var(--tree-focus-ring-offset);
+}
+
+.icon-detail__sibling.is-selected {
+  border-color: var(--tree-color-brand-primary);
+  background: var(--tree-color-brand-subtle);
 }
 
 .icon-detail__nav {

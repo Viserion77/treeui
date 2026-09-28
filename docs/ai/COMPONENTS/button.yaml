@@ -166,6 +166,7 @@ deprecations:
     why: >
       `danger` is a colour trapped in the SHAPE scale, so it can only ever be a
       filled red button — "destructive, but not the primary action of this row"
-      was inexpressible, and two consumer screens independently wrote
-      `variant="ghost" tone="danger"` with the prop dead before anyone noticed.
-      Still works and still renders identically; warns in dev builds only.
+      was inexpressible, and the spelling that expresses it,
+      `variant="ghost" tone="danger"`, silently ignored the tone because
+      `variant` still owned the colour. Still works and still renders
+      identically; warns in dev builds only.

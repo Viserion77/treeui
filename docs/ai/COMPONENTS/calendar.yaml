@@ -39,5 +39,6 @@ i18n:
   render_time_intl: >
     Every `Intl` call happens at RENDER time, memoised per locale — never at
     module scope. A formatter frozen at import freezes the language of the first
-    page load, which is the bug both consumers' ADR exists to prevent.
+    page load, so a locale switched afterwards still renders in the old
+    language — the bug this rule exists to prevent.
   week_start: "From `Intl.Locale.getWeekInfo()` (CLDR), with `weekStartsOn` as the override."

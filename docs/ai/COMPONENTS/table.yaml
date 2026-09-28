@@ -76,9 +76,10 @@ row_activation:
   note: >
     A row either NAVIGATES or it does not, and the API forces the choice —
     `rowHref`/`rowTo` and `rowActivatable` are mutually exclusive and dev builds
-    say so. One consumer audit found four screens that had each invented their
-    own row activation, and the contortion a screen picked had no correlation
-    with whether it navigated; offering two equivalent ways out reproduces that.
+    say so. When the choice is not forced, a screen invents its own row
+    activation — a click handler on the `<tr>`, a stretched overlay, a
+    `role="button"` — and the contortion it picks has no correlation with
+    whether the row navigates; offering two equivalent ways out reproduces that.
   rowHref_rowTo:
     shape: "A real `<a>` in the FIRST cell, stretched over the row by `::after`."
     why_not_a_tr: >

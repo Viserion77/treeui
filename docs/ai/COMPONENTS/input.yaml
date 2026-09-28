@@ -12,9 +12,9 @@ props:
     note: >
       Generic over `T extends string | number`, so a `ref<number>` binds without
       a cast and `update:modelValue` pays back a number. `<script setup>` was
-      widening every model to `string | number`, which under a consumer's
-      `strictTemplates` made a numeric field a type error at the call site with
-      no correct way to write it. When `T` is `number` the
+      widening every model to `string | number`, and widening makes a numeric
+      field a type error under `strictTemplates`, with no correct way to write
+      the binding. When `T` is `number` the
       component parses the raw input value and only falls back to the raw string
       when it does not parse.
   size:
@@ -55,9 +55,9 @@ element_attributes:
   note: >
     Declared as props and bound to the native input, rather than left to
     fallthrough. Fallthrough works at RUNTIME but is invisible to `vue-tsc`
-    under `strictTemplates`, so a consumer writing `<TInput :max="10" />` in a
-    typechecked app got an error with no correct alternative — the shape a
-    number field needs was untypeable.
+    under `strictTemplates`, so `<TInput :max="10" />` is a type error in any
+    typechecked template, with no correct alternative — while the attribute is
+    undeclared, the shape a numeric field needs is untypeable.
   declared: [min, max, step, minlength, maxlength, pattern, inputmode, autocomplete, name, required, readonly]
   inputmode_values: [none, text, decimal, numeric, tel, search, email, url]
 

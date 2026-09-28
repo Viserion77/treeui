@@ -11,13 +11,13 @@ props:
     default: undefined
     note: >
       Generic over the option type AND the selection mode, so the model is the
-      type the call site actually has: `<TToggleGroup v-model="view">` with a
+      type the binding actually has: `<TToggleGroup v-model="view">` with a
       `ref<'grid' | 'list'>` binds, and `selectionMode="multiple"` binds a
       `('grid' | 'list')[]`. It was `string | string[]` in and
       `string | string[] | undefined` out, which no literal-union ref could bind
-      under a consumer's `strictTemplates` — the same defect as TTabs/TInput,
-      found by the gate once it ran on the same `vue-tsc`
-      major consumers use. `undefined` was never actually emitted.
+      under `strictTemplates` — the same defect as TTabs/TInput, and invisible
+      to any build that does not typecheck templates against the published
+      types. `undefined` was never actually emitted.
   options:
     type: "TToggleGroupOption<NoInfer<T>>[]"
     default: "[]"

@@ -95,7 +95,7 @@ css:
 example: |
   <TMenu label="User menu" size="sm">
     <template #trigger="{ isOpen }"><TButton>Menu</TButton></template>
-    <template #header><TBrandLockup title="Jef" subtitle="jef@s7.dev" /></template>
+    <template #header><TBrandLockup title="Nina" subtitle="nina@example.com" /></template>
     <TMenuGroup label="Workspace">
       <TMenuItem v-for="ws in spaces" :key="ws.id" :label="ws.name" :checked="ws.id === current" @select="switchTo(ws.id)" />
     </TMenuGroup>

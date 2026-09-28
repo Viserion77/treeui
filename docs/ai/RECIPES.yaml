@@ -75,8 +75,8 @@ recipes:
       - "Put the lockup in the `header-start` slot, not `header`. Filling `header-start` switches the header to the shell's own grid, so the mark tracks `--tree-app-shell-sidebar-width` and animates with the collapse — no local column math."
       - "The slot is scoped: use its `collapsed` binding to drop the wordmark and keep only the mark (`v-if=\"!collapsed\"`), rather than hiding text with CSS."
       - "Logo is `TAvatar` (`size`, `alt`, `initials` fallback) or a plain `<img>` sized with `--tree-size-icon-*`; name and subtitle are `TText` (`weight`, `tone=\"muted\"`, `truncate`) — never raw `<strong>`/`<span>` with a local class."
-      - "TreeUI ships no `TBrand` component on purpose: the logo asset, the product name, and what survives collapse are product identity, which must stay in the consumer. See DECISIONS.md → Portability Boundary."
-      - "Company and service logos (AWS, LocalStack, social networks) are brand assets and are not TreeUI icons — source them from the app's brand policy, not the icon registry."
+      - "TreeUI ships no `TBrand` component on purpose: the logo asset, the product name, and what survives collapse are product identity, which must stay in the consuming application. See DECISIONS.md → Portability Boundary."
+      - "Company and service logos are brand assets, not TreeUI icons — source them from your own brand assets rather than the icon registry."
 
   - id: image-zoom
     name: "Zoomable image (lightbox)"

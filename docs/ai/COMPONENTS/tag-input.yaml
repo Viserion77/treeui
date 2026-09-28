@@ -98,7 +98,7 @@ behavior:
   reuses_ttag_for_chips: true
 
 example: |
-  <TFormField label="LocalStack services">
+  <TFormField label="Enabled services">
     <TTagInput
       :model-value="services"
       placeholder="Add a service…"

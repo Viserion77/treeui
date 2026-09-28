@@ -124,7 +124,7 @@
           ],
           "notes": [
             "Editing, not display. For read-only key/value display use TDescriptionList.",
-            "A write-only/sensitive mode (value never read back) is a closed contract on the queue, not yet shipped."
+            "A write-only/sensitive mode (value never read back) is a designed contract that is not yet shipped."
           ]
         },
         {
@@ -422,8 +422,8 @@
         "Put the lockup in the `header-start` slot, not `header`. Filling `header-start` switches the header to the shell's own grid, so the mark tracks `--tree-app-shell-sidebar-width` and animates with the collapse — no local column math.",
         "The slot is scoped: use its `collapsed` binding to drop the wordmark and keep only the mark (`v-if=\"!collapsed\"`), rather than hiding text with CSS.",
         "Logo is `TAvatar` (`size`, `alt`, `initials` fallback) or a plain `<img>` sized with `--tree-size-icon-*`; name and subtitle are `TText` (`weight`, `tone=\"muted\"`, `truncate`) — never raw `<strong>`/`<span>` with a local class.",
-        "TreeUI ships no `TBrand` component on purpose: the logo asset, the product name, and what survives collapse are product identity, which must stay in the consumer. See DECISIONS.md → Portability Boundary.",
-        "Company and service logos (AWS, LocalStack, social networks) are brand assets and are not TreeUI icons — source them from the app's brand policy, not the icon registry."
+        "TreeUI ships no `TBrand` component on purpose: the logo asset, the product name, and what survives collapse are product identity, which must stay in the consuming application. See DECISIONS.md → Portability Boundary.",
+        "Company and service logos are brand assets, not TreeUI icons — source them from your own brand assets rather than the icon registry."
       ]
     },
     {
@@ -1662,7 +1662,7 @@
         },
         {
           "name": "header-end",
-          "description": "Trailing header region for actions/controls, pinned to the far end of the row. Filling it adds `has-end`; in the plain flex header the content region's grow already pushes it to the end, and in the `has-start` grid it becomes a content-sized third column with the trailing padding. Replaces the consumer's own `TStack justify=flex-end` wrapper inside `#header`.\n",
+          "description": "Trailing header region for actions/controls, pinned to the far end of the row. Filling it adds `has-end`; in the plain flex header the content region's grow already pushes it to the end, and in the `has-start` grid it becomes a content-sized third column with the trailing padding. Trailing alignment is the shell's own job, so header actions need no `TStack justify=flex-end` wrapper around them.\n",
           "note": "AppShellSlotProps"
         },
         {
@@ -2036,6 +2036,7 @@
         "tone_remaps_variant_color_variables: true",
         "tone_overrides_variant_danger_palette: true",
         "tone_neutral_has_no_stylesheet_rule: true",
+        "tint_ink_is_the_on_soft_token: The `soft` and `danger` variants paint their label with the tone's `*-on-soft` colour, never the tone's full-strength colour. `*-on-soft` is derived to clear AA on that exact tint and deepens as the tint deepens; the full-strength tone on its own tint measured below AA for eight of the ten tone/theme pairs, including `variant=\"soft\" tone=\"neutral\"`, which is both defaults. The mapping is declared in `@treeui/tokens` as `NATIVE_BADGE_TONES` and the stylesheet is tested against it.",
         "icon_wrapper_rendered_only_when_slot_filled: true",
         "icon_renders_before_default_slot: true"
       ],
@@ -6220,6 +6221,7 @@
             "calendar-plus",
             "calendar-range",
             "calendar-x",
+            "campaign",
             "carousel",
             "catalog",
             "chart-column",
@@ -6256,7 +6258,6 @@
             "companion",
             "compass",
             "connections",
-            "contentpilot",
             "copy",
             "cpu",
             "cpu-chip",
@@ -6747,7 +6748,7 @@
           "name": "modelValue",
           "type": "T",
           "default": "undefined",
-          "note": "Generic over `T extends string | number`, so a `ref<number>` binds without a cast and `update:modelValue` pays back a number. `<script setup>` was widening every model to `string | number`, which under a consumer's `strictTemplates` made a numeric field a type error at the call site with no correct way to write it. When `T` is `number` the component parses the raw input value and only falls back to the raw string when it does not parse.\n"
+          "note": "Generic over `T extends string | number`, so a `ref<number>` binds without a cast and `update:modelValue` pays back a number. `<script setup>` was widening every model to `string | number`, and widening makes a numeric field a type error under `strictTemplates`, with no correct way to write the binding. When `T` is `number` the component parses the raw input value and only falls back to the raw string when it does not parse.\n"
         },
         {
           "name": "size",
@@ -8404,7 +8405,7 @@
         {
           "name": "modelValue",
           "type": "number | null",
-          "note": "`null` is REAL, not an error state: clearing the field is empty, and the component emits `null` for it. So `v-model` needs a `ref<number | null>`, and a `ref<number>` is a genuine type error under a consumer's `strictTemplates` rather than a gap in the library. This is the one place in the round where the checker was right and the call site was wrong — the others (TInput, TTabs, TToggleGroup) were the library's fault.\n"
+          "note": "`null` is REAL, not an error state: clearing the field is empty, and the component emits `null` for it. So `v-model` needs a `ref<number | null>`, and a `ref<number>` is a genuine type error under `strictTemplates` rather than a gap in the library — here the binding is what has to widen, not the model. The opposite of TInput/TTabs/TToggleGroup, where the library's own model type was too wide and no narrow ref could bind it.\n"
         },
         {
           "name": "min",
@@ -11418,7 +11419,7 @@
           "name": "modelValue",
           "type": "T",
           "default": "undefined",
-          "note": "The value of the currently active tab; use with v-model. Generic over `T extends string`, so a `ref<'overview' | 'logs'>` keeps its literal union instead of being widened to `string` — under a consumer's `strictTemplates` that widening made the binding an error with no correct way to write it.\n"
+          "note": "The value of the currently active tab; use with v-model. Generic over `T extends string`, so a `ref<'overview' | 'logs'>` keeps its literal union instead of being widened to `string` — widening makes the binding an error under `strictTemplates`, with no correct way to write it.\n"
         },
         {
           "name": "defaultValue",
@@ -12007,7 +12008,7 @@
             "sans",
             "mono"
           ],
-          "note": "Font family of the editable content, same vocabulary as TText. `mono` is for machine text — JSON, a policy document, a payload — which otherwise leaves a `.mono` class behind in the consumer's stylesheet. Applied to the `<textarea>`, not the label wrapper, which also holds the loading spinner.\n"
+          "note": "Font family of the editable content, same vocabulary as TText. `mono` is for machine text — JSON, a policy document, a payload — which otherwise needs a one-off `.mono` font-family rule in product CSS. Applied to the `<textarea>`, not the label wrapper, which also holds the loading spinner.\n"
         }
       ],
       "events": [
@@ -12216,7 +12217,7 @@
           "name": "modelValue",
           "type": "TToggleGroupModel<T, M> — `T` in single mode, `T[]` in multiple",
           "default": "undefined",
-          "note": "Generic over the option type AND the selection mode, so the model is the type the call site actually has: `<TToggleGroup v-model=\"view\">` with a `ref<'grid' | 'list'>` binds, and `selectionMode=\"multiple\"` binds a `('grid' | 'list')[]`. It was `string | string[]` in and `string | string[] | undefined` out, which no literal-union ref could bind under a consumer's `strictTemplates` — the same defect as TTabs/TInput, found by the gate once it ran on the same `vue-tsc` major consumers use. `undefined` was never actually emitted.\n"
+          "note": "Generic over the option type AND the selection mode, so the model is the type the binding actually has: `<TToggleGroup v-model=\"view\">` with a `ref<'grid' | 'list'>` binds, and `selectionMode=\"multiple\"` binds a `('grid' | 'list')[]`. It was `string | string[]` in and `string | string[] | undefined` out, which no literal-union ref could bind under `strictTemplates` — the same defect as TTabs/TInput, and invisible to any build that does not typecheck templates against the published types. `undefined` was never actually emitted.\n"
         },
         {
           "name": "options",

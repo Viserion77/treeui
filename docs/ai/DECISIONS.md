@@ -56,6 +56,41 @@ The example dashboards label their `size` control "Density" because that is the 
 - Tokens, variants, sizes, accessibility expectations, and interaction patterns stay framework-agnostic
 - Vue-specific concerns stay inside `@treeui/vue` so future framework packages do not inherit Vue vocabulary
 
+**A renderer of the token model belongs in `@treeui/tokens`.** `css.ts` has always emitted custom
+properties from that package, and `kotlin.ts` and `rust.ts` now emit Kotlin and Rust source the same
+way. This looks like it violates "no framework-specific code in tokens" and does not: a renderer
+emits text and imports nothing, so the package stays dependency-free and the alternative is worse —
+an emitter living beside the port it feeds is an emitter that can drift from the model it renders,
+and 84 colours times two themes is not a number that survives drift.
+
+**What actually crosses over to a non-web ecosystem.** There is no CSS in Compose or in egui, so the
+`t-*` class layer is a web implementation detail rather than a contract. What the ports reproduce is:
+the resolved token model; the closed vocabularies; which colour each interaction state resolves to;
+and the accessibility floor — a 44×44 target, a focus indicator that clears 3:1, a reported role and
+name, and disabled expressed as a measured colour rather than an opacity.
+
+**The closed vocabularies live in `@treeui/tokens`, not in a framework package.** They were in
+`@treeui/vue`, which left `@treeui/react` maintaining a hand-typed copy — with a comment admitting
+it — and left the two ports with nowhere to import them from. A closed set kept in four places is
+not closed. `@treeui/vue` and `@treeui/react` now re-export; the ports generate their enums.
+
+**A port reproduces the contract, not the contract's mistakes.** `variant="danger"` is a colour
+trapped in the shape scale and is deprecated on the web, where it stays because removing it would
+break consumers. A port shipping today has no consumers to break, so `treeDeprecatedVariants`
+declares the exclusion as data and the emitters leave those members out. Shipping a known mistake
+into a second ecosystem to match the first is how a deprecation becomes permanent.
+
+**The tone axis is data, and the stylesheet is tested against it.** The mapping from a tone to the
+ten colours it resolves to was only ever expressed as seven blocks of CSS. It is now
+`NATIVE_TONES`, and `@treeui/vue`'s `tone-contract.test.ts` parses the shipped stylesheet and fails
+when the two disagree — so one decision has three renderings and no copy.
+
+**Three values the ports need are still stranded in the stylesheet.** The 44px target floor,
+`--tree-focus-ring-width` and `--tree-focus-ring-offset` are literals in
+`packages/vue/src/styles/index.css` rather than tokens, so each port restates them as a documented
+constant. They should move into `treeTokens`; recorded here rather than fixed so the reason is
+written down.
+
 **The icon registry is Vue-coupled today.** `@treeui/icons` renders through `defineComponent`/`h` and declares a `vue` peer dependency, so despite sitting beside `tokens` and `utils` it is not framework-agnostic and `@treeui/react` cannot consume it. This is recorded rather than fixed: a React icon layer would need the SVG data and the registry lookup extracted from the Vue rendering, which is a package split, not a patch. Until that happens, treat only `tokens` and `utils` as the framework-agnostic pair.
 
 ## Locale Data and Flag Assets
@@ -95,8 +130,8 @@ The example dashboards label their `size` control "Density" because that is the 
 
 ## What Is Not an Icon
 
-Two kinds of name were removed from the icon catalog, for the same reason: each
-put a decision inside the library that belongs to the product using it.
+Names and categories leave the icon catalog for the same reason: each put a
+decision inside the library that belongs to the product using it.
 
 **An interactive control is a component, not a glyph.** `toggle-left` and
 `toggle-right` drew a switch. TreeUI ships `TSwitch`, which is a switch — with
@@ -104,8 +139,8 @@ keyboard operation, `role="switch"`, focus-visible treatment and a 44×44 target
 A picture of one has none of that, and shipping it invites
 `<TIcon name="toggle-right" />` where `<TSwitch>` was meant. The rule: if the
 thing depicted is a control the library already builds, the catalog does not
-draw it. The same test applies to any future request for a checkbox, a radio, a
-slider or a progress bar as an icon.
+draw it. The same test rules out a checkbox, a radio, a slider or a progress
+bar as an icon.
 
 The rule is about *depicting the control itself*, not about the concepts those
 controls express. `check`, `circle-check` and `square-check` stay: a tick is a
@@ -115,12 +150,19 @@ statement about state, drawn in running text, in a list, on a badge. It is
 **A category describes what an icon draws, not who uses it.** There was a
 `product` category holding sixteen glyphs — `market`, `storage`, `tasks`,
 `trail` and the rest. Whether `market` is a product mark or just a shop front is
-decided by whoever renders it, so filing it under "products" recorded a consumer
-decision as library metadata, and made those sixteen unfindable by anyone
-searching for what they actually show. They are now filed by subject: `market`
-under commerce, `storage` under data, `assistant` under ai, `trail` under
-navigation.
+decided by whatever renders it, so "products" recorded an application's decision
+as library metadata: two applications would file the same glyph differently, and
+the category answered no question a search can ask. It also made those sixteen
+unfindable by anyone searching for what they actually show. They are now filed by
+subject: `market` under commerce, `storage` under data, `assistant` under ai,
+`trail` under navigation.
 
 They still share a rounded-square container, which is a drawing treatment and
 stays — `FRAMED_GLYPH_NAMES` in `icons.ts` is where that treatment is applied,
 and its name says what it is rather than who it is for.
+
+**A name is held to the same rule as a category.** It describes the subject
+drawn, never the application that renders it. A name that only reads as a
+subject from inside one product is renamed to what the drawing shows, and the
+old name is removed rather than aliased — an alias would keep the unsearchable
+name working, which is the entire cost being removed.

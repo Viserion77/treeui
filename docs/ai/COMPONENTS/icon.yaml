@@ -91,6 +91,7 @@ props:
       - calendar-plus
       - calendar-range
       - calendar-x
+      - campaign
       - carousel
       - catalog
       - chart-column
@@ -127,7 +128,6 @@ props:
       - companion
       - compass
       - connections
-      - contentpilot
       - copy
       - cpu
       - cpu-chip

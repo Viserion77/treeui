@@ -41,6 +41,14 @@ behavior:
   tone_remaps_variant_color_variables: true
   tone_overrides_variant_danger_palette: true
   tone_neutral_has_no_stylesheet_rule: true
+  tint_ink_is_the_on_soft_token: >-
+    The `soft` and `danger` variants paint their label with the tone's
+    `*-on-soft` colour, never the tone's full-strength colour. `*-on-soft` is
+    derived to clear AA on that exact tint and deepens as the tint deepens; the
+    full-strength tone on its own tint measured below AA for eight of the ten
+    tone/theme pairs, including `variant="soft" tone="neutral"`, which is both
+    defaults. The mapping is declared in `@treeui/tokens` as `NATIVE_BADGE_TONES`
+    and the stylesheet is tested against it.
   icon_wrapper_rendered_only_when_slot_filled: true
   icon_renders_before_default_slot: true
 

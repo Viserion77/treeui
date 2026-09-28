@@ -101,7 +101,7 @@ exposed_methods:
       - "An external v-model true→false follows the same automatic heuristic as close()."
       - "If focus is already outside the panel (incl. after an outside pointer), the close never steals focus."
       - "Escape always restores focus to the trigger."
-    replaces_consumer_workaround: "useTriggerFocusRestore and ad-hoc v-model watchers on the consumer side."
+    why_built_in: "Focus restore written outside the component cannot see whether focus is currently inside the panel, so a trigger-focus composable plus v-model watchers either steal focus back after an outside click or drop it entirely. The heuristic has to live where the panel's focus state is known."
 
 a11y:
   role: dialog

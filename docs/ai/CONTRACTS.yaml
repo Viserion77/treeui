@@ -142,10 +142,10 @@ global_component_typing:
     globally registered `<TTag>` against, and a prop that does not exist is not
     an error: it becomes an entry in `$attrs` and, on a component with
     `inheritAttrs: false`, lands on an inner element as an invalid HTML
-    attribute and disappears. One consumer audit found six such props across 19
-    call sites — a checkbox with no accessible name, a destructive button in the
-    default colour, translated copy that never rendered — with no warning in
-    dev, in build, or in `vue-tsc`.
+    attribute and disappears. A single misspelled prop is enough to leave a
+    checkbox with no accessible name, a destructive button in the default
+    colour, or translated copy that never renders — with no warning in dev, in
+    build, or in `vue-tsc`.
   trade_off: >-
     The augmentation is unconditional, so an app importing components by name
     instead of installing the plugin is also told they resolve globally. That
@@ -154,9 +154,10 @@ global_component_typing:
   requires: >-
     `vueCompilerOptions.strictTemplates: true` in the CONSUMER's tsconfig. That
     switch is what turns an unknown prop into an error; without it the
-    augmentation only fixes component RESOLUTION. Turning it on used to cost 87
-    false positives from legitimate code, which is why the passthrough surface
-    below exists.
+    augmentation only fixes component RESOLUTION. On its own it also reports
+    legitimate `aria-*`, `data-*` and i18n attributes as unknown props, and that
+    noise buries the errors worth acting on, which is why the passthrough
+    surface below exists.
   passthrough_surface:
     declared_in: "packages/vue/src/global-components.ts (ComponentCustomProps)"
     members: "AriaAttributes (all aria-*, role), id, title, tabindex, data-*, on*"
@@ -206,9 +207,11 @@ global_component_typing:
     `<script lang="ts">` block beside it.
   checker_version: >-
     The gate runs the same `vue-tsc` MAJOR consumers do (3.x). It was 2.x while
-    consumers were on 3.x, and three rounds of a reported model-typing error
-    could not be reproduced here for exactly that reason: 2.x did not emit it.
-    A gate on an older checker is a gate that agrees with itself.
+    the installed base was on 3.x, and the model-typing error that kept
+    recurring component by component — TInput, TTabs and TToggleGroup each
+    widened its own model — could not be reproduced here for exactly that
+    reason: 2.x did not emit it. A gate on an older checker is a gate that
+    agrees with itself.
 
 layout_capabilities_already_shipping:
   note: >

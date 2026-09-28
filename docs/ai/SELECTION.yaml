@@ -74,7 +74,7 @@ decision_guides:
           - "Rows must be addable/removable with per-row key validation."
         notes:
           - "Editing, not display. For read-only key/value display use TDescriptionList."
-          - "A write-only/sensitive mode (value never read back) is a closed contract on the queue, not yet shipped."
+          - "A write-only/sensitive mode (value never read back) is a designed contract that is not yet shipped."
       - use: TDescriptionList
         when:
           - "The pairs are read-only display, not editable."

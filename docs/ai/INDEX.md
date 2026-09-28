@@ -59,7 +59,23 @@ If a public API changes, update the matching file here in the same change. If a 
 
 ## Coverage
 
-`docs/ai/COMPONENTS/` covers the Storybook-documented public components and key composition subcomponents such as `TAccordionItem`, `TRadioGroup`, `TTabList`, `TTab`, `TTabPanel`, and `TPricingCard`. Data-viz components (`TChart`, `TSparkline`, `TDonutChart`) share a framework-agnostic geometry engine in `@treeui/utils` and the `--tree-color-chart-*` palette.
+`docs/ai/COMPONENTS/` covers the Storybook-documented public components and key composition subcomponents such as `TAccordionItem`, `TRadioGroup`, `TTabList`, `TTab`, `TTabPanel`, and `TPricingCard`.
+
+**This layer is Vue-scoped, and knowingly so.** Every file in `COMPONENTS/` declares
+`package: "@treeui/vue"` and names a `packages/vue/` source file; none of them mentions
+`@treeui/react`, and neither does `practices.json`, whose `components` map is
+name → Vue Storybook story id with no per-framework dimension. TreeUI now renders in
+four ecosystems, so a component's manifest describes one of four implementations.
+
+That is a structural gap, not an omission to patch per file: giving a manifest a
+per-framework dimension is a schema change that `@treeui/mcp`'s catalog generator and
+the Storybook practice notes both read. Until it is made, treat a `COMPONENTS/*.yaml`
+file as the Vue contract, use `SETUP.yaml` → `other_ecosystems` for what the ports
+reproduce and what they deliberately do not, and read the ports' own source for their
+API — both are documented at the same standard, with the reason for every divergence
+written where the divergence is.
+
+Data-viz components (`TChart`, `TSparkline`, `TDonutChart`) share a framework-agnostic geometry engine in `@treeui/utils` and the `--tree-color-chart-*` palette.
 
 ## Non-goals
 

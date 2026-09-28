@@ -8,8 +8,8 @@ purpose: "Edit a Record<string, string> as add/removable key/value rows with per
 notes: >
   Phase 1 (non-sensitive) is shipped: the full value round-trips through v-model.
   A write-only/sensitive phase 2 (value never reaches the client; modelValue is
-  Record<string, { set: boolean }> with set-value/clear-value events) is a closed
-  contract on the queue and NOT yet implemented — do not assume it exists.
+  Record<string, { set: boolean }> with set-value/clear-value events) is a
+  designed contract that is NOT yet implemented — do not assume it exists.
 
 props:
   modelValue:
@@ -65,8 +65,9 @@ validity_emission:
     `modelValue` changes from outside — not only on keystroke. A Record can
     ARRIVE invalid (`{"": "x"}` is a legitimate `Record<string, string>` and the
     control mounts already showing the row error), and after an external reset
-    the rows can render clean while the consumer's aggregated summary still says
-    invalid. Repeat emissions of an unchanged validity are suppressed.
+    the rows can render clean while a summary aggregated from the previous
+    emission still says invalid. Repeat emissions of an unchanged validity are
+    suppressed.
 
 external_updates:
   note: >

@@ -12,10 +12,10 @@ props:
     note: >
       `null` is REAL, not an error state: clearing the field is empty, and the
       component emits `null` for it. So `v-model` needs a `ref<number | null>`,
-      and a `ref<number>` is a genuine type error under a consumer's
-      `strictTemplates` rather than a gap in the library. This is the one place
-      in the round where the checker was right and the call site was wrong — the
-      others (TInput, TTabs, TToggleGroup) were the library's fault.
+      and a `ref<number>` is a genuine type error under `strictTemplates` rather
+      than a gap in the library — here the binding is what has to widen, not the
+      model. The opposite of TInput/TTabs/TToggleGroup, where the library's own
+      model type was too wide and no narrow ref could bind it.
   min:
     type: number
     default: undefined

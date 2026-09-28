@@ -46,13 +46,27 @@ active advocate for this philosophy — not a neutral executor:
 
 ## Workspace Layout
 
-The authoritative workspace map is in [README.md](./README.md#workspace-layout) —
-eleven packages, including `apps/docs-react`, `apps/landing`, and the two
-`examples/*` dashboards that `pnpm typecheck` and CI both build. Maturity differs:
-`@treeui/vue` is the complete component set, `@treeui/react` is early (basic
-primitives on the same tokens and `t-*` classes).
+The authoritative workspace map is in [README.md](./README.md#workspace-layout).
+TreeUI renders in **four ecosystems**, at very different maturities:
 
-Build order: `tokens → utils → icons → vue → react → mcp` (then `apps/*` and `examples/*`).
+| Ecosystem         | Package                                                | Maturity                                                |
+| ----------------- | ------------------------------------------------------ | ------------------------------------------------------- |
+| Web / Vue 3       | `@treeui/vue`                                          | the complete component set, and the reference           |
+| Web / React       | `@treeui/react`                                        | early — primitives on the same tokens and `t-*` classes |
+| Android / Compose | `packages/compose` (`treeui-tokens`, `treeui-compose`) | token layer complete, component set starting            |
+| Desktop / Rust    | `packages/egui` (`treeui-tokens`, `treeui-egui`)       | token layer complete, component set starting            |
+
+When a contract question comes up, `@treeui/vue` is the reference — but not
+automatically the right answer: a port built today carries no compatibility, so
+it reproduces the contract and not the contract's mistakes. See
+`docs/ai/DECISIONS.md` → "Portability Boundary".
+
+Build order: `tokens → utils → icons → vue → react → mcp` (then `apps/*` and
+`examples/*`). The two ports are built by their own toolchains and depend on
+`pnpm codegen:native`, which writes their generated token source.
+
+`packages/compose` and `packages/egui` are excluded from the pnpm workspace —
+they are a Gradle build and a Cargo workspace, not npm packages.
 
 ## AI Contract Layer
 
@@ -76,6 +90,12 @@ changes, update `docs/ai/practices.json`.
 - **CSS variables**: keep the `--tree-*` prefix — these are framework-agnostic design tokens from
   `@treeui/tokens`, not part of the Vue/React component surface. The `[data-tree-theme]` attribute is
   also part of the token layer.
+- **Kotlin**: package `treeui.tokens` / `treeui.compose`; types `Tree<Name>` (`TreeColor`,
+  `TreePalette`, `TreeTone`); composables `T<Name>` (`TButton`), matching the web export name.
+  Maven group `io.github.viserion77`, artifacts `treeui-tokens` / `treeui-compose`.
+- **Rust**: crates `treeui-tokens` / `treeui-egui`; types unprefixed inside their crate
+  (`Palette`, `Tone`, `Color`) since the crate name already namespaces them; widgets `T<Name>`
+  (`TButton`).
 
 ## Coding Patterns
 
@@ -164,6 +184,34 @@ pnpm build:site    # what CI builds: packages + landing + both Storybooks + exam
 pnpm test:e2e      # Playwright; optional locally, required in CI
 ```
 
+When touching the token model, regenerate the ports' source and check it in —
+`pnpm codegen:native:check` runs in CI and fails on a stale file:
+
+```bash
+pnpm codegen:native         # writes the generated Kotlin and Rust token source
+pnpm codegen:native:check   # fails if what is committed is not what the model emits
+```
+
+**After regenerating, build both ports.** `codegen:native:check` only compares text —
+it cannot tell you the emitted source compiles, and an emitter can produce Kotlin or
+Rust that does not. This is not hypothetical: an emitter once wrote
+`when (tone to variant)`, which Kotlin can never treat as exhaustive because a `Pair`
+is an ordinary data class, and the whole token module stopped compiling. Nothing on
+the TypeScript side could see it. The CI `kotlin` and `rust` jobs compile what is
+committed, so a bad generation cannot reach `main` — but locally the two builds below
+are the only thing between you and handing someone a broken module.
+
+The codegen deliberately does NOT run them itself: `validate` invokes
+`codegen:native:check` with no JDK and no Cargo installed, and coupling them would
+break that job.
+
+The two ports have their own gates, run by their own CI jobs:
+
+```bash
+cd packages/egui   && cargo fmt --all -- --check && cargo clippy --all-targets -- -D warnings && cargo test --all
+cd packages/compose && ./gradlew build
+```
+
 When touching icon geometry, the report is faster than the suite:
 
 ```bash
@@ -177,25 +225,30 @@ Use Changesets for any user-facing package change: `pnpm changeset`.
 
 ## Key Files Quick Reference
 
-| Purpose | File |
-|---|---|
-| Shared types | `packages/vue/src/types/contracts.ts` |
-| Component exports | `packages/vue/src/components/index.ts` |
-| Plugin registration | `packages/vue/src/plugin.ts` |
-| Composables | `packages/vue/src/composables/useControllableOpen.ts` |
-| Component styles | `packages/vue/src/styles/index.css` |
-| Class-variants helper | `packages/utils/src/index.ts` (`tv()`) |
-| Token definitions | `packages/tokens/src/tokens.ts` |
-| CSS generation | `packages/tokens/src/css.ts` |
-| Icons | `packages/icons/src/index.ts` |
-| React components | `packages/react/src/` |
-| MCP package | `packages/mcp/` |
-| Named UX practices | `docs/ai/practices.json` |
-| Contract layer index | `docs/ai/INDEX.md` |
-| Design principles | `DESIGN.md` |
-| Architecture | `ARCHITECTURE.md` |
-| Contribution guide | `CONTRIBUTING.md` |
-| Release and CI flow | `RELEASING.md` |
+| Purpose                                      | File                                                          |
+| -------------------------------------------- | ------------------------------------------------------------- |
+| Shared types                                 | `packages/vue/src/types/contracts.ts`                         |
+| Component exports                            | `packages/vue/src/components/index.ts`                        |
+| Plugin registration                          | `packages/vue/src/plugin.ts`                                  |
+| Composables                                  | `packages/vue/src/composables/useControllableOpen.ts`         |
+| Component styles                             | `packages/vue/src/styles/index.css`                           |
+| Class-variants helper                        | `packages/utils/src/index.ts` (`tv()`)                        |
+| Token definitions                            | `packages/tokens/src/tokens.ts`                               |
+| Closed vocabularies (sizes, variants, tones) | `packages/tokens/src/vocabulary.ts`                           |
+| CSS generation                               | `packages/tokens/src/css.ts`                                  |
+| Resolved token model for non-web targets     | `packages/tokens/src/native.ts`                               |
+| Kotlin / Rust source generation              | `packages/tokens/src/kotlin.ts`, `rust.ts`, `build-native.ts` |
+| Kotlin port                                  | `packages/compose/`                                           |
+| Rust port                                    | `packages/egui/`                                              |
+| Icons                                        | `packages/icons/src/index.ts`                                 |
+| React components                             | `packages/react/src/`                                         |
+| MCP package                                  | `packages/mcp/`                                               |
+| Named UX practices                           | `docs/ai/practices.json`                                      |
+| Contract layer index                         | `docs/ai/INDEX.md`                                            |
+| Design principles                            | `DESIGN.md`                                                   |
+| Architecture                                 | `ARCHITECTURE.md`                                             |
+| Contribution guide                           | `CONTRIBUTING.md`                                             |
+| Release and CI flow                          | `RELEASING.md`                                                |
 
 ## Local MCP
 
@@ -224,3 +277,9 @@ In this repository, Claude Code loads the server through
 - Skip contract file updates when the public API changes.
 - Leave `docs/ai/practices.json` stale when a component's practice conformance changes.
 - Add runtime dependencies to `@treeui/tokens` or `@treeui/utils` — they must stay dependency-free.
+  The same rule binds the `treeui-tokens` crate and Gradle module, and CI checks the crate with
+  `cargo tree`.
+- Hand-edit a generated file (`packages/compose/**/Generated.kt`, `packages/egui/**/generated.rs`).
+  Change the model and run `pnpm codegen:native`.
+- Re-declare a closed vocabulary in a framework package. It lives in `@treeui/tokens`; `@treeui/vue`
+  and `@treeui/react` re-export, and the ports generate their enums from it.

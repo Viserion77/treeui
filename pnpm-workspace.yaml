@@ -2,5 +2,10 @@ packages:
   - apps/*
   - examples/*
   - packages/*
+  # The Kotlin and Rust ports live beside the npm packages but are a Gradle
+  # build and a Cargo workspace. Excluded so pnpm does not scan them for a
+  # package.json it will never find.
+  - '!packages/compose'
+  - '!packages/egui'
   - tooling/*
 

@@ -58,6 +58,8 @@ packages/utils               Shared accessibility and interaction helpers
 packages/icons               Curated icon registry and defaults
 packages/vue                 Vue 3 component package and plugin entry
 packages/react               React component package
+packages/compose             Kotlin component package for Android (Jetpack Compose)
+packages/egui                Rust component crates for the desktop (egui)
 packages/mcp                 TreeUI AI catalog and MCP server for coding agents
 docs/ai                      Machine-oriented contracts for tools and agents
 tooling                      Docker, ESLint, and TypeScript shared config

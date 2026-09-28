@@ -46,6 +46,10 @@ change settings via UI or the GitHub API.
   - **Required status checks** must pass before merge
     - `validate` (the job in `.github/workflows/ci.yml`)
     - Branch must be up to date with base (`strict`)
+    - ⚠️ **`kotlin` and `rust` are NOT yet in the ruleset.** Both jobs run on every
+      PR, but until they are added as required checks a red port does not block a
+      merge. Adding them is a repository-settings change, not a code change —
+      see "Adding the port jobs to the ruleset" below.
   - **Linear history** required (no merge commits on `main`)
   - **Deletion** of the protected branch blocked
   - **Non-fast-forward** pushes blocked (no `--force` to `main`)
@@ -69,6 +73,14 @@ change settings via UI or the GitHub API.
 
 - `NPM_TOKEN` — npm automation token for publishing the `@treeui/*` scope.
 
+Not configured yet, and needed before either port can publish:
+
+| Secret                                              | For                               | Notes                                                                                                                  |
+| --------------------------------------------------- | --------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| `MAVEN_CENTRAL_USERNAME` / `MAVEN_CENTRAL_PASSWORD` | `treeui-tokens`, `treeui-compose` | A Sonotype Central Portal user token, not the account password.                                                        |
+| `SIGNING_KEY` / `SIGNING_PASSWORD`                  | the same                          | Maven Central requires a GPG signature on every artifact. Export the private key armoured and store it base64-encoded. |
+| `CARGO_REGISTRY_TOKEN`                              | `treeui-tokens`, `treeui-egui`    | A crates.io API token.                                                                                                 |
+
 ### Environments
 
 - `github-pages` — used by `deploy-pages` job to publish the docs site.
@@ -84,12 +96,42 @@ Required check for branch protection. Steps:
 1. `pnpm install --frozen-lockfile`
 2. `pnpm lint`
 3. `pnpm typecheck`
-4. `pnpm test` (Vitest)
-5. `pnpm build:packages`
-6. `pnpm build:site` (landing + Vue/React Storybooks + example dashboards)
-7. `pnpm exec playwright install --with-deps chromium`
-8. `pnpm test:e2e` (with `PW_SKIP_BUILD=1`, reusing the build from step 6)
-9. Uploads the `site` artifact for the pages job.
+4. `pnpm codegen:native:check` — fails if the generated Kotlin and Rust token
+   source in the two ports is not what `@treeui/tokens` would emit right now.
+   Fix with `pnpm codegen:native` and commit the result.
+5. `pnpm test` (Vitest)
+6. `pnpm build:packages`
+7. `pnpm build:site` (landing + Vue/React Storybooks + example dashboards)
+8. `pnpm exec playwright install --with-deps chromium`
+9. `pnpm test:e2e` (with `PW_SKIP_BUILD=1`, reusing the build from step 7)
+10. Uploads the `site` artifact for the pages job.
+
+### `kotlin` and `rust` jobs (run on every PR and on push to `main`)
+
+Separate jobs rather than steps in `validate`: each needs a toolchain the Node
+build shares nothing with, and a Gradle or Cargo problem should not hold up the
+npm packages or the docs site.
+
+- **`kotlin`** — JDK 17 (Temurin), the Android SDK, then `./gradlew build` in
+  `packages/compose`. That covers both modules, their lint and their tests.
+  It compiles exactly what is committed and does NOT regenerate the token
+  source, because `validate` already failed the build if it were stale.
+- **`rust`** — `cargo fmt --all -- --check`, `cargo clippy --all-targets -- -D warnings`
+  and `cargo test --all` in `packages/egui`, plus a `cargo tree` check asserting
+  `treeui-tokens` has no dependencies. The crate already denies `missing_docs`
+  and forbids `unsafe_code`; `-D warnings` makes everything else as loud.
+
+### Adding the port jobs to the ruleset
+
+One-time repository-settings change, after the two jobs have run green on a PR:
+
+```bash
+gh api -X PUT repos/Viserion77/treeui/rulesets/16707131 \
+  --input ruleset.json   # add "kotlin" and "rust" to required_status_checks
+```
+
+Do it only once both jobs are reliably green — a required check that flakes
+blocks every merge, and the ports are young.
 
 ### `release` job (push to `main` only, after `validate` succeeds)
 
@@ -185,13 +227,49 @@ forced to the same number when only some of them change. `@treeui/react` and
 
 ### Troubleshooting
 
-| Symptom | Cause | Fix |
-|---|---|---|
-| Release job: "GitHub Actions is not permitted to create or approve pull requests" | `can_approve_pull_request_reviews` is `false` | `gh api -X PUT repos/Viserion77/treeui/actions/permissions/workflow -F default_workflow_permissions=write -F can_approve_pull_request_reviews=true` |
-| Release job: `EAUTH` from npm | `NPM_TOKEN` expired or wrong scope | Rotate token at npmjs.com → `gh secret set NPM_TOKEN -R Viserion77/treeui` |
-| Version PR has nothing to release | No `.changeset/*.md` files were committed | Add a changeset in a follow-up PR with `pnpm changeset` |
-| Status check `validate` not appearing in PR | Workflow not triggered (draft? path filter?) | Mark PR ready for review; CI runs on `pull_request` for all paths |
-| Merge button greyed out | Branch behind `main` or required review missing | Click "Update branch"; request review from a code owner |
+| Symptom                                                                           | Cause                                           | Fix                                                                                                                                                 |
+| --------------------------------------------------------------------------------- | ----------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Release job: "GitHub Actions is not permitted to create or approve pull requests" | `can_approve_pull_request_reviews` is `false`   | `gh api -X PUT repos/Viserion77/treeui/actions/permissions/workflow -F default_workflow_permissions=write -F can_approve_pull_request_reviews=true` |
+| Release job: `EAUTH` from npm                                                     | `NPM_TOKEN` expired or wrong scope              | Rotate token at npmjs.com → `gh secret set NPM_TOKEN -R Viserion77/treeui`                                                                          |
+| Version PR has nothing to release                                                 | No `.changeset/*.md` files were committed       | Add a changeset in a follow-up PR with `pnpm changeset`                                                                                             |
+| Status check `validate` not appearing in PR                                       | Workflow not triggered (draft? path filter?)    | Mark PR ready for review; CI runs on `pull_request` for all paths                                                                                   |
+| Merge button greyed out                                                           | Branch behind `main` or required review missing | Click "Update branch"; request review from a code owner                                                                                             |
+
+## Publishing the two ports
+
+Neither port is published yet, and neither is wired into the `release` job. Both
+are deliberate: a first publish fixes a coordinate permanently, and the
+component sets are young enough that the API will still move.
+
+**Decide the Maven coordinate before the first publish, not after.**
+`io.github.viserion77` is verifiable for free through the GitHub account and
+needs no domain. `dev.treeui` would read better and match the npm scope, but it
+requires owning `treeui.dev` — and changing a published groupId later is a
+breaking change for every consumer, so it is a decision to make once.
+
+| Ecosystem | Registry                                       | Coordinate / crate                                      | Docs                          |
+| --------- | ---------------------------------------------- | ------------------------------------------------------- | ----------------------------- |
+| Kotlin    | Maven Central, via the Sonatype Central Portal | `io.github.viserion77:treeui-tokens`, `:treeui-compose` | Dokka → javadoc.io, automatic |
+| Rust      | crates.io                                      | `treeui-tokens`, `treeui-egui`                          | docs.rs, automatic            |
+
+Both names were checked and are free.
+
+What each needs before a first publish:
+
+- **Kotlin** — a verified namespace on the Central Portal, a GPG key published to
+  a keyserver, and a publishing plugin in `packages/compose` (the
+  `com.vanniktech.maven.publish` plugin handles signing, the POM and the
+  staging-repository dance). The module already emits a sources jar and a
+  javadoc jar via its `publishing { singleVariant("release") }` block.
+- **Rust** — a crates.io account and API token. Publish in dependency order:
+  `treeui-tokens` first, then `treeui-egui`, which depends on it by version.
+  A path dependency will not publish, so the workspace already declares
+  `treeui-tokens = { version = "0.1.0", path = "…" }` — cargo uses the path
+  locally and the version on the registry.
+
+Versioning is independent of the npm packages for now. Changesets does not know
+about Gradle or Cargo, and pretending it does by hand-editing four files per
+release is how a version number stops meaning anything.
 
 ## Release commands cheat sheet
 
@@ -204,7 +282,18 @@ pnpm build:packages                   # build the six published packages only
 pnpm changeset                        # create a changeset entry
 pnpm changeset status                 # list pending changesets
 pnpm ai:catalog                       # regenerate docs/ai/treeui.catalog.json
+pnpm codegen:native                   # regenerate the ports' token source
+pnpm codegen:native:check             # fail if that source is stale (runs in CI)
 pnpm mcp:start                        # run the local TreeUI MCP server
+```
+
+The two ports build with their own toolchains:
+
+```bash
+cd packages/compose && ./gradlew build                        # Kotlin: both modules, lint, tests
+cd packages/egui    && cargo fmt --all -- --check \
+                    && cargo clippy --all-targets -- -D warnings \
+                    && cargo test --all                       # Rust
 ```
 
 ## See also

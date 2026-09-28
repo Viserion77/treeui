@@ -26,6 +26,8 @@
     "docs:serve:ci": "node scripts/serve-static.mjs apps/docs/storybook-static 6006 127.0.0.1",
     "site:serve": "node scripts/serve-static.mjs site 6010 0.0.0.0",
     "ai:catalog": "pnpm --filter @treeui/mcp generate:catalog",
+    "codegen:native": "pnpm --filter @treeui/tokens codegen:native",
+    "codegen:native:check": "pnpm --filter @treeui/tokens codegen:native -- --check",
     "mcp:test": "pnpm --filter @treeui/mcp test",
     "mcp:start": "pnpm --filter @treeui/mcp start",
     "build:packages": "pnpm --filter @treeui/tokens build && pnpm --filter @treeui/utils build && pnpm --filter @treeui/icons build && pnpm --filter @treeui/vue build && pnpm --filter @treeui/react build && pnpm --filter @treeui/mcp build",

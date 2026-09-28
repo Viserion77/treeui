@@ -7,7 +7,7 @@
 // real ones. So the gate has two halves, and both have to hold:
 //
 //   probe/  — a template written the way a consumer writes one MUST compile.
-//   bad/    — the six props a consumer audit found dead MUST still error.
+//   bad/    — the six props these components do not accept MUST still error.
 //
 // Checking only the first would let the library "fix" the noise by allowing
 // everything, which is the failure mode this whole item exists to avoid.

@@ -38,6 +38,11 @@ jobs:
       - name: Typecheck
         run: pnpm typecheck
 
+      # Before the tests, because a stale generated file is a faster and clearer
+      # failure than whatever a port would do with last release's colours.
+      - name: Generated Kotlin and Rust tokens are up to date
+        run: pnpm codegen:native:check
+
       - name: Unit tests
         run: pnpm test
 
@@ -72,6 +77,71 @@ jobs:
           name: site
           path: site
           retention-days: 1
+
+  # The Kotlin/Android port. Its own job rather than a step in `validate`: it
+  # needs a JDK and the Android SDK, shares nothing with the Node toolchain, and
+  # a Gradle problem should not redden the npm packages or hold up the site.
+  #
+  # The generated token source is NOT regenerated here — `validate` already
+  # failed the build if it were stale, so this job compiles exactly what is
+  # committed, which is what a consumer gets.
+  kotlin:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - uses: android-actions/setup-android@v3
+
+      - uses: gradle/actions/setup-gradle@v4
+
+      - name: Build, lint and test the Compose port
+        working-directory: packages/compose
+        run: ./gradlew build
+
+  # The Rust/desktop port. `-D warnings` on top of the workspace lints, so a new
+  # warning cannot accumulate: the crate already denies `missing_docs` and
+  # forbids `unsafe_code`, and this makes everything else as loud.
+  rust:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: packages/egui
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: packages/egui
+
+      - name: Formatting
+        run: cargo fmt --all -- --check
+
+      - name: Clippy
+        run: cargo clippy --all-targets -- -D warnings
+
+      - name: Tests
+        run: cargo test --all
+
+      # The token crate is the one piece every ecosystem shares, so it may not
+      # acquire a dependency a consumer of a different renderer would carry.
+      - name: The token crate has no dependencies
+        run: |
+          DEPS="$(cargo tree --package treeui-tokens --edges normal --prefix none --no-dedupe | tail -n +2)"
+          if [ -n "$DEPS" ]; then
+            echo "treeui-tokens must stay dependency-free, but it pulls in:"
+            echo "$DEPS"
+            exit 1
+          fi
+          echo "treeui-tokens has no dependencies."
 
   release:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'

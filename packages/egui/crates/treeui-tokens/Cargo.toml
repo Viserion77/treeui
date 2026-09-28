@@ -1,0 +1,20 @@
+[package]
+name = "treeui-tokens"
+description = "Framework-agnostic design tokens and themes for TreeUI."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+authors.workspace = true
+homepage.workspace = true
+repository.workspace = true
+keywords.workspace = true
+categories = ["gui", "no-std"]
+
+# Deliberately empty, and enforced by `cargo tree` in CI: the token layer is the
+# one piece of TreeUI every ecosystem shares, so it may not acquire a dependency
+# that a consumer of a different renderer would have to carry.
+[dependencies]
+
+[lints]
+workspace = true

@@ -1,0 +1,19 @@
+[package]
+name = "treeui-egui"
+description = "TreeUI components for egui — accessible, token-driven widgets for a Rust desktop app."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+authors.workspace = true
+homepage.workspace = true
+repository.workspace = true
+keywords.workspace = true
+categories.workspace = true
+
+[dependencies]
+treeui-tokens.workspace = true
+egui.workspace = true
+
+[lints]
+workspace = true

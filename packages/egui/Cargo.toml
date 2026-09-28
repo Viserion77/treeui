@@ -1,0 +1,32 @@
+# TreeUI for Rust — the desktop port.
+#
+# Two crates, mirroring the split the TypeScript side has had since the start:
+# `treeui-tokens` is the design contract with no dependency of any kind, and
+# `treeui-egui` is the one crate that knows what a GUI framework is. A future
+# second backend joins as a third crate and reuses the first unchanged.
+[workspace]
+resolver = "2"
+members = ["crates/treeui-tokens", "crates/treeui-egui"]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+# 1.82 is what egui 0.33 itself requires; nothing here reaches past it.
+rust-version = "1.82"
+license = "MIT"
+authors = ["TreeUI"]
+homepage = "https://viserion77.github.io/treeui/"
+repository = "https://github.com/Viserion77/treeui"
+categories = ["gui"]
+keywords = ["treeui", "egui", "design-system", "ui", "accessibility"]
+
+[workspace.dependencies]
+treeui-tokens = { version = "0.1.0", path = "crates/treeui-tokens" }
+egui = "0.33"
+
+[workspace.lints.rust]
+missing_docs = "deny"
+unsafe_code = "forbid"
+
+[workspace.lints.clippy]
+all = { level = "deny", priority = -1 }

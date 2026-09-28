@@ -12,10 +12,11 @@ import {
  * Month grid.
  *
  * It CONSUMES `getMonthMatrix` and draws exactly the matrix that function
- * returns — it does not recompute the grid with a rule of its own. That is the
- * contract the consumer asked for and it matters: their fetch window is
- * `getMonthMatrix(...).flat()`, so a component with its own idea of which days
- * a month contains would show days nobody fetched, silently.
+ * returns — it does not recompute the grid with a rule of its own. That is a
+ * contract rather than an implementation detail, because a caller's fetch
+ * window is derived from the same call: `getMonthMatrix(...).flat()`. A
+ * component with its own idea of which days a month contains would render days
+ * nobody fetched, silently.
  */
 const props = withDefaults(
   defineProps<{

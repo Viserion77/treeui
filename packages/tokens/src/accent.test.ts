@@ -1,12 +1,12 @@
 import { contrastRatio, parseHex, treeThemes, treeTokens } from './index';
 
 /**
- * Consumers asked for an accent because a raw
- * secondary brand colour failed AA on the light surface (`#A16CFF` measured
- * 3.23:1). Shipping a token instead of a hex is only an improvement if the
- * token is measured, so the pair is pinned here: the accent has to be at least
- * as legible as the brand pair the library already ships, on every background
- * and on its own soft tint.
+ * An accent ramp exists because a secondary brand colour taken straight from a
+ * marketing hex can fail AA as text on a light surface (`#A16CFF` measures
+ * 3.23:1 on light `bg-primary`). Shipping a token instead of a hex is only an
+ * improvement if the token is measured, so the pair is pinned here: the accent
+ * has to be at least as legible as the brand pair the library already ships,
+ * on every background and on its own soft tint.
  */
 const AA_NORMAL = 4.5;
 
@@ -55,8 +55,8 @@ describe('marketing-scale elevation', () => {
 
 describe('type scale', () => {
   // `2xl` used to repeat `xl` verbatim, which made every `clamp(xl … 2xl)` a
-  // constant — 12 of them in one consumer's landing pages. A scale with two
-  // equal steps is a scale with a missing step; this keeps it monotonic.
+  // constant, silently freezing every fluid heading. A scale with two equal
+  // steps is a scale with a missing step; this keeps it monotonic.
   const order = ['xs', 'sm', 'md', 'lg', 'xl', '2xl', '3xl', '4xl', '5xl'] as const;
   const rem = (value: string) => Number.parseFloat(value);
 

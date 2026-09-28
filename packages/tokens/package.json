@@ -43,6 +43,7 @@
   ],
   "scripts": {
     "build": "pnpm exec rimraf dist && pnpm exec tsup src/index.ts --format esm,cjs --dts --clean false && pnpm exec tsx src/build-css.ts",
+    "codegen:native": "pnpm exec tsx src/build-native.ts",
     "typecheck": "pnpm exec tsc -p tsconfig.json --noEmit"
   }
 }

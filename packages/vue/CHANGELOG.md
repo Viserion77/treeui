@@ -160,7 +160,7 @@
 - 5a37952: Row activation, a colour axis for the confirm dialog, and a template surface a
   consumer can actually type.
 
-  **`TTable` — six edges found by adopting row activation in production**
+  **`TTable` — six defects in row activation**
 
   - The click target was the FIRST CELL, not the row. Every cell was positioned, so
     the first one became the overlay's containing block and `inset: 0` covered that
@@ -235,7 +235,7 @@
 
 ### Minor Changes
 
-- 1a9d136: Clears the entire accepted backlog from both consumer files in one release.
+- 1a9d136: Calendar, media, drop, canvas and layout primitives in one release.
 
   **Calendar** — `TCalendarMonthGrid`, `TCalendarTimeGrid` and
   the `TCalendar` wrapper with `view`. The month grid CONSUMES `getMonthMatrix`
@@ -294,23 +294,23 @@
     `update:secrets` — replacing a value changes neither which keys exist nor
     whether they are set.
 
-  **Follow-ups from the 0.28 validation**
+  **Follow-ups to 0.28**
 
-  - `TEmptyState frame="narrow"` — a width cap for the FRAME. 28 of one consumer's
-    37 wrappers were the same `max-width: 420px`; `fill`/`inline` answered a
-    different question because the original evidence said "geometry".
+  - `TEmptyState frame="narrow"` — a width cap for the FRAME. The wrapper around a
+    hand-rolled empty state converges on the same `max-width: 420px`;
+    `fill`/`inline` answered the geometry question, not the width one.
   - A soft `TTag` WITH a `tone` now draws that tone's ring. `--tree-tag-border` was
-    computed and then discarded in the one variant a label badge uses. Changed now,
-    with two consumers and both asking for it — a border on an existing look is not
+    computed and then discarded in the one variant a label badge uses. Changed
+    while the tone axis is still new — a border on an existing look is not
     a change that can be made later.
 
 - 1a9d136: - **`TButton` gains `tone`** (`neutral | brand | accent | success | warning |
 danger | info`), orthogonal to `variant` and using the same closed vocabulary
   as `TTag`. This is what makes a quiet destructive action expressible:
   `variant="danger"` is a colour trapped in the shape scale, so it could only
-  ever be a filled red button — two consumer screens independently wrote
-  `variant="ghost" tone="danger"` with the prop dead, because it was the only
-  phrase that described "destructive, but not the primary action of this row".
+  ever be a filled red button — `variant="ghost" tone="danger"` gets written
+  against a dead prop anyway, because it is the only phrase that describes
+  "destructive, but not the primary action of this row".
   On `solid` the tone fills; on `outline`/`ghost` it inks only the label and
   border. **`variant="danger"` is deprecated** in favour of
   `variant="solid" tone="danger"`: it still works and still renders identically,
@@ -340,8 +340,9 @@ danger | info`), orthogonal to `variant` and using the same closed vocabulary
 
   **It was unusable.** The augmentation only reports a wrong prop under
   `vueCompilerOptions.strictTemplates`, which the previous note did not say — and
-  turning that on cost one consumer 87 errors from legitimate code for 2 real
-  ones. The passthrough surface is now declared instead of left to chance:
+  turning that on flags every undeclared passthrough attribute as an error, so
+  the few real mistakes arrive buried in noise. The passthrough surface is now
+  declared instead of left to chance:
 
   - `ComponentCustomProps` accepts ARIA (all `aria-*` and `role`), `id`, `title`,
     `tabindex`, `data-*` and native `on*` listeners on any component, because the
@@ -385,7 +386,8 @@ danger | info`), orthogonal to `variant` and using the same closed vocabulary
 
 ### Minor Changes
 
-- ec31a47: Fixes for the two components that failed validation in a consumer app.
+- ec31a47: Fixes for the two components whose idiomatic binding lost data or
+  misreported validity.
 
   **`TKeyValueEditor` — data loss under the idiomatic binding.** The watcher that
   rebuilt the rows from `modelValue` compared by REFERENCE, and a parent holding
@@ -396,12 +398,12 @@ danger | info`), orthogonal to `variant` and using the same closed vocabulary
   is now by content, and row ids of surviving keys are reused, so an external
   change patches inputs instead of remounting them and stealing the caret.
 
-  Three more, found in the same review:
+  Three more in the same component:
 
   - `validity-change` is emitted **on mount** and whenever `modelValue` changes
     from outside, not only on keystroke. A `Record` can arrive invalid (`{"": "x"}`
     is a legitimate `Record<string, string>`), and after an external reset the rows
-    could render clean while the consumer's aggregated summary still said invalid.
+    could render clean while a parent's aggregated summary still said invalid.
     Repeat emissions of an unchanged validity are suppressed.
   - `invalid` is no longer inert: it draws an error rail and sets `aria-invalid` on
     the now-`role="group"` root. It previously applied a class with no rule behind
@@ -446,12 +448,11 @@ danger | info`), orthogonal to `variant` and using the same closed vocabulary
     `GlobalComponents` with exactly what `TreeUIPlugin` registers, so `vue-tsc`
     fails on a prop that does not exist. Previously such a prop became an entry in
     `$attrs` and, on a component with `inheritAttrs: false`, landed on an inner
-    element as an invalid HTML attribute and disappeared: one consumer audit found
-    six of them across 19 call sites — a checkbox with no accessible name, a
-    destructive button in the default colour, translated copy that never
-    rendered — with no warning in dev, in build, or in `vue-tsc`.
+    element as an invalid HTML attribute and disappeared: a checkbox with no
+    accessible name, a destructive button in the default colour, translated copy
+    that never rendered — each with no warning in dev, in build, or in `vue-tsc`.
 
-- ec31a47: The axes both consumers were hand-rolling in local CSS, and two user-agent boxes
+- ec31a47: The axes that otherwise end up in an app's local CSS, and two user-agent boxes
   that leaked through `as`.
 
   **`TText`**
@@ -460,8 +461,8 @@ danger | info`), orthogonal to `variant` and using the same closed vocabulary
     `--tree-color-status-*`. A sentence that IS the state (the error line under a
     field, the green "connected") is not a `TAlert` (a box with an icon and the
     weight of an announcement) and not a `TBadge`/`TTag` (a pill, when the datum is
-    prose), so the only way to say "this failed" in text was local CSS: 60
-    declarations across 42 files in one consumer.
+    prose), so the only way to say "this failed" in text was local CSS, repeated
+    once per screen that has a state to report.
   - **`wrap`** (`anywhere | break-word`) — an id, ARN or API key is one long word
     with no break opportunity, and `truncate` is the wrong answer when the string
     IS what the reader came to copy. `anywhere` also sets `min-inline-size: 0`,
@@ -480,9 +481,9 @@ danger | info`), orthogonal to `variant` and using the same closed vocabulary
   **User-agent boxes behind `as`**
 
   - `as="ul"/"ol"/"menu"` on **`TStack`/`TGrid`/`TSplit`/`TContainer`** cancels the
-    marker, indent and block margin — the most repeated rule in one consumer's
-    repo, 43 resets across 37 files — and restores `role="list"`, which
-    `list-style: none` removes in Safari.
+    marker, indent and block margin — the most repeated reset in list-heavy
+    layouts — and restores `role="list"`, which `list-style: none` removes in
+    Safari.
   - `as="button"` on **`TCard`** restores font, width and text alignment. Measured
     on the same card in a 900px parent: 134.75px / 13.33px / centre as a button
     against 900px / 16px / start as a div. Scoped to the element, so a card as
@@ -615,7 +616,7 @@ danger | info`), orthogonal to `variant` and using the same closed vocabulary
     flagged and blocked from commit without blocking typing) plus a
     `validity-change` event for an aggregated `TFormField` summary. Copy is
     localizable via `labels`. This is the non-sensitive mode where the full value
-    round-trips; a write-only/sensitive mode is a separate, queued contract.
+    round-trips; a write-only/sensitive mode is a separate contract, not yet shipped.
 
 - 184914c: `TText` gains `size="title"` — a responsive section-heading step (clamp
   xl→4xl, tight line-height and tracking) that stays below `size="display"` at
@@ -678,11 +679,11 @@ danger | info`), orthogonal to `variant` and using the same closed vocabulary
 
 ### Minor Changes
 
-- 3138497: Clear the remaining queued contract items in one batch: the popover close contract, two new list primitives, the rich menu compound, and the responsive-rail policy.
+- 3138497: Clear the remaining contract items in one batch: the popover close contract, two new list primitives, the rich menu compound, and the responsive-rail policy.
 
   **TPopover — `close()` method + slot arg**
 
-  `close(options?)` is exposed via template ref and passed to the default slot, so content dismisses the panel after a navigation or action without a v-model watcher or manual focus handling. Focus restore follows a heuristic: without options it returns focus to the trigger only if focus is inside the panel at close time; `restoreFocus: true/false` forces or suppresses it; an external v-model change follows the same heuristic; an outside pointer never steals focus; Escape always restores. Replaces the consumer's `useTriggerFocusRestore`.
+  `close(options?)` is exposed via template ref and passed to the default slot, so content dismisses the panel after a navigation or action without a v-model watcher or manual focus handling. Focus restore follows a heuristic: without options it returns focus to the trigger only if focus is inside the panel at close time; `restoreFocus: true/false` forces or suppresses it; an external v-model change follows the same heuristic; an outside pointer never steals focus; Escape always restores. Replaces the focus-restore watcher an app would otherwise hand-roll around its trigger.
 
   **TList + TListItem**
 
@@ -706,7 +707,7 @@ danger | info`), orthogonal to `variant` and using the same closed vocabulary
 
 ### Minor Changes
 
-- 47d5166: Fix the `TButton` `iconOnly` dev warning and add three new components agreed with consumer apps.
+- 47d5166: Fix the `TButton` `iconOnly` dev warning and add three components the library had no equivalent for.
 
   **Fix — TButton `iconOnly` accessible-name warning**
 
@@ -724,7 +725,7 @@ danger | info`), orthogonal to `variant` and using the same closed vocabulary
 
 ### Minor Changes
 
-- 6b228cd: Ship the round-3 contract items agreed with consumer apps — all additive prop/slot surface on existing components.
+- 6b228cd: Ship the third batch of contract additions — all additive prop/slot surface on existing components.
 
   **TButton — dev-only accessible-name warning for `iconOnly`**
 

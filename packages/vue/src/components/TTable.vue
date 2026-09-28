@@ -111,10 +111,10 @@ const routerLink = computed<Component | null>(
   () => (instance?.appContext.components.RouterLink as Component | undefined) ?? null,
 );
 
-// The three modes are mutually exclusive on purpose. One consumer audit found
-// four screens that had each invented their own row activation, and the
-// contortion a screen chose had NO correlation with whether it navigated — so
-// the API has to make the distinction, not offer two equivalent ways out.
+// The three modes are mutually exclusive on purpose. A screen left to invent
+// its own row activation picks a contortion with NO correlation to whether the
+// row actually navigates — so the API has to make the distinction, not offer
+// two equivalent ways out.
 const linksRows = computed(() => Boolean(props.rowHref || props.rowTo));
 
 if (process.env.NODE_ENV !== 'production') {

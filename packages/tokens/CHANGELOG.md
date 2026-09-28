@@ -93,7 +93,7 @@
 
 ### Minor Changes
 
-- ec31a47: The axes both consumers were hand-rolling in local CSS, and two user-agent boxes
+- ec31a47: The axes that otherwise end up in an app's local CSS, and two user-agent boxes
   that leaked through `as`.
 
   **`TText`**
@@ -102,8 +102,8 @@
     `--tree-color-status-*`. A sentence that IS the state (the error line under a
     field, the green "connected") is not a `TAlert` (a box with an icon and the
     weight of an announcement) and not a `TBadge`/`TTag` (a pill, when the datum is
-    prose), so the only way to say "this failed" in text was local CSS: 60
-    declarations across 42 files in one consumer.
+    prose), so the only way to say "this failed" in text was local CSS, repeated
+    once per screen that has a state to report.
   - **`wrap`** (`anywhere | break-word`) — an id, ARN or API key is one long word
     with no break opportunity, and `truncate` is the wrong answer when the string
     IS what the reader came to copy. `anywhere` also sets `min-inline-size: 0`,
@@ -122,9 +122,9 @@
   **User-agent boxes behind `as`**
 
   - `as="ul"/"ol"/"menu"` on **`TStack`/`TGrid`/`TSplit`/`TContainer`** cancels the
-    marker, indent and block margin — the most repeated rule in one consumer's
-    repo, 43 resets across 37 files — and restores `role="list"`, which
-    `list-style: none` removes in Safari.
+    marker, indent and block margin — the most repeated reset in list-heavy
+    layouts — and restores `role="list"`, which `list-style: none` removes in
+    Safari.
   - `as="button"` on **`TCard`** restores font, width and text alignment. Measured
     on the same card in a 900px parent: 134.75px / 13.33px / centre as a button
     against 900px / 16px / start as a div. Scoped to the element, so a card as

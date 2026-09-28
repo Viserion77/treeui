@@ -8,10 +8,10 @@ import type { TreeUIGlobalComponents } from './plugin';
  * registered `<TTag>` against, so a prop that does not exist is not an error —
  * it silently becomes an entry in `$attrs`, and on a component with
  * `inheritAttrs: false` it lands on an inner element as an invalid HTML
- * attribute and disappears. One consumer audit found six such props across 19
- * call sites: a checkbox with no accessible name, a destructive button in the
- * default colour, and translated copy that never rendered — none of which
- * produced a single warning in dev, in build, or in `vue-tsc`.
+ * attribute and disappears. The failures that disappearance hides are the
+ * expensive kind: a checkbox with no accessible name, a destructive button in
+ * the default colour, and translated copy that never rendered — none of which
+ * produces a single warning in dev, in build, or in `vue-tsc`.
  *
  * With it — and with `vueCompilerOptions.strictTemplates` on, which is what
  * actually turns an unknown prop into an error — `<TTag clickable>` fails to

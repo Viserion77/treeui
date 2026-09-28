@@ -209,7 +209,7 @@ const validity = computed<TKeyValueEditorValidity>(() => {
 // Validity is watched, not emitted from the input handlers, because a Record
 // can ARRIVE invalid: `{"": "x"}` is a legitimate `Record<string, string>` and
 // the control mounts already showing the row error. Emitting only on keystroke
-// left the consumer's aggregated summary out of sync on mount, after an
+// left an aggregated TFormField summary out of sync on mount, after an
 // external reset, and after add-row. `immediate` covers mount; the signature
 // guard keeps it to one emit per actual change.
 let lastValiditySignature: string | null = null;

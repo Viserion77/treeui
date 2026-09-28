@@ -2047,8 +2047,8 @@ a.t-brand-lockup:focus-visible {
 
 /* Frame geometry. `size` is the message; `frame` is the box the
    message sits in — a board column, a side panel and a page are the same empty
-   state with three geometries, and wrapping the component to supply them was
-   the workaround in 9 files. */
+   state with three geometries, and supplying them by wrapping the component
+   means the same wrapper element re-declared at every call site. */
 .t-empty-state--frame-fill {
   block-size: 100%;
   min-block-size: 0;
@@ -2062,8 +2062,9 @@ a.t-brand-lockup:focus-visible {
 
 /* `narrow` caps the FRAME, not the message. The library already
    capped the inner content, but the dashed box still took the whole column, and
-   in a 900px panel that reads as an enormous empty box. 26rem is the step the
-   consumer's 28 identical `max-width: 420px` wrappers converge on. */
+   in a 900px panel that reads as an enormous empty box. 26rem keeps the dashed
+   border close enough to the message to read as a card; past it the frame
+   reads as a panel with something missing from it. */
 .t-empty-state--frame-narrow {
   width: min(100%, 26rem);
   margin-inline: auto;
@@ -2153,6 +2154,14 @@ a.t-brand-lockup:focus-visible {
   color: currentColor;
 }
 
+/* The tint inks are `*-on-soft`, not the tone's full-strength colour. A tone
+   painted on its own tint measured 4.19:1 to 4.49:1 across the ten tone/theme
+   pairs — eight of them below AA, including `variant="soft" tone="neutral"`,
+   which is BOTH defaults. `*-on-soft` is derived for this exact pairing and
+   deepens as the tint deepens; `.t-button--soft` has always read it. Found by
+   rendering: the Compose and egui ports each measure this matrix in their test
+   suites, and both failed here before the web did. `badge-tone-contract.test.ts`
+   holds the mapping and `badge-contrast.test.ts` holds the floor. */
 .t-badge {
   --tree-badge-solid-bg: var(--tree-color-brand-primary);
   --tree-badge-solid-text: var(--tree-color-brand-contrast);
@@ -2162,9 +2171,9 @@ a.t-brand-lockup:focus-visible {
   --tree-badge-ghost-bg: transparent;
   --tree-badge-ghost-text: var(--tree-color-text-muted);
   --tree-badge-soft-bg: var(--tree-color-brand-soft);
-  --tree-badge-soft-text: var(--tree-color-brand-primary);
+  --tree-badge-soft-text: var(--tree-color-brand-on-soft);
   --tree-badge-danger-bg: var(--tree-color-status-error-soft);
-  --tree-badge-danger-text: var(--tree-color-status-error);
+  --tree-badge-danger-text: var(--tree-color-status-error-on-soft);
   display: inline-flex;
   align-items: center;
   gap: var(--tree-space-2);
@@ -2182,9 +2191,9 @@ a.t-brand-lockup:focus-visible {
   --tree-badge-outline-border: var(--tree-color-status-success-border);
   --tree-badge-ghost-text: var(--tree-color-status-success);
   --tree-badge-soft-bg: var(--tree-color-status-success-soft);
-  --tree-badge-soft-text: var(--tree-color-status-success);
+  --tree-badge-soft-text: var(--tree-color-status-success-on-soft);
   --tree-badge-danger-bg: var(--tree-color-status-success-soft);
-  --tree-badge-danger-text: var(--tree-color-status-success);
+  --tree-badge-danger-text: var(--tree-color-status-success-on-soft);
 }
 
 .t-badge--tone-warning {
@@ -2193,9 +2202,9 @@ a.t-brand-lockup:focus-visible {
   --tree-badge-outline-border: var(--tree-color-status-warning-border);
   --tree-badge-ghost-text: var(--tree-color-status-warning);
   --tree-badge-soft-bg: var(--tree-color-status-warning-soft);
-  --tree-badge-soft-text: var(--tree-color-status-warning);
+  --tree-badge-soft-text: var(--tree-color-status-warning-on-soft);
   --tree-badge-danger-bg: var(--tree-color-status-warning-soft);
-  --tree-badge-danger-text: var(--tree-color-status-warning);
+  --tree-badge-danger-text: var(--tree-color-status-warning-on-soft);
 }
 
 .t-badge--tone-danger {
@@ -2204,7 +2213,7 @@ a.t-brand-lockup:focus-visible {
   --tree-badge-outline-border: var(--tree-color-status-error-border);
   --tree-badge-ghost-text: var(--tree-color-status-error);
   --tree-badge-soft-bg: var(--tree-color-status-error-soft);
-  --tree-badge-soft-text: var(--tree-color-status-error);
+  --tree-badge-soft-text: var(--tree-color-status-error-on-soft);
 }
 
 .t-badge--tone-info {
@@ -2213,9 +2222,9 @@ a.t-brand-lockup:focus-visible {
   --tree-badge-outline-border: var(--tree-color-status-info-border);
   --tree-badge-ghost-text: var(--tree-color-status-info);
   --tree-badge-soft-bg: var(--tree-color-status-info-soft);
-  --tree-badge-soft-text: var(--tree-color-status-info);
+  --tree-badge-soft-text: var(--tree-color-status-info-on-soft);
   --tree-badge-danger-bg: var(--tree-color-status-info-soft);
-  --tree-badge-danger-text: var(--tree-color-status-info);
+  --tree-badge-danger-text: var(--tree-color-status-info-on-soft);
 }
 
 .t-badge--sm {
@@ -4823,8 +4832,8 @@ a.t-brand-lockup:focus-visible {
 
 /* `soft` draws the tone's ring. Without it `--tree-tag-border`
    was computed and then thrown away in the one variant a label badge actually
-   uses. Changed while the tone axis had two consumers, both of whom asked for
-   it — a border on an existing look is not a change that can be made later. */
+   uses. Changed while the tone axis was still new — a border on an existing
+   look is not a change that can be made later. */
 .t-tag--soft {
   background: var(--tree-tag-surface);
   color: var(--tree-tag-fg);
@@ -6193,9 +6202,9 @@ a.t-brand-lockup:focus-visible {
 
 .t-steps__item {
   /* The basis is an axis, not a constant: a strip that can only wrap by width
-     leaves the last step alone on its own row, and the consumer's only fix was
-     to declare the whole component twice inside TShow/THide — which duplicates
-     the copy in the pre-rendered HTML of the one surface that gets crawled. */
+     leaves the last step alone on its own row, and the only fix left is to
+     declare the whole component twice inside TShow/THide — which duplicates
+     the copy in the pre-rendered HTML of any page that gets crawled. */
   flex: 1 1 var(--tree-steps-min-item-width, 14rem);
   list-style: none;
 }

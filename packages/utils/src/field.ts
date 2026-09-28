@@ -1,11 +1,11 @@
 /**
  * Decorative-field arithmetic.
  *
- * Pure functions behind a canvas ornament — a hero wave, a presence orb. Two
- * independent decorations in one repository converged on the same four shapes,
- * which is the bar for lifting maths into the library. No DOM, no timers: the
- * caller owns the frame loop (see `useDecorativeCanvas` in `@treeui/vue`) and
- * these answer "where is everything, at time t".
+ * Pure functions behind a canvas ornament — a hero wave, a presence orb. Any
+ * two such decorations converge on the same four shapes, which is the bar for
+ * lifting maths into the library. No DOM, no timers: the caller owns the frame
+ * loop (see `useDecorativeCanvas` in `@treeui/vue`) and these answer "where is
+ * everything, at time t".
  */
 
 export interface FieldPoint {
@@ -157,8 +157,8 @@ export const containPoint = (
  * Backing-store size for a canvas, with a ceiling on the pixel ratio.
  *
  * A fixed backing store stretched to fit squashes every point into a smear —
- * one consumer measured a 900×520 buffer inside an 800×227 box before fixing
- * it. The ceiling matters just as much: a 3x display on a full-width hero
+ * a 900×520 buffer inside an 800×227 box distorts every coordinate it holds.
+ * The ceiling matters just as much: a 3x display on a full-width hero
  * allocates an enormous surface for an ornament nobody is looking at.
  */
 export const canvasBackingSize = (

@@ -4953,7 +4953,7 @@ describe('TDonutChart', () => {
       slots: {
         'sidebar-header': '<p class="brand">Orchard</p>',
         sidebar: '<nav class="nav">nav</nav>',
-        'sidebar-footer': '<p class="user">Jef</p>',
+        'sidebar-footer': '<p class="user">Nina</p>',
       },
     });
 
@@ -5850,10 +5850,10 @@ describe('TTagInput', () => {
   it('splits a pasted comma-separated string into tags', async () => {
     const wrapper = mount(TTagInput, { props: { modelValue: [] } });
     const input = wrapper.get('input');
-    await input.setValue('dynamodb, sqs, sns');
+    await input.setValue('search, billing, audit');
     // complete segments commit; the trailing fragment stays in the field
-    expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual([['dynamodb', 'sqs']]);
-    expect((input.element as HTMLInputElement).value).toBe('sns');
+    expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual([['search', 'billing']]);
+    expect((input.element as HTMLInputElement).value).toBe('audit');
   });
 
   it('removes the last tag on Backspace when the field is empty', async () => {
@@ -6220,7 +6220,7 @@ describe('quiet accordion', () => {
 describe('TTagInput localizable chip copy', () => {
   it('forwards a localized remove label to every chip', () => {
     const wrapper = mount(TTagInput, {
-      props: { modelValue: ['dynamodb', 'sqs'], removeLabel: 'Remover' },
+      props: { modelValue: ['search', 'billing'], removeLabel: 'Remover' },
     });
     const buttons = wrapper.findAll('.t-tag__remove');
     expect(buttons).toHaveLength(2);
@@ -6228,7 +6228,7 @@ describe('TTagInput localizable chip copy', () => {
   });
 });
 
-describe('TKeyValueEditor, defects found in real adoption', () => {
+describe('TKeyValueEditor, the four ways a typed value could be dropped', () => {
   it('does not drop a row when the parent holds the map reactively', async () => {
     // The parent pattern that broke it: a `reactive()` object handed back as a
     // proxy, which is never `===` the raw record the editor emitted.
@@ -6309,7 +6309,7 @@ describe('TKeyValueEditor, defects found in real adoption', () => {
   });
 });
 
-describe('TTagInput, defects found in real adoption', () => {
+describe('TTagInput, the ways a typed tag could be dropped', () => {
   it('keeps repeated values when allowDuplicates is set', async () => {
     const wrapper = mount(TTagInput, {
       props: { modelValue: ['--param', 'a=1'], allowDuplicates: true },
@@ -7180,7 +7180,8 @@ describe('follow-ups from the 0.28 validation', () => {
   });
 
   it('draws the tone ring on a soft tag, so `--tree-tag-border` stops being computed and dropped', () => {
-    // Route (i), chosen by the consumer while the tone axis still had two users.
+    // The ring lands on `soft` while the tone axis is still new: a border on an
+    // existing look is not a change that can be made later.
     const wrapper = mount(TTag, { props: { variant: 'soft', tone: 'accent' } });
     expect(wrapper.classes()).toContain('t-tag--soft');
     expect(wrapper.classes()).toContain('t-tag--tone-accent');

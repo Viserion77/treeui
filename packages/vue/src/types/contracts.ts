@@ -1,40 +1,33 @@
-export const treeSizes = ['sm', 'md', 'lg'] as const;
-export const treeVariants = ['solid', 'outline', 'ghost', 'soft', 'danger'] as const;
-export const treeCardVariants = ['outline', 'soft', 'inset'] as const;
-export const treeTooltipSides = ['top', 'right', 'bottom', 'left'] as const;
-export const treeDrawerSides = ['top', 'right', 'bottom', 'left'] as const;
 /**
- * Inline-size scale for form controls. Controls fill their container by default
- * (`full`); the other steps cap them at a comfortable reading width while still
- * shrinking on narrow screens.
+ * Shared contract types for the Vue package.
+ *
+ * The closed vocabularies themselves now live in `@treeui/tokens` — they are
+ * design decisions rather than Vue ones, and `@treeui/react` plus the Compose
+ * and egui ports have to reproduce exactly the same sets. This file re-exports
+ * them so every existing import keeps working, and is where a genuinely
+ * Vue-specific contract type would go.
  */
-export const treeFieldWidths = ['xs', 'sm', 'md', 'lg', 'xl', 'full'] as const;
-/**
- * The closed accent axis a surface can declare (TSection, THero, TPageSurface)
- * and every descendant inherits through `--tree-color-accent-*`. Same vocabulary
- * TLinkTile's `tone` uses: a product picks a tone, never a free colour. Left
- * unset, the accent is the secondary brand accent shipped by `@treeui/tokens`.
- */
-export const treeAccents = ['brand', 'neutral', 'success', 'warning', 'danger', 'info'] as const;
-/** Breakpoint names shared with `--tree-breakpoint-*` in `@treeui/tokens`. */
-export const treeBreakpoints = ['sm', 'md', 'lg', 'xl'] as const;
-/**
- * Colour axis for action surfaces (TButton, TConfirmDialog), orthogonal to
- * `variant` — the same closed vocabulary TTag uses. Splitting colour out of the
- * shape scale is what makes a quiet destructive action expressible:
- * `variant="danger"` could only ever be a filled red button.
- */
-export const treeActionTones = [
-  'neutral', 'brand', 'accent', 'success', 'warning', 'danger', 'info',
-] as const;
-
-export type TSize = (typeof treeSizes)[number];
-export type TAccent = (typeof treeAccents)[number];
-export type TBreakpoint = (typeof treeBreakpoints)[number];
-export type TActionTone = (typeof treeActionTones)[number];
-export type TFieldWidth = (typeof treeFieldWidths)[number];
-export type TVariant = (typeof treeVariants)[number];
-export type TCardVariant = (typeof treeCardVariants)[number];
-export type TTooltipSide = (typeof treeTooltipSides)[number];
-export type TDrawerSide = (typeof treeDrawerSides)[number];
-
+export {
+  treeAccents,
+  treeActionTones,
+  treeBadgeTones,
+  treeBreakpoints,
+  treeCardVariants,
+  treeDeprecatedVariants,
+  treeDrawerSides,
+  treeFieldWidths,
+  treeSizes,
+  treeTooltipSides,
+  treeVariants,
+  type TAccent,
+  type TActionTone,
+  type TBadgeTone,
+  type TBreakpoint,
+  type TCardVariant,
+  type TDeprecatedVariant,
+  type TDrawerSide,
+  type TFieldWidth,
+  type TSize,
+  type TTooltipSide,
+  type TVariant,
+} from '@treeui/tokens';

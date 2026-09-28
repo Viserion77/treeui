@@ -2,9 +2,9 @@
  * Drag-and-drop arithmetic.
  *
  * Pure, DOM-free, and framework-agnostic — the Vue composable that owns the
- * listeners builds on this, and a React one would reuse it unchanged. Two
- * consumers arrived at the same three rules independently, which is why they
- * belong here rather than in each product:
+ * listeners builds on this, and a React one would reuse it unchanged. These
+ * are the three rules every drop target has to rediscover the hard way, which
+ * is why they belong here rather than in each product:
  *
  *  1. **A `dragleave` from the parent fires before the `dragenter` of a child**,
  *     so a boolean "is hovering" flickers off every time the pointer crosses an

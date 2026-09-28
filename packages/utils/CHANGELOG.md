@@ -4,7 +4,7 @@
 
 ### Minor Changes
 
-- 1a9d136: Clears the entire accepted backlog from both consumer files in one release.
+- 1a9d136: Calendar, media, drop, canvas and layout primitives in one release.
 
   **Calendar** — `TCalendarMonthGrid`, `TCalendarTimeGrid` and
   the `TCalendar` wrapper with `view`. The month grid CONSUMES `getMonthMatrix`
@@ -63,21 +63,21 @@
     `update:secrets` — replacing a value changes neither which keys exist nor
     whether they are set.
 
-  **Follow-ups from the 0.28 validation**
+  **Follow-ups to 0.28**
 
-  - `TEmptyState frame="narrow"` — a width cap for the FRAME. 28 of one consumer's
-    37 wrappers were the same `max-width: 420px`; `fill`/`inline` answered a
-    different question because the original evidence said "geometry".
+  - `TEmptyState frame="narrow"` — a width cap for the FRAME. The wrapper around a
+    hand-rolled empty state converges on the same `max-width: 420px`;
+    `fill`/`inline` answered the geometry question, not the width one.
   - A soft `TTag` WITH a `tone` now draws that tone's ring. `--tree-tag-border` was
-    computed and then discarded in the one variant a label badge uses. Changed now,
-    with two consumers and both asking for it — a border on an existing look is not
+    computed and then discarded in the one variant a label badge uses. Changed
+    while the tone axis is still new — a border on an existing look is not
     a change that can be made later.
 
 ## 0.26.0
 
 ### Minor Changes
 
-- 184914c: Calendar math fixes from real adoption:
+- 184914c: Calendar math fixes:
 
   - `placeInDay` no longer lets `minHeight` push a block past the day's end. A
     short event near midnight (e.g. 3 minutes at 23:55) was floored to the minimum

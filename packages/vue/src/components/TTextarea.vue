@@ -31,8 +31,8 @@ const props = withDefaults(
     maxRows?: number;
     /**
      * Font family for the editable content, same vocabulary as TText. `mono`
-     * is for machine text — JSON, a policy document, a Lambda payload — which
-     * otherwise leaves a `.mono` class behind in the consumer's stylesheet.
+     * is for machine text — JSON, a policy document, a webhook payload — which
+     * otherwise needs a one-off `.mono` font-family rule in product CSS.
      */
     family?: TTextareaFamily;
     /**

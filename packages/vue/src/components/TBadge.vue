@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import { computed } from 'vue';
-import type { TSize, TVariant } from '../types/contracts';
+import type { TBadgeTone, TSize, TVariant } from '../types/contracts';
 
-const _treeBadgeTones = ['neutral', 'success', 'warning', 'danger', 'info'] as const;
-
-export type TBadgeTone = (typeof _treeBadgeTones)[number];
+// The set itself lives in `@treeui/tokens` so `@treeui/react` and the Compose
+// and egui ports read the same one. Re-exported here because `TBadgeTone` has
+// always been part of this component's public surface.
+export type { TBadgeTone };
 
 const props = withDefaults(
   defineProps<{

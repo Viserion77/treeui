@@ -33,12 +33,12 @@ defineOptions({
 
 /**
  * Generic over the option value AND the selection mode, so the model type is
- * the one the call site actually has: `single` binds a `T`, `multiple` binds a
+ * the one the binding actually has: `single` binds a `T`, `multiple` binds a
  * `T[]`. Before this the model was `string | string[]` in and
  * `string | string[] | undefined` out, so a `ref<'grid' | 'list'>` could not be
- * bound at all under a consumer's `strictTemplates` — the same defect as
- * TTabs/TInput, and `undefined` was never actually
- * emitted.
+ * bound at all under `strictTemplates` — the same defect as TTabs/TInput, and
+ * invisible to any build that does not typecheck templates against the
+ * published types. `undefined` was never actually emitted.
  */
 const props = withDefaults(
   defineProps<{

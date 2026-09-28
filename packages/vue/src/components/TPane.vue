@@ -8,8 +8,8 @@ import { computed } from 'vue';
  * The recipe is four lines, and one of them is the reason this is a component:
  * `min-block-size: 0` on the scrolling child. Without it a flex child refuses to
  * shrink below its content, the middle never scrolls, and the footer is pushed
- * off the bottom of the screen — and nobody gets it right the first time. Two
- * SPAs had copied the same four lines.
+ * off the bottom of the screen — and nobody gets it right the first time. Four
+ * lines re-derived once per docked layout is what a component is for.
  */
 const props = withDefaults(
   defineProps<{

@@ -4,9 +4,9 @@ import { onBeforeUnmount, onMounted, ref, type Ref } from 'vue';
 /**
  * Lifecycle of a decorative canvas.
  *
- * Two independent ornaments in one repository — a hero wave and a presence orb —
- * discovered the same ~90 lines of trap by measuring. None of it is about
- * particles; all of it is about how a decorative canvas has to behave:
+ * Two independent ornaments — a hero wave and a presence orb — discover the
+ * same ~90 lines of trap by measuring. None of it is about particles; all of
+ * it is about how a decorative canvas has to behave:
  *
  *  1. **It does not run when it cannot be seen.** Not under
  *     `prefers-reduced-motion`, not on a coarse pointer, not while the tab is

@@ -16,10 +16,10 @@ describe('dragCarriesTypes', () => {
   });
 
   it('accepts a product payload without assuming files', () => {
-    expect(dragCarriesTypes({ types: ['application/x-s7-task'] }, ['application/x-s7-task'])).toBe(
+    expect(dragCarriesTypes({ types: ['application/x-acme-task'] }, ['application/x-acme-task'])).toBe(
       true,
     );
-    expect(dragCarriesFiles({ types: ['application/x-s7-task'] })).toBe(false);
+    expect(dragCarriesFiles({ types: ['application/x-acme-task'] })).toBe(false);
   });
 
   it('rejects a plain text drag, so dragging text into a field keeps working', () => {
@@ -73,12 +73,12 @@ describe('filesFromTransfer', () => {
 
 describe('payloadFromTransfer', () => {
   const transfer = {
-    types: ['application/x-s7-task'],
-    getData: (type: string) => (type === 'application/x-s7-task' ? '{"id":"7"}' : ''),
+    types: ['application/x-acme-task'],
+    getData: (type: string) => (type === 'application/x-acme-task' ? '{"id":"7"}' : ''),
   };
 
   it('parses a JSON payload', () => {
-    expect(payloadFromTransfer<{ id: string }>(transfer, 'application/x-s7-task')).toEqual({
+    expect(payloadFromTransfer<{ id: string }>(transfer, 'application/x-acme-task')).toEqual({
       id: '7',
     });
   });

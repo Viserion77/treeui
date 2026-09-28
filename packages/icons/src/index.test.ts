@@ -94,7 +94,7 @@ describe('@treeui/icons registry', () => {
     expect(new Set(names).size).toBe(BUILTIN_COUNT);
   });
 
-  it('lists built-ins under the current product vocabulary', () => {
+  it('lists built-ins under the descriptive catalog vocabulary', () => {
     const names = listTreeIcons();
 
     expect(names).toContain('check');
@@ -123,13 +123,13 @@ describe('@treeui/icons registry', () => {
 
   it('does not expose removed app-prefixed or brand names', () => {
     const names = listTreeIcons();
-    const currentProductNames = [
+    const framedGlyphNames = [
       'account',
       'ai-studio',
       'assistant',
+      'campaign',
       'catalog',
       'companion',
-      'contentpilot',
       'draw',
       'llm',
       'market',
@@ -145,7 +145,6 @@ describe('@treeui/icons registry', () => {
       'app-calendar',
       'app-catalog',
       'app-companion',
-      'app-contentpilot',
       'app-draw',
       'app-llm',
       'app-mail',
@@ -156,7 +155,7 @@ describe('@treeui/icons registry', () => {
       'app-trail',
     ];
 
-    for (const name of currentProductNames) {
+    for (const name of framedGlyphNames) {
       expect(names).toContain(name);
     }
 

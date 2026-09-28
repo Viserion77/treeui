@@ -60,6 +60,7 @@ const BUILTIN_ICON_NAMES = [
   'calendar-plus',
   'calendar-range',
   'calendar-x',
+  'campaign',
   'car',
   'carousel',
   'catalog',
@@ -97,7 +98,6 @@ const BUILTIN_ICON_NAMES = [
   'companion',
   'compass',
   'connections',
-  'contentpilot',
   'copy',
   'cpu',
   'cpu-chip',
@@ -1022,19 +1022,20 @@ const storageFrame = (name: string): TIconNodes => {
 /**
  * Glyphs drawn inside a rounded-square container.
  *
- * A shared drawing treatment, not a namespace. These were once filed as
- * "TreeUI product icons", which put a consumer's decision inside the library:
- * whether `market` is a product mark or just a shop front is decided by whoever
- * renders it, so the catalog files each one by what it draws.
+ * A shared drawing treatment, not a namespace. These were once filed under a
+ * `product` category, which recorded an application's decision as library
+ * metadata: whether `market` reads as a product mark or as a shop front is
+ * decided by where it is rendered, so the catalog files each one by what it
+ * draws.
  */
 const FRAMED_GLYPH_NAMES = new Set<string>([
   'account',
   'ai-studio',
   'app-window',
   'assistant',
+  'campaign',
   'catalog',
   'companion',
-  'contentpilot',
   'draw',
   'llm',
   'market',
@@ -1062,7 +1063,7 @@ const framedGlyph = (name: string): TIconNodes => {
     case 'window': return glyph(frame, line(3, 8, 21, 8), circle(6.25, 5.5, 0.5), circle(9, 5.5, 0.5), rect(7, 11, 10, 6, 1.25));
     case 'ai-studio': return glyph(frame, path('M12 6.5v11M6.5 12h11'), path('M8.5 8.5l7 7M15.5 8.5l-7 7'));
     case 'assistant': return glyph(frame, rect(7, 8.5, 10, 8, 2), circle(10, 12.5, 0.7), circle(14, 12.5, 0.7), line(10, 15, 14, 15), line(12, 5.5, 12, 8.5), circle(12, 4.5, 0.75));
-    case 'contentpilot': return glyph(frame, path('M6.5 10h3l7-3v9l-7-3h-3z'), path('M9.5 13l1.25 4h2.5'), path('M18 5v3M16.5 6.5h3'));
+    case 'campaign': return glyph(frame, path('M6.5 10h3l7-3v9l-7-3h-3z'), path('M9.5 13l1.25 4h2.5'), path('M18 5v3M16.5 6.5h3'));
     case 'trail': return glyph(frame, circle(7.5, 16, 1.25), circle(16.5, 8, 1.25), path('M8.75 15.5c5-.5 2-6.5 6.5-7'));
     default: throw new Error(`Missing framed glyph geometry: ${name}`);
   }
@@ -1094,7 +1095,7 @@ const directGeometry = (name: string): TIconNodes | undefined => {
   switch (name) {
     case 'activity': return glyph(polyline('2.75,13 6.5,13 9,6 13,18 15.5,11 21.25,11'), circle(9, 6, 0.55), circle(13, 18, 0.55));
     // Everyday-life subjects: what money is spent on, which the catalog had no
-    // way to draw. `wealth-ui` was falling back to `price-tag` for all of them.
+    // way to draw — every one of them had to fall back to `price-tag`.
     case 'briefcase': return glyph(rect(2.75, 7.5, 18.5, 12.75, 2), path('M8.5 7.5V6a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2v1.5'), line(2.75, 12.75, 21.25, 12.75));
     case 'car': return glyph(path('M3.5 13.5 5.25 8.75A2 2 0 0 1 7.15 7.5h9.7a2 2 0 0 1 1.9 1.25l1.75 4.75'), rect(2.75, 13.5, 18.5, 4.5, 1.5), circle(7, 18, 1.75), circle(17, 18, 1.75));
     case 'graduation-cap': return glyph(path('M12 4.25 22 9l-10 4.75L2 9z'), path('M6 11.25v4.5c0 1.5 2.7 2.75 6 2.75s6-1.25 6-2.75v-4.5'), line(21, 9.5, 21, 14.5));

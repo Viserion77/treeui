@@ -211,7 +211,7 @@ export const treeIconFamilies: Readonly<
   ],
   'communication': [
     { id: 'bell', icons: ['bell'] },
-    { id: 'contentpilot', icons: ['contentpilot'] },
+    { id: 'campaign', icons: ['campaign'] },
     { id: 'globe', icons: ['globe', 'globe-check'] },
     { id: 'languages', icons: ['languages'] },
     { id: 'mail', icons: ['mail', 'mail-open', 'mail-plus', 'mail-check', 'mail-warning'] },

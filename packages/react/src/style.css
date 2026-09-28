@@ -17,6 +17,19 @@
   box-sizing: border-box;
 }
 
+/* Focus ring geometry. @treeui/tokens ships the colour
+   (--tree-color-focus-ring) but no width, so the standard ring is written once
+   here and every rule that draws it references this variable — one edit
+   re-tunes the whole library. Use it for standalone controls (buttons, fields,
+   triggers). The two deliberate exceptions are a 2px inset ring for options
+   inside a scrollable listbox, where an outer glow is clipped by the overflow,
+   and a 2px outline on chips and other controls packed tight enough that a
+   full ring would collide with a neighbour. Belongs in @treeui/tokens the next
+   time that package's public surface changes. */
+:root {
+  --tree-focus-ring-width: 4px;
+}
+
 /* Base typography. The per-component rules below guarantee the design font even
    when a component sits inside a consumer element with its own font-family, but
    they cannot cover unstyled prose or the overlays teleported to <body>. This
@@ -49,14 +62,32 @@ html {
 }
 
 .t-button {
-  --tree-button-bg: var(--tree-color-brand-primary);
-  --tree-button-text: var(--tree-color-brand-contrast);
+  /* Tone axis. The variants read an accent triple instead of
+     hard-coding the brand, so "destructive" composes with every variant —
+     `variant="danger"` could only ever be a filled red button, and a quiet
+     destructive action in a row of ghost buttons had no way to be expressed.
+     Unset, the triple is the brand and every variant renders exactly as before. */
+  --tree-button-accent: var(--tree-color-brand-primary);
+  --tree-button-accent-hover: var(--tree-color-brand-hover);
+  --tree-button-accent-press: var(--tree-color-brand-press);
+  --tree-button-accent-soft: var(--tree-color-brand-soft);
+  --tree-button-accent-soft-hover: var(--tree-color-brand-soft-hover);
+  --tree-button-accent-soft-press: var(--tree-color-brand-soft-press);
+  --tree-button-accent-on-soft: var(--tree-color-brand-on-soft);
+  --tree-button-accent-on-soft-hover: var(--tree-color-brand-on-soft-hover);
+  --tree-button-accent-on-soft-press: var(--tree-color-brand-on-soft-press);
+  --tree-button-accent-contrast: var(--tree-color-brand-contrast);
+  --tree-button-bg: var(--tree-button-accent);
+  --tree-button-text: var(--tree-button-accent-contrast);
   --tree-button-border: transparent;
   --tree-button-shadow: transparent;
-  /* Interaction state defaults, so every variant has a visible hover and press
-     without writing a fallback at each call site. Mirrors the Vue package. */
-  --tree-button-bg-hover: var(--tree-color-brand-hover);
-  --tree-button-bg-press: var(--tree-color-brand-press);
+  /* Interaction state defaults, so every variant has a hover and a press
+     without any of them writing a fallback. A variant that wants different
+     feedback redefines these; one that does not still gets a visible state.
+     Before this, `--tree-button-bg` was never reassigned on hover and the only
+     feedback any variant had was a 1px lift. */
+  --tree-button-bg-hover: var(--tree-button-accent-hover);
+  --tree-button-bg-press: var(--tree-button-accent-press);
   --tree-button-text-hover: var(--tree-button-text);
   --tree-button-text-press: var(--tree-button-text);
   --tree-button-border-hover: var(--tree-button-border);
@@ -118,7 +149,7 @@ html {
 
 .t-button:focus-visible {
   outline: none;
-  box-shadow: 0 0 0 4px var(--tree-color-focus-ring);
+  box-shadow: 0 0 0 var(--tree-focus-ring-width) var(--tree-color-focus-ring);
 }
 
 .t-button.is-disabled {
@@ -138,6 +169,19 @@ html {
   height: var(--tree-size-control-lg);
   padding-inline: var(--tree-space-5);
   font-size: var(--tree-font-size-lg);
+}
+
+.t-button--block {
+  width: 100%;
+  min-width: 0;
+}
+
+.t-button--align-start {
+  justify-content: flex-start;
+}
+
+.t-button--align-end {
+  justify-content: flex-end;
 }
 
 /* Icon-only: collapse the inline padding so the control renders as a square
@@ -160,10 +204,8 @@ html {
 }
 
 .t-button--solid {
-  --tree-button-bg: var(--tree-color-brand-primary);
-  --tree-button-bg-hover: var(--tree-color-brand-hover);
-  --tree-button-bg-press: var(--tree-color-brand-press);
-  --tree-button-text: var(--tree-color-brand-contrast);
+  --tree-button-bg: var(--tree-button-accent);
+  --tree-button-text: var(--tree-button-accent-contrast);
 }
 
 .t-button--outline {
@@ -186,13 +228,15 @@ html {
   --tree-button-border-disabled: transparent;
 }
 
+/* The tint deepens and its ink deepens with it, because a tint has only so
+   much headroom before the label stops clearing AA on it. */
 .t-button--soft {
-  --tree-button-bg-hover: var(--tree-color-brand-soft-hover);
-  --tree-button-bg-press: var(--tree-color-brand-soft-press);
-  --tree-button-text-hover: var(--tree-color-brand-on-soft-hover);
-  --tree-button-text-press: var(--tree-color-brand-on-soft-press);
-  --tree-button-bg: var(--tree-color-brand-soft);
-  --tree-button-text: var(--tree-color-brand-on-soft);
+  --tree-button-bg: var(--tree-button-accent-soft);
+  --tree-button-bg-hover: var(--tree-button-accent-soft-hover);
+  --tree-button-bg-press: var(--tree-button-accent-soft-press);
+  --tree-button-text: var(--tree-button-accent-on-soft);
+  --tree-button-text-hover: var(--tree-button-accent-on-soft-hover);
+  --tree-button-text-press: var(--tree-button-accent-on-soft-press);
 }
 
 .t-button--danger {
@@ -200,6 +244,125 @@ html {
   --tree-button-bg-hover: var(--tree-color-status-error-hover);
   --tree-button-bg-press: var(--tree-color-status-error-press);
   --tree-button-text: var(--tree-color-status-error-contrast);
+}
+
+/* Tone only changes the ink on the quiet variants — a ghost or outline button
+   in a row of neutral ones says "destructive" with its label, not with a filled
+   red block that outweighs the action. */
+.t-button.has-tone.t-button--outline {
+  --tree-button-text: var(--tree-button-accent);
+  --tree-button-border: color-mix(in srgb, var(--tree-button-accent) 36%, var(--tree-color-border-default));
+}
+
+.t-button.has-tone.t-button--ghost {
+  --tree-button-text: var(--tree-button-accent);
+}
+
+/* `soft` accepted `tone` and rendered nothing — the same silent no-op the tone
+   axis existed to kill, one level down. It tints the same way it does for the
+   brand: accent ink on the accent's soft tint. */
+.t-button.has-tone.t-button--soft {
+  --tree-button-bg: var(--tree-button-accent-soft);
+  --tree-button-text: var(--tree-button-accent-on-soft);
+}
+
+.t-button--tone-neutral {
+  --tree-button-accent: var(--tree-color-text-primary);
+  --tree-button-accent-hover: var(--tree-color-text-primary);
+  --tree-button-accent-press: var(--tree-color-text-primary);
+  --tree-button-accent-soft: var(--tree-color-bg-subtle);
+  --tree-button-accent-soft-hover: var(--tree-color-state-hover-bg);
+  --tree-button-accent-soft-press: var(--tree-color-state-press-bg);
+  --tree-button-accent-on-soft: var(--tree-color-text-primary);
+  --tree-button-accent-on-soft-hover: var(--tree-color-text-primary);
+  --tree-button-accent-on-soft-press: var(--tree-color-text-primary);
+  --tree-button-accent-contrast: var(--tree-color-text-inverse);
+}
+
+.t-button--tone-brand {
+  --tree-button-accent: var(--tree-color-brand-primary);
+  --tree-button-accent-hover: var(--tree-color-brand-hover);
+  --tree-button-accent-press: var(--tree-color-brand-press);
+  --tree-button-accent-soft: var(--tree-color-brand-soft);
+  --tree-button-accent-soft-hover: var(--tree-color-brand-soft-hover);
+  --tree-button-accent-soft-press: var(--tree-color-brand-soft-press);
+  --tree-button-accent-on-soft: var(--tree-color-brand-on-soft);
+  --tree-button-accent-on-soft-hover: var(--tree-color-brand-on-soft-hover);
+  --tree-button-accent-on-soft-press: var(--tree-color-brand-on-soft-press);
+  --tree-button-accent-contrast: var(--tree-color-brand-contrast);
+}
+
+.t-button--tone-accent {
+  --tree-button-accent: var(--tree-color-accent-primary);
+  --tree-button-accent-hover: var(--tree-color-accent-hover);
+  --tree-button-accent-press: var(--tree-color-accent-press);
+  --tree-button-accent-soft: var(--tree-color-accent-soft);
+  --tree-button-accent-soft-hover: var(--tree-color-accent-soft-hover);
+  --tree-button-accent-soft-press: var(--tree-color-accent-soft-press);
+  --tree-button-accent-on-soft: var(--tree-color-accent-on-soft);
+  --tree-button-accent-on-soft-hover: var(--tree-color-accent-on-soft-hover);
+  --tree-button-accent-on-soft-press: var(--tree-color-accent-on-soft-press);
+  --tree-button-accent-contrast: var(--tree-color-accent-contrast);
+}
+
+.t-button--tone-success {
+  --tree-button-accent: var(--tree-color-status-success);
+  --tree-button-accent-hover: var(--tree-color-status-success-hover);
+  --tree-button-accent-press: var(--tree-color-status-success-press);
+  --tree-button-accent-soft: var(--tree-color-status-success-soft);
+  --tree-button-accent-soft-hover: var(--tree-color-status-success-soft-hover);
+  --tree-button-accent-soft-press: var(--tree-color-status-success-soft-hover);
+  --tree-button-accent-on-soft: var(--tree-color-status-success-on-soft);
+  --tree-button-accent-on-soft-hover: var(--tree-color-status-success-on-soft-hover);
+  --tree-button-accent-on-soft-press: var(--tree-color-status-success-on-soft-hover);
+  /* Computed per theme, not `text-inverse`: white on the light warning
+     measured 4.87:1 and would break on any lighter amber. */
+  --tree-button-accent-contrast: var(--tree-color-status-success-contrast);
+}
+
+.t-button--tone-warning {
+  --tree-button-accent: var(--tree-color-status-warning);
+  --tree-button-accent-hover: var(--tree-color-status-warning-hover);
+  --tree-button-accent-press: var(--tree-color-status-warning-press);
+  --tree-button-accent-soft: var(--tree-color-status-warning-soft);
+  --tree-button-accent-soft-hover: var(--tree-color-status-warning-soft-hover);
+  --tree-button-accent-soft-press: var(--tree-color-status-warning-soft-hover);
+  --tree-button-accent-on-soft: var(--tree-color-status-warning-on-soft);
+  --tree-button-accent-on-soft-hover: var(--tree-color-status-warning-on-soft-hover);
+  --tree-button-accent-on-soft-press: var(--tree-color-status-warning-on-soft-hover);
+  /* Computed per theme, not `text-inverse`: white on the light warning
+     measured 4.87:1 and would break on any lighter amber. */
+  --tree-button-accent-contrast: var(--tree-color-status-warning-contrast);
+}
+
+.t-button--tone-danger {
+  --tree-button-accent: var(--tree-color-status-error);
+  --tree-button-accent-hover: var(--tree-color-status-error-hover);
+  --tree-button-accent-press: var(--tree-color-status-error-press);
+  --tree-button-accent-soft: var(--tree-color-status-error-soft);
+  --tree-button-accent-soft-hover: var(--tree-color-status-error-soft-hover);
+  --tree-button-accent-soft-press: var(--tree-color-status-error-soft-hover);
+  --tree-button-accent-on-soft: var(--tree-color-status-error-on-soft);
+  --tree-button-accent-on-soft-hover: var(--tree-color-status-error-on-soft-hover);
+  --tree-button-accent-on-soft-press: var(--tree-color-status-error-on-soft-hover);
+  /* Computed per theme, not `text-inverse`: white on the light warning
+     measured 4.87:1 and would break on any lighter amber. */
+  --tree-button-accent-contrast: var(--tree-color-status-error-contrast);
+}
+
+.t-button--tone-info {
+  --tree-button-accent: var(--tree-color-status-info);
+  --tree-button-accent-hover: var(--tree-color-status-info-hover);
+  --tree-button-accent-press: var(--tree-color-status-info-press);
+  --tree-button-accent-soft: var(--tree-color-status-info-soft);
+  --tree-button-accent-soft-hover: var(--tree-color-status-info-soft-hover);
+  --tree-button-accent-soft-press: var(--tree-color-status-info-soft-hover);
+  --tree-button-accent-on-soft: var(--tree-color-status-info-on-soft);
+  --tree-button-accent-on-soft-hover: var(--tree-color-status-info-on-soft-hover);
+  --tree-button-accent-on-soft-press: var(--tree-color-status-info-on-soft-hover);
+  /* Computed per theme, not `text-inverse`: white on the light warning
+     measured 4.87:1 and would break on any lighter amber. */
+  --tree-button-accent-contrast: var(--tree-color-status-info-contrast);
 }
 
 .t-button__icon,
@@ -213,6 +376,20 @@ html {
 
 .t-button__spinner .t-spinner {
   color: currentColor;
+}
+
+/* Same scale contract as the tag's icon slot in @treeui/vue. */
+.t-badge__icon > :where(svg) {
+  inline-size: var(--tree-badge-icon-size, var(--tree-size-icon-sm));
+  block-size: var(--tree-badge-icon-size, var(--tree-size-icon-sm));
+}
+
+.t-badge--sm .t-badge__icon {
+  --tree-badge-icon-size: 0.875rem;
+}
+
+.t-badge--lg .t-badge__icon {
+  --tree-badge-icon-size: var(--tree-size-icon-md);
 }
 
 .t-input {
@@ -234,7 +411,7 @@ html {
 
 .t-input:focus-within {
   border-color: var(--tree-color-brand-primary);
-  box-shadow: 0 0 0 4px var(--tree-color-focus-ring);
+  box-shadow: 0 0 0 var(--tree-focus-ring-width) var(--tree-color-focus-ring);
 }
 
 .t-input.is-invalid {
@@ -342,6 +519,11 @@ html {
   gap: var(--tree-space-2);
 }
 
+/* The tint inks are `*-on-soft`, not the tone's full-strength colour. A tone
+   painted on its own tint measured 4.19:1 to 4.49:1 across the ten tone/theme
+   pairs — eight of them below AA, including `variant="soft" tone="neutral"`,
+   which is BOTH defaults. See the same comment in
+   packages/vue/src/styles/index.css, which is the source of truth. */
 .t-badge {
   --tree-badge-solid-bg: var(--tree-color-brand-primary);
   --tree-badge-solid-text: var(--tree-color-brand-contrast);
@@ -351,9 +533,9 @@ html {
   --tree-badge-ghost-bg: transparent;
   --tree-badge-ghost-text: var(--tree-color-text-muted);
   --tree-badge-soft-bg: var(--tree-color-brand-soft);
-  --tree-badge-soft-text: var(--tree-color-brand-primary);
-  --tree-badge-danger-bg: color-mix(in srgb, var(--tree-color-status-error) 16%, var(--tree-color-bg-surface));
-  --tree-badge-danger-text: var(--tree-color-status-error);
+  --tree-badge-soft-text: var(--tree-color-brand-on-soft);
+  --tree-badge-danger-bg: var(--tree-color-status-error-soft);
+  --tree-badge-danger-text: var(--tree-color-status-error-on-soft);
   display: inline-flex;
   align-items: center;
   gap: var(--tree-space-2);
@@ -370,10 +552,10 @@ html {
   --tree-badge-outline-text: var(--tree-color-status-success);
   --tree-badge-outline-border: var(--tree-color-status-success-border);
   --tree-badge-ghost-text: var(--tree-color-status-success);
-  --tree-badge-soft-bg: color-mix(in srgb, var(--tree-color-status-success) 14%, var(--tree-color-bg-surface));
-  --tree-badge-soft-text: var(--tree-color-status-success);
-  --tree-badge-danger-bg: color-mix(in srgb, var(--tree-color-status-success) 18%, var(--tree-color-bg-surface));
-  --tree-badge-danger-text: var(--tree-color-status-success);
+  --tree-badge-soft-bg: var(--tree-color-status-success-soft);
+  --tree-badge-soft-text: var(--tree-color-status-success-on-soft);
+  --tree-badge-danger-bg: var(--tree-color-status-success-soft);
+  --tree-badge-danger-text: var(--tree-color-status-success-on-soft);
 }
 
 .t-badge--tone-warning {
@@ -381,10 +563,10 @@ html {
   --tree-badge-outline-text: var(--tree-color-status-warning);
   --tree-badge-outline-border: var(--tree-color-status-warning-border);
   --tree-badge-ghost-text: var(--tree-color-status-warning);
-  --tree-badge-soft-bg: color-mix(in srgb, var(--tree-color-status-warning) 14%, var(--tree-color-bg-surface));
-  --tree-badge-soft-text: var(--tree-color-status-warning);
-  --tree-badge-danger-bg: color-mix(in srgb, var(--tree-color-status-warning) 18%, var(--tree-color-bg-surface));
-  --tree-badge-danger-text: var(--tree-color-status-warning);
+  --tree-badge-soft-bg: var(--tree-color-status-warning-soft);
+  --tree-badge-soft-text: var(--tree-color-status-warning-on-soft);
+  --tree-badge-danger-bg: var(--tree-color-status-warning-soft);
+  --tree-badge-danger-text: var(--tree-color-status-warning-on-soft);
 }
 
 .t-badge--tone-danger {
@@ -392,8 +574,8 @@ html {
   --tree-badge-outline-text: var(--tree-color-status-error);
   --tree-badge-outline-border: var(--tree-color-status-error-border);
   --tree-badge-ghost-text: var(--tree-color-status-error);
-  --tree-badge-soft-bg: color-mix(in srgb, var(--tree-color-status-error) 14%, var(--tree-color-bg-surface));
-  --tree-badge-soft-text: var(--tree-color-status-error);
+  --tree-badge-soft-bg: var(--tree-color-status-error-soft);
+  --tree-badge-soft-text: var(--tree-color-status-error-on-soft);
 }
 
 .t-badge--tone-info {
@@ -401,10 +583,10 @@ html {
   --tree-badge-outline-text: var(--tree-color-status-info);
   --tree-badge-outline-border: var(--tree-color-status-info-border);
   --tree-badge-ghost-text: var(--tree-color-status-info);
-  --tree-badge-soft-bg: color-mix(in srgb, var(--tree-color-status-info) 14%, var(--tree-color-bg-surface));
-  --tree-badge-soft-text: var(--tree-color-status-info);
-  --tree-badge-danger-bg: color-mix(in srgb, var(--tree-color-status-info) 18%, var(--tree-color-bg-surface));
-  --tree-badge-danger-text: var(--tree-color-status-info);
+  --tree-badge-soft-bg: var(--tree-color-status-info-soft);
+  --tree-badge-soft-text: var(--tree-color-status-info-on-soft);
+  --tree-badge-danger-bg: var(--tree-color-status-info-soft);
+  --tree-badge-danger-text: var(--tree-color-status-info-on-soft);
 }
 
 .t-badge--sm {

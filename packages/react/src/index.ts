@@ -6,4 +6,14 @@ export { TBadge } from './components/TBadge';
 export type { TBadgeProps } from './components/TBadge';
 export { TCard } from './components/TCard';
 export type { TCardProps } from './components/TCard';
-export type { TSize, TVariant, TCardVariant, TBadgeTone } from './types';
+export type {
+  TAccent,
+  TActionTone,
+  TBadgeTone,
+  TBreakpoint,
+  TCardVariant,
+  TFieldWidth,
+  TSize,
+  TTooltipSide,
+  TVariant,
+} from './types';

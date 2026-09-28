@@ -193,7 +193,7 @@ function selectView(value: string, closeSidebar: () => void) {
             <TDropdown
               :items="userMenu"
               size="sm"
-              label="Jef"
+              label="Nina"
               aria-label="User menu"
               @select="onUserMenu"
             />
@@ -306,10 +306,10 @@ function selectView(value: string, closeSidebar: () => void) {
           gap="var(--tree-space-2)"
         >
           <TAvatar
-            initials="JA"
+            initials="NR"
             status="online"
             size="sm"
-            alt="Jef Almeida"
+            alt="Nina Rocha"
           />
           <template v-if="!collapsed">
             <TText
@@ -317,7 +317,7 @@ function selectView(value: string, closeSidebar: () => void) {
               tone="muted"
               truncate
             >
-              Jef Almeida
+              Nina Rocha
             </TText>
             <TSpacer />
             <TTooltip content="Collapse sidebar">

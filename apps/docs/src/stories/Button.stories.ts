@@ -22,6 +22,12 @@ const meta = {
       control: 'select',
       options: ['solid', 'outline', 'ghost', 'soft', 'danger', 'brand'],
     },
+    tone: {
+      control: 'select',
+      // `undefined` first: unset is the default and is not the same as
+      // `neutral` — unset fills with the brand, `neutral` fills with ink.
+      options: [undefined, 'neutral', 'brand', 'accent', 'success', 'warning', 'danger', 'info'],
+    },
     size: {
       control: 'select',
       options: ['sm', 'md', 'lg'],
@@ -73,6 +79,73 @@ export const Variants: Story = {
         <TButton variant="soft">Soft</TButton>
         <TButton variant="danger">Danger</TButton>
         <TButton variant="brand">Brand</TButton>
+      </div>
+    `,
+  }),
+};
+
+export const Tones: Story = {
+  render: () => ({
+    components: { TButton },
+    template: `
+      <div style="display: grid; gap: 1rem;">
+        <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+          <TButton tone="neutral">Neutral</TButton>
+          <TButton tone="brand">Brand</TButton>
+          <TButton tone="accent">Accent</TButton>
+          <TButton tone="success">Success</TButton>
+          <TButton tone="warning">Warning</TButton>
+          <TButton tone="danger">Danger</TButton>
+          <TButton tone="info">Info</TButton>
+        </div>
+        <div style="font-size: var(--tree-font-size-sm); color: var(--tree-color-text-muted);">
+          <code>tone</code> is orthogonal to <code>variant</code>: the variant decides the shape,
+          the tone decides which colour set that shape paints with. Each tone carries its own
+          hover, press and tint steps, plus the ink computed to clear AA on both — which is why
+          <code>tone="warning"</code> does not put white on amber.
+        </div>
+      </div>
+    `,
+  }),
+};
+
+export const ToneAcrossVariants: Story = {
+  render: () => ({
+    components: { TButton },
+    template: `
+      <div style="display: grid; gap: 1rem;">
+        <div style="display: flex; gap: 0.75rem; flex-wrap: wrap; align-items: center;">
+          <TButton variant="solid" tone="danger">Solid</TButton>
+          <TButton variant="soft" tone="danger">Soft</TButton>
+          <TButton variant="outline" tone="danger">Outline</TButton>
+          <TButton variant="ghost" tone="danger">Ghost</TButton>
+        </div>
+        <div style="font-size: var(--tree-font-size-sm); color: var(--tree-color-text-muted);">
+          This is the row the axis exists for. On the quiet variants a tone inks the label and the
+          edge instead of filling the button, so a destructive action can say what it is without
+          outweighing everything around it. The deprecated <code>variant="danger"</code> could only
+          ever be the first of these four.
+        </div>
+      </div>
+    `,
+  }),
+};
+
+export const QuietDestructive: Story = {
+  render: () => ({
+    components: { TButton },
+    template: `
+      <div style="display: grid; gap: 1rem; max-width: 26rem;">
+        <div style="display: flex; gap: 0.75rem; flex-wrap: wrap; align-items: center;">
+          <TButton>Save changes</TButton>
+          <TButton variant="ghost">Duplicate</TButton>
+          <TButton variant="ghost">Archive</TButton>
+          <TButton variant="ghost" tone="danger">Delete</TButton>
+        </div>
+        <div style="font-size: var(--tree-font-size-sm); color: var(--tree-color-text-muted);">
+          One primary action, three quiet ones, and the destructive one still reads as destructive.
+          A filled red button here would outweigh the action people actually came to take.
+        </div>
       </div>
     `,
   }),

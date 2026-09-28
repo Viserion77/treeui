@@ -11,9 +11,15 @@ const meta = {
       control: 'select',
       options: ['solid', 'outline', 'ghost', 'soft', 'danger'],
     },
+    tone: {
+      control: 'select',
+      options: [undefined, 'neutral', 'brand', 'accent', 'success', 'warning', 'danger', 'info'],
+    },
     size: { control: 'select', options: ['sm', 'md', 'lg'] },
     loading: { control: 'boolean' },
     disabled: { control: 'boolean' },
+    block: { control: 'boolean' },
+    align: { control: 'select', options: ['start', 'center', 'end'] },
   },
 } satisfies Meta<typeof TButton>;
 
@@ -60,6 +66,71 @@ export const Sizes: Story = {
           {size}
         </TButton>
       ))}
+    </div>
+  ),
+};
+
+/**
+ * `tone` is a second axis, orthogonal to `variant`: the shape stays the shape
+ * and the tone decides the colour. On `solid` it fills.
+ */
+export const Tones: Story = {
+  render: (args) => (
+    <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+      {(['neutral', 'brand', 'accent', 'success', 'warning', 'danger', 'info'] as const).map(
+        (tone) => (
+          <TButton key={tone} {...args} tone={tone}>
+            {tone}
+          </TButton>
+        ),
+      )}
+    </div>
+  ),
+};
+
+/**
+ * A destructive action that is not the primary action of its row. On `ghost` and
+ * `outline` the tone inks only the label and the border, so "Delete" reads as
+ * destructive without outweighing the buttons beside it — which is the case
+ * `variant="danger"` cannot express, since a filled red block is the only thing
+ * it can be. `variant="danger"` is deprecated for that reason and warns in
+ * development; `variant="solid" tone="danger"` is the filled spelling.
+ */
+export const QuietDestructive: Story = {
+  render: (args) => (
+    <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', alignItems: 'center' }}>
+      <TButton {...args} variant="ghost">
+        Cancel
+      </TButton>
+      <TButton {...args} variant="ghost" tone="danger">
+        Delete repository
+      </TButton>
+      <TButton {...args} variant="outline" tone="danger">
+        Revoke access
+      </TButton>
+      <TButton {...args} variant="solid" tone="danger">
+        Delete everything
+      </TButton>
+    </div>
+  ),
+};
+
+/**
+ * `block` stretches the button to its container; `align` then decides where the
+ * content sits, which only means anything once the button is wider than its
+ * content. `center` is the default and emits no class.
+ */
+export const BlockAndAlignment: Story = {
+  render: (args) => (
+    <div style={{ display: 'grid', gap: '0.5rem', maxWidth: '20rem' }}>
+      {(['start', 'center', 'end'] as const).map((align) => (
+        <TButton key={align} {...args} block align={align} variant="ghost">
+          Align {align}
+        </TButton>
+      ))}
+      <TButton {...args} block>
+        Full-width primary action
+      </TButton>
     </div>
   ),
 };

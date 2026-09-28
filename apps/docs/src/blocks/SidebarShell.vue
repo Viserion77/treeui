@@ -46,7 +46,7 @@ const activeSection = ref('dashboard');
           <strong>Workspace</strong>
         </template>
         <template #end>
-          <span>jeferson@example.com</span>
+          <span>nina@example.com</span>
         </template>
       </TNavbar>
 

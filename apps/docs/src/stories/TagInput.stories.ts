@@ -15,7 +15,7 @@ const meta = {
     disabled: false,
     invalid: false,
     placeholder: 'Add a service…',
-    modelValue: ['dynamodb', 'sqs', 'sns'],
+    modelValue: ['search', 'billing', 'audit'],
   },
   argTypes: {
     size: { control: 'select', options: ['sm', 'md', 'lg'] },
@@ -54,11 +54,11 @@ export const Playground: Story = {
 export const InFormField: Story = {
   render: () => ({
     components: { TFormField, TTagInput },
-    setup: () => ({ value: ref<string[]>(['dynamodb', 'sqs']) }),
+    setup: () => ({ value: ref<string[]>(['search', 'billing']) }),
     template: `
       <div style="width: 380px;">
         <TFormField
-          label="LocalStack services"
+          label="Enabled services"
           hint="Press Enter or comma to add. Backspace removes the last tag."
         >
           <TTagInput

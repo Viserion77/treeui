@@ -32,8 +32,8 @@ export const UserMenu: Story = {
       <TMenu v-bind="args" label="User menu">
         <template #trigger><TButton variant="outline">Account</TButton></template>
         <template #header>
-          <TText weight="semibold">Jef</TText>
-          <TText tone="muted" size="sm">jef@s7.dev</TText>
+          <TText weight="semibold">Nina</TText>
+          <TText tone="muted" size="sm">nina@example.com</TText>
         </template>
         <TMenuGroup label="Workspace">
           <TMenuItem

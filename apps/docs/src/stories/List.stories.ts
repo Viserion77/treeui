@@ -23,7 +23,7 @@ export const Playground: Story = {
     setup: () => ({
       args,
       rows: [
-        { id: 1, title: 'Deploy web-shell', when: '2h ago', icon: 'rocket' },
+        { id: 1, title: 'Deploy the storefront', when: '2h ago', icon: 'rocket' },
         { id: 2, title: 'Rotate credentials', when: 'yesterday', icon: 'key' },
         { id: 3, title: 'Review PR #482', when: '3 days ago', icon: 'git-pull-request' },
       ],

@@ -95,7 +95,12 @@ jobs:
           distribution: temurin
           java-version: 17
 
-      - uses: android-actions/setup-android@v3
+      # v4, not v3: Google stopped serving the deprecated `tools` package in
+      # September 2026, and v3 still asks for it by default, so every run of this
+      # job died in `sdkmanager` with `Failed to find package 'tools'` before a
+      # line of Kotlin was compiled. v4 dropped `tools` from the default
+      # `packages` and skips it with a warning when asked for it explicitly.
+      - uses: android-actions/setup-android@v4
 
       - uses: gradle/actions/setup-gradle@v4
 

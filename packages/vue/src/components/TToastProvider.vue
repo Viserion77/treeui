@@ -7,10 +7,16 @@ const props = withDefaults(
   defineProps<{
     position?: ToastPosition;
     max?: number;
+    /**
+     * Instance default for the dismiss button's accessible name. A single
+     * toast can still override it with `closeLabel` in its own options.
+     */
+    closeLabel?: string;
   }>(),
   {
     position: 'bottom-right',
     max: 5,
+    closeLabel: 'Dismiss notification',
   },
 );
 
@@ -44,6 +50,7 @@ function handleClose(id: string) {
           v-for="toast in visibleToasts"
           :key="toast.id"
           :toast="toast"
+          :close-label="closeLabel"
           @close="handleClose"
         />
       </TransitionGroup>

@@ -21,6 +21,14 @@ props:
     default: md
     values: [sm, md, lg]
     description: "Changes min-height and font-size only; inline padding is constant across sizes."
+  truncate:
+    type: boolean
+    default: false
+    description: "Keep the label on one line and clip it with an ellipsis. Opt-in: the default is to wrap, because a status pill that silently loses the end of its text is worse than a two-line pill. Pass `label` alongside it so the full text reaches the `title` tooltip."
+  label:
+    type: string
+    default: undefined
+    description: "The badge text. Only needed with `truncate`, which puts it in `title`; otherwise use the default slot."
 
 events: []
 
@@ -51,6 +59,11 @@ behavior:
     and the stylesheet is tested against it.
   icon_wrapper_rendered_only_when_slot_filled: true
   icon_renders_before_default_slot: true
+  never_wider_than_its_container: >-
+    The badge carries `max-inline-size: 100%` and `min-inline-size: 0`, so a
+    long label wraps inside the container instead of pushing it. Wrapped lines
+    use the UI line height with block padding rather than `line-height: 1`, at
+    which a second line's ascenders touched the pill's border.
 
 css:
   block: t-badge
@@ -68,7 +81,10 @@ css:
     - t-badge--tone-warning
     - t-badge--tone-danger
     - t-badge--tone-info
+  state_classes:
+    - is-truncated
   elements:
     - t-badge__icon
+    - t-badge__label
 
 example: '<TBadge variant="soft" tone="success">Stable foundation</TBadge>'

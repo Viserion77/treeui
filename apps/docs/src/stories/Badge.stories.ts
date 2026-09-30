@@ -28,6 +28,7 @@ const meta = {
       control: 'select',
       options: ['neutral', 'success', 'warning', 'danger', 'info'],
     },
+    truncate: { control: 'boolean' },
   },
 } satisfies Meta<typeof TBadge>;
 
@@ -131,6 +132,31 @@ export const WithIcon: Story = {
             Outline + icon
           </TBadge>
         </div>
+      </div>
+    `,
+  }),
+};
+
+export const LongLabel: Story = {
+  name: 'Long label: wrap (default) vs truncate',
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'A badge never grows past its container. The default is to wrap, because a status pill that silently loses the end of its text is worse than a two-line pill — and a wrapped second line keeps clear of the border, which `line-height: 1` did not. `truncate` is the opt-in for a badge that must stay on one line; pass `label` with it so the full text reaches the `title` tooltip.',
+      },
+    },
+  },
+  render: () => ({
+    components: { TBadge },
+    template: `
+      <div style="display: grid; gap: 1rem; inline-size: 14rem; border: 1px dashed var(--tree-color-border-default); padding: 0.75rem;">
+        <TBadge tone="info">Deployment pending manual approval</TBadge>
+        <TBadge
+          tone="info"
+          truncate
+          label="Deployment pending manual approval"
+        />
       </div>
     `,
   }),

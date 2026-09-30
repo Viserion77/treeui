@@ -6,6 +6,10 @@ status: available
 purpose: "Multi-line text field with size, loading, invalid states, and auto-grow option."
 
 props:
+  spellcheck:
+    type: boolean
+    default: undefined
+    description: "A real `<textarea>` attribute that the declared surface was missing. It matters most with `family=\"mono\"`: a JSON or config editor wants the spell-checker to stop underlining keys, ARNs and identifiers."
   modelValue:
     type: string
     default: ""

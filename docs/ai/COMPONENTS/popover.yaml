@@ -144,6 +144,24 @@ example_custom_trigger: |
 contract: overlay_contract
 composable: useControllableOpen
 
+placement:
+  panel_is_teleported_to_the_body: >-
+    The panel renders through `<Teleport to="body">` and is placed with
+    `position: fixed` from the trigger's viewport rect by the `useAnchoredLayer`
+    composable. Previously it was absolutely positioned inside the root, so any
+    ancestor with `overflow` clipped it — inside the TAppShell sidebar the panel
+    was cut off and unreachable. The `side` modifier now only reports which side
+    was used, for the enter transition; the offsets come from the measurement.
+  panel_is_pushed_back_inside_the_viewport: >-
+    After measuring, the panel is clamped into `[16px, innerWidth - 16px]`. A
+    width that WOULD fit is not the same as a position that fits: `align="end"`
+    on a trigger away from the right edge used to open the panel at a negative
+    `left`, with its first column off-screen. The panel also flips to the
+    opposite side when the requested one has no room and the opposite one does.
+  outside_click_accounts_for_the_teleported_panel: >-
+    The dismissal test checks the panel as well as the root, since the panel is
+    no longer a descendant of it. In tests, query the panel from `document.body`.
+
 css_classes:
   - t-popover
   - t-popover__anchor

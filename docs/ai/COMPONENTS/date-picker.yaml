@@ -179,6 +179,17 @@ keyboard:
     returns focus to the trigger.
 
 behavior:
+  panel_is_teleported_to_the_body: >-
+    The calendar panel renders through `<Teleport to="body">` and is placed with
+    `position: fixed` from the trigger's viewport rect by `useAnchoredLayer`. It
+    used to be absolutely positioned inside the root, so inside a `TModal` it
+    was trapped in the surface and clipped. Query it from `document.body` in
+    tests.
+  month_title_capitalises_only_its_first_letter: >-
+    `text-transform: capitalize` uppercased every word, which in most locales
+    hits a particle in the middle of the title — pt-BR's "setembro de 2026"
+    rendered as "Setembro De 2026". The rule is now `none` plus a
+    `::first-letter` uppercase.
   value_format: YYYY-MM-DD
   controlled_and_uncontrolled_open: true
   open_state_emits_are_deduped: true

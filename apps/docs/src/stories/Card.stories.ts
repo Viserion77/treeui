@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite';
-import { TBadge, TButton, TCard, TText, treeCardVariants, treeSizes } from '@treeui/vue';
+import { TBadge, TButton, TCard, TCodeBlock, TText, treeCardVariants, treeSizes } from '@treeui/vue';
 import { practiceNote } from './practice-refs';
 
 const meta = {
@@ -220,6 +220,41 @@ export const InteractiveLink: Story = {
         <TText weight="semibold">orders-processor</TText>
         <TText tone="muted" size="sm">Lambda · us-east-1 · 128 MB</TText>
       </TCard>
+    `,
+  }),
+};
+
+export const SurfaceContainment: Story = {
+  name: 'An unbreakable descendant cannot inflate the card',
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "The card and its body declare `grid-template-columns: minmax(0, 1fr)`. An implicit `auto` track takes its minimum from the min-content of its items, so one descendant that cannot break — a code block, a table, a machine string — used to widen the whole card and lay every sibling out at that width: the title never truncated, a table's wrapper never scrolled, and the actions were painted past the border or over the next card. Both cards below sit in a 22rem frame; the unbreakable URL now scrolls or wraps inside the card rather than moving it.",
+      },
+    },
+  },
+  render: () => ({
+    components: { TBadge, TButton, TCard, TCodeBlock, TText },
+    setup: () => ({
+      url: 'http://localhost:3085/public/v1/mesh/sync/01a0e0d4-8f80-719b-8e11-88256b0401aa',
+    }),
+    template: `
+      <div style="display: grid; gap: 1rem; inline-size: 22rem;">
+        <TCard title="Paired device">
+          <template #actions>
+            <TButton size="sm" variant="ghost">Revoke</TButton>
+            <TButton size="sm" variant="solid" tone="danger">Remove</TButton>
+          </template>
+          <TCodeBlock :code="url" wrap label="Device endpoint" />
+          <TText tone="muted" size="sm">The actions stay inside the border, and wrap when they must.</TText>
+        </TCard>
+
+        <TCard title="relatorio_financeiro_consolidado_2026Q3_APROVADA_v12.pdf">
+          <template #actions><TBadge tone="success">Ready</TBadge></template>
+          <TText tone="muted" size="sm">A title without spaces wraps rather than setting the card's width.</TText>
+        </TCard>
+      </div>
     `,
   }),
 };

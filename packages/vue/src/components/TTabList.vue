@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { isActivationKey } from '@treeui/utils';
-import { computed, inject, ref } from 'vue';
+import { computed, inject, nextTick, ref, watch } from 'vue';
 import { TABS_INJECTION_KEY } from './tabs-context';
 
 const ctx = inject(TABS_INJECTION_KEY);
@@ -93,6 +93,23 @@ const onKeydown = (event: KeyboardEvent) => {
       break;
   }
 };
+
+/* The strip scrolls when the tabs do not fit (see `.t-tabs__list`), so an active
+   tab chosen with the keyboard — or restored from a model value — can sit
+   outside the visible run. Bring it back into view whenever the active value
+   changes. `inline: 'nearest'` scrolls the minimum needed and leaves an already
+   visible tab alone; `block: 'nearest'` keeps the surrounding page still. */
+watch(
+  () => ctx.activeValue.value,
+  async (value) => {
+    if (!value) return;
+    await nextTick();
+    const active = getAllTabElements().find((el) => el.dataset.tabValue === value);
+    // Optional call: jsdom does not implement `scrollIntoView`, and a tab strip
+    // that cannot scroll is not a reason to throw inside a watcher.
+    active?.scrollIntoView?.({ inline: 'nearest', block: 'nearest' });
+  },
+);
 
 const classes = computed(() => [
   't-tabs__list',

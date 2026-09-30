@@ -234,9 +234,14 @@ const teardownResizeObserver = () => {
   resizeObserver = null;
 };
 
-// Collapsing is desktop-only, so the built-in toggle follows the same rule.
+/* Collapsing is desktop-only, so the built-in toggle follows the same rule —
+   and it is also hidden inside the auto-rail band. In that band the width, not
+   the user, decides the state: the button stayed on screen, did nothing when
+   pressed (`effectiveCollapsed` is forced true), and announced the manual
+   preference rather than what was on screen. A control that cannot change
+   anything should not be offered. */
 const showCollapseToggle = computed(
-  () => !isMobile.value && props.collapsible && props.showCollapseButton,
+  () => !isMobile.value && props.collapsible && props.showCollapseButton && !railActive.value,
 );
 
 // The effective (visual) collapsed state descendants and slots see: the drawer
@@ -576,8 +581,8 @@ const slotProps = computed<AppShellSlotProps>(() => ({
           v-if="showCollapseToggle"
           type="button"
           class="t-app-shell__collapse-button"
-          :aria-label="isCollapsed ? expandLabel : collapseLabel"
-          :aria-expanded="!isCollapsed"
+          :aria-label="effectiveCollapsed ? expandLabel : collapseLabel"
+          :aria-expanded="!effectiveCollapsed"
           :aria-controls="sidebarId"
           @click="toggleCollapsed"
         >

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
+import type { TSize } from '../types/contracts';
 import TIcon from './TIcon.vue';
 
 const props = withDefaults(
@@ -21,6 +22,12 @@ const props = withDefaults(
     copyable?: boolean;
     /** Accessible name for the scrollable region and the copy button. */
     label?: string;
+    /**
+     * Density, on the shared size axis. `md` (default) is what the block has
+     * always been; `sm` is for a block that sits inside a dense surface — a
+     * table cell, a list row — where the fixed type size dominated the row.
+     */
+    size?: TSize;
   }>(),
   {
     code: undefined,
@@ -28,6 +35,7 @@ const props = withDefaults(
     maxBlockSize: undefined,
     copyable: false,
     label: 'Code',
+    size: 'md',
   },
 );
 
@@ -45,7 +53,11 @@ const preStyle = computed(() =>
   props.maxBlockSize ? { maxBlockSize: props.maxBlockSize } : undefined,
 );
 
-const classes = computed(() => ['t-code-block', { 'is-wrap': props.wrap }]);
+const classes = computed(() => [
+  't-code-block',
+  `t-code-block--${props.size}`,
+  { 'is-wrap': props.wrap },
+]);
 
 async function onCopy() {
   if (props.code == null) return;

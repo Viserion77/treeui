@@ -406,18 +406,23 @@ props:
       - zap
     note: "Names use TreeUI's descriptive kebab-case vocabulary. The catalog covers common application needs; anything missing is one `registerTreeIcons` call away, and `listTreeIcons()` returns the live list at runtime."
   size:
-    type: number | string
+    type: number | TIconSize
     default: 20
-    description: "Pixel size for both width and height of the rendered svg."
+    values: [sm, md, lg, xl, "2xl", "<number of pixels>"]
+    description: "A token name from the icon scale, or a pixel number."
     note: |
-      This is a PIXEL COUNT, not the sm | md | lg token scale used by nearly every
-      other TreeUI component. `<TIcon size="md" />` does not fail loudly: it writes
-      width="md" / height="md" onto the svg, which the browser discards, so the
-      icon becomes unsized and stretches to fill its container. Pass a number
-      (20, 32) or a numeric string ("20"). To size an icon from tokens, leave `size`
-      alone and set width/height in CSS from the icon scale — --tree-size-icon-sm |
-      -md | -lg | -xl | -2xl (1rem / 1.25rem / 1.5rem / 2rem / 3rem) — which is what
-      TLanguageSelect's switcher variant does.
+      `size` used to be `number | string`, which meant `<TIcon size="sm" />`
+      type-checked, wrote width="sm" onto the svg, and left the icon unsized —
+      it then stretched to fill its container, measured at 300px in the report
+      that produced this change. It now takes either a NUMBER of pixels or one
+      of the icon-scale token names, which map to the same values as
+      --tree-size-icon-sm | -md | -lg | -xl | -2xl (16 / 20 / 24 / 32 / 48 px).
+      An unrecognised string is a compile error in TypeScript and, for
+      JavaScript consumers, falls back to the default size with a console
+      warning in development rather than rendering at an arbitrary size.
+      A free-form CSS length is no longer accepted: set width/height in CSS
+      from the icon scale instead, which is what TLanguageSelect's switcher
+      variant does.
   strokeWidth:
     type: number | string
     default: 2

@@ -24,6 +24,7 @@ import {
   watch,
 } from 'vue';
 import { useControllableOpen } from '../composables/useControllableOpen';
+import { useAnchoredLayer } from '../composables/useAnchoredLayer';
 import type { TSize } from '../types/contracts';
 import type { TModelModifiers } from './form-field';
 
@@ -94,6 +95,7 @@ const calendarId = props.id ?? createId('t-date-picker');
 const captionId = `${calendarId}-caption`;
 const rootRef = ref<HTMLElement | null>(null);
 const triggerRef = ref<HTMLButtonElement | null>(null);
+const panelRef = ref<HTMLElement | null>(null);
 const dayRefs = new Map<string, HTMLButtonElement>();
 const viewMonth = ref(startOfMonth(selectedDate.value ?? today));
 const focusedDate = ref<Date>(selectedDate.value ?? today);
@@ -127,6 +129,19 @@ const { value: isOpen, setValue } = useControllableOpen(
     emit('update:open', value);
     emit('open-change', value);
   },
+);
+
+/* Teleported and placed from the trigger's viewport rect. Inside a TModal the
+   panel was trapped in the surface: it could not escape the clip, and with the
+   surface now `overflow: hidden` it would be cut off outright. The width cap
+   was always right — what was missing was a position pinned to the viewport
+   rather than to a clipping ancestor. */
+const { style: panelStyle } = useAnchoredLayer(
+  triggerRef,
+  panelRef,
+  isOpen,
+  ref('bottom' as const),
+  ref('start' as const),
 );
 
 const triggerText = computed(() => {
@@ -394,6 +409,11 @@ const onDocumentPointerDown = (event: PointerEvent) => {
     return;
   }
 
+  // Teleported, so the panel is no longer inside the root.
+  if (panelRef.value?.contains(target)) {
+    return;
+  }
+
   closeCalendar();
 };
 
@@ -456,96 +476,100 @@ onBeforeUnmount(() => {
       </span>
     </button>
 
-    <transition name="t-fade">
-      <div
-        v-if="isOpen && !disabled"
-        :id="calendarId"
-        class="t-date-picker__content"
-        role="dialog"
-        aria-modal="false"
-        :aria-labelledby="captionId"
-      >
-        <div class="t-date-picker__header">
-          <button
-            type="button"
-            class="t-date-picker__nav"
-            :disabled="!canMovePrev"
-            aria-label="Previous month"
-            @click="moveCalendar(-1)"
-          >
-            <ChevronLeftIcon v-bind="treeIconDefaults" />
-          </button>
-          <p
-            :id="captionId"
-            class="t-date-picker__month"
-          >
-            {{ monthLabel }}
-          </p>
-          <button
-            type="button"
-            class="t-date-picker__nav"
-            :disabled="!canMoveNext"
-            aria-label="Next month"
-            @click="moveCalendar(1)"
-          >
-            <ChevronRightIcon v-bind="treeIconDefaults" />
-          </button>
-        </div>
-
+    <Teleport to="body">
+      <transition name="t-fade">
         <div
-          class="t-date-picker__weekdays"
-          aria-hidden="true"
-        >
-          <span
-            v-for="label in weekdayLabels"
-            :key="label"
-            class="t-date-picker__weekday"
-          >
-            {{ label }}
-          </span>
-        </div>
-
-        <div
-          class="t-date-picker__grid"
-          role="grid"
+          v-if="isOpen && !disabled"
+          :id="calendarId"
+          ref="panelRef"
+          class="t-date-picker__content is-anchored"
+          :style="panelStyle"
+          role="dialog"
+          aria-modal="false"
           :aria-labelledby="captionId"
         >
+          <div class="t-date-picker__header">
+            <button
+              type="button"
+              class="t-date-picker__nav"
+              :disabled="!canMovePrev"
+              aria-label="Previous month"
+              @click="moveCalendar(-1)"
+            >
+              <ChevronLeftIcon v-bind="treeIconDefaults" />
+            </button>
+            <p
+              :id="captionId"
+              class="t-date-picker__month"
+            >
+              {{ monthLabel }}
+            </p>
+            <button
+              type="button"
+              class="t-date-picker__nav"
+              :disabled="!canMoveNext"
+              aria-label="Next month"
+              @click="moveCalendar(1)"
+            >
+              <ChevronRightIcon v-bind="treeIconDefaults" />
+            </button>
+          </div>
+
           <div
-            v-for="(week, weekIndex) in cells"
-            :key="weekIndex"
-            class="t-date-picker__row"
-            role="row"
+            class="t-date-picker__weekdays"
+            aria-hidden="true"
+          >
+            <span
+              v-for="label in weekdayLabels"
+              :key="label"
+              class="t-date-picker__weekday"
+            >
+              {{ label }}
+            </span>
+          </div>
+
+          <div
+            class="t-date-picker__grid"
+            role="grid"
+            :aria-labelledby="captionId"
           >
             <div
-              v-for="cell in week"
-              :key="cell.key"
-              class="t-date-picker__cell"
-              role="gridcell"
-              :aria-selected="cell.isSelected"
+              v-for="(week, weekIndex) in cells"
+              :key="weekIndex"
+              class="t-date-picker__row"
+              role="row"
             >
-              <button
-                :ref="(element) => setDayRef(element, cell.key)"
-                type="button"
-                class="t-date-picker__day"
-                :class="{
-                  'is-muted': !cell.inMonth,
-                  'is-selected': cell.isSelected,
-                  'is-today': cell.isToday,
-                }"
-                :data-date="cell.key"
-                :disabled="cell.disabled"
-                :tabindex="cell.isFocused ? 0 : -1"
-                :aria-current="cell.isToday ? 'date' : undefined"
-                :aria-label="cell.key"
-                @click="selectDate(cell.date)"
-                @keydown="onDayKeydown($event, cell.date)"
+              <div
+                v-for="cell in week"
+                :key="cell.key"
+                class="t-date-picker__cell"
+                role="gridcell"
+                :aria-selected="cell.isSelected"
               >
-                {{ cell.dayLabel }}
-              </button>
+                <button
+                  :ref="(element) => setDayRef(element, cell.key)"
+                  type="button"
+                  class="t-date-picker__day"
+                  :class="{
+                    'is-muted': !cell.inMonth,
+                    'is-selected': cell.isSelected,
+                    'is-today': cell.isToday,
+                  }"
+                  :data-date="cell.key"
+                  :disabled="cell.disabled"
+                  :tabindex="cell.isFocused ? 0 : -1"
+                  :aria-current="cell.isToday ? 'date' : undefined"
+                  :aria-label="cell.key"
+                  @click="selectDate(cell.date)"
+                  @keydown="onDayKeydown($event, cell.date)"
+                >
+                  {{ cell.dayLabel }}
+                </button>
+              </div>
             </div>
           </div>
         </div>
-      </div>
-    </transition>
+      </transition>
+    </Teleport>
   </div>
 </template>

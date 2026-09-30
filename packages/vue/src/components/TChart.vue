@@ -60,6 +60,13 @@ const props = withDefaults(
     showXAxis?: boolean;
     /** Show y-axis value ticks. */
     showYAxis?: boolean;
+    /**
+     * Fix the space reserved for the y-axis labels, in pixels. Left unset the
+     * chart measures the formatted ticks and reserves what they need, which is
+     * the right answer nearly always; set it to line several charts up on a
+     * shared gutter.
+     */
+    yAxisWidth?: number;
     /** Show the hover crosshair + tooltip. */
     showTooltip?: boolean;
     /** Always render markers on line/area points (not just on hover). */
@@ -98,6 +105,7 @@ const props = withDefaults(
     showLegend: undefined,
     showXAxis: true,
     showYAxis: true,
+    yAxisWidth: undefined,
     showTooltip: true,
     showPoints: false,
     yTicks: 5,
@@ -182,12 +190,56 @@ const formatValue = (value: number) => {
   return `${value}`;
 };
 
+/* --- label measurement ----------------------------------------------------
+
+   The axis margins used to be constants: 44px on the left whatever the y
+   labels said, and one x label per 52px whatever they were. Both are wrong the
+   moment the numbers are large or the categories are words — a formatted
+   `1,234,567` was clipped by the 44, and month names overlapped inside the 52.
+
+   Measured with a canvas 2d context rather than `getBBox`: `getBBox` needs the
+   text already in a rendered SVG, which makes the margin depend on a layout
+   that depends on the margin. `measureText` answers before the first paint.
+   Where there is no canvas (SSR, jsdom) the estimate below stands in; it only
+   has to be close enough to keep labels from colliding. */
+const AXIS_FONT = '12px system-ui, -apple-system, "Segoe UI", Roboto, sans-serif';
+
+let measureContext: CanvasRenderingContext2D | null | undefined;
+
+const measureLabel = (text: string): number => {
+  if (measureContext === undefined) {
+    try {
+      measureContext = document.createElement('canvas').getContext('2d');
+      if (measureContext) measureContext.font = AXIS_FONT;
+    } catch {
+      measureContext = null;
+    }
+  }
+  if (measureContext) return measureContext.measureText(text).width;
+  // ~0.6em per character at 12px. Deliberately generous: over-reserving costs
+  // a few pixels of plot, under-reserving clips the label.
+  return text.length * 7.2;
+};
+
+const widest = (labels: string[]) =>
+  labels.reduce((max, label) => Math.max(max, measureLabel(label)), 0);
+
 // --- layout ---------------------------------------------------------------
+const yLabelWidth = computed(() => {
+  if (!props.showYAxis) return 0;
+  if (props.yAxisWidth != null) return props.yAxisWidth;
+  const measured = widest(scale.value.ticks.map((tick) => formatValue(tick)));
+  // 8px is the gap between the label and the plot (see the `x` below).
+  // Capped at 40% of the chart so a pathological format cannot eat the plot;
+  // past the cap the label is clipped, which is the lesser damage.
+  return Math.min(Math.ceil(measured) + 12, Math.floor(width.value * 0.4));
+});
+
 const margin = computed(() => ({
   top: 12,
   right: 12,
   bottom: props.showXAxis && props.labels.length ? 28 : 10,
-  left: props.showYAxis ? 44 : 10,
+  left: props.showYAxis ? Math.max(yLabelWidth.value, 10) : 10,
 }));
 
 const plot = computed(() => {
@@ -342,13 +394,40 @@ const gridLines = computed(() =>
 const xLabels = computed(() => {
   if (!props.showXAxis) return [];
   const count = categoryCount.value;
-  const maxLabels = Math.max(2, Math.floor(plot.value.innerWidth / 52));
+  const shown = props.labels.slice(0, count);
+  // Thinned by the widest label actually rendered, not by a constant: 52px was
+  // right for `Q1` and far too tight for `September`.
+  const slot = Math.max(widest(shown) + 12, 24);
+  const maxLabels = Math.max(2, Math.floor(plot.value.innerWidth / slot));
   const step = Math.max(1, Math.ceil(count / maxLabels));
-  return props.labels.slice(0, count).map((label, index) => ({
-    label,
-    x: activeX(index),
-    show: index % step === 0 || index === count - 1,
-  }));
+
+  const items = shown.map((label, index) => {
+    // The first and last labels anchor inward so they cannot hang off the SVG;
+    // everything between stays centred on its category.
+    const anchor = index === 0 ? 'start' : index === count - 1 ? 'end' : 'middle';
+    return {
+      label,
+      x: activeX(index),
+      anchor,
+      width: measureLabel(label),
+      show: index % step === 0 || index === count - 1,
+    };
+  });
+
+  // The last label is forced on, so it can land on top of the one the step
+  // rule already placed. Drop that neighbour rather than overlap.
+  const last = items[count - 1];
+  if (last && count > 1) {
+    for (let i = count - 2; i >= 0; i -= 1) {
+      const item = items[i];
+      if (!item.show) continue;
+      const gap = last.x - last.width - (item.x + item.width / 2);
+      if (gap < 4) item.show = false;
+      break;
+    }
+  }
+
+  return items;
 });
 
 // --- interaction ----------------------------------------------------------
@@ -584,6 +663,7 @@ const rootClasses = computed(() => [
               class="t-chart__axis-label t-chart__axis-label--x"
               :x="item.x"
               :y="height - 8"
+              :text-anchor="item.anchor"
             >
               {{ item.label }}
             </text>

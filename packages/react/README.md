@@ -38,7 +38,7 @@ The stylesheet re-imports `@treeui/tokens/styles.css` and `@treeui/tokens/themes
 |---|---|
 | `TButton` | `variant`, `tone`, `size`, `loading` (+ `loadingLabel`), `icon`, `iconOnly` (needs `aria-label`), `block`, `align`; forwards native button attributes |
 | `TInput` | `size`, `invalid`, `prefix`, `suffix`; forwards native input attributes |
-| `TBadge` | `variant`, `size`, `tone`, `icon` |
+| `TBadge` | `variant`, `size`, `tone`, `icon`, `truncate`, `label` |
 | `TCard` | `variant`, `size`, `header`, `footer` |
 
 All components forward refs and extra DOM attributes to their root element.
@@ -72,3 +72,17 @@ does not ship is simply absent. What this package does not have yet:
 - **No `TSpinner` component.** The `loading` spinner is emitted inline as
   `t-spinner t-spinner--sm`, so the markup matches but the spinner is not
   separately importable.
+
+### `TBadge`
+
+- **`truncate` needs `label`, not children, for the tooltip.** The Vue component
+  can read its own default slot; here the `title` attribute is filled from the
+  `label` prop, so pass it alongside `truncate` if the clipped text should stay
+  readable. `children` still wins for what is rendered.
+
+### Not in this package at all
+
+`useAnchoredLayer` and `useBreakpoint`, and the overlay components that use
+them (`TPopover`, `TSelect`, `TDatePicker`), are Vue-only for now. A React
+consumer needing an anchored panel writes its own placement; the contract to
+mirror is in `docs/ai/CONTRACTS.yaml` under `overlay_contract.anchored_panels`.

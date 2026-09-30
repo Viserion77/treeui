@@ -29,6 +29,7 @@ const meta = {
     ],
   },
   argTypes: {
+    yAxisWidth: { control: 'number' },
     type: {
       control: 'select',
       options: ['line', 'area', 'bar'],

@@ -32,24 +32,50 @@ export interface TBadgeProps extends HTMLAttributes<HTMLSpanElement> {
   size?: TSize;
   tone?: TBadgeTone;
   icon?: ReactNode;
+  /**
+   * Keep the label on one line and clip it with an ellipsis. Opt-in, because
+   * the useful default for a badge is to wrap: a status pill that silently
+   * loses the end of its text is worse than a two-line pill. Pass `label` as
+   * well so the full text reaches the `title` tooltip.
+   */
+  truncate?: boolean;
+  /** The badge text, used for `title` when `truncate` is on. */
+  label?: string;
 }
 
 export const TBadge = forwardRef<HTMLSpanElement, TBadgeProps>(function TBadge(
-  { variant = 'soft', size = 'md', tone = 'neutral', icon, className, children, ...rest },
+  {
+    variant = 'soft',
+    size = 'md',
+    tone = 'neutral',
+    icon,
+    truncate = false,
+    label,
+    className,
+    children,
+    title,
+    ...rest
+  },
   ref,
 ) {
   return (
     <span
       {...rest}
       ref={ref}
-      className={badgeClass({ variant, size, tone, class: className })}
+      title={title ?? (truncate ? label : undefined)}
+      className={badgeClass({
+        variant,
+        size,
+        tone,
+        class: [truncate ? 'is-truncated' : null, className].filter(Boolean).join(' ') || undefined,
+      })}
     >
       {icon ? (
         <span className="t-badge__icon" aria-hidden="true">
           {icon}
         </span>
       ) : null}
-      {children}
+      <span className="t-badge__label">{children ?? label}</span>
     </span>
   );
 });

@@ -62,6 +62,12 @@ a11y:
   aria_disabled: "on link items when disabled"
 
 behavior:
+  labels_wrap_rather_than_scroll_the_sidebar: >-
+    `.t-nav-menu__list` and `.t-nav-menu__copy` declare
+    `grid-template-columns: minmax(0, 1fr)`, and the label and description carry
+    `overflow-wrap: anywhere`. A sidebar is the one place a horizontal scrollbar
+    is never the right answer, and an item label without a break opportunity
+    used to give it one.
   can_be_controlled_or_uncontrolled: true
   can_inherit_collapsed_state_from_sidebar: true
   supports_rich_item_rendering_via_slot: true

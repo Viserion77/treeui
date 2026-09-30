@@ -17,11 +17,18 @@ export interface ToastOptions {
   variant?: ToastVariant;
   duration?: number;
   closable?: boolean;
+  /**
+   * Accessible name for the dismiss button. It was hard-coded English with no
+   * way out, which made the one control in the toast unreadable to a screen
+   * reader in any other language. `TToastProvider` sets the instance default.
+   */
+  closeLabel?: string;
 }
 
 export interface ToastItem extends Required<Pick<ToastOptions, 'title' | 'variant' | 'duration' | 'closable'>> {
   id: string;
   description?: string;
+  closeLabel?: string;
 }
 
 const toasts = ref<ToastItem[]>([]);
@@ -37,6 +44,7 @@ function add(options: ToastOptions): string {
     variant: options.variant ?? 'info',
     duration: options.duration ?? 5000,
     closable: options.closable ?? true,
+    closeLabel: options.closeLabel,
   };
 
   toasts.value = [...toasts.value, item];

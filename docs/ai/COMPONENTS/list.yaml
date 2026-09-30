@@ -44,6 +44,14 @@ a11y:
   not_selectable: "For a single-select list of options use TSelectableList instead."
 
 behavior:
+  actions_take_their_own_line_in_a_narrow_container: >-
+    Inside the existing `@container (max-width: 30rem)` query,
+    `.t-list-item__actions` becomes `flex-basis: 100%; order: 2; flex-wrap:
+    wrap; justify-content: flex-end`. Rigid actions used to squeeze the content
+    column down to 40–110px rather than moving below it — the meta already
+    dropped to its own line, and the actions now follow the same rule. Actions
+    are still never hidden or auto-collapsed into an overflow menu; that stays a
+    deliberate consumer choice.
   responsive: "On a container narrower than 30rem the row wraps: meta drops below the content while actions stay visible inline, and the leading slot stays on the first line of the content — the wrap is for the meta only. Actions are NEVER hidden or auto-collapsed into an overflow menu — compose a TMenu inside the actions slot deliberately if an overflow is wanted (uses a CSS container query; the list sets container-type)."
   no_overflow_ownership: "TList does not create, own, or collapse an actions overflow."
 

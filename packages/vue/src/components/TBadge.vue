@@ -12,11 +12,25 @@ const props = withDefaults(
     variant?: TVariant;
     size?: TSize;
     tone?: TBadgeTone;
+    /**
+     * Keep the label on one line and clip it with an ellipsis. Opt-in, because
+     * the useful default for a badge is to wrap: a status pill that silently
+     * loses the end of its text is worse than a two-line pill. Pass `label` as
+     * well so the full text reaches the `title` tooltip.
+     */
+    truncate?: boolean;
+    /**
+     * The badge text. Only needed with `truncate`, which puts it in `title` so
+     * the clipped text stays readable; otherwise use the default slot.
+     */
+    label?: string;
   }>(),
   {
     variant: 'soft',
     size: 'md',
     tone: 'neutral',
+    truncate: false,
+    label: undefined,
   },
 );
 
@@ -25,11 +39,15 @@ const classes = computed(() => [
   `t-badge--${props.variant}`,
   `t-badge--${props.size}`,
   `t-badge--tone-${props.tone}`,
+  { 'is-truncated': props.truncate },
 ]);
 </script>
 
 <template>
-  <span :class="classes">
+  <span
+    :class="classes"
+    :title="truncate ? label : undefined"
+  >
     <span
       v-if="$slots.icon"
       class="t-badge__icon"
@@ -37,6 +55,8 @@ const classes = computed(() => [
     >
       <slot name="icon" />
     </span>
-    <slot />
+    <span class="t-badge__label">
+      <slot>{{ label }}</slot>
+    </span>
   </span>
 </template>

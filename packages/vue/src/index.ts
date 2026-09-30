@@ -36,5 +36,14 @@ export type {
 } from './composables/useCanvasSurface';
 export { useToast } from './composables/useToast';
 export type { ToastVariant, ToastPosition, ToastOptions, ToastItem } from './composables/useToast';
+export { useBreakpoint } from './composables/useBreakpoint';
+export type { UseBreakpoint, UseBreakpointOptions } from './composables/useBreakpoint';
+export { useAnchoredLayer } from './composables/useAnchoredLayer';
+export type {
+  UseAnchoredLayer,
+  UseAnchoredLayerOptions,
+  TAnchoredSide,
+  TAnchoredAlign,
+} from './composables/useAnchoredLayer';
 
 export { TreeUIPlugin as default } from './plugin';

@@ -1,5 +1,116 @@
 # @treeui/vue
 
+## 0.32.0
+
+### Minor Changes
+
+- 97a1cec: The library takes back the layout work it had been leaving to consumers: a surface no longer grows to fit something inside it, an anchored panel is no longer clipped by an ancestor, and the strings a screen reader announces are props rather than English literals.
+
+  This closes a measured audit of `@treeui/vue` 0.31.0 — every item below came with a repro, pixel measurements at 320/390/600/1440, and a consumer case. They are not thirty-one independent defects; they are four causes.
+
+  **A surface takes its container's width.** `.t-card`, `.t-card__body`, `.t-modal__body`, `.t-confirm-dialog`, `.t-timeline`, `.t-timeline__content`, `.t-nav-menu__list` and `.t-nav-menu__copy` are grids with no `grid-template-columns`, so their track was the implicit `auto` — whose minimum is the **min-content of its items**. One descendant that cannot break (a `TTable`, a `TCodeBlock`, a machine string) behind any wrapper widened the whole surface, and then every sibling on it was laid out at the inflated width: `TText truncate` never engaged because the box grew instead of clipping, the `TTable` wrapper's `overflow-x` never scrolled because the track grew in its place, and anything aligned to the end — a modal's close button, a footer, a card's `#actions` — was painted outside the surface or on top of the neighbouring card. A `TModal size="lg"` holding a markdown editor measured 651px of overflow at 1440, with close and save unreachable. They all declare `minmax(0, 1fr)` now. `.t-confirm-dialog--with-icon` becomes `auto minmax(0, 1fr)`.
+
+  **Text that can arrive without a break opportunity wraps.** `overflow-wrap: anywhere` on `.t-modal__title`, `.t-modal__description`, `.t-card__title`, `.t-timeline__title`, `.t-timeline__description`, `.t-nav-menu__label`, `.t-nav-menu__description` and `.t-select__option`. `anywhere`, not `break-word`: only `anywhere` reduces the min-content, which is the property that lets the box shrink at all. `TCodeBlock`'s `wrap` had exactly this bug — it promised to wrap and used `break-word`, which breaks only once a width is already settled, so in a table cell or an `auto` track a URL still set the minimum width and pushed the container. `TText` had it too, in the cascade: `.t-text.is-pre-wrap` is (0,2,0) and `.t-text--wrap-anywhere` was (0,1,0), so `preserveWhitespace` silently downgraded `wrap="anywhere"` to `break-word`. The wrap axis is now qualified with `.t-text` and wins.
+
+  **An anchored panel is rendered in a layer nothing can clip.** `TPopover`, `TMenu`, `TSelect` and `TDatePicker` positioned their panels `absolute` inside their own root, which puts them in an ancestor's clip and an ancestor's coordinate space. One cause, four symptoms: a popover inside the `TAppShell` sidebar was cut off and unreachable, `align="end"` on a trigger away from the right edge opened the panel at a negative `left` with its first column off-screen, the select listbox was cut off by the `TTable` wrapper's `overflow`, and the date-picker panel was trapped in a modal surface. All four now render through `<Teleport to="body">` and are placed by a new exported composable, **`useAnchoredLayer`**, which measures from the trigger's viewport rect, flips to the opposite side when the requested one has no room, and clamps the panel into `[16px, innerWidth - 16px]` — a width that _would_ fit is not the same as a position that fits. **This changes where the panel lives in the DOM:** it is no longer a descendant of the component's root, so a test or a selector that descends from the trigger's container has to read `document.body` instead.
+
+  **Controls stay inside the surface they belong to.** `.t-card__actions` was `flex-shrink: 0` and is now allowed to shrink and wrap, like the header it sits in. `.t-list-item__actions` takes its own line inside the container query that already drops the meta, rather than squeezing the content column to 40–110px. `.t-tabs__list` scrolls within its own strip (`overflow-x: auto`, `overscroll-behavior-x: contain`) instead of pushing the page sideways, and `TTabList` scrolls the active tab into view when it changes. `.t-modal__surface` becomes a flex column that clips, with `.t-modal__body` as the only scroller — the whole surface used to scroll, which put the footer's actions below the fold on a short viewport.
+
+  **Accessibility fixes that were not optional.** A `TText tone="muted"` inside a selected `TToggleGroup` item kept reading `--tree-color-text-muted` over the brand fill and measured **1.18:1 in light and 1.09:1 in dark**, against the 4.5:1 that `xs` text requires; the selected item now rebinds that token to `--tree-color-brand-contrast`, the one value that clears AA in both themes (5.19:1 / 6.21:1). `TFileUpload`'s "Clear all" and "Remove" and `TToast`'s "Dismiss notification" were hard-coded English with no way out, leaving those controls unnamed to a screen reader in any other language: they are now `clearLabel`, `removeLabel`, `removeAriaLabel` (a function, because the file name sits inside the sentence) and `closeLabel` (on `TToastProvider` as the instance default, or per toast). `.t-app-shell__main` gains `position: relative`, without which the library's own `.t-visually-hidden` `TProgress` label anchored to the initial block and extended the **document's** scroll past the `100dvh` shell.
+
+  **New and changed public API.**
+
+  - **`TIcon.size` is now `number | 'sm' | 'md' | 'lg' | 'xl' | '2xl'`.** It was `number | string`, so `<TIcon size="sm" />` type-checked, wrote `width="sm"` onto the svg, and left the icon unsized — it then stretched to fill its container, measured at 300px. The token names map to the icon scale (16/20/24/32/48). **This is the one breaking change here:** a free-form CSS length is no longer accepted, and for JavaScript consumers an unknown value falls back to the default with a development warning instead of rendering at an arbitrary size.
+  - **`TSelect` is generic over its value** (`T extends string | number = string`), so a `ref<'scan' | 'query'>` gets its own literal union back from `v-model` instead of a widened `string | number` — the move `TInput`, `TTabs` and `TToggleGroup` already made. Consumers running `strictTemplates` lose a cast at every binding.
+  - **`useBreakpoint`** answers the breakpoint question in JavaScript, from the same `--tree-breakpoint-*` values `TShow`/`THide` are generated from, so the two cannot drift. It is the escape hatch, not the default: `TShow`/`THide` still win for anything purely visual, because both of their branches render and neither flashes. Reach for this when a branch must not **mount**, or when the answer is not about rendering at all.
+  - `TBadge` gains `truncate` and `label` (Vue and React). The default stays wrapping — a status pill that silently loses the end of its text is worse than a two-line pill — and a wrapped second line no longer touches the border, because `line-height: 1` has become the UI line height with block padding.
+  - `TTable` columns gain `minWidth`, a floor that the automatic table layout must honour. `width` could not be one: under `table-layout: auto` a CSS width on a cell is a suggestion, and the algorithm goes under it whenever the row is tight.
+  - `TChart` **measures** its axis labels instead of reserving 44px on the left and one x label per 52px. A formatted `1,234,567` was clipped and month names overlapped; the first and last x labels also anchor inward so they cannot leave the SVG. `yAxisWidth` fixes the gutter when several charts need to line up.
+  - `TCodeBlock` gains `size`, `TTextarea` gains `spellcheck` (a real `<textarea>` attribute missing from the declared surface — it is what stops a mono JSON editor underlining every key).
+  - `TPageHeader` reads its `#title`/`#subtitle` slot presence during render. A `computed` over `useSlots()` cached the first answer, so a conditionally provided slot never appeared, or left an empty `<h1>` behind.
+  - `TAppShell` hides the collapse toggle inside the auto-rail band and derives its `aria-expanded`/`aria-label` from the effective state. In that band the width decides, so the button could not change anything, did nothing when pressed, and announced the manual preference rather than what was on screen.
+  - Smaller: `TLinkTile`'s default slot no longer stretches its children (a four-character `TTag` was as wide as the description); `TDatePicker`'s month title capitalises only its first letter, so pt-BR reads "Setembro de 2026" rather than "Setembro De 2026"; the `TAppShell` skip link stops painting a shadow while hidden, which had been a permanent grey smudge in the top-left of every header.
+
+### Patch Changes
+
+- 6f62a18: **`TBadge`'s tinted variants had an illegible label, including with no props at all.**
+
+  `soft` and `danger` painted the label with the tone's full-strength colour on the tone's own tint. Measured against the surface, eight of the ten tone/theme pairs fell below the 4.5:1 that WCAG 1.4.3 asks of normal-size text:
+
+  | `soft` tone | light    | dark     |
+  | ----------- | -------- | -------- |
+  | neutral     | 4.56     | **4.49** |
+  | success     | **4.31** | **4.36** |
+  | warning     | **4.30** | **4.38** |
+  | danger      | **4.19** | **4.45** |
+  | info        | **4.26** | 5.33     |
+
+  `variant="soft" tone="neutral"` is what `<TBadge>` renders with nothing passed, and in the dark theme it measured 4.49:1 — one rounding step from passing, which is how it survived review.
+
+  Both variants now read the tone's `*-on-soft` colour. That token already existed and already carried this exact job: it is derived to clear AA on a tint and it deepens as the tint deepens, which is why `.t-button--soft` has always used it. Every pair now clears, worst case 4.54:1. **The label colour changes visibly on tinted badges** — it is a step darker in light mode and a step lighter in dark.
+
+  Nothing had caught it. `CONTRAST_PAIRS` in `contract.ts` checks the semantic colours against the three surfaces, and a component pairing two semantic colours of its own is not in that list. It was found by rendering: the new Compose and egui ports each measure the full variant × tone × theme matrix in their own suites, and both failed here independently before the web had a test that could. `packages/tokens/src/badge-contrast.test.ts` is that test now.
+
+  The mapping itself is no longer only CSS. `NATIVE_BADGE_TONES` in `@treeui/tokens` declares all twenty cells, `badge-tone-contract.test.ts` parses the shipped stylesheet and fails if the two disagree, and both ports generate their accessor from it instead of deriving it by hand a third time.
+
+  One thing that is NOT fixed, and is recorded rather than changed: `--tree-badge-solid-text` is `--tree-color-brand-contrast` for every tone, including the four status ones. It measures 5.19:1 to 8.13:1 today, so it passes — but it passes because the shipped status hues happen to be dark enough, not by construction. `TButton` does this properly, reading the per-theme `--tree-color-status-*-contrast`. A product re-theming the brand or seeding a lighter warning would break the badge and not the button.
+
+- 08fba8b: Icons are now drawn to a named contract, **Branchline**, and the contract is enforced by rendering rather than by review.
+
+  **Modifier variants are legible again.** `mail-check`, `mail-plus` and `mail-warning` used to be the same picture: they were distinguished only by a ~1.2u mark inside a 6.7u corner badge, which at the default 20px render is roughly one pixel. The badge is gone. A modifier is now drawn inside bases that enclose space (`shield`, `file`, `folder`, `calendar`, `ticket`, `message-square`, `square`, `badge`, `search`) and in a cleared corner otherwise. Measured at 16px, `shield-check` and `shield-x` now differ by 15% of their ink, against 0.6% before — and `shield-*` reads as a shield again instead of as a broken ring.
+
+  **A modified icon is the same size as the icon it modifies.** The base is not scaled down to make room for the corner mark; it keeps its full size and is redrawn with that corner interrupted, so `globe` and `globe-check` are the same globe. A new rule, `checkCornerClearance`, holds 5.5u of empty canvas around every corner mark and fails the build when the base crowds it.
+
+  **Fourteen icons had geometry generated from a hash of their own name.** `network`, `network-nodes`, `workflow`, `hierarchy`, `git-branch`, `git-fork`, `route` and `timeline` were interchangeable arrangements of sticks and dots, plus six overlay uses in `brain-circuit`, `brain-lock`, `repeat-*`, `browser`, `page-snapshot` and `ai-studio`. All are now drawn to the convention each concept already has.
+
+  **Names that did not match their drawing.** `settings` was a sun and is now a gear. `circle-alert` held a warning triangle inside a circle — two alert metaphors stacked — and now holds an exclamation. `info` and `clock` both carried a broken ring with a dot floating outside it, which reads as a notification; both rings are closed. `users-round` drew two heads over one shared body inside a ring, which read as a face, and is now two avatars. `bot-users` was a bot with a plus, meaning "add a bot", and is now a bot with the person it serves. `support` was a spiral and is now a headset. `wrench-zap` drew its bolt inside the wrench outline, so it shared a silhouette with `wrench`. `file-pdf` spelled three letters in a 9u box that no size could resolve. `chevrons-up-down` closed into a diamond. `lock` no longer carries the keyhole that `lock-keyhole` is named for.
+
+  **Other redrawings:** `file-archive`, `folder-input`, `calendar-dot`, `list-rule`, `send-request`, `library-books`, `assistant`, `lightbulb-sparkles` and `code-api` were redrawn to clear the contract.
+
+  **Five names became aliases rather than separate drawings.** `microphone`, `house`, `paper-plane`, `alert-circle` and `check-circle` now share the geometry of `mic`, `home`, `send`, `circle-alert` and `circle-check`. Every name still resolves; nothing was removed from the catalog.
+
+  **Six new icons open a subject the catalog had no way to draw.** `briefcase`, `car`, `graduation-cap`, `landmark`, `shirt` and `utensils` land in a new `everyday` category — everyday-life subjects, as opposed to the payment mechanics `commerce` already covered. Before them, any expense- or subject-categorisation UI had to fall back to `price-tag`: transport, food, education, apparel and civic all resolved to the same picture.
+
+  `trending-up` is now an alias of `trend-up`. It is the spelling a Lucide-shaped codebase reaches for first, and reaching for it used to produce an unknown-icon warning.
+
+  **Two names were removed: `toggle-left` and `toggle-right`.** They drew a switch, and TreeUI ships `TSwitch` — a real one, with keyboard operation, `role="switch"`, focus-visible treatment and a 44×44 target. A picture of a switch has none of that, and shipping it invites `<TIcon name="toggle-right" />` where `<TSwitch>` was meant. The rule now lives in `DECISIONS.md` → "What Is Not an Icon": if the thing depicted is a control the library already builds, the catalog does not draw it. `check`, `circle-check` and `square-check` are unaffected — a tick is a statement about state, not a box the user clicks.
+
+  **The `product` category is gone, and its sixteen icons are filed by what they draw.** Whether `market` reads as a product mark or as a shop front is decided by where it is rendered, so a `product` category recorded an application's decision as library metadata — and made those sixteen unfindable by anyone searching for what they actually show. `market` is now under commerce, `storage` under data, `assistant` under ai, `trail` under navigation, and so on. They keep their shared rounded-square container, which is a drawing treatment rather than a namespace; the helper that applies it is `FRAMED_GLYPH_NAMES`.
+
+  **One of those sixteen still carried a name that described an application rather than a drawing, and is now `campaign`.** It draws a megaphone with a sparkle inside the shared rounded square, so it is filed by what it shows like the rest of them. For a consumer this is one name added and one name removed, with no alias between them: an alias would keep a name that says nothing about the drawing in the catalog forever, which is the reason for the rename. Code that still asks for the old name now gets the usual unknown-icon warning and should ask for `campaign` instead. The frame and the sparkle stay, so `campaign` remains distinct from the unframed `megaphone`.
+
+  **The catalog is browsable.** `treeIconFamilies`, `treeIconCategories`, `treeIconCategoryOrder`, `treeIconCategoryLabels`, `treeIconAliases`, `treeIconCategory(name)` and `treeIconFamily(name)` are new exports from `@treeui/icons` and `@treeui/vue`: the catalog's own structure, two levels deep. Sixteen subjects, each split into families — `signal` with its four strengths, `chevron` with its four directions.
+
+  Three rules make that structure worth shipping rather than deriving. A family lists its variants **by meaning**, so a scale reads `off`, `low`, `medium`, `high` rather than the alphabetical `high`, `low`, `medium`, `off`. An icon with no relatives is a family of one named after itself, so every group renders the same way. And only canonical names appear: `close` and `x` are one drawing under two names, listed once, with `treeIconAliases` giving the synonyms — enough for a picker to match "close" in a search without showing the same picture twice. `categories.test.ts` holds all three, so a new icon cannot ship without a family and a family cannot drift out of order.
+
+  Storybook's icon gallery is rebuilt on top of it: grouped by subject and family, searchable by name or synonym, with a second row of family chips inside a chosen category and a drawer that shows the family siblings and hands you the line of code.
+
+  The rules ship as tooling: `pnpm --filter @treeui/icons branchline` reports on any icon, and `branchline.test.ts` gates the build. It replaces a test that compared serialised geometry — which measured byte uniqueness, something hash-generated geometry satisfies perfectly while drawing nothing, and which in the other direction forbade true synonyms from sharing one glyph.
+
+- 6f62a18: The closed vocabularies move into `@treeui/tokens`, and the token model gains a second and third rendering.
+
+  **A closed set kept in four places is not closed.** `sm | md | lg`, `solid | outline | ghost | soft`, the seven action tones — these are design decisions, not framework ones, and every ecosystem that renders TreeUI has to reproduce exactly the same members. They lived in `@treeui/vue`'s `types/contracts.ts`, which meant `@treeui/react` shipped a hand-typed copy with a comment promising to centralize it, and a non-web target had nowhere to import them from at all. They now live in `@treeui/tokens`: `treeSizes`, `treeVariants`, `treeCardVariants`, `treeActionTones`, `treeBadgeTones`, `treeAccents`, `treeBreakpoints`, `treeFieldWidths`, `treeTooltipSides`, `treeDrawerSides`, with their types.
+
+  Nothing moves for a consumer. `@treeui/vue`'s `types/contracts.ts` re-exports every name it exported before, and `TBadgeTone` is still exported from `TBadge` as well as from the shared surface. `@treeui/react`'s types are now re-exports rather than re-declarations, which also adds `TAccent`, `TActionTone`, `TBreakpoint`, `TFieldWidth` and `TTooltipSide` to its public surface.
+
+  **`@treeui/tokens` can now render itself for a target that has no CSS.** `css.ts` has always emitted custom properties; `native.ts` resolves the same model into numbers and colours — `rem` into pixels, `color-mix()` into a real alpha, the elevation scale tinted by each theme's own umbra, the brand gradient into an angle and stops — and `kotlin.ts` and `rust.ts` emit source from that. New exports: `resolveNativeTokens`, `nativeParityReport`, `resolveTone`, `NATIVE_TONES`, `NATIVE_TOKEN_GROUPS`, `NATIVE_VOCABULARIES`, `createKotlinTokens`, `createRustTokens`.
+
+  `nativeParityReport` is the part that matters: it compares the stylesheet's variables with the resolved model key by key, and `native.test.ts` fails the build on a token that is in one and not the other. Adding a token without teaching the resolver about it would otherwise turn a second ecosystem into a stale copy of the design system — which is worse than no copy, because it still looks authoritative.
+
+  **The tone axis is data now, and the stylesheet is tested against it.** The mapping from a tone to the ten colours it resolves to only ever existed as seven blocks of `.t-button--tone-*` assignments. It is `NATIVE_TONES`, and a new `tone-contract.test.ts` parses the shipped stylesheet and fails when the two disagree, so one decision has three renderings and no hand-maintained copy.
+
+  **A deprecated member is declared as one.** `treeDeprecatedVariants` names `danger` — a colour trapped in the shape scale, which is why the tone axis exists — so a generator can leave it out. It keeps working on the web, where removing it would break consumers.
+
+  `TButton`'s tone axis is also documented at last. It has shipped since the axis was introduced, but the Vue Storybook had no `tone` control and no tone story — so the decision that motivated splitting colour out of the shape scale was only visible in `DECISIONS.md`. Three stories now cover it: every tone, one tone across all four variants, and the row the axis exists for — a destructive action sitting quietly among other quiet ones.
+
+  Also in this release: `TTagInput`'s and `TAppShell`'s example and test fixtures use neutral sample data, and a number of source comments, contract notes and changelog entries that justified a decision by pointing at an external application now state the same claim as a property of the problem. No behaviour changes with any of it.
+
+- Updated dependencies [6f62a18]
+- Updated dependencies [08fba8b]
+- Updated dependencies [6f62a18]
+  - @treeui/tokens@0.32.0
+  - @treeui/icons@0.32.0
+
 ## 0.31.0
 
 ### Minor Changes

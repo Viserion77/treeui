@@ -15,7 +15,7 @@
   },
   "devDependencies": {
     "@storybook/addon-vitest": "^10.5.2",
-    "@vitest/browser": "^3.2.7",
+    "@vitest/browser": "^4.1.11",
     "vue-component-type-helpers": "^3"
   }
 }

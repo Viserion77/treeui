@@ -12,7 +12,15 @@
     "skipLibCheck": true,
     "allowSyntheticDefaultImports": true,
     "resolveJsonModule": true,
-    "jsx": "preserve",
+    // `react-jsx`, not `preserve`. Every .tsx in this workspace is React, and
+    // every config that owns one already overrides to `react-jsx` — the base
+    // value was only ever reachable by a file whose nearest config forgot to,
+    // which is how `packages/react/**/*.test.tsx` (excluded from the React
+    // tsconfig) ended up telling the transformer to leave JSX alone. Vitest 3
+    // transformed it anyway; Vitest 4 honours the setting and the file stopped
+    // parsing. `tooling/strict-templates` keeps `preserve` deliberately and is
+    // unaffected.
+    "jsx": "react-jsx",
     "lib": ["ES2022", "DOM", "DOM.Iterable"]
   }
 }

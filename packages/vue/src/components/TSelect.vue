@@ -1,8 +1,20 @@
-<script setup lang="ts">
+<script lang="ts">
+// A normal <script> block, because a generic `<script setup>` does not
+// re-export the types declared inside it — and `TSelectOption` is public API.
+// Same arrangement as TToggleGroup.
+export interface TSelectOption<V extends string | number = string | number> {
+  label: string;
+  value: V;
+  disabled?: boolean;
+}
+</script>
+
+<script setup lang="ts" generic="T extends string | number = string">
 import { createId, isActivationKey, isEscapeKey } from '@treeui/utils';
-import { computed, nextTick, onBeforeUnmount, ref, toRef, useAttrs, watch } from 'vue';
+import { computed, nextTick, onBeforeUnmount, ref, useAttrs, watch } from 'vue';
 import { useFormFieldIdentity, type TModelModifiers } from './form-field';
 import { useControllableOpen } from '../composables/useControllableOpen';
+import { useAnchoredLayer } from '../composables/useAnchoredLayer';
 import type { TFieldWidth, TSize } from '../types/contracts';
 import TSpinner from './TSpinner.vue';
 
@@ -10,16 +22,15 @@ defineOptions({
   inheritAttrs: false,
 });
 
-export interface TSelectOption {
-  label: string;
-  value: string | number;
-  disabled?: boolean;
-}
-
 const props = withDefaults(
   defineProps<{
-    modelValue?: string | number;
-    options?: TSelectOption[];
+    /**
+     * Generic over the value, so a `ref<'scan' | 'query'>` gets its own literal
+     * union back from `v-model` instead of a widened `string | number`. The
+     * same move `TInput`, `TTabs` and `TToggleGroup` already made.
+     */
+    modelValue?: T;
+    options?: TSelectOption<T>[];
     open?: boolean;
     defaultOpen?: boolean;
     size?: TSize;
@@ -32,7 +43,7 @@ const props = withDefaults(
   } & TModelModifiers>(),
   {
     modelModifiers: () => ({}),
-    modelValue: '',
+    modelValue: undefined,
     options: () => [],
     open: undefined,
     defaultOpen: false,
@@ -46,7 +57,7 @@ const props = withDefaults(
 );
 
 const emit = defineEmits<{
-  'update:modelValue': [value: string | number];
+  'update:modelValue': [value: T];
   'update:open': [value: boolean];
   'open-change': [value: boolean];
 }>();
@@ -58,7 +69,6 @@ const triggerRef = ref<HTMLButtonElement | null>(null);
 const listboxRef = ref<HTMLElement | null>(null);
 const optionRefs = ref<Map<string | number, HTMLElement>>(new Map());
 const focusedIndex = ref(-1);
-const dropUp = ref(false);
 
 // The trigger is a real `<button>`, so this control CAN carry a TFormField's id
 // and be the target of its `<label for>`.
@@ -76,7 +86,7 @@ const triggerAttrs = computed(() => {
 });
 
 const { value: isOpen, setValue } = useControllableOpen(
-  toRef(props, 'open'),
+  computed(() => props.open),
   props.defaultOpen,
   (value) => {
     emit('update:open', value);
@@ -98,39 +108,22 @@ const rootClasses = computed(() => [
   attrs.class,
 ]);
 
-// Nearest ancestor that can clip the listbox (scroll container or hidden overflow).
-const findClippingAncestor = (element: HTMLElement): HTMLElement | null => {
-  let parent = element.parentElement;
-  while (parent && parent !== document.body) {
-    const { overflowY } = window.getComputedStyle(parent);
-    if (overflowY === 'auto' || overflowY === 'scroll' || overflowY === 'hidden') {
-      return parent;
-    }
-    parent = parent.parentElement;
-  }
-  return null;
-};
+/* The listbox is teleported to the body and placed from the trigger's viewport
+   rect. It used to be positioned inside the root, which meant any ancestor
+   with `overflow` clipped it — the TTable wrapper cut it off, and inside a
+   modal it was trapped. Flipping up when there is no room below now comes from
+   the shared layer, so the ancestor-scanning that approximated it is gone; the
+   only boundary left is the viewport, which is the honest one. */
+const { style: listboxStyle, placedSide } = useAnchoredLayer(
+  triggerRef,
+  listboxRef,
+  isOpen,
+  ref('bottom' as const),
+  ref('start' as const),
+  { matchTriggerWidth: true },
+);
 
-// Flip the listbox above the trigger when its rendered position overflows the
-// nearest clipping ancestor (e.g. a modal body) or the viewport, and there is
-// more room above the trigger than below it. Measuring the rendered rect keeps
-// the decision in sync with the CSS offset (--tree-space-2) automatically.
-const updateDropDirection = () => {
-  const trigger = triggerRef.value;
-  const listbox = listboxRef.value;
-  if (!trigger || !listbox) {
-    dropUp.value = false;
-    return;
-  }
-  const triggerRect = trigger.getBoundingClientRect();
-  const listboxRect = listbox.getBoundingClientRect();
-  const boundary = findClippingAncestor(trigger)?.getBoundingClientRect();
-  const bottomLimit = Math.min(boundary?.bottom ?? Infinity, window.innerHeight);
-  const topLimit = Math.max(boundary?.top ?? 0, 0);
-  const spaceBelow = bottomLimit - triggerRect.bottom;
-  const spaceAbove = triggerRect.top - topLimit;
-  dropUp.value = listboxRect.bottom > bottomLimit && spaceAbove > spaceBelow;
-};
+const dropUp = computed(() => placedSide.value === 'top');
 
 const rootStyle = computed(() => attrs.style);
 
@@ -147,11 +140,8 @@ const openDropdown = () => {
   if (props.disabled) return;
   const selectedIdx = props.options.findIndex((o) => o.value === props.modelValue);
   focusedIndex.value = selectedIdx >= 0 ? selectedIdx : 0;
-  // Render downward first so the measurement always starts from the default position.
-  dropUp.value = false;
   setValue(true);
   nextTick(() => {
-    updateDropDirection();
     focusOption(focusedIndex.value);
   });
 };
@@ -172,7 +162,7 @@ const toggleDropdown = () => {
   }
 };
 
-const selectOption = (opt: TSelectOption) => {
+const selectOption = (opt: TSelectOption<T>) => {
   if (opt.disabled) return;
   emit('update:modelValue', opt.value);
   closeDropdown(true);
@@ -220,7 +210,7 @@ const onTriggerKeydown = (event: KeyboardEvent) => {
   }
 };
 
-const onOptionKeydown = (event: KeyboardEvent, opt: TSelectOption, _index: number) => {
+const onOptionKeydown = (event: KeyboardEvent, opt: TSelectOption<T>, _index: number) => {
   if (isEscapeKey(event)) {
     event.preventDefault();
     closeDropdown(true);
@@ -266,6 +256,8 @@ const onDocumentPointerDown = (event: PointerEvent) => {
   const target = event.target;
   if (!(target instanceof Node)) return;
   if (rootRef.value?.contains(target)) return;
+  // Teleported, so the listbox is not inside the root any more.
+  if (listboxRef.value?.contains(target)) return;
   closeDropdown();
 };
 
@@ -340,48 +332,52 @@ onBeforeUnmount(() => {
         <polyline points="4 6 8 10 12 6" />
       </svg>
     </button>
-    <transition name="t-fade">
-      <ul
-        v-if="isOpen && !disabled"
-        :id="listboxId"
-        ref="listboxRef"
-        role="listbox"
-        class="t-select__listbox"
-        :aria-label="typeof triggerAttrs['aria-label'] === 'string' ? triggerAttrs['aria-label'] : undefined"
-      >
-        <li
-          v-for="(opt, index) in options"
-          :key="opt.value"
-          :ref="(el) => setOptionRef(el as Element | null, opt.value)"
-          role="option"
-          class="t-select__option"
-          :class="{
-            'is-selected': opt.value === modelValue,
-            'is-disabled': opt.disabled,
-            'is-focused': index === focusedIndex,
-          }"
-          :aria-selected="opt.value === modelValue"
-          :aria-disabled="opt.disabled || undefined"
-          :tabindex="opt.disabled ? -1 : 0"
-          @click="selectOption(opt)"
-          @keydown="onOptionKeydown($event, opt, index)"
+    <Teleport to="body">
+      <transition name="t-fade">
+        <ul
+          v-if="isOpen && !disabled"
+          :id="listboxId"
+          ref="listboxRef"
+          role="listbox"
+          class="t-select__listbox is-anchored"
+          :class="{ 'is-drop-up': dropUp }"
+          :style="listboxStyle"
+          :aria-label="typeof triggerAttrs['aria-label'] === 'string' ? triggerAttrs['aria-label'] : undefined"
         >
-          {{ opt.label }}
-          <svg
-            v-if="opt.value === modelValue"
-            class="t-select__check"
-            viewBox="0 0 16 16"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            aria-hidden="true"
+          <li
+            v-for="(opt, index) in options"
+            :key="opt.value"
+            :ref="(el) => setOptionRef(el as Element | null, opt.value)"
+            role="option"
+            class="t-select__option"
+            :class="{
+              'is-selected': opt.value === modelValue,
+              'is-disabled': opt.disabled,
+              'is-focused': index === focusedIndex,
+            }"
+            :aria-selected="opt.value === modelValue"
+            :aria-disabled="opt.disabled || undefined"
+            :tabindex="opt.disabled ? -1 : 0"
+            @click="selectOption(opt)"
+            @keydown="onOptionKeydown($event, opt, index)"
           >
-            <polyline points="3.5 8.5 6.5 11.5 12.5 4.5" />
-          </svg>
-        </li>
-      </ul>
-    </transition>
+            {{ opt.label }}
+            <svg
+              v-if="opt.value === modelValue"
+              class="t-select__check"
+              viewBox="0 0 16 16"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              <polyline points="3.5 8.5 6.5 11.5 12.5 4.5" />
+            </svg>
+          </li>
+        </ul>
+      </transition>
+    </Teleport>
   </div>
 </template>

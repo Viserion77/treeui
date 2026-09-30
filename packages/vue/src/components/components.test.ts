@@ -107,6 +107,26 @@ import {
 } from '@treeui/icons';
 import { useToast } from '../composables/useToast';
 
+/**
+ * Overlay panels (popover, menu, select listbox, date-picker panel) render
+ * through `<Teleport to="body">` so an ancestor's `overflow` cannot clip them,
+ * which also puts them outside the mounted wrapper. `wrapper.find` cannot see
+ * them; these read the document instead. `vitest.setup.ts` empties the body
+ * between tests, so a query here only ever sees the current mount.
+ */
+const inBody = <T extends Element = HTMLElement>(selector: string): T | null =>
+  document.body.querySelector<T>(selector);
+
+const allInBody = <T extends Element = HTMLElement>(selector: string): T[] => [
+  ...document.body.querySelectorAll<T>(selector),
+];
+
+const clickInBody = (selector: string) =>
+  inBody(selector)?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+
+const keyInBody = (selector: string, key: string) =>
+  inBody(selector)?.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, key }));
+
 describe('@treeui/vue', () => {
   it('renders button states and blocks clicks while loading', async () => {
     const wrapper = mount(TButton, {
@@ -957,9 +977,10 @@ describe('@treeui/vue', () => {
     await nextTick();
 
     expect(wrapper.emitted('update:open')?.[0]).toEqual([true]);
-    expect(wrapper.find('[role="dialog"]').exists()).toBe(true);
+    // The panel teleports to the body so a modal surface cannot clip it.
+    expect(inBody('[role="dialog"]')).not.toBeNull();
 
-    await wrapper.get('[data-date="2026-03-20"]').trigger('click');
+    clickInBody('[data-date="2026-03-20"]');
     await nextTick();
 
     expect(wrapper.emitted('update:modelValue')?.[0]).toEqual(['2026-03-20']);
@@ -985,20 +1006,18 @@ describe('@treeui/vue', () => {
     });
     await nextTick();
 
-    const selectedDay = wrapper.get('[data-date="2026-03-15"]');
-
-    await selectedDay.trigger('keydown', { key: 'ArrowRight' });
+    keyInBody('[data-date="2026-03-15"]', 'ArrowRight');
     await nextTick();
     expect(document.activeElement?.getAttribute('data-date')).toBe('2026-03-16');
 
-    await wrapper.get('[data-date="2026-03-16"]').trigger('keydown', { key: 'PageDown' });
+    keyInBody('[data-date="2026-03-16"]', 'PageDown');
     await nextTick();
-    expect(wrapper.get('.t-date-picker__month').text()).toContain('April');
+    expect(inBody('.t-date-picker__month')?.textContent).toContain('April');
 
-    await wrapper.get('[data-date="2026-04-16"]').trigger('keydown', { key: 'Escape' });
+    keyInBody('[data-date="2026-04-16"]', 'Escape');
     await nextTick();
 
-    expect(wrapper.find('[role="dialog"]').exists()).toBe(false);
+    expect(inBody('[role="dialog"]')).toBeNull();
 
     wrapper.unmount();
   });
@@ -1860,12 +1879,15 @@ describe('@treeui/vue', () => {
 
     // Open dropdown
     await trigger.trigger('click');
-    const options = wrapper.findAll('[role="option"]');
+    // The listbox teleports to the body so an ancestor's `overflow` cannot
+    // clip it, which also puts it outside the wrapper.
+    const options = allInBody('[role="option"]');
     expect(options.length).toBe(2);
-    expect(options[0].text()).toBe('Apple');
+    expect(options[0].textContent?.trim()).toBe('Apple');
 
     // Select an option
-    await options[1].trigger('click');
+    options[1].dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    await nextTick();
     expect(wrapper.emitted('update:modelValue')?.[0]).toEqual(['banana']);
   });
 
@@ -1975,9 +1997,9 @@ describe('@treeui/vue', () => {
     });
 
     await wrapper.get('button').trigger('click');
-    const options = wrapper.findAll('[role="option"]');
-    expect(options[1].classes()).toContain('is-disabled');
-    expect(options[1].attributes('aria-disabled')).toBe('true');
+    const options = allInBody('[role="option"]');
+    expect(options[1].classList.contains('is-disabled')).toBe(true);
+    expect(options[1].getAttribute('aria-disabled')).toBe('true');
   });
 
   it('flips the select listbox above the trigger when it overflows below', async () => {
@@ -2051,10 +2073,10 @@ describe('@treeui/vue', () => {
     });
 
     await wrapper.get('button').trigger('click');
-    const options = wrapper.findAll('[role="option"]');
-    expect(options[0].classes()).toContain('is-selected');
-    expect(options[0].find('.t-select__check').exists()).toBe(true);
-    expect(options[1].find('.t-select__check').exists()).toBe(false);
+    const options = allInBody('[role="option"]');
+    expect(options[0].classList.contains('is-selected')).toBe(true);
+    expect(options[0].querySelector('.t-select__check')).not.toBeNull();
+    expect(options[1].querySelector('.t-select__check')).toBeNull();
   });
 
   it('emits numeric values from select options without string coercion', async () => {
@@ -2072,7 +2094,8 @@ describe('@treeui/vue', () => {
     });
 
     await wrapper.get('button').trigger('click');
-    await wrapper.findAll('[role="option"]')[1].trigger('click');
+    allInBody('[role="option"]')[1].dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    await nextTick();
 
     expect(wrapper.emitted('update:modelValue')?.[0]).toEqual([2026]);
   });
@@ -3752,16 +3775,20 @@ describe('TTabs', () => {
       },
     });
 
-    expect(wrapper.find('[role="dialog"]').exists()).toBe(false);
+    // The panel teleports to the body (see `useAnchoredLayer`), so it is not
+    // inside the wrapper — same convention the TModal tests already use.
+    expect(document.body.querySelector('[role="dialog"]')).toBeNull();
 
     await wrapper.get('button').trigger('click');
     await nextTick();
 
     expect(wrapper.emitted('update:open')?.[0]).toEqual([true]);
     expect(wrapper.emitted('open-change')?.[0]).toEqual([true]);
-    expect(wrapper.find('[role="dialog"]').exists()).toBe(true);
+    expect(document.body.querySelector('[role="dialog"]')).not.toBeNull();
 
-    await wrapper.find('[role="dialog"]').trigger('keydown', { key: 'Escape' });
+    document.body
+      .querySelector('[role="dialog"]')
+      ?.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, key: 'Escape' }));
     await nextTick();
 
     expect(wrapper.emitted('update:open')?.[1]).toEqual([false]);
@@ -3784,9 +3811,9 @@ describe('TTabs', () => {
       },
     });
 
-    const content = wrapper.find('[role="dialog"]');
-    expect(content.classes()).toContain('t-popover__content--right');
-    expect(content.classes()).toContain('t-popover__content--align-start');
+    const content = document.body.querySelector('[role="dialog"]');
+    expect(content?.classList.contains('t-popover__content--right')).toBe(true);
+    expect(content?.classList.contains('t-popover__content--align-start')).toBe(true);
 
     wrapper.unmount();
   });
@@ -4547,9 +4574,23 @@ describe('TIcon', () => {
     expect(wrapper.find('svg').attributes('stroke-width')).toBe('1');
   });
 
-  it('survives a non-numeric size instead of emitting NaN', () => {
-    const wrapper = mount(TIcon, { props: { name: 'cpu', size: 'auto' } });
-    expect(wrapper.find('svg').attributes('stroke-width')).toBe('2');
+  it('falls back to the default size for an unknown one instead of rendering it raw', () => {
+    // `'auto'` is now a compile error; the cast is what a JavaScript consumer
+    // reaches this path with. It used to be forwarded to the SVG untouched,
+    // which rendered a 300px glyph.
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const wrapper = mount(TIcon, { props: { name: 'cpu', size: 'auto' as unknown as number } });
+
+    // 20 is `treeIconDefaults.size`; with `absoluteStrokeWidth` that is 2 × 24/20.
+    expect(wrapper.find('svg').attributes('width')).toBe('20');
+    expect(wrapper.find('svg').attributes('stroke-width')).toBe('2.4');
+    expect(warn).toHaveBeenCalledOnce();
+    warn.mockRestore();
+  });
+
+  it('maps a token size onto the icon scale', () => {
+    expect(mount(TIcon, { props: { name: 'cpu', size: 'sm' } }).find('svg').attributes('width')).toBe('16');
+    expect(mount(TIcon, { props: { name: 'cpu', size: 'lg' } }).find('svg').attributes('width')).toBe('24');
   });
 
   it('renders nothing for a typed but unregistered name instead of throwing', () => {
@@ -5320,11 +5361,13 @@ describe('Closed-contract prop additions — batch 3', () => {
 
   describe('TPopover size', () => {
     it('scales the content density by the shared size axis', () => {
-      const wrapper = mount(TPopover, {
+      mount(TPopover, {
         props: { defaultOpen: true, size: 'sm' },
         slots: { default: '<p>painel</p>' },
       });
-      expect(wrapper.find('.t-popover__content').classes()).toContain('t-popover__content--sm');
+      expect(
+        document.body.querySelector('.t-popover__content')?.classList.contains('t-popover__content--sm'),
+      ).toBe(true);
     });
   });
 
@@ -5502,10 +5545,14 @@ describe('Queued contract items — batch 6', () => {
         },
       });
       await nextTick();
-      expect(wrapper.find('.t-popover__content').exists()).toBe(true);
-      await wrapper.find('.closer').trigger('click');
+      expect(document.body.querySelector('.t-popover__content')).not.toBeNull();
+      // Inside the teleported panel, so not reachable through the wrapper.
+      document.body
+        .querySelector<HTMLButtonElement>('.closer')
+        ?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
       await nextTick();
-      expect(wrapper.find('.t-popover__content').exists()).toBe(false);
+      expect(document.body.querySelector('.t-popover__content')).toBeNull();
+      wrapper.unmount();
     });
 
     it('restores focus to the trigger when focus is inside the panel at close', async () => {
@@ -5518,10 +5565,10 @@ describe('Queued contract items — batch 6', () => {
         },
       });
       await nextTick();
-      const inside = wrapper.find('.inside').element as HTMLElement;
+      const inside = document.body.querySelector<HTMLButtonElement>('.inside')!;
       inside.focus();
       expect(document.activeElement).toBe(inside);
-      await wrapper.find('.inside').trigger('click');
+      inside.dispatchEvent(new MouseEvent('click', { bubbles: true }));
       await nextTick();
       await nextTick();
       expect(document.activeElement).toBe(wrapper.find('.trg').element);
@@ -5538,9 +5585,9 @@ describe('Queued contract items — batch 6', () => {
         },
       });
       await nextTick();
-      const inside = wrapper.find('.inside').element as HTMLElement;
+      const inside = document.body.querySelector<HTMLButtonElement>('.inside')!;
       inside.focus();
-      await wrapper.find('.inside').trigger('click');
+      inside.dispatchEvent(new MouseEvent('click', { bubbles: true }));
       await nextTick();
       await nextTick();
       expect(document.activeElement).not.toBe(wrapper.find('.trg').element);
@@ -5615,20 +5662,20 @@ describe('Queued contract items — batch 6', () => {
     it('renders role=menu with the header outside it, and typed items', async () => {
       const wrapper = openMenu();
       await nextTick();
-      const menu = wrapper.find('[role="menu"]');
-      expect(menu.exists()).toBe(true);
-      expect(menu.attributes('aria-label')).toBe('Actions');
+      const menu = inBody('[role="menu"]');
+      expect(menu).not.toBeNull();
+      expect(menu?.getAttribute('aria-label')).toBe('Actions');
       // header sits outside the role=menu element
-      expect(wrapper.find('.t-menu__header .hdr').exists()).toBe(true);
-      expect(menu.find('.hdr').exists()).toBe(false);
+      expect(inBody('.t-menu__header .hdr')).not.toBeNull();
+      expect(menu?.querySelector('.hdr')).toBeNull();
       // group label is non-focusable
-      expect(wrapper.find('.t-menu-group__label').text()).toBe('Workspace');
+      expect(inBody('.t-menu-group__label')?.textContent).toBe('Workspace');
       // link item is an anchor; radio item exposes aria-checked
-      expect(wrapper.find('.i1').element.tagName).toBe('A');
-      expect(wrapper.find('.i2').attributes('role')).toBe('menuitemradio');
-      expect(wrapper.find('.i2').attributes('aria-checked')).toBe('true');
-      expect(wrapper.find('.i3').classes()).toContain('t-menu-item--danger');
-      expect(wrapper.find('.i4').attributes('aria-disabled')).toBe('true');
+      expect(inBody('.i1')?.tagName).toBe('A');
+      expect(inBody('.i2')?.getAttribute('role')).toBe('menuitemradio');
+      expect(inBody('.i2')?.getAttribute('aria-checked')).toBe('true');
+      expect(inBody('.i3')?.classList.contains('t-menu-item--danger')).toBe(true);
+      expect(inBody('.i4')?.getAttribute('aria-disabled')).toBe('true');
       wrapper.unmount();
     });
 
@@ -5636,27 +5683,29 @@ describe('Queued contract items — batch 6', () => {
       const wrapper = openMenu();
       await nextTick();
       await nextTick();
-      const menu = wrapper.find('[role="menu"]');
       // first enabled item is active after open
-      expect(wrapper.find('.i1').attributes('tabindex')).toBe('0');
-      await menu.trigger('keydown', { key: 'ArrowDown' });
-      expect(wrapper.find('.i2').attributes('tabindex')).toBe('0');
-      await menu.trigger('keydown', { key: 'ArrowDown' });
-      expect(wrapper.find('.i3').attributes('tabindex')).toBe('0');
+      expect(inBody('.i1')?.getAttribute('tabindex')).toBe('0');
+      keyInBody('[role="menu"]', 'ArrowDown');
+      await nextTick();
+      expect(inBody('.i2')?.getAttribute('tabindex')).toBe('0');
+      keyInBody('[role="menu"]', 'ArrowDown');
+      await nextTick();
+      expect(inBody('.i3')?.getAttribute('tabindex')).toBe('0');
       // ArrowDown again loops past the disabled i4 back to i1
-      await menu.trigger('keydown', { key: 'ArrowDown' });
-      expect(wrapper.find('.i1').attributes('tabindex')).toBe('0');
-      expect(wrapper.find('.i4').attributes('tabindex')).toBe('-1');
+      keyInBody('[role="menu"]', 'ArrowDown');
+      await nextTick();
+      expect(inBody('.i1')?.getAttribute('tabindex')).toBe('0');
+      expect(inBody('.i4')?.getAttribute('tabindex')).toBe('-1');
       wrapper.unmount();
     });
 
     it('closes the menu when an item is selected', async () => {
       const wrapper = openMenu();
       await nextTick();
-      expect(wrapper.find('[role="menu"]').exists()).toBe(true);
-      await wrapper.find('.i3').trigger('click');
+      expect(inBody('[role="menu"]')).not.toBeNull();
+      clickInBody('.i3');
       await nextTick();
-      expect(wrapper.find('[role="menu"]').exists()).toBe(false);
+      expect(inBody('[role="menu"]')).toBeNull();
       wrapper.unmount();
     });
   });
@@ -5687,11 +5736,11 @@ describe('TMenu opens via the trigger — regression', () => {
       global: { components: { TMenuItem } },
     });
     // closed initially
-    expect(wrapper.find('[role="menu"]').exists()).toBe(false);
+    expect(inBody('[role="menu"]')).toBeNull();
     await wrapper.find('.trg').trigger('click');
     await nextTick();
     // the panel must now be open
-    expect(wrapper.find('[role="menu"]').exists()).toBe(true);
+    expect(inBody('[role="menu"]')).not.toBeNull();
     expect(wrapper.find('.t-popover').attributes('data-state')).toBe('open');
     wrapper.unmount();
   });
@@ -5712,9 +5761,10 @@ describe('TMenu opens via the trigger — regression', () => {
     // parent applies it
     await wrapper.setProps({ open: true });
     await nextTick();
-    expect(wrapper.find('[role="menu"]').exists()).toBe(true);
+    expect(inBody('[role="menu"]')).not.toBeNull();
     // selecting an item requests close (emits update:open(false))
-    await wrapper.find('.mi').trigger('click');
+    clickInBody('.mi');
+    await nextTick();
     expect(wrapper.emitted('update:open')?.at(-1)).toEqual([false]);
     wrapper.unmount();
   });
@@ -5726,10 +5776,18 @@ describe('TPopover width', () => {
       props: { defaultOpen: true, width: 'content' },
       slots: { default: '<div>x</div>' },
     });
-    expect(wide.find('.t-popover__content').classes()).toContain('t-popover__content--w-content');
+    expect(
+      document.body.querySelector('.t-popover__content')?.classList.contains('t-popover__content--w-content'),
+    ).toBe(true);
+    // Unmounted before the next one: both panels teleport to the same body, so
+    // leaving this one up would make the query below find the wrong panel.
+    wide.unmount();
 
     const base = mount(TPopover, { props: { defaultOpen: true }, slots: { default: '<div>x</div>' } });
-    expect(base.find('.t-popover__content').classes().join(' ')).not.toContain('t-popover__content--w-');
+    expect(
+      [...(document.body.querySelector('.t-popover__content')?.classList ?? [])].join(' '),
+    ).not.toContain('t-popover__content--w-');
+    base.unmount();
   });
 
   it('forwards width through TMenu', () => {
@@ -5738,7 +5796,9 @@ describe('TPopover width', () => {
       slots: { default: '<TMenuItem label="A" />' },
       global: { components: { TMenuItem } },
     });
-    expect(wrapper.find('.t-popover__content').classes()).toContain('t-popover__content--w-lg');
+    expect(
+      document.body.querySelector('.t-popover__content')?.classList.contains('t-popover__content--w-lg'),
+    ).toBe(true);
     wrapper.unmount();
   });
 });

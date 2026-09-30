@@ -6,6 +6,18 @@ status: available
 purpose: "Composable dropzone and file picker with browse, drag-and-drop, and Ctrl+V paste support, plus per-file upload state: progress, remaining time, thumbnails, and independent per-file retry/resume."
 
 props:
+  clearLabel:
+    type: string
+    default: "Clear all"
+    description: "Label for the button that drops every selected file. It was hard-coded English with no way out."
+  removeLabel:
+    type: string
+    default: "Remove"
+    description: "Label for a row's remove button."
+  removeAriaLabel:
+    type: "(file: File) => string"
+    default: "(f) => `Remove ${f.name}`"
+    description: "Accessible name for a row's remove button. A function, not a string, because the file name sits INSIDE the sentence and its position differs by language — a prefix and a suffix cannot express that."
   modelValue:
     type: File[]
     default: "[]"

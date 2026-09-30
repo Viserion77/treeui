@@ -61,6 +61,15 @@ a11y:
   activation_keys_select_option: true
 
 behavior:
+  selected_item_repaints_its_descendants_secondary_text: >-
+    `.t-toggle-group__item.is-selected` rebinds `--tree-color-text-muted` to
+    `--tree-color-brand-contrast`. Only the inherited colour used to change, so
+    a `TText tone="muted"` in the `#option` slot kept reading the muted token
+    and measured 1.18:1 (light) and 1.09:1 (dark) over the brand fill, where
+    `xs` text needs 4.5:1. Rebinding the token is what keeps a slot the library
+    does not control legible; `brand-contrast` is the only value that clears AA
+    in both themes (5.19:1 / 6.21:1) — a `color-mix` at 85% still measured
+    4.18:1.
   single_and_multiple_modes: true
   variant_changes_visual_style_only: true
   visible_option_set_expected: true

@@ -17,7 +17,21 @@ export type TTableColumn = {
   label: string;
   sortable?: boolean;
   align?: 'left' | 'center' | 'right';
+  /**
+   * Preferred width. Under `table-layout: auto` — which is what this table
+   * uses, so columns size to their content — the CSS `width` on a cell is a
+   * SUGGESTION: the algorithm is free to go under it when the row is tight,
+   * and it does.
+   */
   width?: string;
+  /**
+   * A width the column may not go below. Unlike `width` this is a real floor:
+   * it is applied to a box inside the header rather than to the cell, so the
+   * auto layout has to honour it and the table overflows into the wrapper's
+   * scroll instead of squeezing the column to nothing. Use it for a column
+   * whose content must stay readable (a timestamp, an id, an amount).
+   */
+  minWidth?: string;
 };
 
 export type TTableSortDirection = 'asc' | 'desc' | 'none';
@@ -304,7 +318,10 @@ const tableAttrs = computed(() => {
               :name="`header-${column.key}`"
               :column="column"
             >
-              <span class="t-table__header-content">
+              <span
+                class="t-table__header-content"
+                :style="column.minWidth ? { minInlineSize: column.minWidth } : undefined"
+              >
                 {{ column.label }}
                 <span
                   v-if="column.sortable"

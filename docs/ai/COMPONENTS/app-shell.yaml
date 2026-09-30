@@ -77,7 +77,7 @@ props:
   showCollapseButton:
     type: boolean
     default: true
-    note: "Renders the built-in collapse toggle in the sidebar footer. Desktop only, and only when `collapsible` is set — no need to wire your own. Never rendered in the mobile drawer."
+    note: "Renders the built-in collapse toggle in the sidebar footer. Desktop only, and only when `collapsible` is set — no need to wire your own. Never rendered in the mobile drawer, and never inside the auto-rail band (between `breakpoint` and `railBreakpoint`): there the width decides the state, so the button could not change anything, did nothing when pressed, and announced the manual preference instead of what was on screen. Its `aria-expanded` and `aria-label` are derived from the EFFECTIVE collapsed state, as the glyph already was."
   collapseLabel:
     type: string
     default: Collapse sidebar
@@ -218,6 +218,14 @@ a11y:
   menu_and_drawer_close_buttons_are_44px: true
 
 behavior:
+  scroller_is_a_containing_block: >-
+    `.t-app-shell__main` (and `.t-app-shell__sidebar-body`) carry `position:
+    relative`. Without it an absolutely positioned descendant with auto insets —
+    `.t-visually-hidden`, which this library itself uses for the TProgress
+    label — anchored to the initial block instead of the panel: it was neither
+    clipped nor scrolled with the panel, and it extended the DOCUMENT's scroll.
+    The shell is `100dvh`, so the document is not supposed to scroll at all;
+    it did, leaving an empty band below the shell.
   fills_viewport_full_width_and_height: true
   resets_body_margin_while_a_shell_is_mounted: "body:has(.t-app-shell) { margin: 0 } — a deliberate global rule, scoped so it only applies to pages that mount a shell"
   header_spans_full_width_above_sidebar_and_content: true

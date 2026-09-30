@@ -31,6 +31,12 @@ slots:
 forwards_attrs_to: root_element
 
 behavior:
+  slot_presence_is_read_during_render: >-
+    The template tests `$slots.title` / `$slots.subtitle` directly instead of a
+    `computed` over `useSlots()`. The computed cached its first answer, so a
+    `v-if`'d title slot that appeared later never rendered, and one that
+    disappeared left an empty `<h1>` behind. This is the arrangement TCard
+    already used for `$slots.header`.
   title_and_subtitle_optional: true
   heading_level_controlled_by_level: true
   actions_area_right_aligned_and_wraps: true

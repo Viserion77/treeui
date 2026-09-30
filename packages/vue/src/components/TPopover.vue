@@ -2,6 +2,7 @@
 import { computed, nextTick, onBeforeUnmount, ref, toRef, useAttrs, watch } from 'vue';
 import { createId, focusFirst, isEscapeKey } from '@treeui/utils';
 import { useControllableOpen } from '../composables/useControllableOpen';
+import { useAnchoredLayer } from '../composables/useAnchoredLayer';
 import type { TSize, TTooltipSide } from '../types/contracts';
 
 export interface TPopoverCloseOptions {
@@ -94,9 +95,23 @@ const rootClasses = computed(() => [
 
 const rootStyle = computed(() => attrs.style);
 
+/* Teleported to the body and placed from the trigger's viewport rect. Inside
+   the app shell sidebar — or any ancestor with `overflow` — an absolutely
+   positioned panel was clipped and unreachable, and `align="end"` on a trigger
+   away from the right edge opened it at a negative `left`. The shared layer
+   fixes both, and reports back the side it actually used. */
+const { style: panelStyle, placedSide } = useAnchoredLayer(
+  triggerRef,
+  contentRef,
+  isOpen,
+  toRef(props, 'side'),
+  toRef(props, 'align'),
+);
+
 const contentClasses = computed(() => [
   't-popover__content',
-  `t-popover__content--${props.side}`,
+  'is-anchored',
+  `t-popover__content--${placedSide.value}`,
   `t-popover__content--align-${props.align}`,
   `t-popover__content--${props.size}`,
   // `md` is the base cap; only the other widths need a modifier.
@@ -178,6 +193,9 @@ const onDocumentPointerDown = (event: PointerEvent) => {
   const target = event.target;
   if (!(target instanceof Node)) return;
   if (rootRef.value?.contains(target)) return;
+  // The panel is teleported to the body, so it is NOT inside the root any more
+  // — without this a click on the panel's own padding closed it.
+  if (contentRef.value?.contains(target)) return;
   // The user is interacting elsewhere — never pull focus back to the trigger.
   requestClose(false);
 };
@@ -235,19 +253,22 @@ defineExpose({ close });
         />
       </slot>
     </div>
-    <transition name="t-popover-fade">
-      <div
-        v-if="isOpen && !disabled"
-        :id="contentId"
-        ref="contentRef"
-        role="dialog"
-        :class="contentClasses"
-        :data-state="isOpen ? 'open' : 'closed'"
-        tabindex="-1"
-        @keydown="onContentKeydown"
-      >
-        <slot :close="close" />
-      </div>
-    </transition>
+    <Teleport to="body">
+      <transition name="t-popover-fade">
+        <div
+          v-if="isOpen && !disabled"
+          :id="contentId"
+          ref="contentRef"
+          role="dialog"
+          :class="contentClasses"
+          :style="panelStyle"
+          :data-state="isOpen ? 'open' : 'closed'"
+          tabindex="-1"
+          @keydown="onContentKeydown"
+        >
+          <slot :close="close" />
+        </div>
+      </transition>
+    </Teleport>
   </div>
 </template>

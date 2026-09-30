@@ -253,8 +253,13 @@ layout_capabilities_already_shipping:
   TShow_THide:
     purpose: >
       Breakpoint visibility in pure CSS — both branches render, so a
-      pre-rendered page keeps every link. Reach for these before a `matchMedia`
-      composable; a media query cannot read `--tree-breakpoint-*`.
+      pre-rendered page keeps every link. Still the default for showing one of
+      two arrangements of the same content. What they cannot do is keep a branch
+      from MOUNTING: a map, an editor, anything that opens a socket is paid for
+      on a phone even though it is never visible. For that — and for questions
+      that are not about rendering at all, like how many rows to request — use
+      `useBreakpoint`, which reads the same `--tree-breakpoint-*` values so the
+      two cannot drift apart.
 
 shared_sizes:
   values: [sm, md, lg]
@@ -524,6 +529,47 @@ overlay_contract:
     - update:open
     - open-change
   rule: "controlled and uncontrolled modes should behave the same from the outside"
+  anchored_panels:
+    components: [TPopover, TMenu, TSelect, TDatePicker, TModal]
+    rule: >-
+      A panel anchored to a trigger renders through `<Teleport to="body">` and
+      is placed with `position: fixed` from the trigger's viewport rect by the
+      `useAnchoredLayer` composable. An absolutely positioned panel lives in its
+      ancestor's clip and in its ancestor's coordinate space, which is one cause
+      with four symptoms: a popover clipped inside the app shell sidebar, a
+      popover opening at a negative `left` with `align="end"`, a select listbox
+      cut off by the TTable wrapper, and a date-picker panel trapped in a modal
+      surface. The composable also flips to the opposite side when the requested
+      one has no room, and clamps the panel into
+      `[16px, innerWidth - 16px]`.
+    consequence_for_consumers: >-
+      The panel is NOT a descendant of the component's root element. Query it
+      from `document.body` in tests, and do not rely on a CSS selector that
+      descends from the trigger's container.
+
+composables:
+  useControllableOpen:
+    purpose: "Back an overlay's `open`/`defaultOpen` pair with one source of truth."
+  useAnchoredLayer:
+    purpose: >-
+      Place a teleported panel against a trigger, out of any clipping ancestor.
+      See `overlay_contract.anchored_panels`. Exported so a consumer composing
+      its own overlay gets the same placement the library uses.
+    signature: "useAnchoredLayer(triggerRef, panelRef, isOpen, side, align, options?)"
+  useBreakpoint:
+    purpose: >-
+      Read the current breakpoint in JavaScript, from the same
+      `--tree-breakpoint-*` values `TShow`/`THide` are generated from. The
+      escape hatch, not the default: prefer `TShow`/`THide` for anything purely
+      visual, because both of their branches render and neither flashes. Use
+      this when a branch must not MOUNT, or when the answer is not about
+      rendering at all.
+    signature: "useBreakpoint({ ssrValue? }) => { current, at, below, width }"
+    ssr: >-
+      There is no `matchMedia` while pre-rendering, so the first answer is
+      `ssrValue` (default `lg`) and the client corrects it on mount. That
+      correction is a real re-render, which is the reason a purely visual choice
+      belongs in `TShow`.
 
 form_contract:
   props:

@@ -210,6 +210,12 @@ describe('TDropdown trigger slot contract', () => {
 });
 
 describe('TPopover trigger slot contract', () => {
+  // The panel teleports to the body so an ancestor's `overflow` cannot clip it,
+  // which puts it outside the wrapper. Read the document instead.
+  const panel = () => document.body.querySelector<HTMLElement>('.t-popover__content');
+  const escapePanel = () =>
+    panel()?.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, key: 'Escape' }));
+
   const mountWithCustomTrigger = () =>
     mount(TPopover, {
       attachTo: document.body,
@@ -225,12 +231,13 @@ describe('TPopover trigger slot contract', () => {
 
     await trigger.trigger('click');
     await nextTick();
-    expect(wrapper.find('.t-popover__content').exists()).toBe(true);
+    expect(panel()).not.toBeNull();
 
-    await wrapper.find('.t-popover__content').trigger('keydown', { key: 'Escape' });
+    escapePanel();
+    await nextTick();
     await nextTick();
 
-    expect(wrapper.find('.t-popover__content').exists()).toBe(false);
+    expect(panel()).toBeNull();
     expect(document.activeElement).toBe(trigger.element);
     wrapper.unmount();
   });
@@ -245,7 +252,8 @@ describe('TPopover trigger slot contract', () => {
     await trigger.trigger('click');
     await nextTick();
 
-    await wrapper.find('.t-popover__content').trigger('keydown', { key: 'Escape' });
+    escapePanel();
+    await nextTick();
     await nextTick();
 
     expect(document.activeElement).toBe(trigger.element);
@@ -279,7 +287,7 @@ describe('TPopover trigger slot contract', () => {
 
     expect(trigger.attributes('aria-expanded')).toBe('true');
     expect(trigger.attributes('aria-controls')).toBe('popover-panel');
-    expect(wrapper.find('.t-popover__content').attributes('id')).toBe('popover-panel');
+    expect(panel()?.id).toBe('popover-panel');
     wrapper.unmount();
   });
 });

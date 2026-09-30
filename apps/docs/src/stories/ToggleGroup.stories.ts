@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite';
 import type { ComponentProps } from 'vue-component-type-helpers';
 import { ref } from 'vue';
-import { TToggleGroup } from '@treeui/vue';
+import { TStack, TText, TToggleGroup } from '@treeui/vue';
 
 // `TToggleGroup` is generic over its option type AND its selection mode, so
 // `typeof TToggleGroup` is a generic FUNCTION, which Storybook's
@@ -117,6 +117,43 @@ export const SizesAndVariants: Story = {
         <TToggleGroup aria-label="Medium" size="md" variant="soft" :options="options" model-value="week" />
         <TToggleGroup aria-label="Large" size="lg" variant="solid" :options="options" model-value="month" />
       </div>
+    `,
+  }),
+};
+
+export const SubtitleInTheOptionSlot: Story = {
+  name: 'Secondary text stays legible on the selected item',
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'The selected item repaints its background, so the SECONDARY text colours of its descendants have to be repainted with it — not only the inherited one. A `TText tone="muted"` in the `#option` slot kept reading `--tree-color-text-muted` over the brand fill and measured 1.18:1 in light and 1.09:1 in dark, where `xs` text needs 4.5:1. The selected item now rebinds that token to `--tree-color-brand-contrast`, the one value that clears AA in both themes (5.19:1 / 6.21:1). Check this story in both themes.',
+      },
+    },
+  },
+  render: () => ({
+    components: { TStack, TText, TToggleGroup },
+    setup: () => ({
+      platforms: [
+        { label: 'macOS', value: 'macos', hint: 'Apple Silicon · Intel' },
+        { label: 'Windows', value: 'windows', hint: 'x64 · ARM64' },
+        { label: 'Linux', value: 'linux', hint: 'deb · rpm' },
+      ],
+      picked: ref('macos'),
+    }),
+    template: `
+      <TToggleGroup
+        v-model="picked"
+        aria-label="Operating system"
+        :options="platforms"
+      >
+        <template #option="{ option }">
+          <TStack :gap="0">
+            <TText size="sm">{{ option.label }}</TText>
+            <TText size="xs" tone="muted">{{ option.hint }}</TText>
+          </TStack>
+        </template>
+      </TToggleGroup>
     `,
   }),
 };

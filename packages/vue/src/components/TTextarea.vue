@@ -46,6 +46,12 @@ const props = withDefaults(
     name?: string;
     required?: boolean;
     autocomplete?: string;
+    /**
+     * A real `<textarea>` attribute that the declared surface was missing. It
+     * matters most with `family="mono"`: a JSON or config editor wants the
+     * spell-checker to stop underlining keys, ARNs and identifiers.
+     */
+    spellcheck?: boolean;
   } & TModelModifiers>(),
   {
     modelModifiers: () => ({}),
@@ -66,6 +72,7 @@ const props = withDefaults(
     name: undefined,
     required: false,
     autocomplete: undefined,
+    spellcheck: undefined,
   },
 );
 
@@ -187,6 +194,7 @@ onMounted(() => {
       :name="name"
       :required="required || undefined"
       :autocomplete="autocomplete"
+      :spellcheck="spellcheck"
       :aria-invalid="invalid || undefined"
       :aria-busy="loading || undefined"
       @input="onInput"

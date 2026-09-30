@@ -6,6 +6,10 @@ status: available
 purpose: "Lightweight cartesian chart (line, area, bar) for multi-series data, with axes, gridlines, hover tooltip, legend, and an accessible data table. No external charting dependency."
 
 props:
+  yAxisWidth:
+    type: number
+    default: undefined
+    description: "Fix the space reserved for the y-axis labels, in pixels. Left unset, the chart MEASURES the formatted ticks and reserves what they need — the margin used to be a flat 44px, which clipped a formatted `1,234,567`. Set it to line several charts up on a shared gutter."
   type:
     type: TChartType
     default: line

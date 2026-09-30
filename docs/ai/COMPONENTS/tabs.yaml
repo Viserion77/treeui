@@ -89,6 +89,12 @@ a11y:
   aria_controls_aria_labelledby_pairing: true
 
 behavior:
+  overflowing_tabs_scroll_within_their_own_strip: >-
+    `.t-tabs__list` is `overflow-x: auto` with `overscroll-behavior-x: contain`.
+    Tabs that did not fit pushed the PAGE sideways, which moves every other
+    element on screen to solve a problem belonging to one component. TTabList
+    scrolls the active tab into view whenever the active value changes, so a tab
+    reached by keyboard or restored from a model value is never left off-strip.
   arrow_left_right_moves_focus: true
   home_focuses_first_tab: true
   end_focuses_last_tab: true

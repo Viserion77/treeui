@@ -17,6 +17,7 @@ const meta = {
     autoGrow: false,
   },
   argTypes: {
+    spellcheck: { control: 'boolean' },
     size: {
       control: 'select',
       options: ['sm', 'md', 'lg'],

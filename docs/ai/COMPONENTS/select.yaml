@@ -5,14 +5,22 @@ kind: primitive
 status: available
 purpose: "Custom styled dropdown select with listbox; controlled and uncontrolled via v-model and open/defaultOpen."
 
+generic:
+  parameter: "T extends string | number = string"
+  note: >-
+    `TSelect` is generic over its value, so a `ref<'scan' | 'query'>` gets its
+    own literal union back from `v-model` instead of a widened `string | number`
+    — the same move `TInput`, `TTabs` and `TToggleGroup` already made. Consumers
+    with `strictTemplates` on no longer need a cast at the binding.
+
 props:
   modelValue:
-    type: "string | number"
-    default: ""
+    type: "T"
+    default: undefined
   options:
-    type: "TSelectOption[]"
+    type: "TSelectOption<T>[]"
     default: "[]"
-    note: "Array of { label: string; value: string | number; disabled?: boolean }"
+    note: "Array of { label: string; value: T; disabled?: boolean }"
   open:
     type: boolean
     default: undefined
@@ -75,6 +83,18 @@ behavior:
   focus_restores_on_close: true
   numeric_values_supported_without_string_coercion: true
   listbox_flips_above_trigger_when_space_below_is_insufficient: true
+  option_label_wraps_instead_of_being_clipped: >-
+    `.t-select__option` carries `overflow-wrap: anywhere`, so a label without a
+    break opportunity wraps inside the listbox rather than overflowing it and
+    being cut off.
+  listbox_is_teleported_to_the_body: >-
+    The listbox renders through `<Teleport to="body">` and is placed with
+    `position: fixed` from the trigger's viewport rect by the `useAnchoredLayer`
+    composable, matching the trigger's width. It used to be positioned inside
+    the root, which meant ANY ancestor with `overflow` clipped it — the TTable
+    wrapper cut it off and a modal trapped it. Consequences for tests: the
+    listbox is not a descendant of the component's root element, so query it
+    from `document.body`.
 
 example: |
   <TSelect

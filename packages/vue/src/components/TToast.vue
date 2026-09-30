@@ -18,9 +18,15 @@ const VARIANT_ICONS = {
 const props = withDefaults(
   defineProps<{
     toast: ToastItem;
+    /** Provider-level default; the toast's own `closeLabel` wins over it. */
+    closeLabel?: string;
   }>(),
-  {},
+  {
+    closeLabel: 'Dismiss notification',
+  },
 );
+
+const closeLabel = computed(() => props.toast.closeLabel ?? props.closeLabel);
 
 const emit = defineEmits<{
   close: [id: string];
@@ -77,7 +83,7 @@ function handleClose() {
       v-if="toast.closable"
       type="button"
       class="t-toast__close"
-      aria-label="Dismiss notification"
+      :aria-label="closeLabel"
       @click="handleClose"
     >
       <XIcon

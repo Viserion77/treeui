@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, useAttrs, useSlots } from 'vue';
+import { computed, useAttrs } from 'vue';
 
 defineOptions({
   inheritAttrs: false,
@@ -30,7 +30,6 @@ defineSlots<{
 }>();
 
 const attrs = useAttrs();
-const slots = useSlots();
 
 const rootClasses = computed(() => ['t-page-header', attrs.class]);
 const rootStyle = computed(() => attrs.style);
@@ -40,8 +39,6 @@ const rootAttrs = computed(() => {
 });
 
 const titleTag = computed(() => `h${props.level}`);
-const hasTitle = computed(() => Boolean(slots.title || props.title));
-const hasSubtitle = computed(() => Boolean(slots.subtitle || props.subtitle));
 </script>
 
 <template>
@@ -60,12 +57,12 @@ const hasSubtitle = computed(() => Boolean(slots.subtitle || props.subtitle));
 
     <div class="t-page-header__bar">
       <div
-        v-if="hasTitle || hasSubtitle"
+        v-if="$slots.title || title || $slots.subtitle || subtitle"
         class="t-page-header__heading"
       >
         <component
           :is="titleTag"
-          v-if="hasTitle"
+          v-if="$slots.title || title"
           class="t-page-header__title"
         >
           <slot name="title">
@@ -74,7 +71,7 @@ const hasSubtitle = computed(() => Boolean(slots.subtitle || props.subtitle));
         </component>
 
         <p
-          v-if="hasSubtitle"
+          v-if="$slots.subtitle || subtitle"
           class="t-page-header__subtitle"
         >
           <slot name="subtitle">

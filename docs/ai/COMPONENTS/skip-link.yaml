@@ -61,3 +61,11 @@ example: |
 
   <!-- inside the shell -->
   <TAppShell skip-link-label="Pular para o conteúdo">…</TAppShell>
+
+behavior:
+  hidden_link_paints_no_shadow: >-
+    `.t-skip-link:not(:focus-visible)` sets `box-shadow: none`. The box is
+    translated off-screen while hidden, but a 14px offset with a 34px blur is
+    not: it painted a grey smudge in the top-left of every header, at every
+    width, all the time. The shadow belongs to the focused state, which is when
+    the link is actually on screen.

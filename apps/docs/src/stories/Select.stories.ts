@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite';
+import type { ComponentProps } from 'vue-component-type-helpers';
 import { ref } from 'vue';
 import { TSelect } from '@treeui/vue';
 import { practiceNote } from './practice-refs';
@@ -18,9 +19,15 @@ const monthOptions = [
   { label: 'April', value: 4 },
 ];
 
-const meta = {
+// `TSelect` is generic over its model type, so `typeof TSelect` is a generic
+// FUNCTION, which Storybook's `Meta<Component>` cannot accept. Type the story by
+// its PROPS and annotate instead of `satisfies`, exactly as Tabs and
+// ToggleGroup already do. The component itself is untouched.
+type TSelectArgs = ComponentProps<typeof TSelect>;
+
+const meta: Meta<TSelectArgs> = {
   title: 'Components/Data Entry/Select',
-  component: TSelect,
+  component: TSelect as never,
   parameters: {
     docs: { description: { component: practiceNote('TSelect') } },
   },
@@ -40,10 +47,10 @@ const meta = {
       options: ['sm', 'md', 'lg'],
     },
   },
-} satisfies Meta<typeof TSelect>;
+};
 
 export default meta;
-type Story = StoryObj<typeof meta>;
+type Story = StoryObj<TSelectArgs>;
 
 export const Playground: Story = {
   render: (args: Record<string, unknown>) => ({

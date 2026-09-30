@@ -185,6 +185,16 @@ const props = withDefaults(
     maxThumbnailSize?: number | null;
     retryLabel?: string;
     resumeLabel?: (percent: number) => string;
+    /** Label for the button that drops every selected file. */
+    clearLabel?: string;
+    /** Label for a row's remove button. */
+    removeLabel?: string;
+    /**
+     * Accessible name for a row's remove button. A function, not a string,
+     * because the file name sits INSIDE the sentence and its position differs
+     * by language — a prefix and a suffix cannot express that.
+     */
+    removeAriaLabel?: (file: File) => string;
     remainingTimeFormat?: (remainingMs: number) => string;
     statusLabels?: Partial<Record<TFileUploadStatus, string>>;
     /**
@@ -229,6 +239,9 @@ const props = withDefaults(
     maxThumbnailSize: 10 * 1024 * 1024,
     retryLabel: 'Retry',
     resumeLabel: (percent: number) => `Resume from ${percent}%`,
+    clearLabel: 'Clear all',
+    removeLabel: 'Remove',
+    removeAriaLabel: (file: File) => `Remove ${file.name}`,
     remainingTimeFormat: (remainingMs: number) => {
       if (remainingMs < 5000) {
         return 'Less than 5s left';
@@ -1175,7 +1188,7 @@ onBeforeUnmount(() => {
           :disabled="isDisabled"
           @click="clearFiles"
         >
-          Clear all
+          {{ clearLabel }}
         </button>
       </div>
 
@@ -1272,10 +1285,10 @@ onBeforeUnmount(() => {
               type="button"
               :data-t-remove="row.slotProps.fileKey"
               :disabled="isDisabled"
-              :aria-label="`Remove ${row.slotProps.file.name}`"
+              :aria-label="removeAriaLabel(row.slotProps.file)"
               @click="row.slotProps.removeFile()"
             >
-              Remove
+              {{ removeLabel }}
             </button>
           </slot>
         </li>

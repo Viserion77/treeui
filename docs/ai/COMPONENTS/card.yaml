@@ -98,6 +98,23 @@ css:
     - t-card__footer
 
 behavior:
+  surface_never_inflated_by_a_descendant: >-
+    The surface and its body declare `grid-template-columns: minmax(0, 1fr)`.
+    An implicit `auto` track takes its minimum from the min-content of its
+    items, so one unbreakable descendant — a table, a code block, a machine
+    string — behind any wrapper widened the whole surface and laid every
+    sibling out past the border: `TText truncate` never engaged, the TTable
+    wrapper's `overflow-x` never scrolled, and anything aligned to the end was
+    painted outside the surface or over the neighbouring card.
+  title_wraps_instead_of_widening_the_card: >-
+    `.t-card__title` carries `overflow-wrap: anywhere`. A title without spaces
+    used to set the card's min-content width, and the `#header` slot was no way
+    out because the same track was still `auto`.
+  actions_shrink_and_wrap: >-
+    `.t-card__actions` is `flex-shrink: 1; min-inline-size: 0; flex-wrap: wrap`.
+    It was `flex-shrink: 0`, so in a narrow card the controls were laid out past
+    the border instead of moving to the next line — the header already wraps,
+    and the actions now follow it.
   body_wrapper_class: t-card__body
   header_render_condition: >
     The `header.t-card__header` element renders when ANY of the `header` slot,

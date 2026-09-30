@@ -80,3 +80,10 @@ example: |
       <template #leading><TIcon :name="app.icon" /></template>
     </TLinkTile>
   </TGrid>
+
+behavior:
+  default_slot_does_not_stretch_its_children: >-
+    `.t-link-tile__body` is `align-items: flex-start`, not the `stretch`
+    default. The default slot is where a consumer drops a TTag or a TBadge, and
+    stretch made a four-character tag as wide as the description. Title and
+    description are TText and still wrap to the available width.

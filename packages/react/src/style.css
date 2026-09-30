@@ -454,8 +454,14 @@ html {
   color: var(--tree-color-text-muted);
 }
 
+/* `minmax(0, 1fr)`, not the implicit `auto` track: an `auto` track's minimum is
+   the min-content of its items, so one unbreakable descendant (a table, a code
+   block, a machine string) behind any wrapper used to widen the whole surface
+   and lay every sibling out past the border. The surface takes its container's
+   width; scrolling and truncation belong to the descendant that asked for it. */
 .t-card {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: var(--tree-space-3);
   border: var(--tree-border-width-subtle) solid var(--tree-color-border-default);
   border-radius: var(--tree-radius-lg);
@@ -501,21 +507,28 @@ html {
 
 .t-card__title {
   min-width: 0;
+  overflow-wrap: anywhere;
   font-size: var(--tree-font-size-lg);
   font-weight: var(--tree-font-weight-semibold);
   line-height: var(--tree-font-lineHeight-heading);
   color: var(--tree-color-text-primary);
 }
 
+/* The actions may shrink and wrap. `flex-shrink: 0` kept them rigid, so in a
+   narrow card the controls were laid out past the border instead of moving to
+   the next line — the header already wraps, the actions have to follow. */
 .t-card__actions {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: var(--tree-space-2);
-  flex-shrink: 0;
+  flex-shrink: 1;
+  min-inline-size: 0;
 }
 
 .t-card__body {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: var(--tree-space-2);
 }
 
@@ -540,11 +553,30 @@ html {
   align-items: center;
   gap: var(--tree-space-2);
   width: fit-content;
+  max-inline-size: 100%;
+  min-inline-size: 0;
   border: var(--tree-border-width-subtle) solid transparent;
   border-radius: var(--tree-radius-pill);
+  padding-block: var(--tree-space-1);
   padding-inline: var(--tree-space-3);
   font-weight: var(--tree-font-weight-medium);
-  line-height: 1;
+  /* UI line height, not `1`: at `1` the ascenders and descenders of a wrapped
+     second line touch the pill's border. The block padding above keeps the
+     single-line case at the optical height it always had. */
+  line-height: var(--tree-font-lineHeight-ui);
+}
+
+/* `truncate` is opt-in: a badge that must stay on one line clips with an
+   ellipsis and carries the full text in `title`. Without it the badge wraps,
+   which is why it may never grow past its container. */
+.t-badge__label {
+  min-inline-size: 0;
+}
+
+.t-badge.is-truncated .t-badge__label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .t-badge--tone-success {

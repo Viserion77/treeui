@@ -65,6 +65,32 @@ a11y:
   escape_closes_when_enabled: true
 
 behavior:
+  surface_never_inflated_by_a_descendant: >-
+    The surface and its body declare `grid-template-columns: minmax(0, 1fr)`.
+    An implicit `auto` track takes its minimum from the min-content of its
+    items, so one unbreakable descendant — a table, a code block, a machine
+    string — behind any wrapper widened the whole surface and laid every
+    sibling out past the border: `TText truncate` never engaged, the TTable
+    wrapper's `overflow-x` never scrolled, and anything aligned to the end was
+    painted outside the surface or over the neighbouring card.
+  only_the_body_scrolls: >-
+    `.t-modal__surface` is a flex column with `overflow: hidden`, and
+    `.t-modal__body` is the single scroller (`flex: 1 1 auto; min-block-size: 0;
+    overflow: auto`). The whole surface used to scroll, so on a short viewport
+    the footer's actions sat below the fold and the title scrolled away with the
+    content. A flex column also removes the implicit `auto` track, which is the
+    other half of the inflation above.
+  title_and_description_wrap: >-
+    `.t-modal__title` and `.t-modal__description` carry `overflow-wrap:
+    anywhere` — `anywhere`, not `break-word`, because only `anywhere` reduces
+    the min-content. A confirm dialog exists to name the thing being deleted,
+    and a resource name without a break opportunity used to push confirm and
+    cancel off the surface at any width, desktop included.
+  a_child_overlay_must_be_teleported: >-
+    Because the surface now clips, a panel rendered inside it would be cut off.
+    TSelect's listbox and TDatePicker's panel teleport to the body for exactly
+    this reason; a consumer composing its own overlay inside a modal should do
+    the same with `useAnchoredLayer`.
   uses_teleport_to_body: true
   locks_body_scroll_while_open: true
   overlay_click_closes_when_enabled: true

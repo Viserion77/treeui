@@ -100,6 +100,12 @@ slots:
   - default
 
 behavior:
+  the_wrap_axis_outranks_preserve_whitespace: >-
+    `.t-text.t-text--wrap-anywhere` is qualified with `.t-text` so it matches
+    the (0,2,0) specificity of `.t-text.is-pre-wrap`, and wins by order.
+    Without it `preserveWhitespace` silently downgraded `wrap="anywhere"` to
+    `break-word`, which is the one thing `anywhere` exists to do differently:
+    only `anywhere` reduces the min-content.
   semantic_element_controlled_by_as: true
   token_driven_size_tone_weight: true
   truncate_takes_precedence_over_preserve_whitespace: true

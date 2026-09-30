@@ -29,6 +29,11 @@ a11y:
   timestamp_uses_time_element_when_provided: true
 
 behavior:
+  content_stays_inside_the_container: >-
+    `.t-timeline` and `.t-timeline__content` declare `grid-template-columns:
+    minmax(0, 1fr)`, and the title and description carry `overflow-wrap:
+    anywhere`. Together they stop an unbreakable string from setting the
+    column's min-content and carrying the whole entry across the container.
   items_render_in_order_given: true
   line_hidden_on_last_item: true
   marker_tone_defaults_to_neutral: true

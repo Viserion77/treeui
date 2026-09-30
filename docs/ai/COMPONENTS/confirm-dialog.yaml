@@ -156,6 +156,13 @@ attrs_note: >
   as a DOM attribute on the wrapper.
 
 behavior:
+  surface_never_inflated_by_a_descendant: >-
+    `.t-confirm-dialog` and its body declare `grid-template-columns: minmax(0,
+    1fr)`, and the icon variant uses `auto minmax(0, 1fr)`. It inherits
+    TModal's title and description wrapping, which is what keeps confirm and
+    cancel on the surface when the dialog names a long resource — it passes
+    `title`/`description` as strings and exposes no `#header` slot, so there was
+    no way around it from the API.
   built_on_modal_contract: true
   default_confirm_button_variant: danger
   default_cancel_button_variant: ghost

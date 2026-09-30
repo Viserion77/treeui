@@ -48,6 +48,10 @@ provider_props:
     note: "TToastProvider prop — how many toasts stay visible at once."
 
 props:
+  closeLabel:
+    type: string
+    default: "Dismiss notification"
+    description: "Accessible name for the dismiss button, on `TToastProvider` as the instance default and on a single toast's options to override it. It was hard-coded English, which left the toast's only control unreadable to a screen reader in any other language."
   toast:
     type: ToastItem
     required: true

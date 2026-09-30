@@ -1085,6 +1085,16 @@ table.t-visually-hidden {
   color: var(--tree-color-text-muted);
 }
 
+/* `is-anchored` hands placement to `useAnchoredLayer`, which measures from the
+   trigger and writes `position: fixed`. The absolute offsets stay as the
+   in-place fallback. Inside a modal the panel used to be trapped in the
+   surface's clip; the width cap was never the problem, the coordinate space
+   was. */
+.t-date-picker__content.is-anchored {
+  position: fixed;
+  inset: auto;
+}
+
 .t-date-picker__content {
   position: absolute;
   top: calc(100% + var(--tree-space-2));
@@ -1113,13 +1123,20 @@ table.t-visually-hidden {
   align-items: center;
 }
 
+/* `capitalize` uppercases EVERY word, and most locales put a particle in the
+   middle of a month title — pt-BR's "setembro de 2026" came out as "Setembro De
+   2026". Only the first letter should change. */
 .t-date-picker__month {
   margin: 0;
   font-size: var(--tree-font-size-sm);
   font-weight: var(--tree-font-weight-semibold);
   line-height: var(--tree-font-lineHeight-ui);
   text-align: center;
-  text-transform: capitalize;
+  text-transform: none;
+}
+
+.t-date-picker__month::first-letter {
+  text-transform: uppercase;
 }
 
 .t-date-picker__nav {
@@ -1257,13 +1274,17 @@ table.t-visually-hidden {
   padding: var(--tree-space-4);
 }
 
+/* A flex column, not a grid: the footer and the topbar must stay put while only
+   the body scrolls, and a column also removes the implicit `auto` track whose
+   min-content a single unbreakable descendant used to inflate. */
 .t-modal__surface {
   position: relative;
-  display: grid;
+  display: flex;
+  flex-direction: column;
   gap: var(--tree-space-3);
   width: min(100%, 34rem);
   max-height: min(90vh, 48rem);
-  overflow: auto;
+  overflow: hidden;
   padding: var(--tree-space-4);
   border: var(--tree-border-width-subtle) solid var(--tree-color-border-default);
   border-radius: var(--tree-radius-lg);
@@ -1297,8 +1318,12 @@ table.t-visually-hidden {
   min-width: 0;
 }
 
+/* `anywhere`, not `break-word`: only `anywhere` reduces the min-content, and a
+   confirm dialog exists to name the thing being deleted — the name may not push
+   the buttons off the surface. */
 .t-modal__title {
   margin: 0;
+  overflow-wrap: anywhere;
   font-size: var(--tree-font-size-xl);
   font-weight: var(--tree-font-weight-semibold);
   line-height: var(--tree-font-lineHeight-heading);
@@ -1307,6 +1332,7 @@ table.t-visually-hidden {
 
 .t-modal__description {
   margin: 0;
+  overflow-wrap: anywhere;
   font-size: var(--tree-font-size-md);
   line-height: var(--tree-font-lineHeight-body);
   color: var(--tree-color-text-muted);
@@ -1314,7 +1340,11 @@ table.t-visually-hidden {
 
 .t-modal__body {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  flex: 1 1 auto;
   gap: var(--tree-space-3);
+  min-block-size: 0;
+  overflow: auto;
   color: var(--tree-color-text-primary);
 }
 
@@ -1352,8 +1382,14 @@ table.t-visually-hidden {
   box-shadow: 0 0 0 var(--tree-focus-ring-width) var(--tree-color-focus-ring);
 }
 
+/* `minmax(0, 1fr)`, not the implicit `auto` track: an `auto` track's minimum is
+   the min-content of its items, so one unbreakable descendant (a table, a code
+   block, a machine string) behind any wrapper used to widen the whole surface
+   and lay every sibling out past the border. The surface takes its container's
+   width; scrolling and truncation belong to the descendant that asked for it. */
 .t-card {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: var(--tree-space-3);
   border: var(--tree-border-width-subtle) solid var(--tree-color-border-default);
   border-radius: var(--tree-radius-lg);
@@ -1535,15 +1571,31 @@ a.t-brand-lockup:focus-visible {
   box-shadow: 0 0 0 2px var(--tree-color-focus-ring);
 }
 
+/* The density axis is driven through two custom properties so `--sm`/`--lg`
+   stay one declaration each, the way the other sized components do it. `md`
+   holds the values the block has always shipped. */
 .t-code-block__pre {
   margin: 0;
-  padding: var(--tree-space-3) var(--tree-space-4);
+  padding: var(--tree-code-block-pad-block, var(--tree-space-3))
+    var(--tree-code-block-pad-inline, var(--tree-space-4));
   overflow: auto;
   font-family: var(--tree-font-family-mono);
-  font-size: var(--tree-font-size-sm);
+  font-size: var(--tree-code-block-font, var(--tree-font-size-sm));
   line-height: var(--tree-font-lineHeight-base);
   color: var(--tree-color-text-primary);
   white-space: pre;
+}
+
+.t-code-block--sm {
+  --tree-code-block-pad-block: var(--tree-space-2);
+  --tree-code-block-pad-inline: var(--tree-space-3);
+  --tree-code-block-font: var(--tree-font-size-xs);
+}
+
+.t-code-block--lg {
+  --tree-code-block-pad-block: var(--tree-space-4);
+  --tree-code-block-pad-inline: var(--tree-space-5);
+  --tree-code-block-font: var(--tree-font-size-md);
 }
 
 .t-code-block__pre:focus-visible {
@@ -1551,9 +1603,15 @@ a.t-brand-lockup:focus-visible {
   box-shadow: inset 0 0 0 2px var(--tree-color-focus-ring);
 }
 
+/* `anywhere`, not `break-word`: `break-word` breaks only once a width is already
+   settled, so wherever the block's width comes from its content (a grid `auto`
+   track, a table cell, a flex item without `min-width: 0`) the longest run
+   without a break opportunity — a URL, a token, a credential — became the
+   minimum width and pushed the container instead of wrapping. That is exactly
+   what `wrap` is for. Same semantics as `TText wrap="anywhere"`. */
 .t-code-block.is-wrap .t-code-block__pre {
   white-space: pre-wrap;
-  overflow-wrap: break-word;
+  overflow-wrap: anywhere;
 }
 
 .t-code-block__code {
@@ -1619,9 +1677,14 @@ a.t-brand-lockup:focus-visible {
   color: var(--tree-link-tile-accent);
 }
 
+/* `flex-start`, not the `stretch` default: the default slot is where a consumer
+   drops a TTag or a TBadge, and stretch made a 4-character tag as wide as the
+   description. Title and description are TText and still wrap to the available
+   width. */
 .t-link-tile__body {
   display: flex;
   flex-direction: column;
+  align-items: flex-start;
   gap: var(--tree-space-1);
   min-inline-size: 0;
 }
@@ -1731,6 +1794,15 @@ a.t-brand-lockup:focus-visible {
   .t-list-item__meta {
     order: 1;
     flex-basis: 100%;
+  }
+  /* Same reasoning as the meta above: rigid actions squeezed the content column
+     down to 40–110px rather than taking a line of their own. They wrap among
+     themselves so a long action row does not reintroduce the squeeze. */
+  .t-list-item__actions {
+    order: 2;
+    flex-basis: 100%;
+    flex-wrap: wrap;
+    justify-content: flex-end;
   }
 }
 
@@ -1977,31 +2049,39 @@ a.t-brand-lockup:focus-visible {
 
 .t-card__title {
   min-width: 0;
+  overflow-wrap: anywhere;
   font-size: var(--tree-font-size-lg);
   font-weight: var(--tree-font-weight-semibold);
   line-height: var(--tree-font-lineHeight-heading);
   color: var(--tree-color-text-primary);
 }
 
+/* The actions may shrink and wrap. `flex-shrink: 0` kept them rigid, so in a
+   narrow card the controls were laid out past the border instead of moving to
+   the next line — the header already wraps, the actions have to follow. */
 .t-card__actions {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: var(--tree-space-2);
-  flex-shrink: 0;
+  flex-shrink: 1;
+  min-inline-size: 0;
 }
 
 .t-card__body {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: var(--tree-space-2);
 }
 
 .t-confirm-dialog {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: var(--tree-space-4);
 }
 
 .t-confirm-dialog--with-icon {
-  grid-template-columns: auto 1fr;
+  grid-template-columns: auto minmax(0, 1fr);
   align-items: start;
 }
 
@@ -2018,6 +2098,7 @@ a.t-brand-lockup:focus-visible {
 
 .t-confirm-dialog__body {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: var(--tree-space-2);
   color: var(--tree-color-text-primary);
   font-size: var(--tree-font-size-sm);
@@ -2178,11 +2259,30 @@ a.t-brand-lockup:focus-visible {
   align-items: center;
   gap: var(--tree-space-2);
   width: fit-content;
+  max-inline-size: 100%;
+  min-inline-size: 0;
   border: var(--tree-border-width-subtle) solid transparent;
   border-radius: var(--tree-radius-pill);
+  padding-block: var(--tree-space-1);
   padding-inline: var(--tree-space-3);
   font-weight: var(--tree-font-weight-medium);
-  line-height: 1;
+  /* UI line height, not `1`: at `1` the ascenders and descenders of a wrapped
+     second line touch the pill's border. The block padding above keeps the
+     single-line case at the optical height it always had. */
+  line-height: var(--tree-font-lineHeight-ui);
+}
+
+/* `truncate` is opt-in: a badge that must stay on one line clips with an
+   ellipsis and carries the full text in `title`. Without it the badge wraps,
+   which is why it may never grow past its container. */
+.t-badge__label {
+  min-inline-size: 0;
+}
+
+.t-badge.is-truncated .t-badge__label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .t-badge--tone-success {
@@ -3301,15 +3401,28 @@ a.t-brand-lockup:focus-visible {
   box-shadow: var(--tree-shadow-md);
 }
 
+/* Teleported to the body and placed by `useAnchoredLayer`, which writes
+   `position: fixed` with a measured `left`/`top` and matches the trigger's
+   width. The `absolute` offsets above are the fallback for a listbox rendered
+   in place; `is-anchored` hands the placement over to the measurement, which
+   is what stops the TTable wrapper's `overflow` from cutting the list off.
+   `.t-select--drop-up` stays as the in-place flip; the anchored panel reports
+   its own side with `is-drop-up` for anything keyed on direction. */
 .t-select--drop-up .t-select__listbox {
   top: auto;
   bottom: calc(100% + var(--tree-space-2));
+}
+
+.t-select__listbox.is-anchored {
+  inset: auto;
+  width: auto;
 }
 
 .t-select__option {
   display: flex;
   align-items: center;
   gap: var(--tree-space-2);
+  overflow-wrap: anywhere;
   padding: var(--tree-space-2) var(--tree-space-3);
   border-radius: var(--tree-radius-sm);
   font-size: var(--tree-font-size-md);
@@ -4200,57 +4313,18 @@ a.t-brand-lockup:focus-visible {
   --tree-popover-max-w: 40rem;
 }
 
-/* ── Side positioning ── */
+/* ── Side positioning ──
 
-.t-popover__content--top {
-  bottom: calc(100% + var(--tree-space-2));
-  left: 50%;
-  transform: translateX(-50%);
-}
+   The panel is teleported to the body and placed by `useAnchoredLayer`, which
+   writes `position: fixed` with a `left`/`top` measured from the trigger. That
+   is what stops an ancestor's `overflow` from clipping it and what lets it be
+   pushed back inside the viewport; the side modifier is now only a statement of
+   WHICH side was used, for the enter transition below. The former
+   `bottom: calc(100% + …)` / `translateX(-50%)` pairs are gone: with a fixed
+   panel they would fight the measured position. */
 
-.t-popover__content--bottom {
-  top: calc(100% + var(--tree-space-2));
-  left: 50%;
-  transform: translateX(-50%);
-}
-
-.t-popover__content--left {
-  top: 50%;
-  right: calc(100% + var(--tree-space-2));
-  transform: translateY(-50%);
-}
-
-.t-popover__content--right {
-  top: 50%;
-  left: calc(100% + var(--tree-space-2));
-  transform: translateY(-50%);
-}
-
-/* ── Alignment overrides ── */
-
-.t-popover__content--top.t-popover__content--align-start,
-.t-popover__content--bottom.t-popover__content--align-start {
-  left: 0;
-  transform: none;
-}
-
-.t-popover__content--top.t-popover__content--align-end,
-.t-popover__content--bottom.t-popover__content--align-end {
-  left: auto;
-  right: 0;
-  transform: none;
-}
-
-.t-popover__content--left.t-popover__content--align-start,
-.t-popover__content--right.t-popover__content--align-start {
-  top: 0;
-  transform: none;
-}
-
-.t-popover__content--left.t-popover__content--align-end,
-.t-popover__content--right.t-popover__content--align-end {
-  top: auto;
-  bottom: 0;
+.t-popover__content.is-anchored {
+  inset: auto;
   transform: none;
 }
 
@@ -4268,52 +4342,26 @@ a.t-brand-lockup:focus-visible {
   opacity: 0;
 }
 
-.t-popover__content--top.t-popover-fade-enter-from,
-.t-popover__content--top.t-popover-fade-leave-to {
-  transform: translateX(-50%) translateY(4px);
+/* The panel slides in FROM the trigger, so the offset points back at the side
+   it was placed on. A plain translation, with no centring term to preserve. */
+.t-popover__content.is-anchored.t-popover__content--top.t-popover-fade-enter-from,
+.t-popover__content.is-anchored.t-popover__content--top.t-popover-fade-leave-to {
+  transform: translateY(4px);
 }
 
-.t-popover__content--bottom.t-popover-fade-enter-from,
-.t-popover__content--bottom.t-popover-fade-leave-to {
-  transform: translateX(-50%) translateY(-4px);
-}
-
-.t-popover__content--left.t-popover-fade-enter-from,
-.t-popover__content--left.t-popover-fade-leave-to {
-  transform: translateY(-50%) translateX(4px);
-}
-
-.t-popover__content--right.t-popover-fade-enter-from,
-.t-popover__content--right.t-popover-fade-leave-to {
-  transform: translateY(-50%) translateX(-4px);
-}
-
-.t-popover__content--align-start.t-popover__content--top.t-popover-fade-enter-from,
-.t-popover__content--align-start.t-popover__content--top.t-popover-fade-leave-to,
-.t-popover__content--align-start.t-popover__content--bottom.t-popover-fade-enter-from,
-.t-popover__content--align-start.t-popover__content--bottom.t-popover-fade-leave-to {
+.t-popover__content.is-anchored.t-popover__content--bottom.t-popover-fade-enter-from,
+.t-popover__content.is-anchored.t-popover__content--bottom.t-popover-fade-leave-to {
   transform: translateY(-4px);
 }
 
-.t-popover__content--align-end.t-popover__content--top.t-popover-fade-enter-from,
-.t-popover__content--align-end.t-popover__content--top.t-popover-fade-leave-to,
-.t-popover__content--align-end.t-popover__content--bottom.t-popover-fade-enter-from,
-.t-popover__content--align-end.t-popover__content--bottom.t-popover-fade-leave-to {
-  transform: translateY(-4px);
-}
-
-.t-popover__content--align-start.t-popover__content--left.t-popover-fade-enter-from,
-.t-popover__content--align-start.t-popover__content--left.t-popover-fade-leave-to,
-.t-popover__content--align-start.t-popover__content--right.t-popover-fade-enter-from,
-.t-popover__content--align-start.t-popover__content--right.t-popover-fade-leave-to {
+.t-popover__content.is-anchored.t-popover__content--left.t-popover-fade-enter-from,
+.t-popover__content.is-anchored.t-popover__content--left.t-popover-fade-leave-to {
   transform: translateX(4px);
 }
 
-.t-popover__content--align-end.t-popover__content--left.t-popover-fade-enter-from,
-.t-popover__content--align-end.t-popover__content--left.t-popover-fade-leave-to,
-.t-popover__content--align-end.t-popover__content--right.t-popover-fade-enter-from,
-.t-popover__content--align-end.t-popover__content--right.t-popover-fade-leave-to {
-  transform: translateX(4px);
+.t-popover__content.is-anchored.t-popover__content--right.t-popover-fade-enter-from,
+.t-popover__content.is-anchored.t-popover__content--right.t-popover-fade-leave-to {
+  transform: translateX(-4px);
 }
 
 /* ── Accordion ────────────────────────────────────────────────────────── */
@@ -4505,11 +4553,19 @@ a.t-brand-lockup:focus-visible {
   width: 100%;
 }
 
+/* Tabs that do not fit scroll within their own strip. Without this the list
+   pushed the PAGE sideways, which moves every other element on the screen to
+   solve a problem that belongs to one component. `overscroll-behavior-x` keeps
+   the gesture from chaining out to the page once the strip is at its end;
+   `TTabs` scrolls the active tab into view when it changes. */
 .t-tabs__list {
   display: flex;
   gap: 0;
   margin: 0;
   padding: 0;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scrollbar-width: thin;
   border-bottom: var(--tree-border-width-subtle) solid var(--tree-color-border-default);
 }
 
@@ -4989,6 +5045,7 @@ a.t-brand-lockup:focus-visible {
 
 .t-timeline {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: var(--tree-space-4);
   margin: 0;
   padding: 0;
@@ -5059,6 +5116,7 @@ a.t-brand-lockup:focus-visible {
 
 .t-timeline__content {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: var(--tree-space-2);
   min-width: 0;
   padding: var(--tree-space-3) var(--tree-space-4);
@@ -5086,6 +5144,7 @@ a.t-brand-lockup:focus-visible {
 
 .t-timeline__title {
   margin: 0;
+  overflow-wrap: anywhere;
   color: var(--tree-color-text-primary);
   font-size: var(--tree-font-size-md);
   font-weight: var(--tree-font-weight-semibold);
@@ -5101,6 +5160,7 @@ a.t-brand-lockup:focus-visible {
 
 .t-timeline__description {
   margin: 0;
+  overflow-wrap: anywhere;
   color: var(--tree-color-text-muted);
   font-size: var(--tree-font-size-sm);
   line-height: var(--tree-font-lineHeight-body);
@@ -6041,7 +6101,16 @@ a.t-brand-lockup:focus-visible {
   box-shadow: 0 0 0 var(--tree-focus-ring-width) var(--tree-color-focus-ring);
 }
 
+/* The selected item repaints the background, so the secondary text colours of
+   its descendants have to be repainted with it — not only the inherited one. A
+   `TText tone="muted"` in the `#option` slot kept reading
+   `--tree-color-text-muted` and measured 1.18:1 (light) and 1.09:1 (dark) over
+   the brand fill; `xs` text needs 4.5:1. Rebinding the token is what keeps a
+   slot the library does not control legible, and `brand-contrast` is the one
+   value that clears AA in both themes (5.19:1 / 6.21:1) — a `color-mix` at 85%
+   still measured 4.18:1. */
 .t-toggle-group__item.is-selected {
+  --tree-color-text-muted: var(--tree-color-brand-contrast);
   background: var(--tree-color-brand-primary);
   color: var(--tree-color-brand-contrast);
   border-color: transparent;
@@ -7239,14 +7308,19 @@ a.t-brand-lockup:focus-visible {
 
 /* Break axis for machine strings (ids, ARNs, keys, hashes). `min-inline-size: 0`
    goes with `anywhere`: without it the element still refuses to shrink below
-   its longest word inside a flex or grid parent, and the break never happens. */
-.t-text--wrap-anywhere {
+   its longest word inside a flex or grid parent, and the break never happens.
+
+   Qualified with `.t-text` so the axis outranks `.t-text.is-pre-wrap`, which is
+   also (0,2,0) and otherwise won the cascade — `preserveWhitespace` silently
+   downgraded `wrap="anywhere"` to `break-word`, which is the one thing
+   `anywhere` exists to do differently. */
+.t-text.t-text--wrap-anywhere {
   min-inline-size: 0;
   overflow-wrap: anywhere;
   word-break: break-word;
 }
 
-.t-text--wrap-break-word {
+.t-text.t-text--wrap-break-word {
   overflow-wrap: break-word;
 }
 
@@ -7456,6 +7530,7 @@ a.t-brand-lockup:focus-visible {
 
 .t-nav-menu__list {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: var(--tree-space-1);
   margin: 0;
   padding: 0;
@@ -7545,17 +7620,22 @@ a.t-brand-lockup:focus-visible {
 
 .t-nav-menu__copy {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: var(--tree-space-1);
   min-width: 0;
 }
 
+/* A sidebar is the one place a horizontal scrollbar is never the right answer:
+   an item label without a break opportunity has to wrap inside the rail. */
 .t-nav-menu__label {
+  overflow-wrap: anywhere;
   font-weight: var(--tree-font-weight-medium);
   line-height: var(--tree-font-lineHeight-ui);
 }
 
 .t-nav-menu__description,
 .t-nav-menu__empty {
+  overflow-wrap: anywhere;
   color: var(--tree-color-text-muted);
   font-size: var(--tree-font-size-sm);
   line-height: var(--tree-font-lineHeight-ui);
@@ -7890,6 +7970,7 @@ body:has(.t-app-shell) {
 
 /* The sidebar body takes the slack so the footer pins to the bottom. */
 .t-app-shell__sidebar-body {
+  position: relative;
   flex: 1 1 auto;
   min-block-size: 0;
 }
@@ -7964,7 +8045,13 @@ body:has(.t-app-shell) {
   padding-inline: var(--tree-space-3);
 }
 
+/* `position: relative` so the scroller is a containing block. Without it an
+   absolutely positioned descendant with auto insets — `.t-visually-hidden`,
+   which this library itself uses for the `TProgress` label — anchors to the
+   initial block and extends the DOCUMENT's scroll instead of the panel's. The
+   shell is `100dvh`; the document is not supposed to scroll at all. */
 .t-app-shell__main {
+  position: relative;
   grid-area: main;
   min-inline-size: 0;
   min-block-size: 0;
@@ -9360,6 +9447,14 @@ body:has(.t-page-surface) {
   text-decoration: none;
   transform: translateY(calc(-100% - var(--tree-space-4)));
   transition: transform var(--tree-motion-duration-fast) var(--tree-motion-easing-standard);
+}
+
+/* The box is translated off-screen while hidden, but a 14px offset with a 34px
+   blur is not: it painted a grey smudge in the top-left of every header, all
+   the time. The shadow belongs to the focused state, which is when the link is
+   actually on screen. */
+.t-skip-link:not(:focus-visible) {
+  box-shadow: none;
 }
 
 .t-skip-link:focus-visible {

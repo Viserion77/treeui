@@ -6,6 +6,11 @@ status: available
 purpose: "Scrollable monospace surface for logs, JSON, ARNs and other machine text. Block-level only — for inline code/IDs use `TText family=\"mono\"`. No syntax highlighting and no virtualization by design; assumes bounded content (e.g. a limited log tail)."
 
 props:
+  size:
+    type: TSize
+    default: md
+    values: [sm, md, lg]
+    description: "Density. Scales the type size and the padding of the `<pre>` by tokens, like every other sized component. `md` is what the block has always shipped; `sm` is for a block inside a dense surface — a table cell, a list row — where the fixed type size dominated the row."
   code:
     type: string
     default: undefined
@@ -52,3 +57,13 @@ css:
 example: |
   <TCodeBlock :code="lambdaLog" label="Lambda log" max-block-size="24rem" copyable @copy="onCopied" />
   <TCodeBlock :code="dynamoItem" wrap label="DynamoDB item" />
+
+behavior:
+  wrap_reduces_the_min_content: >-
+    `.t-code-block.is-wrap .t-code-block__pre` uses `overflow-wrap: anywhere`,
+    not `break-word`. `break-word` breaks only once a width is already settled,
+    so wherever the block's width came from its content — a grid `auto` track, a
+    table cell, a flex item without `min-width: 0` — the longest run without a
+    break opportunity became the minimum width and pushed the container instead
+    of wrapping. That is precisely the case `wrap` exists for: a URL, a token, a
+    credential. Same semantics as `TText wrap="anywhere"`.

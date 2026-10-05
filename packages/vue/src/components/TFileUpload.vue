@@ -213,6 +213,22 @@ const props = withDefaults(
      * dialog's filter.
      */
     rejectionLabels?: TFileUploadRejectionLabels;
+    /** Accessible name for the spinner shown while `loading`. */
+    uploadingLabel?: string;
+    /**
+     * What the live region announces when a file finishes. Functions, not
+     * strings: the file name sits inside the sentence and its position differs
+     * by language.
+     */
+    uploadedAnnouncement?: (name: string) => string;
+    failedAnnouncement?: (name: string) => string;
+    /**
+     * Render the built-in rejection messages. Turn it off when the product
+     * already surfaces `files-rejected` in its own alert — otherwise the user
+     * reads the same refusal twice, and the embedded copy is the one that
+     * cannot be placed where the product wants it.
+     */
+    showRejections?: boolean;
   } & TModelModifiers>(),
   {
     modelModifiers: () => ({}),
@@ -264,6 +280,10 @@ const props = withDefaults(
     statusLabels: () => ({}),
     variant: 'dropzone',
     rejectionLabels: undefined,
+    uploadingLabel: 'Uploading files',
+    uploadedAnnouncement: (name: string) => `${name} uploaded.`,
+    failedAnnouncement: (name: string) => `${name} failed.`,
+    showRejections: true,
   },
 );
 
@@ -282,7 +302,18 @@ const isDragActive = ref(false);
 const isDragReject = ref(false);
 const isFocusedWithin = ref(false);
 const dragDepth = ref(0);
-const feedbackMessages = ref<string[]>([]);
+/* The rejections themselves, not their rendered text.
+   Storing the formatted string froze it at refusal time, so switching language
+   afterwards left the old sentence on screen — the one piece of copy in this
+   component that could not be retranslated. `feedbackMessages` derives from
+   this, so it re-renders whenever `rejectionLabels` changes. */
+const feedbackRejections = ref<{ file: File; reason: TFileUploadRejectionReason }[]>([]);
+
+const feedbackMessages = computed(() =>
+  props.showRejections
+    ? feedbackRejections.value.map(({ file, reason }) => buildRejectionMessage(file, reason))
+    : [],
+);
 const statusLog = ref<StatusLogEntry[]>([]);
 let statusLogId = 0;
 const retryFocusKey = ref<string | null>(null);
@@ -594,7 +625,7 @@ const emitFiles = (
   acceptedFiles: File[],
   rejections: TFileUploadRejection[],
 ) => {
-  feedbackMessages.value = rejections.map((rejection) => rejection.message);
+  feedbackRejections.value = rejections.map(({ file, reason }) => ({ file, reason }));
 
   if (rejections.length > 0) {
     emit('files-rejected', rejections);
@@ -682,7 +713,7 @@ const removeFile = (index: number) => {
     emitCancel(file, index, 'remove');
   }
 
-  feedbackMessages.value = [];
+  feedbackRejections.value = [];
   emit('update:modelValue', props.modelValue.filter((_, fileIndex) => fileIndex !== index));
 };
 
@@ -695,7 +726,7 @@ const clearFiles = () => {
     emitCancel(file, index, 'clear');
   });
 
-  feedbackMessages.value = [];
+  feedbackRejections.value = [];
   emit('update:modelValue', []);
 };
 
@@ -972,9 +1003,9 @@ watch(
       }
 
       if (status === 'success') {
-        messages.push(`${file.name} uploaded.`);
+        messages.push(props.uploadedAnnouncement(file.name));
       } else if (status === 'error') {
-        messages.push(`${file.name} failed. ${states[index]?.error ?? ''}`.trim());
+        messages.push(`${props.failedAnnouncement(file.name)} ${states[index]?.error ?? ''}`.trim());
       }
     });
 
@@ -1138,7 +1169,7 @@ onBeforeUnmount(() => {
         v-if="loading"
         class="t-file-upload__spinner"
         size="sm"
-        label="Uploading files"
+        :label="uploadingLabel"
       />
     </div>
 

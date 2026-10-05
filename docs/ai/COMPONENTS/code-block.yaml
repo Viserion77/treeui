@@ -59,6 +59,13 @@ example: |
   <TCodeBlock :code="dynamoItem" wrap label="DynamoDB item" />
 
 behavior:
+  copyable_reserves_the_toolbar_width: >-
+    With the copy button rendered, `.t-code-block.is-copyable .t-code-block__pre`
+    reserves its width as `padding-inline-end`. The toolbar floats over the
+    code, so a wrapped line used to run underneath it and the characters behind
+    the button were unreadable. This only became visible once `wrap` started
+    breaking for real: before, the long token overflowed sideways and never
+    reached the button.
   wrap_reduces_the_min_content: >-
     `.t-code-block.is-wrap .t-code-block__pre` uses `overflow-wrap: anywhere`,
     not `break-word`. `break-word` breaks only once a width is already settled,

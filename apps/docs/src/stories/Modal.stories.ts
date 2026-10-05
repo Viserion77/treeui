@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite';
 import { ref } from 'vue';
-import { TButton, TInput, TModal } from '@treeui/vue';
+import { TButton, TDatePicker, TInput, TModal, TSelect } from '@treeui/vue';
 import { practiceNote } from './practice-refs';
 
 const meta = {
@@ -125,6 +125,46 @@ export const States: Story = {
             <TButton variant="soft">Disabled</TButton>
           </template>
           <p style="margin: 0;">You should never see this modal open.</p>
+        </TModal>
+      </div>
+    `,
+  }),
+};
+
+export const AnchoredPanelsInsideAModal: Story = {
+  name: 'An anchored panel opened inside the modal stacks above it',
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "A panel anchored to a trigger renders in a layer no ancestor can clip — it teleports to the body. That also takes it out of the modal's stacking context, where it used to be painted above the dialog for free: as a sibling of the modal it stacks by its own `z-index`, and `--tree-z-dropdown` (1000) is below `--tree-z-modal` (1300). The panel opened BEHIND the dialog and nothing in it could be clicked. `useAnchoredLayer` now reads the stacking level of the layer the trigger sits in and clears it, so this works for `TDrawer` and any layer added later without either side knowing about the other. Open the modal, then open the select and the date picker: both panels must be on top and clickable.",
+      },
+    },
+  },
+  render: () => ({
+    components: { TButton, TDatePicker, TModal, TSelect },
+    setup: () => ({
+      open: ref(true),
+      kind: ref('meeting'),
+      day: ref('2026-03-15'),
+      kinds: [
+        { label: 'Meeting', value: 'meeting' },
+        { label: 'Review', value: 'review' },
+        { label: 'Deploy window', value: 'deploy' },
+      ],
+    }),
+    template: `
+      <div>
+        <TButton @click="open = true">New appointment</TButton>
+        <TModal v-model:open="open" title="New appointment">
+          <div style="display: grid; gap: var(--tree-space-4);">
+            <TSelect v-model="kind" aria-label="Kind" :options="kinds" />
+            <TDatePicker v-model="day" aria-label="Day" />
+          </div>
+          <template #footer>
+            <TButton variant="ghost" @click="open = false">Cancel</TButton>
+            <TButton @click="open = false">Save</TButton>
+          </template>
         </TModal>
       </div>
     `,

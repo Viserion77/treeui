@@ -56,7 +56,9 @@ const preStyle = computed(() =>
 const classes = computed(() => [
   't-code-block',
   `t-code-block--${props.size}`,
-  { 'is-wrap': props.wrap },
+  // `is-copyable` and not `showCopy`: the class reserves the toolbar's width in
+  // the `pre`, and the toolbar is what `showCopy` renders.
+  { 'is-wrap': props.wrap, 'is-copyable': showCopy.value },
 ]);
 
 async function onCopy() {

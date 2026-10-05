@@ -1,5 +1,7 @@
 <script setup lang="ts">
-import { computed, useAttrs, useSlots } from 'vue';
+import { computed, inject, useAttrs, useSlots } from 'vue';
+import type { TSize } from '../types/contracts';
+import { STAT_GROUP_INJECTION_KEY } from './stat-group-context';
 import TSkeleton from './TSkeleton.vue';
 
 defineOptions({
@@ -12,10 +14,18 @@ const _treeStatTrendDirections = ['up', 'down', 'neutral'] as const;
 // reader is scanning for WHAT is measured; on a marketing band the figure is
 // the argument and the label explains it afterwards.
 const _treeStatEmphases = ['label', 'value'] as const;
+/* Whether the tile draws its own card. `plain` keeps the padding, the type and
+   the tones and drops the border, radius, shadow and background — for a band
+   of indicators that shares ONE surface. A stat has always drawn its own card,
+   which inside a TCard is a card within a card: doubled frame, summed padding,
+   and eight of them on a dashboard read as eight objects instead of one row of
+   figures. */
+const _treeStatVariants = ['card', 'plain'] as const;
 
 export type TStatTone = (typeof _treeStatTones)[number];
 export type TStatTrendDirection = (typeof _treeStatTrendDirections)[number];
 export type TStatEmphasis = (typeof _treeStatEmphases)[number];
+export type TStatVariant = (typeof _treeStatVariants)[number];
 
 const props = withDefaults(
   defineProps<{
@@ -34,6 +44,36 @@ const props = withDefaults(
      * have to be the same height.
      */
     emphasis?: TStatEmphasis;
+    /**
+     * Density. `sm` lowers the value's floor from 1.5rem to 1.125rem and
+     * tightens the padding, which is what lets two stats share a row on a
+     * phone — at the default floor a formatted negative currency does not fit,
+     * so a grid of six indicators collapsed into one tall column. The value
+     * still scales to its card through the container query, not to the
+     * viewport.
+     */
+    size?: TSize;
+    /**
+     * Where the `meta` note sits. `top` (default) shares the label's line;
+     * `bottom` puts it under the value, for the reading order of an indicator
+     * with a footnote — label, figure, note.
+     *
+     * Different from `emphasis="value"`, which promotes the FIGURE and takes
+     * both the label and the note below it. Here the label still leads, which
+     * is the dashboard reading; only the note moves.
+     *
+     * It is also a height fix. On the shared line, a long label and a long note
+     * do not fit, the note wraps onto a line of its own ABOVE the value, and
+     * that one tile grows — the grid then stretches the whole row to match, so
+     * every sibling shows an empty band between its label and its value.
+     */
+    metaPlacement?: 'top' | 'bottom';
+    /**
+     * Whether the tile draws its own card. Defaults to `card`, except inside a
+     * `TStatGroup`, which owns the surface and the hairlines between cells —
+     * there the default is `plain`. Setting it explicitly always wins.
+     */
+    variant?: TStatVariant;
   }>(),
   {
     label: '',
@@ -44,7 +84,16 @@ const props = withDefaults(
     trendDirection: 'neutral',
     loading: false,
     emphasis: 'label',
+    size: 'md',
+    metaPlacement: 'top',
+    variant: undefined,
   },
+);
+
+const inGroup = inject(STAT_GROUP_INJECTION_KEY, false);
+
+const effectiveVariant = computed<TStatVariant>(
+  () => props.variant ?? (inGroup ? 'plain' : 'card'),
 );
 
 defineSlots<{
@@ -61,7 +110,10 @@ const slots = useSlots();
 const rootClasses = computed(() => [
   't-stat',
   `t-stat--${props.tone}`,
+  `t-stat--${props.size}`,
   `t-stat--emphasis-${props.emphasis}`,
+  `t-stat--meta-${props.metaPlacement}`,
+  `t-stat--${effectiveVariant.value}`,
   {
     'has-icon': Boolean(slots.icon) && !props.loading,
     'is-loading': props.loading,
@@ -122,7 +174,7 @@ const trendSymbol = computed(() => {
 
       <div class="t-stat__body">
         <div
-          v-if="hasLabel || hasMeta"
+          v-if="hasLabel || (hasMeta && metaPlacement === 'top')"
           class="t-stat__topline"
         >
           <p
@@ -135,7 +187,7 @@ const trendSymbol = computed(() => {
           </p>
 
           <p
-            v-if="hasMeta"
+            v-if="hasMeta && metaPlacement === 'top'"
             class="t-stat__meta"
           >
             <slot name="meta">
@@ -169,6 +221,17 @@ const trendSymbol = computed(() => {
             </slot>
           </p>
         </div>
+
+        <!-- After the value, so the announced order follows the visual one:
+             label, figure, note. -->
+        <p
+          v-if="hasMeta && metaPlacement === 'bottom'"
+          class="t-stat__meta t-stat__meta--bottom"
+        >
+          <slot name="meta">
+            {{ meta }}
+          </slot>
+        </p>
       </div>
     </template>
   </div>

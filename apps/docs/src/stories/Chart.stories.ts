@@ -328,3 +328,35 @@ export const PointClick: Story = {
     `,
   }),
 };
+
+export const AxisFormatterAndEdgeLabels: Story = {
+  name: 'axisValueFormat, and edge labels that stay inside the SVG',
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Two things the axis needs that the tooltip does not. **`axisValueFormat`** formats the ticks apart from `valueFormat`: a tooltip can spell `R$ 1.500.000.000,00` in full, but the same string on a y-axis at 320px eats the plot, and the space reserved for it is capped at 40% of the chart — past the cap it clips. **Edge anchoring** puts `is-anchor-start` on the first x label and `is-anchor-end` on the last, as classes: these were written as the `text-anchor` attribute, which CSS always beats, so `.t-chart__axis-label--x { text-anchor: middle }` won and the last label kept hanging off the SVG.",
+      },
+    },
+  },
+  render: () => ({
+    components: { TChart },
+    setup: () => ({
+      labels: ['janeiro de 2026', 'abril de 2026', 'setembro de 2026'],
+      series: [{ label: 'Patrimônio', data: [900_000_000, 1_200_000_000, 1_500_000_000] }],
+      full: (v: number) => `R$ ${v.toLocaleString('pt-BR')}`,
+      compact: (v: number) => `R$ ${(v / 1e9).toFixed(1)} bi`,
+    }),
+    template: `
+      <div style="inline-size: 320px; border: 1px dashed var(--tree-color-border-default); padding: var(--tree-space-2);">
+        <TChart
+          :labels="labels"
+          :series="series"
+          :value-format="full"
+          :axis-value-format="compact"
+          :height="220"
+        />
+      </div>
+    `,
+  }),
+};

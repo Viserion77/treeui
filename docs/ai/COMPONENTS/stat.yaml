@@ -6,6 +6,20 @@ status: available
 purpose: "Compact KPI display with label, value, trend, metadata, and optional icon."
 
 props:
+  variant:
+    type: TStatVariant
+    default: "card (plain inside a TStatGroup)"
+    values: [card, plain]
+    description: "Whether the tile draws its own card. `plain` keeps the padding, the type and the tones and drops the border, radius, shadow and background. Inside a `TStatGroup` the default flips to `plain`, because the group owns the surface; an explicit value always wins. A stat drawing its own card inside a TCard is a card within a card — doubled frame, summed padding, and eight of them read as eight objects rather than one row of figures."
+  metaPlacement:
+    type: "'top' | 'bottom'"
+    default: top
+    description: "Where the `meta` note sits. `top` shares the label's line; `bottom` puts it under the value, for the reading order of an indicator with a footnote. It is also a height fix: on the shared line a long label and a long note do not fit, the note wraps onto a line of its own ABOVE the value, and that one tile grows — the grid then stretches the whole row and every sibling shows an empty band. With `bottom` the DOM follows the visual order, so the announced order is label, value, note. Different from `emphasis=\"value\"`, which promotes the FIGURE and takes the label down with it."
+  size:
+    type: TSize
+    default: md
+    values: [sm, md, lg]
+    description: "Density. `sm` lowers the value's floor from 1.5rem to 1.125rem and tightens the padding, which is what lets two stats share a row on a phone — at the default floor a formatted negative currency does not fit, so a grid of six indicators collapsed into one tall column. The value still scales to its card through the container query, not to the viewport."
   label:
     type: string
     default: ""

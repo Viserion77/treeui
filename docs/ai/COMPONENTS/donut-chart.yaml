@@ -63,6 +63,11 @@ types:
   TDonutSegment: "{ label: string; value: number; color?: string }"
 
 behavior:
+  legend_label_is_the_flexible_column: >-
+    `.t-donut-chart__legend-label` is `flex: 1 1 0` with `min-width: 0` and an
+    ellipsis, and `.t-donut-chart__legend-value` is `flex: 0 0 auto`. A
+    60-character label used to push the value out of the card. The full text is
+    carried in `title`, since truncation hides data the chart is meant to show.
   colors_auto_assign_from_chart_palette: "--tree-color-chart-1..8, cycling by visible-segment index; per-segment color overrides"
   hovering_a_slice_dims_the_rest_and_updates_center: "the other segments get is-dimmed, the hovered donut segment grows to thickness + 4, and its legend row gets is-active"
   hovering_a_legend_row_drives_the_same_highlight: "legend items carry the same pointerenter/pointerleave handlers as the segments"

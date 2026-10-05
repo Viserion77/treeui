@@ -786,6 +786,7 @@
         "TDropdown",
         "TFileUpload",
         "TFormField",
+        "TIconTile",
         "TImage",
         "TLinkTile",
         "TMenu",
@@ -793,6 +794,7 @@
         "TPopover",
         "TSelect",
         "TSkipLink",
+        "TStatGroup",
         "TSteps",
         "TTabs",
         "TText",
@@ -878,6 +880,7 @@
         "TGrid",
         "THero",
         "THide",
+        "TIconTile",
         "TLinkTile",
         "TList",
         "TModal",
@@ -892,6 +895,7 @@
         "TSplit",
         "TStack",
         "TStat",
+        "TStatGroup",
         "TSteps",
         "TTabs",
         "TText",
@@ -922,6 +926,7 @@
         "TColorSwatch",
         "TDescriptionList",
         "THero",
+        "TIconTile",
         "TImage",
         "TInput",
         "TKeyValueEditor",
@@ -935,6 +940,7 @@
         "TSection",
         "TSelect",
         "TStat",
+        "TStatGroup",
         "TSwitch",
         "TTag",
         "TTagInput",
@@ -2942,6 +2948,12 @@
       "manifestFile": "docs/ai/COMPONENTS/chart.yaml",
       "props": [
         {
+          "name": "axisValueFormat",
+          "type": "(value: number) => string",
+          "default": "undefined",
+          "description": "Formatter for the AXIS ticks only, falling back to `valueFormat`. The two have different jobs and the axis is the one with no room: a tooltip can spell `R$ 1.500.000.000,00` in full, while the same string on a y-axis at 320px eats the plot — and the space reserved for it is capped at 40% of the chart, so past that it clips. One formatter could not serve both."
+        },
+        {
           "name": "yAxisWidth",
           "type": "number",
           "default": "undefined",
@@ -3091,6 +3103,7 @@
         "point-click has no keyboard equivalent — do not make it the only way to reach a behavior."
       ],
       "behavior": [
+        "edge_x_labels_anchor_with_a_class_not_an_attribute: The first and last x labels carry `is-anchor-start` / `is-anchor-end`, not a `text-anchor` ATTRIBUTE. CSS always beats a presentation attribute, so `.t-chart__axis-label--x { text-anchor: middle }` silently won and the anchoring never applied — the last label kept rendering centred and hanging off the SVG.",
         "colors_auto_assign_from_chart_palette: --tree-color-chart-1..8, cycling by series index; per-series color overrides",
         "zero_baseline_for_bar_and_area: the y domain is extended to include 0 for bar and area; line uses the data extent. minY overrides it.",
         "y_domain_uses_nice_ticks: every type runs through niceScale, which rounds the min down and the max up to round numbers",
@@ -3348,6 +3361,7 @@
         "copy_button_state: The copy button's aria-label reflects the copied state briefly."
       ],
       "behavior": [
+        "copyable_reserves_the_toolbar_width: With the copy button rendered, `.t-code-block.is-copyable .t-code-block__pre` reserves its width as `padding-inline-end`. The toolbar floats over the code, so a wrapped line used to run underneath it and the characters behind the button were unreadable. This only became visible once `wrap` started breaking for real: before, the long token overflowed sideways and never reached the button.",
         "wrap_reduces_the_min_content: `.t-code-block.is-wrap .t-code-block__pre` uses `overflow-wrap: anywhere`, not `break-word`. `break-word` breaks only once a width is already settled, so wherever the block's width came from its content — a grid `auto` track, a table cell, a flex item without `min-width: 0` — the longest run without a break opportunity became the minimum width and pushed the container instead of wrapping. That is precisely the case `wrap` exists for: a URL, a token, a credential. Same semantics as `TText wrap=\"anywhere\"`."
       ],
       "selection": {
@@ -4829,6 +4843,7 @@
         "Provide a meaningful ariaLabel describing what the chart shows."
       ],
       "behavior": [
+        "legend_label_is_the_flexible_column: `.t-donut-chart__legend-label` is `flex: 1 1 0` with `min-width: 0` and an ellipsis, and `.t-donut-chart__legend-value` is `flex: 0 0 auto`. A 60-character label used to push the value out of the card. The full text is carried in `title`, since truncation hides data the chart is meant to show.",
         "colors_auto_assign_from_chart_palette: --tree-color-chart-1..8, cycling by visible-segment index; per-segment color overrides",
         "hovering_a_slice_dims_the_rest_and_updates_center: the other segments get is-dimmed, the hovered donut segment grows to thickness + 4, and its legend row gets is-active",
         "hovering_a_legend_row_drives_the_same_highlight: legend items carry the same pointerenter/pointerleave handlers as the segments",
@@ -5403,6 +5418,30 @@
       "manifestFile": "docs/ai/COMPONENTS/file-upload.yaml",
       "props": [
         {
+          "name": "uploadingLabel",
+          "type": "string",
+          "default": "Uploading files",
+          "description": "Accessible name for the spinner shown while `loading`."
+        },
+        {
+          "name": "uploadedAnnouncement",
+          "type": "(name: string) => string",
+          "default": "(n) => `${n} uploaded.`",
+          "description": "What the live region announces when a file succeeds. A function, because the file name sits inside the sentence and its position differs by language."
+        },
+        {
+          "name": "failedAnnouncement",
+          "type": "(name: string) => string",
+          "default": "(n) => `${n} failed.`",
+          "description": "The same, for a failure. The error text is appended after it."
+        },
+        {
+          "name": "showRejections",
+          "type": "boolean",
+          "default": "true",
+          "description": "Render the built-in rejection messages. Turn it off when the product already surfaces `files-rejected` in its own alert — otherwise the user reads the same refusal twice, and the embedded copy is the one that cannot be placed where the product wants it. The event fires either way."
+        },
+        {
           "name": "clearLabel",
           "type": "string",
           "default": "Clear all",
@@ -5628,6 +5667,7 @@
         "remove_and_retry_meet_the_44px_target: true"
       ],
       "behavior": [
+        "a_rejection_follows_the_active_language: A rejection is held as DATA (the file and the reason) and formatted during render. It used to be stored as its rendered string, frozen at refusal time, so switching language afterwards left the old sentence on screen — the one piece of copy in this component that could not be retranslated.",
         "accepts_files_from_input_drop_and_paste: true",
         "multiple_false_replaces_existing_selection: true",
         "accept_maxFiles_and_maxFileSize_apply_to_all_entry_points: true",
@@ -6718,6 +6758,86 @@
       ],
       "practices": [
         "branchline-icons"
+      ]
+    },
+    {
+      "name": "TIconTile",
+      "aliases": [],
+      "package": "@treeui/vue",
+      "kind": "display",
+      "category": "Data Display",
+      "status": "available",
+      "purpose": "A registered icon on a toned ground, sized and coloured so the glyph reads at phone size.",
+      "sourceFile": "packages/vue/src/components/TIconTile.vue",
+      "storyFile": "apps/docs/src/stories/IconTile.stories.ts",
+      "storyTitle": "Components/Data Display/IconTile",
+      "manifestFile": "docs/ai/COMPONENTS/icon-tile.yaml",
+      "props": [
+        {
+          "name": "name",
+          "type": "TIconName",
+          "default": "undefined",
+          "description": "Registry name. Use the default slot for a glyph that is not registered."
+        },
+        {
+          "name": "tone",
+          "type": "TIconTileTone",
+          "default": "brand",
+          "values": [
+            "brand",
+            "neutral",
+            "success",
+            "warning",
+            "danger",
+            "info"
+          ],
+          "description": "Selects the `--tree-icon-tile-accent` / `--tree-icon-tile-soft` pair. The ink is the tone's full-strength colour on its own `*-soft` tint, which is the pairing that tint is derived for."
+        },
+        {
+          "name": "size",
+          "type": "TSize",
+          "default": "md",
+          "values": [
+            "sm",
+            "md",
+            "lg"
+          ],
+          "description": "2rem / 2.75rem / 3.5rem. The glyph steps with the tile (16 / 20 / 24px) so the ink keeps its proportion of the pill."
+        },
+        {
+          "name": "label",
+          "type": "string",
+          "default": "undefined",
+          "description": "Accessible name. Omit it when the tile sits beside a heading that already says the same thing — the glyph is then decoration, and a screen reader reading it twice is noise."
+        }
+      ],
+      "events": [],
+      "slots": [
+        {
+          "name": "default"
+        }
+      ],
+      "a11y": [
+        "semantic_element: span",
+        "role_img_only_when_named: With `label` the tile is `role=\"img\"` with that name; without it, `aria-hidden`. There is no third state where a glyph is announced as nothing.",
+        "contrast_floor: 3:1, measured. An icon is a non-text UI component under WCAG 1.4.11, so the floor is 3:1 and not the 4.5:1 a badge has to clear — a badge carries a word. `packages/tokens/src/icon-tile-contrast.test.ts` measures every tone in both themes and fails the build below the floor, the same way the badge's own floor is held."
+      ],
+      "behavior": [],
+      "selection": {
+        "keywords": [],
+        "useWhen": [],
+        "avoidWhen": [],
+        "alternatives": []
+      },
+      "setup": {
+        "required": [],
+        "notes": []
+      },
+      "recipes": [],
+      "practices": [
+        "accessible-by-default",
+        "content-alignment",
+        "token-driven"
       ]
     },
     {
@@ -11045,6 +11165,33 @@
       "manifestFile": "docs/ai/COMPONENTS/stat.yaml",
       "props": [
         {
+          "name": "variant",
+          "type": "TStatVariant",
+          "default": "card (plain inside a TStatGroup)",
+          "values": [
+            "card",
+            "plain"
+          ],
+          "description": "Whether the tile draws its own card. `plain` keeps the padding, the type and the tones and drops the border, radius, shadow and background. Inside a `TStatGroup` the default flips to `plain`, because the group owns the surface; an explicit value always wins. A stat drawing its own card inside a TCard is a card within a card — doubled frame, summed padding, and eight of them read as eight objects rather than one row of figures."
+        },
+        {
+          "name": "metaPlacement",
+          "type": "'top' | 'bottom'",
+          "default": "top",
+          "description": "Where the `meta` note sits. `top` shares the label's line; `bottom` puts it under the value, for the reading order of an indicator with a footnote. It is also a height fix: on the shared line a long label and a long note do not fit, the note wraps onto a line of its own ABOVE the value, and that one tile grows — the grid then stretches the whole row and every sibling shows an empty band. With `bottom` the DOM follows the visual order, so the announced order is label, value, note. Different from `emphasis=\"value\"`, which promotes the FIGURE and takes the label down with it."
+        },
+        {
+          "name": "size",
+          "type": "TSize",
+          "default": "md",
+          "values": [
+            "sm",
+            "md",
+            "lg"
+          ],
+          "description": "Density. `sm` lowers the value's floor from 1.5rem to 1.125rem and tightens the padding, which is what lets two stats share a row on a phone — at the default floor a formatted negative currency does not fit, so a grid of six indicators collapsed into one tall column. The value still scales to its card through the container query, not to the viewport."
+        },
+        {
           "name": "label",
           "type": "string",
           "default": ""
@@ -11164,6 +11311,75 @@
         "metric-dashboard"
       ],
       "practices": [
+        "content-alignment",
+        "token-driven"
+      ]
+    },
+    {
+      "name": "TStatGroup",
+      "aliases": [],
+      "package": "@treeui/vue",
+      "kind": "layout",
+      "status": "available",
+      "purpose": "A row of indicators sharing one surface, with a hairline between cells.",
+      "sourceFile": "packages/vue/src/components/TStatGroup.vue",
+      "manifestFile": "docs/ai/COMPONENTS/stat-group.yaml",
+      "props": [
+        {
+          "name": "label",
+          "type": "string",
+          "default": "undefined",
+          "description": "Accessible name for the band. Sets `aria-label` on a `role=\"group\"`, so the row is announced as one unit rather than as a run of unrelated figures."
+        },
+        {
+          "name": "columns",
+          "type": "number",
+          "default": "undefined",
+          "description": "Fixed track count. Leave unset to let `minItemWidth` decide."
+        },
+        {
+          "name": "minItemWidth",
+          "type": "string",
+          "default": "12rem",
+          "description": "Smallest a cell may get before a track is dropped. Same meaning as on TGrid."
+        },
+        {
+          "name": "balance",
+          "type": "boolean",
+          "default": "false",
+          "description": "Let the last row share itself out. Off by default here, unlike TGrid, and deliberately: a stat's value scales to its own cell (`container-type: inline-size`), so a lone cell stretched across the last row prints a number visibly larger than its siblings', and size on a dashboard reads as importance. An orphan beside empty space is the lesser mistake. The real fix for a band is a track count that divides the figures — set `columns`, or a `minItemWidth` that lands on one."
+        }
+      ],
+      "events": [],
+      "slots": [
+        {
+          "name": "default"
+        }
+      ],
+      "a11y": [
+        "semantic_element: div",
+        "role: group",
+        "naming: `label` is what makes the band a named unit. Without it the group has no accessible name and is announced as an unlabelled grouping."
+      ],
+      "behavior": [
+        "children_render_plain_without_being_told: The group provides a context that TStat reads, so every child defaults to `variant=\"plain\"` inside it. The alternative is the consumer repeating `variant=\"plain\"` on all eight, which is the alignment busywork this library exists to absorb — and which goes wrong on the ninth one added later. An explicit `variant` on a child still wins.",
+        "the_track_is_a_TGrid: Composed, not re-implemented, so `columns`, `minItemWidth` and `balance` behave exactly as they do everywhere else. `gap` is 0: the cells have to meet for the hairline to be a shared edge, and the breathing room comes from each cell's own padding.",
+        "hairlines_survive_reflow: Every cell carries a start and a top line as pseudo-elements, and the track is pulled back one pixel so the outermost pair falls outside the clipped box. A cell that reflows onto a new row keeps its top line and becomes the first of its row, where its start line is the one being clipped — nothing hanging on the outer edge, nothing doubled between neighbours. `:nth-child` cannot express this, because which cell starts a row depends on a track count only the browser knows.",
+        "pseudo_elements_not_borders: A border would land on the child's own `border-width`. The contract is that a cell in a band measures as frameless from the outside — `border-width` is actually 0 — so the lines are drawn beside the cell rather than on it."
+      ],
+      "selection": {
+        "keywords": [],
+        "useWhen": [],
+        "avoidWhen": [],
+        "alternatives": []
+      },
+      "setup": {
+        "required": [],
+        "notes": []
+      },
+      "recipes": [],
+      "practices": [
+        "accessible-by-default",
         "content-alignment",
         "token-driven"
       ]

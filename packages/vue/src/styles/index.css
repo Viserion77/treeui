@@ -1524,6 +1524,15 @@ a.t-brand-lockup:focus-visible {
   overflow: hidden;
 }
 
+/* The toolbar floats over the code, so the `pre` has to reserve its width —
+   otherwise a wrapped line runs underneath the copy button and the characters
+   behind it are unreadable. This only became visible once `wrap` started
+   breaking for real: before, the long token overflowed horizontally and never
+   reached the button. Button 1.75rem + two gaps of `--tree-space-2`. */
+.t-code-block.is-copyable .t-code-block__pre {
+  padding-inline-end: calc(1.75rem + var(--tree-space-2) * 2);
+}
+
 .t-code-block__toolbar {
   position: absolute;
   inset-block-start: var(--tree-space-2);
@@ -5799,6 +5808,77 @@ a.t-brand-lockup:focus-visible {
   grid-template-columns: 1fr;
 }
 
+/* `plain` keeps the padding, the type and the tones, and drops everything that
+   draws a card. The surface then belongs to whatever contains the tile — which
+   inside a TCard is the point: a stat drawing its own card there is a card
+   within a card, with a doubled frame and summed padding. */
+.t-stat--plain {
+  border-color: transparent;
+  border-width: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+/* ── StatGroup ─────────────────────────────────────────
+
+   One surface for a row of indicators, with a hairline between cells.
+
+   The lines are a start-and-top border on every cell, with the track pulled
+   back by one pixel so the outermost pair falls outside the clipped box. That
+   is what survives reflow: a cell that drops to the next row keeps its top
+   border and becomes the first of its row, where its start border is the one
+   being clipped — nothing left hanging on the outer edge, nothing doubled
+   between neighbours. `:nth-child` cannot express this, because which cell
+   starts a row depends on a track count only the browser knows. */
+
+.t-stat-group {
+  /* Clips the outermost borders that the negative margins push out. */
+  overflow: hidden;
+  inline-size: 100%;
+}
+
+/* The track itself is a TGrid (so `balance` and `minItemWidth` behave exactly
+   as they do everywhere else); all this adds is the one-pixel pull that puts
+   the outermost hairlines outside the clipped box. */
+.t-stat-group__track {
+  margin-block-start: calc(-1 * var(--tree-border-width-subtle));
+  margin-inline-start: calc(-1 * var(--tree-border-width-subtle));
+}
+
+/* Pseudo-elements, not borders on the cell.
+
+   A border would land on the child's own `border-width`, and the contract this
+   band has to meet is that a cell in a group reads as frameless — `border-width`
+   actually 0, measurable from the outside. Absolutely positioned, so they do
+   not become grid items of a cell that is itself a grid. */
+.t-stat-group__track > * {
+  position: relative;
+}
+
+.t-stat-group__track > *::before,
+.t-stat-group__track > *::after {
+  content: '';
+  position: absolute;
+  background: var(--tree-color-border-default);
+  pointer-events: none;
+}
+
+/* The start edge: a vertical hairline between neighbours on the same row. */
+.t-stat-group__track > *::before {
+  inset-block: 0;
+  inset-inline-start: calc(-1 * var(--tree-border-width-subtle));
+  inline-size: var(--tree-border-width-subtle);
+}
+
+/* The top edge: the horizontal hairline a cell gains when it reflows onto a
+   new row. */
+.t-stat-group__track > *::after {
+  inset-inline: 0;
+  inset-block-start: calc(-1 * var(--tree-border-width-subtle));
+  block-size: var(--tree-border-width-subtle);
+}
+
 .t-stat--neutral {
   --tree-stat-accent: var(--tree-color-text-primary);
   --tree-stat-soft: var(--tree-color-bg-subtle);
@@ -5833,6 +5913,69 @@ a.t-brand-lockup:focus-visible {
   border-radius: var(--tree-radius-pill);
   background: var(--tree-stat-soft);
   color: var(--tree-stat-accent);
+}
+
+/* ── IconTile ──────────────────────────────────────────
+
+   The same pill as `.t-stat__icon`, as a primitive. It was drawn inside TStat
+   and reachable only by using a whole TStat; a feature card wanting the same
+   affordance had a bare TIcon as its only public route, which inherits the
+   text colour, carries a flat 2px stroke and has no ground behind it — at
+   26px on a phone that reads as a grey scratch, not a glyph.
+
+   The ink is the tone's full-strength colour on its own `*-soft` tint, which
+   is the pairing `--tree-color-*-soft` is derived for. An ICON is a
+   non-text UI component, so the floor it has to clear is 3:1 (WCAG 1.4.11),
+   not the 4.5:1 that text needs — `icon-tile-contrast.test.ts` measures it. */
+
+.t-icon-tile {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  inline-size: var(--tree-icon-tile-size, 2.75rem);
+  block-size: var(--tree-icon-tile-size, 2.75rem);
+  border-radius: var(--tree-radius-pill);
+  background: var(--tree-icon-tile-soft);
+  color: var(--tree-icon-tile-accent);
+}
+
+.t-icon-tile--sm {
+  --tree-icon-tile-size: 2rem;
+}
+
+.t-icon-tile--lg {
+  --tree-icon-tile-size: 3.5rem;
+}
+
+.t-icon-tile--brand {
+  --tree-icon-tile-accent: var(--tree-color-brand-primary);
+  --tree-icon-tile-soft: var(--tree-color-brand-soft);
+}
+
+.t-icon-tile--neutral {
+  --tree-icon-tile-accent: var(--tree-color-text-primary);
+  --tree-icon-tile-soft: var(--tree-color-bg-subtle);
+}
+
+.t-icon-tile--success {
+  --tree-icon-tile-accent: var(--tree-color-status-success);
+  --tree-icon-tile-soft: var(--tree-color-status-success-soft);
+}
+
+.t-icon-tile--warning {
+  --tree-icon-tile-accent: var(--tree-color-status-warning);
+  --tree-icon-tile-soft: var(--tree-color-status-warning-soft);
+}
+
+.t-icon-tile--danger {
+  --tree-icon-tile-accent: var(--tree-color-status-error);
+  --tree-icon-tile-soft: var(--tree-color-status-error-soft);
+}
+
+.t-icon-tile--info {
+  --tree-icon-tile-accent: var(--tree-color-status-info);
+  --tree-icon-tile-soft: var(--tree-color-status-info-soft);
 }
 
 /* Two fixed rows — topline, then content — so a row of TStats in a TGrid keeps
@@ -5902,6 +6045,14 @@ a.t-brand-lockup:focus-visible {
   flex-wrap: wrap;
 }
 
+/* The note under the value, for the reading order of an indicator with a
+   footnote. On the label's line a long note wraps ABOVE the value and only
+   that tile grows, which stretches the whole grid row and leaves an empty band
+   in every sibling. */
+.t-stat__meta--bottom {
+  margin-block-start: var(--tree-space-1);
+}
+
 /* Value and trend share one line so a row of stats keeps its rhythm: a long
    value used to push the chip onto its own line in one card and not its
    neighbours, leaving the numerals unaligned. The container-relative font size
@@ -5930,9 +6081,30 @@ a.t-brand-lockup:focus-visible {
   line-height: var(--tree-font-lineHeight-ui);
 }
 
+/* Density axis. `sm` lowers the value's floor from 1.5rem to 1.125rem and
+   tightens the padding, which is what lets two stats share a row on a phone —
+   at the default floor a formatted negative currency could not fit, so a grid
+   of six indicators collapsed to one tall column. The container query stays:
+   the value still scales to the card, not the viewport. */
+.t-stat--sm {
+  --tree-stat-value-min: 1.125rem;
+  --tree-stat-value-max: 1.75rem;
+  padding: var(--tree-space-3);
+}
+
+.t-stat--lg {
+  --tree-stat-value-min: 1.75rem;
+  --tree-stat-value-max: 3rem;
+  padding: var(--tree-space-5);
+}
+
 .t-stat__value {
   min-width: 0;
-  font-size: clamp(1.5rem, 9cqi, 2.5rem);
+  font-size: clamp(
+    var(--tree-stat-value-min, 1.5rem),
+    9cqi,
+    var(--tree-stat-value-max, 2.5rem)
+  );
   font-weight: var(--tree-font-weight-semibold);
   line-height: var(--tree-font-lineHeight-heading);
   letter-spacing: -0.02em;
@@ -5954,6 +6126,19 @@ a.t-brand-lockup:focus-visible {
 
 .t-stat__trend-indicator {
   font-weight: var(--tree-font-weight-semibold);
+}
+
+/* Below 16rem of tile the value and the chip stop sharing a line. Measured at
+   half-width on a phone (a 180px tile) the chip sat ON the value — `flex-wrap`
+   alone does not help, because the chip is `flex: 0 0 auto` and the value
+   shrinks under it instead of pushing it down. Keyed to the tile, not the
+   viewport, so a narrow tile on a wide screen behaves the same. */
+@container (max-width: 16rem) {
+  .t-stat__content {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--tree-space-2);
+  }
 }
 
 /* ── NumberInput ──────────────────────────────────────── */
@@ -8307,6 +8492,18 @@ body:has(.t-app-shell) {
   text-anchor: middle;
 }
 
+/* The first and last x labels anchor inward so they cannot hang off the SVG.
+   A modifier class and not the `text-anchor` ATTRIBUTE the component used to
+   write: CSS always beats a presentation attribute, so the rule above silently
+   won and the anchoring never applied. */
+.t-chart__axis-label--x.is-anchor-start {
+  text-anchor: start;
+}
+
+.t-chart__axis-label--x.is-anchor-end {
+  text-anchor: end;
+}
+
 .t-chart__area {
   fill: currentColor;
   stroke: none;
@@ -8586,8 +8783,12 @@ body:has(.t-app-shell) {
   background: var(--tree-color-bg-subtle);
 }
 
+/* `flex: 1 1 0`, not `flex: 1`: `flex: 1` leaves the basis at 0 but the item
+   still refuses to shrink past its content in some engines, and a 60-character
+   label then pushed the value out of the card. The ellipsis needs the floor to
+   actually apply. The full text goes in `title`, since truncation hides data. */
 .t-donut-chart__legend-label {
-  flex: 1;
+  flex: 1 1 0;
   min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -8595,7 +8796,9 @@ body:has(.t-app-shell) {
   color: var(--tree-color-text-primary);
 }
 
+/* The value is the fixed column and never shrinks out of the container. */
 .t-donut-chart__legend-value {
+  flex: 0 0 auto;
   min-width: 2.5rem;
   text-align: right;
   font-variant-numeric: tabular-nums;

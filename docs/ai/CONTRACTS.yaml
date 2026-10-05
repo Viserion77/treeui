@@ -542,6 +542,20 @@ overlay_contract:
       surface. The composable also flips to the opposite side when the requested
       one has no room, and clamps the panel into
       `[16px, innerWidth - 16px]`.
+    stacks_above_the_layer_it_was_opened_from: >-
+      Leaving the ancestor's clip also leaves its STACKING CONTEXT. A panel
+      positioned `absolute` inside a modal was painted above the dialog for
+      free; as a sibling of it on `body` it stacks by its own `z-index`, and
+      `--tree-z-dropdown` (1000) is below `--tree-z-modal` (1300) — so the
+      panel opened BEHIND the dialog and nothing in it could be clicked.
+      `useAnchoredLayer` walks the trigger's ancestors, takes the highest
+      `z-index` among the positioned ones, and writes that plus one — but only
+      when it exceeds what the panel's own stylesheet gives it, so a trigger
+      inside a card with `z-index: 1` cannot pull a 1000 panel down to 2.
+      Reading the trigger's ancestors rather than having each layer register a
+      level: the trigger is still inside the layer, so the answer is already in
+      the DOM, and TDrawer or any layer added later is covered without either
+      side knowing about the other.
     consequence_for_consumers: >-
       The panel is NOT a descendant of the component's root element. Query it
       from `document.body` in tests, and do not rely on a CSS selector that

@@ -1,0 +1,82 @@
+name: TStatGroup
+source_file: packages/vue/src/components/TStatGroup.vue
+package: "@treeui/vue"
+kind: layout
+status: available
+purpose: "A row of indicators sharing one surface, with a hairline between cells."
+
+why_it_exists: >-
+  TStat has always drawn its own card, and there was no prop to stop it. Inside
+  a TCard — where a measured majority of real usages sit — that is a card
+  within a card: doubled frame, summed padding, and a dashboard of eight
+  indicators reads as eight objects instead of one row of figures. The band is
+  the denser reading: the number is the content, and the frame belongs to the
+  section.
+
+props:
+  label:
+    type: string
+    default: undefined
+    description: "Accessible name for the band. Sets `aria-label` on a `role=\"group\"`, so the row is announced as one unit rather than as a run of unrelated figures."
+  columns:
+    type: number
+    default: undefined
+    description: "Fixed track count. Leave unset to let `minItemWidth` decide."
+  minItemWidth:
+    type: string
+    default: 12rem
+    description: "Smallest a cell may get before a track is dropped. Same meaning as on TGrid."
+  balance:
+    type: boolean
+    default: false
+    description: >-
+      Let the last row share itself out. Off by default here, unlike TGrid, and
+      deliberately: a stat's value scales to its own cell
+      (`container-type: inline-size`), so a lone cell stretched across the last
+      row prints a number visibly larger than its siblings', and size on a
+      dashboard reads as importance. An orphan beside empty space is the lesser
+      mistake. The real fix for a band is a track count that divides the
+      figures — set `columns`, or a `minItemWidth` that lands on one.
+
+slots:
+  - default
+
+behavior:
+  children_render_plain_without_being_told: >-
+    The group provides a context that TStat reads, so every child defaults to
+    `variant="plain"` inside it. The alternative is the consumer repeating
+    `variant="plain"` on all eight, which is the alignment busywork this
+    library exists to absorb — and which goes wrong on the ninth one added
+    later. An explicit `variant` on a child still wins.
+  the_track_is_a_TGrid: >-
+    Composed, not re-implemented, so `columns`, `minItemWidth` and `balance`
+    behave exactly as they do everywhere else. `gap` is 0: the cells have to
+    meet for the hairline to be a shared edge, and the breathing room comes
+    from each cell's own padding.
+  hairlines_survive_reflow: >-
+    Every cell carries a start and a top line as pseudo-elements, and the track
+    is pulled back one pixel so the outermost pair falls outside the clipped
+    box. A cell that reflows onto a new row keeps its top line and becomes the
+    first of its row, where its start line is the one being clipped — nothing
+    hanging on the outer edge, nothing doubled between neighbours. `:nth-child`
+    cannot express this, because which cell starts a row depends on a track
+    count only the browser knows.
+  pseudo_elements_not_borders: >-
+    A border would land on the child's own `border-width`. The contract is that
+    a cell in a band measures as frameless from the outside — `border-width` is
+    actually 0 — so the lines are drawn beside the cell rather than on it.
+
+a11y:
+  semantic_element: div
+  role: group
+  naming: "`label` is what makes the band a named unit. Without it the group has no accessible name and is announced as an unlabelled grouping."
+
+css:
+  block: t-stat-group
+  elements:
+    - t-stat-group__track
+
+example: |
+  <TStatGroup label="Indicadores do mês" :columns="4">
+    <TStat v-for="k in kpis" :key="k.label" :label="k.label" :value="k.value" />
+  </TStatGroup>

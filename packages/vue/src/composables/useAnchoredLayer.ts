@@ -57,6 +57,40 @@ export interface UseAnchoredLayer {
 
 const isBlockAxis = (side: TAnchoredSide) => side === 'top' || side === 'bottom';
 
+/**
+ * The stacking level a panel anchored to `trigger` has to clear.
+ *
+ * Teleporting fixed one problem and created another: a panel positioned
+ * `absolute` inside a modal lived in the modal's stacking context and was
+ * painted above it for free. As a sibling of the modal on `body` it stacks by
+ * its own `z-index`, and `--tree-z-dropdown` (1000) is below
+ * `--tree-z-modal` (1300) — so the panel opened BEHIND the dialog it was
+ * opened from, and every option in it was unclickable.
+ *
+ * Reading the trigger's ancestors rather than having each layer register a
+ * level: the trigger is still inside the layer, so the answer is already in the
+ * DOM, and this covers TDrawer and any layer added later without either side
+ * knowing about the other.
+ */
+const stackingLevelAbove = (trigger: HTMLElement): number | null => {
+  if (typeof window === 'undefined') return null;
+  let highest: number | null = null;
+  let node: HTMLElement | null = trigger;
+
+  while (node && node !== document.body) {
+    // Only a positioned element participates with a numeric z-index; on a
+    // static one the value is meaningless even when it parses.
+    const style = window.getComputedStyle(node);
+    if (style.position !== 'static') {
+      const z = Number.parseInt(style.zIndex, 10);
+      if (!Number.isNaN(z) && (highest === null || z > highest)) highest = z;
+    }
+    node = node.parentElement;
+  }
+
+  return highest === null ? null : highest + 1;
+};
+
 /** Keep `value` within `[min, max]`, preferring `min` when the span is too narrow. */
 const clamp = (value: number, min: number, max: number) =>
   max < min ? min : Math.min(Math.max(value, min), max);
@@ -73,6 +107,18 @@ export function useAnchoredLayer(
 
   const style = ref<CSSProperties>({});
   const placedSide = ref<TAnchoredSide>(side.value);
+
+  /* The panel's own `z-index` from the stylesheet, captured once per open
+     cycle BEFORE anything is written inline.
+
+     It cannot be read fresh on every pass: `update()` runs at least twice per
+     open (once to place, once to correct from the settled rect), and from the
+     second pass on the computed value is whatever the first pass wrote. The
+     comparison then reads `1301 > 1301`, decides nothing is needed, and
+     rewrites the style without the `z-index` it had just set — the panel drops
+     back behind the modal. A browser is the only place that shows this; in
+     jsdom there is no computed cascade to feed back. */
+  let baseZIndex: number | null = null;
 
   const update = () => {
     const trigger = triggerRef.value;
@@ -125,10 +171,23 @@ export function useAnchoredLayer(
     left = clamp(left, viewportPadding, vw - width - viewportPadding);
     top = clamp(top, viewportPadding, vh - rect.height - viewportPadding);
 
+    /* Raise the panel only when the layer it was opened from outranks what the
+       stylesheet already gives it. A trigger can sit inside something
+       positioned with a small local `z-index` (a card, a sticky row); taking
+       `that + 1` unconditionally would DROP the panel from 1000 to 2, so the
+       sheet's value is the floor. */
+    if (baseZIndex === null) {
+      const parsed = Number.parseInt(window.getComputedStyle(panel).zIndex, 10);
+      baseZIndex = Number.isNaN(parsed) ? Number.NEGATIVE_INFINITY : parsed;
+    }
+    const needed = stackingLevelAbove(trigger);
+    const zIndex = needed !== null && needed > baseZIndex ? needed : undefined;
+
     style.value = {
       position: 'fixed',
       left: `${Math.round(left)}px`,
       top: `${Math.round(top)}px`,
+      ...(zIndex === undefined ? null : { zIndex }),
       ...(matchTriggerWidth ? { width: `${Math.round(width)}px` } : null),
     };
   };
@@ -167,6 +226,9 @@ export function useAnchoredLayer(
         unlisten();
         style.value = {};
         placedSide.value = side.value;
+        // Re-read the sheet on the next open: the panel may be styled
+        // differently, or open from somewhere else entirely.
+        baseZIndex = null;
       }
     },
     { flush: 'post' },

@@ -24,6 +24,8 @@ const meta = {
     showFileList: true,
   },
   argTypes: {
+    showRejections: { control: 'boolean' },
+    uploadingLabel: { control: 'text' },
     size: {
       control: 'select',
       options: ['sm', 'md', 'lg'],

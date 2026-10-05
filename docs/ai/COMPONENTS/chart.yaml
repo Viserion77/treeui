@@ -6,6 +6,10 @@ status: available
 purpose: "Lightweight cartesian chart (line, area, bar) for multi-series data, with axes, gridlines, hover tooltip, legend, and an accessible data table. No external charting dependency."
 
 props:
+  axisValueFormat:
+    type: "(value: number) => string"
+    default: undefined
+    description: "Formatter for the AXIS ticks only, falling back to `valueFormat`. The two have different jobs and the axis is the one with no room: a tooltip can spell `R$ 1.500.000.000,00` in full, while the same string on a y-axis at 320px eats the plot — and the space reserved for it is capped at 40% of the chart, so past that it clips. One formatter could not serve both."
   yAxisWidth:
     type: number
     default: undefined
@@ -103,6 +107,12 @@ types:
   TChartActivePayload: "{ index: number; label: string; values: { name: string; value: number; color: string }[] }"
 
 behavior:
+  edge_x_labels_anchor_with_a_class_not_an_attribute: >-
+    The first and last x labels carry `is-anchor-start` / `is-anchor-end`, not
+    a `text-anchor` ATTRIBUTE. CSS always beats a presentation attribute, so
+    `.t-chart__axis-label--x { text-anchor: middle }` silently won and the
+    anchoring never applied — the last label kept rendering centred and hanging
+    off the SVG.
   colors_auto_assign_from_chart_palette: "--tree-color-chart-1..8, cycling by series index; per-series color overrides"
   zero_baseline_for_bar_and_area: "the y domain is extended to include 0 for bar and area; line uses the data extent. minY overrides it."
   y_domain_uses_nice_ticks: "every type runs through niceScale, which rounds the min down and the max up to round numbers"

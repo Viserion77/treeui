@@ -75,6 +75,16 @@ const props = withDefaults(
     yTicks?: number;
     /** Format axis + tooltip values. */
     valueFormat?: (value: number) => string;
+    /**
+     * Formatter for the AXIS ticks only, falling back to `valueFormat`.
+     *
+     * The two have different jobs and the axis is the one with no room: a
+     * tooltip can spell `R$ 1.500.000.000,00` in full, while the same string on
+     * a y-axis at 320px eats the plot — and the space reserved for it is capped
+     * at 40% of the chart, so past that it clips. One formatter could not serve
+     * both: this is where `R$ 1,5 bi` goes.
+     */
+    axisValueFormat?: (value: number) => string;
     /** Force the low end of the y domain. */
     minY?: number;
     /** Force the high end of the y domain. */
@@ -110,6 +120,7 @@ const props = withDefaults(
     showPoints: false,
     yTicks: 5,
     valueFormat: undefined,
+    axisValueFormat: undefined,
     minY: undefined,
     maxY: undefined,
     animated: true,
@@ -190,6 +201,10 @@ const formatValue = (value: number) => {
   return `${value}`;
 };
 
+/** Axis ticks: `axisValueFormat` when given, otherwise whatever the tooltip uses. */
+const formatAxisValue = (value: number) =>
+  props.axisValueFormat ? props.axisValueFormat(value) : formatValue(value);
+
 /* --- label measurement ----------------------------------------------------
 
    The axis margins used to be constants: 44px on the left whatever the y
@@ -228,7 +243,7 @@ const widest = (labels: string[]) =>
 const yLabelWidth = computed(() => {
   if (!props.showYAxis) return 0;
   if (props.yAxisWidth != null) return props.yAxisWidth;
-  const measured = widest(scale.value.ticks.map((tick) => formatValue(tick)));
+  const measured = widest(scale.value.ticks.map((tick) => formatAxisValue(tick)));
   // 8px is the gap between the label and the plot (see the `x` below).
   // Capped at 40% of the chart so a pathological format cannot eat the plot;
   // past the cap the label is clipped, which is the lesser damage.
@@ -387,7 +402,7 @@ const gridLines = computed(() =>
   scale.value.ticks.map((tick) => ({
     value: tick,
     y: yScale.value(tick),
-    label: formatValue(tick),
+    label: formatAxisValue(tick),
   })),
 );
 
@@ -663,7 +678,7 @@ const rootClasses = computed(() => [
               class="t-chart__axis-label t-chart__axis-label--x"
               :x="item.x"
               :y="height - 8"
-              :text-anchor="item.anchor"
+              :class="`is-anchor-${item.anchor}`"
             >
               {{ item.label }}
             </text>

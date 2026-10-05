@@ -1,0 +1,69 @@
+name: TIconTile
+source_file: packages/vue/src/components/TIconTile.vue
+package: "@treeui/vue"
+kind: display
+status: available
+purpose: "A registered icon on a toned ground, sized and coloured so the glyph reads at phone size."
+
+why_it_exists: >-
+  The pill was drawn inside TStat first and lived as `.t-stat__icon`, reachable
+  only by rendering a whole TStat. A feature card wanting the same affordance
+  had a bare TIcon as its only public route — and a bare TIcon inherits the
+  text colour, carries a flat 2px stroke and has no ground behind it, so at
+  26px on a phone it reads as a grey scratch rather than a glyph. Recreating
+  the tile in product CSS is what the consumer contract forbids, which is why
+  this is a primitive and not a recipe.
+
+props:
+  name:
+    type: TIconName
+    default: undefined
+    description: "Registry name. Use the default slot for a glyph that is not registered."
+  tone:
+    type: TIconTileTone
+    default: brand
+    values: [brand, neutral, success, warning, danger, info]
+    description: "Selects the `--tree-icon-tile-accent` / `--tree-icon-tile-soft` pair. The ink is the tone's full-strength colour on its own `*-soft` tint, which is the pairing that tint is derived for."
+  size:
+    type: TSize
+    default: md
+    values: [sm, md, lg]
+    description: "2rem / 2.75rem / 3.5rem. The glyph steps with the tile (16 / 20 / 24px) so the ink keeps its proportion of the pill."
+  label:
+    type: string
+    default: undefined
+    description: "Accessible name. Omit it when the tile sits beside a heading that already says the same thing — the glyph is then decoration, and a screen reader reading it twice is noise."
+
+events: []
+
+slots:
+  - default
+
+a11y:
+  semantic_element: span
+  role_img_only_when_named: "With `label` the tile is `role=\"img\"` with that name; without it, `aria-hidden`. There is no third state where a glyph is announced as nothing."
+  contrast_floor: >-
+    3:1, measured. An icon is a non-text UI component under WCAG 1.4.11, so the
+    floor is 3:1 and not the 4.5:1 a badge has to clear — a badge carries a
+    word. `packages/tokens/src/icon-tile-contrast.test.ts` measures every tone
+    in both themes and fails the build below the floor, the same way the badge's
+    own floor is held.
+
+css:
+  block: t-icon-tile
+  modifiers:
+    - t-icon-tile--sm
+    - t-icon-tile--md
+    - t-icon-tile--lg
+    - t-icon-tile--brand
+    - t-icon-tile--neutral
+    - t-icon-tile--success
+    - t-icon-tile--warning
+    - t-icon-tile--danger
+    - t-icon-tile--info
+
+related:
+  TStat: "Carries the same pill as `.t-stat__icon` through its `#icon` slot. Use TStat when there is a figure; use TIconTile when the icon is the whole affordance."
+  TIcon: "The glyph itself, with no ground. Right inside a button or beside a label, where the surrounding text carries the meaning."
+
+example: '<TIconTile name="fingerprint" tone="brand" size="lg" />'

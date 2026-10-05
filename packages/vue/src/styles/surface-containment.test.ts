@@ -165,3 +165,74 @@ describe('colour on a repainted background', () => {
     );
   });
 });
+
+describe('round two: what the first delivery left measurably open', () => {
+  it('lets the first and last x labels anchor inward', () => {
+    // These were written as the `text-anchor` ATTRIBUTE, which CSS always
+    // beats — so `.t-chart__axis-label--x { text-anchor: middle }` won and the
+    // anchoring never applied. They are modifier classes now, at (0,2,0).
+    expect(blockContaining('.t-chart__axis-label--x.is-anchor-start')).toContain(
+      'text-anchor: start',
+    );
+    expect(blockContaining('.t-chart__axis-label--x.is-anchor-end')).toContain('text-anchor: end');
+  });
+
+  it('reserves the toolbar width in a copyable code block', () => {
+    // Only visible once `wrap` started breaking for real: before, the long
+    // token overflowed sideways and never reached the button it now runs under.
+    expect(blockContaining('.t-code-block.is-copyable .t-code-block__pre')).toContain(
+      'padding-inline-end',
+    );
+  });
+
+  it('makes the donut legend label the flexible column and the value the fixed one', () => {
+    expect(blockContaining('.t-donut-chart__legend-label {\n  flex: 1 1 0')).toContain(
+      'min-width: 0',
+    );
+    expect(blockContaining('.t-donut-chart__legend-value {')).toContain('flex: 0 0 auto');
+  });
+
+  it('gives TStat a density axis with a lower floor for the value', () => {
+    // 1.5rem was the floor at every size, which is why a formatted negative
+    // currency could not fit two-per-row on a phone.
+    expect(blockContaining('.t-stat--sm {')).toContain('--tree-stat-value-min: 1.125rem');
+    expect(blockContaining('.t-stat__value {')).toContain('var(--tree-stat-value-min, 1.5rem)');
+  });
+});
+
+describe('round three: the indicator band', () => {
+  it('strips the card from a plain stat', () => {
+    const rule = blockContaining('.t-stat--plain {');
+    expect(rule).toContain('border-width: 0');
+    expect(rule).toContain('box-shadow: none');
+    expect(rule).toContain('background: transparent');
+  });
+
+  it('draws the hairlines as pseudo-elements, not as borders on the cell', () => {
+    // A border would land on the child's own `border-width`, and the contract
+    // is that a cell in a band measures as frameless from the outside.
+    expect(blockContaining('.t-stat-group__track > *::before,')).toContain('position: absolute');
+
+    // Anchored on the declarations, because the grouped selector above also
+    // contains the text `.t-stat-group__track > *::after {`.
+    const pull = 'calc(-1 * var(--tree-border-width-subtle))';
+    expect(stylesheet).toContain(`inset-inline-start: ${pull}`);
+    expect(stylesheet).toContain(`inset-block-start: ${pull}`);
+    // And no border on the cell itself, which is what the group's own contract
+    // with TStat depends on.
+    expect(stylesheet).not.toContain('.t-stat-group__track > * {\n  border-');
+  });
+
+  it('pulls the track back so the outermost lines fall outside the clip', () => {
+    expect(blockContaining('.t-stat-group {')).toContain('overflow: hidden');
+    const track = blockContaining('.t-stat-group__track {');
+    expect(track).toContain('margin-block-start: calc(-1 * var(--tree-border-width-subtle))');
+    expect(track).toContain('margin-inline-start: calc(-1 * var(--tree-border-width-subtle))');
+  });
+
+  it('drops the trend chip below the value in a narrow tile', () => {
+    // At half-width on a phone the chip sat ON the value: it is `flex: 0 0 auto`,
+    // so the value shrinks under it rather than pushing it down.
+    expect(blockContaining('@container (max-width: 16rem)')).toContain('flex-direction: column');
+  });
+});

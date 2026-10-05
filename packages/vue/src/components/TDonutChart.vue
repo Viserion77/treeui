@@ -264,7 +264,12 @@ const rootClasses = computed(() => [
           :style="{ background: segment.color }"
           aria-hidden="true"
         />
-        <span class="t-donut-chart__legend-label">{{ segment.label }}</span>
+        <!-- `title` because the label is clipped, and a truncated label that
+             cannot be read in full is data the chart is hiding. -->
+        <span
+          class="t-donut-chart__legend-label"
+          :title="segment.label"
+        >{{ segment.label }}</span>
         <span class="t-donut-chart__legend-value">{{ formatValue(segment.value) }}</span>
         <span
           v-if="showPercent"

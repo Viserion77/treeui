@@ -87,6 +87,7 @@
         "TSkipLink",
         "TStatGroup",
         "TSteps",
+        "TTable",
         "TTabs",
         "TText",
         "TToast",
@@ -191,6 +192,7 @@
         "TStat",
         "TStatGroup",
         "TSteps",
+        "TTable",
         "TTabs",
         "TText",
         "TTimeline"

@@ -41,3 +41,35 @@ describe('TShow / THide breakpoints match the tokens', () => {
     expect([...new Set(declared)].sort()).toEqual([...names].sort());
   });
 });
+
+describe('TTable stacked mode uses the same breakpoints', () => {
+  // Same reason as above, one layer down: a CONTAINER query cannot resolve a
+  // custom property in its condition either, so `stackBelow` writes the
+  // literals out. The alternative is a ResizeObserver per table.
+  it.each(names)('%s stacks below the token value', (name) => {
+    const px = Number.parseInt(breakpoints[name], 10);
+    expect(px).toBeGreaterThan(0);
+    expect(stylesheet).toContain(`@container t-table (max-width: ${px}px) {`);
+    expect(stylesheet).toContain(`.t-table-wrapper--stack-below-${name} .t-table {`);
+  });
+
+  it('names the container, so the query cannot match some other ancestor', () => {
+    expect(stylesheet).toContain('container-name: t-table');
+    expect(stylesheet).toContain('container-type: inline-size');
+  });
+
+  it('scopes the containment to tables that asked for it', () => {
+    // `container-type: inline-size` applies `contain: layout inline-size style`.
+    // Imposing that on every table to serve the ones using `stackBelow` is a
+    // cost with no matching benefit.
+    expect(stylesheet).toContain(
+      ".t-table-wrapper[class*='t-table-wrapper--stack-below-'] {\n  container-type: inline-size;",
+    );
+  });
+
+  it('declares a rule for every breakpoint the prop accepts, and no other', () => {
+    const declared = [...stylesheet.matchAll(/\.t-table-wrapper--stack-below-([a-z0-9]+) \.t-table \{/g)]
+      .map((m) => m[1]);
+    expect([...new Set(declared)].sort()).toEqual([...names].sort());
+  });
+});

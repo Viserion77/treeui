@@ -145,3 +145,89 @@ export const MutedRows: Story = {
     `,
   }),
 };
+
+const ledger = [
+  { entry: 'Mercado — compra do mês', real: 'R$ 1.284,30', credit: 'R$ 412,00' },
+  { entry: 'Assinatura de streaming renovada automaticamente', real: 'R$ 39,90', credit: 'R$ 0,00' },
+  { entry: 'Transferência recebida', real: 'R$ 2.000,00', credit: 'R$ 0,00' },
+  { entry: 'Fatura do cartão — parcela 3 de 10', real: 'R$ 418,77', credit: 'R$ 1.254,00' },
+];
+
+const ledgerColumns = [
+  { key: 'entry', label: 'Lançamento', stack: 'title' as const },
+  { key: 'real', label: 'Saldo real', align: 'right' as const, minWidth: '8rem' },
+  { key: 'credit', label: 'Saldo do crédito', align: 'right' as const, minWidth: '8rem' },
+];
+
+export const StackedBelowABreakpoint: Story = {
+  name: 'stackBelow: one block per row on a narrow container',
+  parameters: {
+    layout: 'padded',
+    docs: {
+      description: {
+        story:
+          'Below the given container width the grid becomes one block per row: the column marked `stack="title"` is the block\'s heading, and the rest sit under it with their column label, because the header row is gone. Above it the table is unchanged. Measured on the **wrapper**, not the viewport — a table can sit in a narrow panel on a wide screen, which is the case a media query cannot see. The two frames below are 390px and 760px wide in the same page, which is the whole point: the narrow one stacks and the wide one does not. `role` is declared on the table, rows and cells, because `display: block` drops the implicit table semantics and a block would otherwise be announced as a run of unrelated text.',
+      },
+    },
+  },
+  render: () => ({
+    components: { TTable },
+    setup: () => ({ ledger, ledgerColumns }),
+    template: `
+      <div style="display: grid; gap: var(--tree-space-6);">
+        <div style="inline-size: 390px; border: 1px dashed var(--tree-color-border-default); padding: var(--tree-space-2);">
+          <TTable
+            :columns="ledgerColumns"
+            :rows="ledger"
+            stack-below="sm"
+            aria-label="Lançamentos, contêiner estreito"
+          />
+        </div>
+        <div style="inline-size: 760px; border: 1px dashed var(--tree-color-border-default); padding: var(--tree-space-2);">
+          <TTable
+            :columns="ledgerColumns"
+            :rows="ledger"
+            stack-below="sm"
+            aria-label="Lançamentos, contêiner largo"
+          />
+        </div>
+      </div>
+    `,
+  }),
+};
+
+export const StackedWithRowLinksAndState: Story = {
+  name: 'stackBelow: row links and row state survive the block',
+  parameters: {
+    layout: 'padded',
+    docs: {
+      description: {
+        story:
+          'A block is still a row: `rowState` keeps colouring it, `rowHref` keeps making the whole block the link target, and the accessible name still comes from `rowLabel` rather than from the concatenation of every cell. The stretched link is a pseudo-element on the first cell, which covers the block because the row is the positioning context either way.',
+      },
+    },
+  },
+  render: () => ({
+    components: { TTable },
+    setup: () => ({
+      ledger,
+      ledgerColumns,
+      rowHref: (row: Record<string, unknown>) => `#/lancamento/${String(row.entry).slice(0, 8)}`,
+      rowLabel: (row: Record<string, unknown>) => `Abrir ${String(row.entry)}`,
+      rowState: (_row: Record<string, unknown>, index: number) => (index === 1 ? 'muted' : 'default'),
+    }),
+    template: `
+      <div style="inline-size: 390px; border: 1px dashed var(--tree-color-border-default); padding: var(--tree-space-2);">
+        <TTable
+          :columns="ledgerColumns"
+          :rows="ledger"
+          :row-href="rowHref"
+          :row-label="rowLabel"
+          :row-state="rowState"
+          stack-below="sm"
+          aria-label="Lançamentos com link por linha"
+        />
+      </div>
+    `,
+  }),
+};

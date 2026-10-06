@@ -5201,7 +5201,14 @@ describe('Consumer contract hardening — batch 1', () => {
 
     it('is a reading table, not an unmanaged grid', () => {
       const wrapper = mount(TTable, { props: { columns, rows } });
-      expect(wrapper.find('table').attributes('role')).toBeUndefined();
+      // `table`, never `grid`: a grid is a managed widget and promises a
+      // keyboard model this component does not implement. The role is written
+      // out rather than left implicit because stacked mode changes `display`,
+      // and a `display: block` table loses its implicit semantics — so the
+      // assertion is now "the right role", which is what the name always meant,
+      // rather than "no role".
+      expect(wrapper.find('table').attributes('role')).toBe('table');
+      expect(wrapper.find('table').attributes('role')).not.toBe('grid');
     });
 
     it('renders a visible caption', () => {
@@ -7144,7 +7151,10 @@ describe('TTable row activation and detail', () => {
     // destroys the table's grid semantics, so a row that is activatable AND
     // holds a control had no accessible shape at all.
     const row = wrapper.get('.t-table__row.is-activatable');
-    expect(row.attributes('role')).toBeUndefined();
+    // `row`, which is what a `<tr>` already is — and specifically NOT `button`.
+    // Declared for the same reason as the table's: stacked mode changes
+    // `display` and the implicit role goes with it.
+    expect(row.attributes('role')).toBe('row');
     expect(row.attributes('tabindex')).toBeUndefined();
 
     const action = wrapper.get('.t-table__row-action');

@@ -5214,6 +5214,340 @@ a.t-brand-lockup:focus-visible {
   overflow-x: auto;
 }
 
+/* ── Table: stacked mode ───────────────────────────────
+
+   Below a container width the grid becomes one block per row: one column is
+   the block's heading, the rest sit under it, and each value carries its
+   column's label because the header row is gone.
+
+   Keyed to the WRAPPER and not the viewport — a table can sit in a narrow
+   panel on a wide screen, which is the case a media query cannot see. One
+   rule per breakpoint rather than one parameterised rule, because a container
+   query cannot read a custom property in its condition: the alternative is a
+   `ResizeObserver` per table, and a page with twenty tables would pay for an
+   axis the token scale already covers. The pixel values mirror
+   `--tree-breakpoint-*`; `breakpoints.test.ts` is what keeps them honest.
+
+   The horizontal scroll stays on the wrapper above the threshold, and `role`
+   is declared on the table, rows and cells in the markup — `display: block`
+   drops the implicit table semantics, and without them a block is announced
+   as a run of unrelated text. */
+
+/* The containment is scoped to the tables that asked for it. `container-type:
+   inline-size` applies `contain: layout inline-size style`, and imposing that
+   on every table in the library to serve the ones using `stackBelow` is a cost
+   with no matching benefit. */
+.t-table-wrapper[class*='t-table-wrapper--stack-below-'] {
+  container-type: inline-size;
+  container-name: t-table;
+}
+
+/* Hidden until stacked: above the threshold the header row carries the labels. */
+.t-table__stack-label {
+  display: none;
+}
+
+/* Below `sm` (640px) the grid becomes one block per row. */
+@container t-table (max-width: 640px) {
+  .t-table-wrapper--stack-below-sm .t-table {
+    display: block;
+  }
+
+  .t-table-wrapper--stack-below-sm .t-table__head {
+    display: none;
+  }
+
+  .t-table-wrapper--stack-below-sm .t-table__body {
+    display: block;
+  }
+
+  .t-table-wrapper--stack-below-sm .t-table__row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--tree-space-2);
+    padding: var(--tree-space-3) var(--tree-space-4);
+    border-block-end: var(--tree-border-width-subtle) solid var(--tree-color-border-default);
+  }
+
+  .t-table-wrapper--stack-below-sm .t-table__cell {
+    display: block;
+    padding: 0;
+    border: 0;
+    text-align: start;
+  }
+
+  .t-table-wrapper--stack-below-sm .t-table__cell--stack-hidden {
+    display: none;
+  }
+
+  .t-table-wrapper--stack-below-sm .t-table__cell--stack-title {
+    font-size: var(--tree-font-size-md);
+    font-weight: var(--tree-font-weight-semibold);
+    color: var(--tree-color-text-primary);
+  }
+
+  .t-table-wrapper--stack-below-sm .t-table__stack-label {
+    display: block;
+    color: var(--tree-color-text-muted);
+    font-size: var(--tree-font-size-xs);
+    line-height: var(--tree-font-lineHeight-ui);
+  }
+
+  /* A row link covers the whole BLOCK, not just its first cell.
+
+     Outside stacked mode every cell after the first is raised above the
+     overlay, because in a grid those are the neighbouring columns and one of
+     them may hold a delete button. Stacked, those same cells are the fields
+     UNDER the title — plain text in the middle of the block — and raising
+     them punched a hole in the link: `elementFromPoint` at the centre of the
+     block did not find it. Raising only the cells that actually contain
+     something interactive keeps the button clickable and gives the rest of
+     the block back to the link. */
+  .t-table-wrapper--stack-below-sm .t-table__row.is-linked .t-table__cell + .t-table__cell,
+  .t-table-wrapper--stack-below-sm .t-table__row.is-activatable .t-table__cell + .t-table__cell {
+    position: static;
+    z-index: auto;
+  }
+
+  .t-table-wrapper--stack-below-sm
+    .t-table__row.is-linked
+    .t-table__cell
+    + .t-table__cell:has(:is(a, button, input, select, textarea, [tabindex])),
+  .t-table-wrapper--stack-below-sm
+    .t-table__row.is-activatable
+    .t-table__cell
+    + .t-table__cell:has(:is(a, button, input, select, textarea, [tabindex])) {
+    position: relative;
+    z-index: 1;
+  }
+}
+
+/* Below `md` (768px) the grid becomes one block per row. */
+@container t-table (max-width: 768px) {
+  .t-table-wrapper--stack-below-md .t-table {
+    display: block;
+  }
+
+  .t-table-wrapper--stack-below-md .t-table__head {
+    display: none;
+  }
+
+  .t-table-wrapper--stack-below-md .t-table__body {
+    display: block;
+  }
+
+  .t-table-wrapper--stack-below-md .t-table__row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--tree-space-2);
+    padding: var(--tree-space-3) var(--tree-space-4);
+    border-block-end: var(--tree-border-width-subtle) solid var(--tree-color-border-default);
+  }
+
+  .t-table-wrapper--stack-below-md .t-table__cell {
+    display: block;
+    padding: 0;
+    border: 0;
+    text-align: start;
+  }
+
+  .t-table-wrapper--stack-below-md .t-table__cell--stack-hidden {
+    display: none;
+  }
+
+  .t-table-wrapper--stack-below-md .t-table__cell--stack-title {
+    font-size: var(--tree-font-size-md);
+    font-weight: var(--tree-font-weight-semibold);
+    color: var(--tree-color-text-primary);
+  }
+
+  .t-table-wrapper--stack-below-md .t-table__stack-label {
+    display: block;
+    color: var(--tree-color-text-muted);
+    font-size: var(--tree-font-size-xs);
+    line-height: var(--tree-font-lineHeight-ui);
+  }
+
+  /* A row link covers the whole BLOCK, not just its first cell.
+
+     Outside stacked mode every cell after the first is raised above the
+     overlay, because in a grid those are the neighbouring columns and one of
+     them may hold a delete button. Stacked, those same cells are the fields
+     UNDER the title — plain text in the middle of the block — and raising
+     them punched a hole in the link: `elementFromPoint` at the centre of the
+     block did not find it. Raising only the cells that actually contain
+     something interactive keeps the button clickable and gives the rest of
+     the block back to the link. */
+  .t-table-wrapper--stack-below-md .t-table__row.is-linked .t-table__cell + .t-table__cell,
+  .t-table-wrapper--stack-below-md .t-table__row.is-activatable .t-table__cell + .t-table__cell {
+    position: static;
+    z-index: auto;
+  }
+
+  .t-table-wrapper--stack-below-md
+    .t-table__row.is-linked
+    .t-table__cell
+    + .t-table__cell:has(:is(a, button, input, select, textarea, [tabindex])),
+  .t-table-wrapper--stack-below-md
+    .t-table__row.is-activatable
+    .t-table__cell
+    + .t-table__cell:has(:is(a, button, input, select, textarea, [tabindex])) {
+    position: relative;
+    z-index: 1;
+  }
+}
+
+/* Below `lg` (1024px) the grid becomes one block per row. */
+@container t-table (max-width: 1024px) {
+  .t-table-wrapper--stack-below-lg .t-table {
+    display: block;
+  }
+
+  .t-table-wrapper--stack-below-lg .t-table__head {
+    display: none;
+  }
+
+  .t-table-wrapper--stack-below-lg .t-table__body {
+    display: block;
+  }
+
+  .t-table-wrapper--stack-below-lg .t-table__row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--tree-space-2);
+    padding: var(--tree-space-3) var(--tree-space-4);
+    border-block-end: var(--tree-border-width-subtle) solid var(--tree-color-border-default);
+  }
+
+  .t-table-wrapper--stack-below-lg .t-table__cell {
+    display: block;
+    padding: 0;
+    border: 0;
+    text-align: start;
+  }
+
+  .t-table-wrapper--stack-below-lg .t-table__cell--stack-hidden {
+    display: none;
+  }
+
+  .t-table-wrapper--stack-below-lg .t-table__cell--stack-title {
+    font-size: var(--tree-font-size-md);
+    font-weight: var(--tree-font-weight-semibold);
+    color: var(--tree-color-text-primary);
+  }
+
+  .t-table-wrapper--stack-below-lg .t-table__stack-label {
+    display: block;
+    color: var(--tree-color-text-muted);
+    font-size: var(--tree-font-size-xs);
+    line-height: var(--tree-font-lineHeight-ui);
+  }
+
+  /* A row link covers the whole BLOCK, not just its first cell.
+
+     Outside stacked mode every cell after the first is raised above the
+     overlay, because in a grid those are the neighbouring columns and one of
+     them may hold a delete button. Stacked, those same cells are the fields
+     UNDER the title — plain text in the middle of the block — and raising
+     them punched a hole in the link: `elementFromPoint` at the centre of the
+     block did not find it. Raising only the cells that actually contain
+     something interactive keeps the button clickable and gives the rest of
+     the block back to the link. */
+  .t-table-wrapper--stack-below-lg .t-table__row.is-linked .t-table__cell + .t-table__cell,
+  .t-table-wrapper--stack-below-lg .t-table__row.is-activatable .t-table__cell + .t-table__cell {
+    position: static;
+    z-index: auto;
+  }
+
+  .t-table-wrapper--stack-below-lg
+    .t-table__row.is-linked
+    .t-table__cell
+    + .t-table__cell:has(:is(a, button, input, select, textarea, [tabindex])),
+  .t-table-wrapper--stack-below-lg
+    .t-table__row.is-activatable
+    .t-table__cell
+    + .t-table__cell:has(:is(a, button, input, select, textarea, [tabindex])) {
+    position: relative;
+    z-index: 1;
+  }
+}
+
+/* Below `xl` (1280px) the grid becomes one block per row. */
+@container t-table (max-width: 1280px) {
+  .t-table-wrapper--stack-below-xl .t-table {
+    display: block;
+  }
+
+  .t-table-wrapper--stack-below-xl .t-table__head {
+    display: none;
+  }
+
+  .t-table-wrapper--stack-below-xl .t-table__body {
+    display: block;
+  }
+
+  .t-table-wrapper--stack-below-xl .t-table__row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--tree-space-2);
+    padding: var(--tree-space-3) var(--tree-space-4);
+    border-block-end: var(--tree-border-width-subtle) solid var(--tree-color-border-default);
+  }
+
+  .t-table-wrapper--stack-below-xl .t-table__cell {
+    display: block;
+    padding: 0;
+    border: 0;
+    text-align: start;
+  }
+
+  .t-table-wrapper--stack-below-xl .t-table__cell--stack-hidden {
+    display: none;
+  }
+
+  .t-table-wrapper--stack-below-xl .t-table__cell--stack-title {
+    font-size: var(--tree-font-size-md);
+    font-weight: var(--tree-font-weight-semibold);
+    color: var(--tree-color-text-primary);
+  }
+
+  .t-table-wrapper--stack-below-xl .t-table__stack-label {
+    display: block;
+    color: var(--tree-color-text-muted);
+    font-size: var(--tree-font-size-xs);
+    line-height: var(--tree-font-lineHeight-ui);
+  }
+
+  /* A row link covers the whole BLOCK, not just its first cell.
+
+     Outside stacked mode every cell after the first is raised above the
+     overlay, because in a grid those are the neighbouring columns and one of
+     them may hold a delete button. Stacked, those same cells are the fields
+     UNDER the title — plain text in the middle of the block — and raising
+     them punched a hole in the link: `elementFromPoint` at the centre of the
+     block did not find it. Raising only the cells that actually contain
+     something interactive keeps the button clickable and gives the rest of
+     the block back to the link. */
+  .t-table-wrapper--stack-below-xl .t-table__row.is-linked .t-table__cell + .t-table__cell,
+  .t-table-wrapper--stack-below-xl .t-table__row.is-activatable .t-table__cell + .t-table__cell {
+    position: static;
+    z-index: auto;
+  }
+
+  .t-table-wrapper--stack-below-xl
+    .t-table__row.is-linked
+    .t-table__cell
+    + .t-table__cell:has(:is(a, button, input, select, textarea, [tabindex])),
+  .t-table-wrapper--stack-below-xl
+    .t-table__row.is-activatable
+    .t-table__cell
+    + .t-table__cell:has(:is(a, button, input, select, textarea, [tabindex])) {
+    position: relative;
+    z-index: 1;
+  }
+}
+
+
 .t-table {
   width: 100%;
   border-collapse: collapse;

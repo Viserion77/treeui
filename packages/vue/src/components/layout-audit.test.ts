@@ -437,3 +437,74 @@ describe('round three: a band of indicators, and the note under the value', () =
     expect(wrapper.find('.t-stat__topline .t-stat__label').exists()).toBe(true);
   });
 });
+
+describe('round four: TTable stacked mode', () => {
+  const columns = [
+    { key: 'entry', label: 'Lançamento', stack: 'title' as const },
+    { key: 'real', label: 'Saldo real' },
+    { key: 'note', label: 'Interno', stack: 'hidden' as const },
+  ];
+  const rows = [{ entry: 'Mercado', real: 'R$ 1.284,30', note: 'x' }];
+
+  it('emits no stacking markup at all without the prop', () => {
+    const wrapper = mount(TTable, { props: { columns, rows } });
+    expect(wrapper.find('.t-table-wrapper').classes().join(' ')).not.toContain('stack-below');
+    expect(wrapper.find('.t-table__stack-label').exists()).toBe(false);
+  });
+
+  it('carries the breakpoint on the wrapper, which is the container', () => {
+    // On the wrapper and not the table: the query measures the box that holds
+    // the horizontal scroll, which is the one whose width actually decides.
+    const wrapper = mount(TTable, { props: { columns, rows, stackBelow: 'sm' } });
+    expect(wrapper.find('.t-table-wrapper').classes()).toContain(
+      't-table-wrapper--stack-below-sm',
+    );
+  });
+
+  it('labels every field cell, and neither the title nor a hidden one', () => {
+    const wrapper = mount(TTable, { props: { columns, rows, stackBelow: 'sm' } });
+    const cells = wrapper.findAll('.t-table__body .t-table__cell');
+    expect(cells[0].classes()).toContain('t-table__cell--stack-title');
+    expect(cells[0].find('.t-table__stack-label').exists()).toBe(false);
+
+    expect(cells[1].classes()).toContain('t-table__cell--stack-field');
+    expect(cells[1].find('.t-table__stack-label').text()).toBe('Saldo real');
+
+    expect(cells[2].classes()).toContain('t-table__cell--stack-hidden');
+    expect(cells[2].find('.t-table__stack-label').exists()).toBe(false);
+  });
+
+  it('gives the title to the first column that claims it', () => {
+    // Two headings in one block is not a block, and honouring the last would
+    // make the answer depend on column order in a way nobody would guess.
+    const two = [
+      { key: 'a', label: 'A', stack: 'title' as const },
+      { key: 'b', label: 'B', stack: 'title' as const },
+    ];
+    const wrapper = mount(TTable, {
+      props: { columns: two, rows: [{ a: '1', b: '2' }], stackBelow: 'sm' },
+    });
+    const cells = wrapper.findAll('.t-table__body .t-table__cell');
+    expect(cells[0].classes()).toContain('t-table__cell--stack-title');
+    expect(cells[1].classes()).toContain('t-table__cell--stack-field');
+  });
+
+  it('declares the table roles explicitly, so a block keeps its semantics', () => {
+    // `display: block` drops the implicit table roles in several screen
+    // readers, and a block would be announced as a run of unrelated text.
+    const wrapper = mount(TTable, { props: { columns, rows, stackBelow: 'sm' } });
+    expect(wrapper.find('table').attributes('role')).toBe('table');
+    expect(wrapper.find('thead').attributes('role')).toBe('rowgroup');
+    expect(wrapper.find('tbody').attributes('role')).toBe('rowgroup');
+    expect(wrapper.find('thead tr').attributes('role')).toBe('row');
+    expect(wrapper.find('thead th').attributes('role')).toBe('columnheader');
+    expect(wrapper.find('tbody tr').attributes('role')).toBe('row');
+    expect(wrapper.find('tbody td').attributes('role')).toBe('cell');
+  });
+
+  it('keeps the roles when the table is not stacked at all', () => {
+    const wrapper = mount(TTable, { props: { columns, rows } });
+    expect(wrapper.find('table').attributes('role')).toBe('table');
+    expect(wrapper.find('tbody td').attributes('role')).toBe('cell');
+  });
+});

@@ -2,7 +2,7 @@
 import { computed, getCurrentInstance, ref, useAttrs, watchEffect, type Component } from 'vue';
 import type { TIconName } from '@treeui/icons';
 import { createId } from '@treeui/utils';
-import type { TSize } from '../types/contracts';
+import type { TBreakpoint, TSize } from '../types/contracts';
 import TIcon from './TIcon.vue';
 
 // The scroll container is the root element, but the accessible name and any
@@ -24,6 +24,15 @@ export type TTableColumn = {
    * and it does.
    */
   width?: string;
+  /**
+   * What this column becomes in stacked mode. `title` makes it the block's
+   * heading and drops its caption — there is at most one, and the first
+   * column declaring it wins. `hidden` drops the column from the block
+   * entirely, for something that only makes sense beside its neighbours.
+   * `field` (the default) shows the column's `label` above the value, because
+   * the header row is gone and the value would otherwise be unlabelled.
+   */
+  stack?: 'title' | 'field' | 'hidden';
   /**
    * A width the column may not go below. Unlike `width` this is a real floor:
    * it is applied to a box inside the header rather than to the cell, so the
@@ -95,6 +104,20 @@ const props = withDefaults(
      * accessible shape at all. Use this only when there is no URL.
      */
     rowActivatable?: boolean;
+    /**
+     * Below this container width, the grid becomes one block per row: one
+     * column is the block's heading and the rest appear under it, each value
+     * carrying its column's label. Above it, the table is unchanged.
+     *
+     * Measured on the WRAPPER, not the viewport — a table can sit in a narrow
+     * panel on a wide screen, and that is the case the viewport cannot see.
+     *
+     * A breakpoint name rather than a free length: a container query cannot
+     * read a custom property in its condition, so an arbitrary value would
+     * need a `ResizeObserver` per table, and a page with twenty tables would
+     * pay for an axis the token scale already covers.
+     */
+    stackBelow?: TBreakpoint;
     /** Key of the row whose detail panel is open, matched against `rowKey`. */
     expandedRow?: string | number | null;
   }>(),
@@ -108,6 +131,7 @@ const props = withDefaults(
     rowTo: undefined,
     rowLabel: undefined,
     rowActivatable: false,
+    stackBelow: undefined,
     expandedRow: null,
   },
 );
@@ -193,6 +217,20 @@ const classes = computed(() => [
   't-table',
   `t-table--${props.size}`,
 ]);
+
+/* At most one title per block, and the first column that asks for it wins —
+   two headings in one block is not a block, and silently honouring the last
+   would make the answer depend on column order in a way nobody would guess. */
+const stackTitleKey = computed(
+  () => props.columns.find((column) => column.stack === 'title')?.key,
+);
+
+/** What a column becomes in stacked mode, with the title claim resolved. */
+const stackRole = (column: TTableColumn): 'title' | 'field' | 'hidden' => {
+  if (column.stack === 'hidden') return 'hidden';
+  if (column.key === stackTitleKey.value) return 'title';
+  return 'field';
+};
 
 const sortedRows = computed(() => {
   const sort = currentSort.value;
@@ -284,11 +322,19 @@ const tableAttrs = computed(() => {
 <template>
   <div
     class="t-table-wrapper"
-    :class="attrs.class"
+    :class="[stackBelow ? `t-table-wrapper--stack-below-${stackBelow}` : null, attrs.class]"
     :style="attrs.style"
   >
+    <!--
+      The roles are explicit because stacked mode changes `display`, and a
+      `display: block` table loses its implicit table semantics in several
+      screen readers: the rows stop being rows and the cells stop being cells.
+      Each role here is the one the element already had, so nothing changes
+      above the breakpoint; they exist to survive the switch.
+    -->
     <table
       v-bind="tableAttrs"
+      role="table"
       :class="classes"
     >
       <caption
@@ -297,11 +343,18 @@ const tableAttrs = computed(() => {
       >
         {{ caption }}
       </caption>
-      <thead class="t-table__head">
-        <tr class="t-table__row">
+      <thead
+        role="rowgroup"
+        class="t-table__head"
+      >
+        <tr
+          role="row"
+          class="t-table__row"
+        >
           <th
             v-for="column in columns"
             :key="column.key"
+            role="columnheader"
             class="t-table__header"
             :class="[
               column.sortable ? 't-table__header--sortable' : '',
@@ -339,12 +392,17 @@ const tableAttrs = computed(() => {
           </th>
         </tr>
       </thead>
-      <tbody class="t-table__body">
+      <tbody
+        role="rowgroup"
+        class="t-table__body"
+      >
         <tr
           v-if="sortedRows.length === 0"
+          role="row"
           class="t-table__row t-table__row--empty"
         >
           <td
+            role="cell"
             :colspan="columns.length"
             class="t-table__cell t-table__cell--empty"
           >
@@ -358,6 +416,7 @@ const tableAttrs = computed(() => {
           :key="resolveRowKey(row, index)"
         >
           <tr
+            role="row"
             class="t-table__row"
             :class="[
               rowStateClass(row, index),
@@ -371,9 +430,24 @@ const tableAttrs = computed(() => {
             <td
               v-for="(column, columnIndex) in columns"
               :key="column.key"
+              role="cell"
               class="t-table__cell"
-              :class="column.align ? `t-table__cell--${column.align}` : ''"
+              :class="[
+                column.align ? `t-table__cell--${column.align}` : '',
+                stackBelow ? `t-table__cell--stack-${stackRole(column)}` : null,
+              ]"
             >
+              <!--
+                The column's label, for stacked mode. Rendered always and shown
+                only there: the header row is hidden in a block, so without
+                this the value is unlabelled — and the header being gone from
+                the accessibility tree too is what makes this the cell's own
+                label rather than a duplicate of one.
+              -->
+              <span
+                v-if="stackBelow && stackRole(column) === 'field'"
+                class="t-table__stack-label"
+              >{{ column.label }}</span>
               <!--
                 The stretched link lives in the FIRST cell and covers the row
                 through a pseudo-element. Any cell after it raises itself above

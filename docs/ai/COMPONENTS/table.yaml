@@ -5,6 +5,20 @@ source: TTable.vue
 description: Sortable, accessible data table with column definitions and row data.
 
 props:
+  stackBelow:
+    type: TBreakpoint
+    default: undefined
+    values: [sm, md, lg, xl]
+    description: >-
+      Below this CONTAINER width the grid becomes one block per row: the column
+      marked `stack="title"` is the block's heading, the rest sit under it, and
+      each value carries its column's label because the header row is gone.
+      Above it the table is unchanged, horizontal scroll included. Measured on
+      the wrapper and not the viewport — a table can sit in a narrow panel on a
+      wide screen, which is the case a media query cannot see. A breakpoint
+      name and not a free length: a container query cannot read a custom
+      property in its condition, so an arbitrary value would need a
+      ResizeObserver per table.
   columns:
     type: "TTableColumn[]"
     required: true
@@ -57,6 +71,13 @@ types:
     sortable: boolean (optional)
     align: "'left' | 'center' | 'right' (optional)"
     width: string (optional)
+    stack: |
+      'title' | 'field' | 'hidden' (optional, default 'field'). What the column
+      becomes in stacked mode. `title` makes it the block's heading and drops
+      its caption — there is at most one, and the first column declaring it
+      wins, because two headings in one block is not a block. `hidden` drops
+      the column from the block, for something that only makes sense beside its
+      neighbours. `field` shows the column's `label` above the value.
     minWidth: |
       string (optional). A width the column may not go below. Unlike `width`
       this is a real floor: under `table-layout: auto` — which is what this
@@ -118,3 +139,25 @@ row_activation:
       expandable and pointed at an id the consumer could not reach. The cell
       slot receives `detailId` and `expanded` so the control that actually
       toggles can carry them.
+
+behavior:
+  roles_are_declared_rather_than_implied: >-
+    `role` is on the table, both rowgroups, every row, every column header and
+    every cell. Each is the element's own implicit role, so nothing changes
+    while `display: table` holds — they exist to survive stacked mode, where
+    `display: block` drops the implicit table semantics in several screen
+    readers and the block would be announced as a run of unrelated text.
+    Measured in the accessibility tree: a stacked cell reads as
+    "Saldo real R$ 1.284,30", carrying its column.
+  containment_is_scoped_to_tables_that_use_it: >-
+    `container-type: inline-size` applies `contain: layout inline-size style`,
+    so it is set only on a wrapper carrying a `stack-below` modifier rather
+    than on every table in the library.
+  a_row_link_covers_the_whole_block: >-
+    Outside stacked mode every cell after the first is raised above the
+    stretched-link overlay, because those are neighbouring columns and one may
+    hold a button. Stacked, those same cells are plain text under the title, and
+    raising them punched a hole in the link. Inside the container query only
+    cells that actually contain something focusable are raised — and never the
+    first, which holds the overlay: positioning it makes it the overlay's
+    containing block, and `inset: 0` then covers that cell alone.

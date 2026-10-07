@@ -1,7 +1,7 @@
-component: TAvatar
+name: TAvatar
 status: available
 package: "@treeui/vue"
-source: TAvatar.vue
+source_file: packages/vue/src/components/TAvatar.vue
 description: User avatar that renders an image when `src` is set, otherwise initials derived from `alt`, plus an optional status indicator dot.
 
 props:

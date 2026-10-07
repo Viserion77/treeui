@@ -1,11 +1,15 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite';
 import { ref } from 'vue';
 import { TRadio, TRadioGroup } from '@treeui/vue';
+import { practiceNote } from './practice-refs';
 
 const meta = {
   title: 'Components/Data Entry/Radio',
   component: TRadioGroup,
   tags: ['autodocs'],
+  parameters: {
+    docs: { description: { component: practiceNote('TRadio') } },
+  },
   args: {
     size: 'md',
     disabled: false,

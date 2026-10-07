@@ -15,7 +15,7 @@ install:
 
 vue_setup:
   plugin_install:
-    import: "import TreeUIPlugin from '@treeui/vue'"
+    import: "import { TreeUIPlugin } from '@treeui/vue'"
     usage: "app.use(TreeUIPlugin)"
   individual_imports:
     import: "import { TButton, TInput, TModal } from '@treeui/vue'"
@@ -60,7 +60,7 @@ icons:
     `registerTreeIcons` and then uses those by name too, everywhere an icon is
     accepted.
   ships:
-    - "364 built-in names, reached by name — `<TIcon name=\"cpu\" />`, `icon: 'cpu'` on a nav item. The catalog covers interface, product, file, status, and action vocabulary using TreeUI's own descriptive kebab-case names."
+    - "370 built-in names (352 drawn glyphs + 18 aliases), reached by name — `<TIcon name=\"cpu\" />`, `icon: 'cpu'` on a nav item. The catalog covers interface, product, file, status, and action vocabulary using TreeUI's own descriptive kebab-case names."
     - "`listTreeIcons()` returns every registered name (built-ins plus anything the app registered), sorted — use it instead of hardcoding the list."
     - "The whole registry API is re-exported from `@treeui/vue`: `registerTreeIcons`, `resetTreeIcons`, `createTreeIcon`, `resolveTreeIcon`, `getTreeIcon`, `hasTreeIcon`, `listTreeIcons`, `treeIcons`, `builtinTreeIconNodes`, `treeIconDefaults`, and the `TIconName` / `TIconInput` / `TIconDefinition` / `TIconNode` / `TIconNodes` / `TIconRegistry` types. Registering icons needs no extra runtime dependency."
     - "`resetTreeIcons()` restores the registry to the icons TreeUI ships, dropping everything registered since. It exists for tests: the registry is process-wide mutable state, so call it in an `afterEach` or a registration in one case leaks into every case after it."
@@ -72,10 +72,10 @@ icons:
     - "Call `registerTreeIcons` once, near the application root, BEFORE anything renders — in `main.ts` beside `app.use(TreeUIPlugin)`, not inside a component's `setup`."
     - "Register a name before any component references it. A name that is not registered at render time resolves to nothing and warns."
   notes:
-    - "Registration is per name and idempotent. Registering one of the 364 built-in names REPLACES that built-in for the whole process, silently — that is how a built-in is swapped for a house version, so it must be deliberate. To ADD an icon, pick a name TreeUI does not ship (`orbit`, `webhook`, and `radar` are safe); `listTreeIcons()` or `hasTreeIcon(name)` tells you which names are taken."
-    - "Components are built lazily on first lookup and cached, so an icon nobody renders stays as data instead of becoming a component — registering a large set is cheap. This is not a bundle-size claim: the geometry for all 364 built-ins is held in a module-scope `Map`, so importing the package retains it and `sideEffects: false` does not tree-shake it away."
+    - "Registration is per name and idempotent. Registering one of the 370 built-in names REPLACES that built-in for the whole process, silently — that is how a built-in is swapped for a house version, so it must be deliberate. To ADD an icon, pick a name TreeUI does not ship (`orbit`, `webhook`, and `radar` are safe); `listTreeIcons()` or `hasTreeIcon(name)` tells you which names are taken."
+    - "Components are built lazily on first lookup and cached, so an icon nobody renders stays as data instead of becoming a component — registering a large set is cheap. This is not a bundle-size claim: the geometry is held in a module-scope `Map` with 370 entries pointing at 352 distinct geometry arrays (the 18 aliases share their target's array byte for byte), so importing the package retains all of it and `sideEffects: false` does not tree-shake it away."
     - "Every glyph inherits the surrounding text color through the root `currentColor` stroke and needs no color prop. Company logos are not built-ins; import the official SVG as an app-owned component and register it when needed."
-    - "The catalog includes 12 compatibility aliases with identical geometry: grid → layout-grid, share → share-nodes, chevron-updown → chevrons-up-down, refresh → refresh-cw, comment/chat → message-circle, check-square → square-check, help → circle-help, automations → zap, connections → external-link, persona → user-round, and close → x."
+    - "The catalog includes 18 compatibility aliases with identical geometry: trending-up → trend-up, microphone → mic, house → home, paper-plane → send, alert-circle → circle-alert, check-circle → circle-check, grid → layout-grid, share → share-nodes, chevron-updown → chevrons-up-down, refresh → refresh-cw, comment/chat → message-circle, check-square → square-check, help → circle-help, automations → zap, connections → external-link, persona → user-round, and close → x."
     - "Prefer a name over a component in application data (menu definitions, route metadata, API payloads). A string is never made reactive, while a component object stored in a `ref`/`reactive` triggers Vue's reactivity warning and needs `markRaw`."
     - "An unknown name renders nothing and logs a `console.warn` listing every valid name — once per name, and in production builds too, not dev-only. `TNavMenu` degrades to its letter marker rather than leaving a hole."
     - "Never hand-roll an `<svg>` for a missing icon. `createTreeIcon` applies `absoluteStrokeWidth`: it sets the stroke-width attribute to `(strokeWidth * 24) / size`, which cancels the 24-unit viewBox scale and paints a constant 2px at any size. A fixed `stroke-width=\"2\"` scales with the icon instead — 1.67px at size 20, 2.67px at 32, 4px at 48 — so it reads slightly thin when small and clearly bolder than its neighbours when large. Hand-rolling also loses the `size` / `strokeWidth` / `absoluteStrokeWidth` props and the `aria-hidden` default."
@@ -86,7 +86,7 @@ icons:
   example: |
     // main.ts — once, before mount
     import { createApp } from 'vue';
-    import TreeUIPlugin, { registerTreeIcons } from '@treeui/vue';
+    import { TreeUIPlugin, registerTreeIcons } from '@treeui/vue';
     import WebhookIcon from './icons/WebhookIcon.vue';
     import '@treeui/vue/style.css';
     import App from './App.vue';

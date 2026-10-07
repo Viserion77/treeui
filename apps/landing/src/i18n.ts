@@ -108,7 +108,7 @@ const en: LandingMessages = {
     ariaLabel: 'Documentation',
     vueBadge: 'Stable',
     vueBody:
-      'The complete library: 60+ production components, a plugin, full type exports, and the entire design-system documentation.',
+      'The complete library: 100+ production components, a plugin, full type exports, and the entire design-system documentation.',
     vueGo: 'Open Vue docs →',
     reactBadge: 'Early',
     reactBody:
@@ -192,7 +192,7 @@ const pt: LandingMessages = {
     ariaLabel: 'Documentação',
     vueBadge: 'Estável',
     vueBody:
-      'A biblioteca completa: mais de 60 componentes de produção, um plugin, exports de tipos e toda a documentação do design system.',
+      'A biblioteca completa: mais de 100 componentes de produção, um plugin, exports de tipos e toda a documentação do design system.',
     vueGo: 'Abrir docs Vue →',
     reactBadge: 'Inicial',
     reactBody:
@@ -313,7 +313,7 @@ const es: LandingMessages = {
     ariaLabel: 'Documentación',
     vueBadge: 'Estable',
     vueBody:
-      'La librería completa: más de 60 componentes de producción, un plugin, exports de tipos y toda la documentación del design system.',
+      'La librería completa: más de 100 componentes de producción, un plugin, exports de tipos y toda la documentación del design system.',
     vueGo: 'Abrir docs Vue →',
     reactBadge: 'Inicial',
     reactBody:

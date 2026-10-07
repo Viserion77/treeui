@@ -425,7 +425,7 @@ The rules, and which ones fail a build:
 | | Positions land on a **0.25u** step, and glyphs sit on one of four keylines — square **17.5**, circle **⌀18.5**, wide **18×14**, tall **14×18** | guidance |
 | `peso-unico` | `stroke-width`, `stroke-linecap`, `stroke-linejoin`, `stroke` and `fill` are owned by the root `<svg>`; only the seven allowed primitives are used | error |
 | `legivel-a-16px` | Every pair of canonical icons differs by at least **5% of its ink at 16px** | error |
-| `toda-forma-significa-algo` | Every node changes at least **1% of the glyph's ink**; nothing is drawn for technical reasons | error |
+| `toda-forma-significa-algo` | Every node changes at least **1% of the glyph's ink (at 32px)**; nothing is drawn for technical reasons | error |
 | `modificador-tem-territorio` | A corner modifier keeps **5.5u** of clear canvas around it; the base is interrupted, never crowded | error |
 | `um-conceito-um-nome` | An alias shares its target's geometry exactly, and no two canonical names share a drawing | error |
 

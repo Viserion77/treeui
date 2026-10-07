@@ -51,10 +51,10 @@ export type TvProps<V extends VariantOptions> = VariantSelection<V> & { class?: 
  *
  * @example
  * const button = tv({
- *   base: 'tree-button',
- *   variants: { variant: { solid: 'tree-button--solid' }, size: { md: 'tree-button--md' } },
+ *   base: 't-button',
+ *   variants: { variant: { solid: 't-button--solid' }, size: { md: 't-button--md' } },
  * });
- * button({ variant: 'solid', size: 'md' }); // 'tree-button tree-button--solid tree-button--md'
+ * button({ variant: 'solid', size: 'md' }); // 't-button t-button--solid t-button--md'
  */
 export const tv = <V extends VariantOptions>(config: TvConfig<V>) => {
   const { base, variants, defaultVariants, compoundVariants } = config;

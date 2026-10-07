@@ -1,10 +1,14 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite';
 import { TText } from '@treeui/vue';
+import { practiceNote } from './practice-refs';
 
 const meta = {
   title: 'Components/Data Display/Text',
   component: TText,
   tags: ['autodocs'],
+  parameters: {
+    docs: { description: { component: practiceNote('TText') } },
+  },
   args: {
     as: 'span',
     size: 'md',

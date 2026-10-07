@@ -1,7 +1,7 @@
 # Pricing — Component Contract
 # Components: TPricingCard, TPricing
 
-component: PricingCard
+name: TPricingCard
 source_file: packages/vue/src/components/TPricingCard.vue
 status: available
 category: data-display
@@ -119,7 +119,7 @@ a11y:
 
 ---
 
-component: Pricing
+name: TPricing
 source_file: packages/vue/src/components/TPricing.vue
 status: available
 category: data-display

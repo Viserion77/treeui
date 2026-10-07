@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from '@storybook/vue3-vite';
 import { TTimeline } from '@treeui/vue';
 import type { TTimelineItem } from '@treeui/vue';
 import { CheckIcon, InfoIcon, iconProps } from './icon-helpers';
+import { practiceNote } from './practice-refs';
 
 const releaseEvents: TTimelineItem[] = [
   {
@@ -56,6 +57,9 @@ const meta = {
   title: 'Components/Data Display/Timeline',
   component: TTimeline,
   tags: ['autodocs'],
+  parameters: {
+    docs: { description: { component: practiceNote('TTimeline') } },
+  },
   args: {
     size: 'md',
     items: releaseEvents,

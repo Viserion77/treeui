@@ -9,16 +9,24 @@ Use the setup in [README.md](./README.md#getting-started) to install dependencie
 Run the quality gates — the same commands CI runs:
 
 ```bash
-pnpm lint                  # ESLint, zero warnings
-pnpm typecheck             # TypeScript strict mode across every workspace package
-pnpm codegen:native:check  # the ports' generated token source matches the model
-pnpm test                  # Vitest unit tests with coverage
-pnpm build:site            # what CI builds: packages + landing + both Storybooks + examples
+pnpm lint                        # ESLint, zero warnings
+pnpm typecheck                   # TypeScript strict mode across every workspace package
+pnpm codegen:native:check        # the ports' generated token source matches the model
+pnpm test                        # Vitest unit tests with coverage
+pnpm build:site                  # what CI builds: packages + landing + both Storybooks + examples
+pnpm typecheck:strict-templates  # typechecks consumer templates against the built package (strictTemplates)
+pnpm check:theme                 # validates the example's accent presets against the colour contract
 ```
 
 If `codegen:native:check` fails, run `pnpm codegen:native` and commit what it
 writes. It means the token model changed and the Kotlin and Rust ports are
 carrying the previous release's values.
+
+`typecheck:strict-templates` and `check:theme` both read the **built**
+package, not the source, so they run after `build:site` here — in CI they sit
+between the dedicated `build:packages` step and the `build:site` step, but
+this list has no standalone `build:packages` line, since `build:site` already
+runs it first.
 
 If your change touches interaction or accessibility, also run:
 

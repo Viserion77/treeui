@@ -1032,7 +1032,7 @@ component_profiles:
     registering:
       - "Geometry: `registerTreeIcons({ orbit: [['circle', { cx: 12, cy: 12, r: 10 }], ['path', { d: '...' }]] })` — nodes are drawn on a 24x24 grid."
       - "Components: `registerTreeIcons({ webhook: WebhookIcon })` also accepts ready app-owned components under a registry name."
-      - "Pick names TreeUI does not already ship — `orbit`, `webhook`, and `radar` are safe; `cpu`, `server`, `workflow`, `boxes`, and `circle-dot` are built-ins. Registering any of the 364 built-in names REPLACES it process-wide with no warning. That is the supported way to swap a built-in for a house version, but it must be the intent, not an accident."
+      - "Pick names TreeUI does not already ship — `orbit`, `webhook`, and `radar` are safe; `cpu`, `server`, `workflow`, `boxes`, and `circle-dot` are built-ins. Registering any of the 370 built-in names REPLACES it process-wide with no warning. That is the supported way to swap a built-in for a house version, but it must be the intent, not an accident."
       - "Call it once near the app root, and augment `TIconRegistry` through `declare module '@treeui/icons'` for autocomplete and typo-checking. Registering later is safe — lookups are reactive. Full wiring is in SETUP.yaml → `icons`."
       - "In tests, call `resetTreeIcons()` in an `afterEach`. The registry is process-wide mutable state, so a registered (or replaced) icon otherwise leaks into every later test."
       - "An unknown name resolves to `undefined` and logs a warning — in production builds too, once per name — listing every valid name; `TNavMenu` falls back to its letter marker rather than rendering a hole."

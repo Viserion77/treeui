@@ -1,7 +1,7 @@
-component: TTable
+name: TTable
 status: available
 package: "@treeui/vue"
-source: TTable.vue
+source_file: packages/vue/src/components/TTable.vue
 description: Sortable, accessible data table with column definitions and row data.
 
 props:
@@ -49,11 +49,50 @@ props:
     required: false
     description: "Semantic per-row state applied by data, not position, so it survives sorting. `muted` recesses a row (e.g. a resource that no longer exists) via `t-table__row--muted`, written at compound specificity so it wins over the zebra/hover rules."
     a11y_note: "Dimming is a visual aid only, never the sole signal — pair `muted` with a status cell (TBadge/TTag) or visually hidden text conveying the same meaning, per the accessible-by-default practice."
+  rowHref:
+    type: "(row: Record<string, unknown>, index: number) => string | undefined"
+    default: undefined
+    description: >-
+      The row NAVIGATES: a real `href` per row, rendered as an `<a>` in the
+      first cell and stretched over the whole row via `::after`, so
+      ctrl/middle-click, "open in new tab", and the status-bar URL all work
+      and the accessible role is `link`. Mutually exclusive with `rowTo` and
+      `rowActivatable` — dev builds warn. The affordance follows the RESOLVED
+      target: a row whose function returns `undefined` renders no link and
+      gets no pointer.
+  rowTo:
+    type: "(row: Record<string, unknown>, index: number) => string | undefined"
+    default: undefined
+    description: "Same as `rowHref`, resolved through the app's RouterLink instead of a plain `<a>`."
+  rowLabel:
+    type: "(row: Record<string, unknown>, index: number) => string"
+    default: undefined
+    description: >-
+      Accessible name for the row's activator, per row — used by BOTH
+      `rowHref`/`rowTo` and `rowActivatable`. Required with the former and
+      strongly advised with the latter: without it the name is every cell
+      concatenated, repeated for every row.
+  rowActivatable:
+    type: boolean
+    default: false
+    description: >-
+      The row ACTIVATES something that is not a route — a modal, a selection.
+      Renders a real `<button>` in the first cell, stretched over the row the
+      same way `rowHref` does, rather than `role="button"` on the `<tr>`,
+      which would make every cell presentational and destroy the table's grid
+      semantics. Mutually exclusive with `rowHref`/`rowTo` — dev builds warn.
+  expandedRow:
+    type: "string | number | null"
+    default: null
+    description: "Key of the row whose detail panel is open, matched against the identity `rowKey` resolves."
 
 events:
   sort:
     payload: "TTableSortState"
     description: Emitted when a sortable column header is clicked.
+  row-activate:
+    payload: "[row: Record<string, unknown>, index: number]"
+    description: "Emitted when an activatable row is activated without navigating — see `rowActivatable`."
 
 slots:
   "cell-{key}":
@@ -63,6 +102,9 @@ slots:
     description: Custom header renderer for a specific column. Receives `{ column }`.
   empty:
     description: Content shown when rows array is empty.
+  detail:
+    description: Detail panel for the expanded row, rendered as a `<tr>` adjacent to its own row. Receives `{ row, index }`.
+    note: "Shown only when `expandedRow` matches the row's resolved key. `aria-expanded`/`aria-controls` are not put on the `<tr>` — the cell slot rendering the toggle gets `detailId` and `expanded` to carry them itself."
 
 types:
   TTableColumn:

@@ -1,11 +1,15 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite';
 import { ref } from 'vue';
 import { TTextarea } from '@treeui/vue';
+import { practiceNote } from './practice-refs';
 
 const meta = {
   title: 'Components/Data Entry/Textarea',
   component: TTextarea,
   tags: ['autodocs'],
+  parameters: {
+    docs: { description: { component: practiceNote('TTextarea') } },
+  },
   args: {
     size: 'md',
     disabled: false,

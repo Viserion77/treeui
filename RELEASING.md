@@ -101,10 +101,15 @@ Required check for branch protection. Steps:
    Fix with `pnpm codegen:native` and commit the result.
 5. `pnpm test` (Vitest)
 6. `pnpm build:packages`
-7. `pnpm build:site` (landing + Vue/React Storybooks + example dashboards)
-8. `pnpm exec playwright install --with-deps chromium`
-9. `pnpm test:e2e` (with `PW_SKIP_BUILD=1`, reusing the build from step 7)
-10. Uploads the `site` artifact for the pages job.
+7. `pnpm typecheck:strict-templates` — typechecks consumer-app templates with
+   `strictTemplates` against the package just built in step 6, not the source.
+8. `pnpm check:theme` — validates the example dashboard's accent presets
+   against the colour contract; the validator is also imported from the
+   built package.
+9. `pnpm build:site` (landing + Vue/React Storybooks + example dashboards)
+10. `pnpm exec playwright install --with-deps chromium`
+11. `pnpm test:e2e` (with `PW_SKIP_BUILD=1`, reusing the build from step 9)
+12. Uploads the `site` artifact for the pages job.
 
 ### `kotlin` and `rust` jobs (run on every PR and on push to `main`)
 
@@ -280,8 +285,8 @@ release-specific commands are:
 ```bash
 pnpm build:packages                   # build the six published packages only
 pnpm changeset                        # create a changeset entry
-pnpm changeset status                 # list pending changesets
-pnpm ai:catalog                       # regenerate docs/ai/treeui.catalog.json
+pnpm changeset:status                 # list pending changesets since origin/main
+pnpm ai:catalog                       # regenerate docs/ai/treeui.catalog.json and packages/mcp/src/generated/treeui.catalog.json
 pnpm codegen:native                   # regenerate the ports' token source
 pnpm codegen:native:check             # fail if that source is stale (runs in CI)
 pnpm mcp:start                        # run the local TreeUI MCP server

@@ -62,7 +62,8 @@ packages/compose             Kotlin component package for Android (Jetpack Compo
 packages/egui                Rust component crates for the desktop (egui)
 packages/mcp                 TreeUI AI catalog and MCP server for coding agents
 docs/ai                      Machine-oriented contracts for tools and agents
-tooling                      Docker, ESLint, and TypeScript shared config
+assets                       Self-hosted fonts used by the Vue and React Storybooks
+tooling                      Docker, ESLint, TypeScript config, and the strictTemplates gate
 scripts                      Site assembly, static serving, and asset scripts
 tests                        Playwright end-to-end specs
 ```

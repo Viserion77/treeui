@@ -1,7 +1,7 @@
 # TContextMenu
 # Right-click floating menu anchored at cursor position.
 
-component: TContextMenu
+name: TContextMenu
 source_file: packages/vue/src/components/TContextMenu.vue
 since: 0.5.0
 status: available

@@ -1,7 +1,7 @@
 {
-  "generatedAt": "0.33.0",
+  "generatedAt": "0.34.0",
   "packageName": "@treeui/vue",
-  "packageVersion": "0.33.0",
+  "packageVersion": "0.34.0",
   "decisionGuides": [
     {
       "id": "single-choice",
@@ -461,7 +461,7 @@
         "`TNavMenuItem.icon` is `TIconInput`, so a component is accepted too. Prefer the name: `items` normally lives in a `ref`, a `computed`, or a route config, and a string is never made reactive — a component object there needs `markRaw` or Vue warns.",
         "An item with no icon (or an unregistered name) falls back to a letter marker, and a `console.warn` lists the valid names — once per name, in production builds too. Give every item an icon before shipping a collapsible rail, or the collapsed state is a column of letters.",
         "Icons the app needs but TreeUI does not ship are REGISTERED, not worked around: one `registerTreeIcons` call in `main.ts` and they are usable by name everywhere. Never hand-roll an `<svg>` — without the `absoluteStrokeWidth` correction its stroke scales with the icon (1.67px at size 20, 4px at 48), so it looks bolder than its neighbours at every size above 24.",
-        "Check the name is not already taken before registering it — `hasTreeIcon(name)` answers that. Registering one of the 364 built-in names replaces that built-in everywhere, silently, which is a supported swap but never what you want when the goal was adding an icon.",
+        "Check the name is not already taken before registering it — `hasTreeIcon(name)` answers that. Registering one of the 370 built-in names replaces that built-in everywhere, silently, which is a supported swap but never what you want when the goal was adding an icon.",
         "Keep the icon vocabulary consistent: built-ins use TreeUI's descriptive kebab-case names, so register custom ones with the same convention.",
         "Icon registration is process-wide state. In component tests that register icons, call `resetTreeIcons()` in an `afterEach` so one case's icons do not leak into the next.",
         "Set `to` for the route target on each item — `TNavMenuItem` has no `href` and no `id`; identity is `value`.",
@@ -982,7 +982,7 @@
     },
     "vueSetup": {
       "pluginInstall": {
-        "import": "import TreeUIPlugin from '@treeui/vue'",
+        "import": "import { TreeUIPlugin } from '@treeui/vue'",
         "usage": "app.use(TreeUIPlugin)"
       },
       "individualImports": {
@@ -11673,6 +11673,35 @@
           "type": "(row, index) => 'default' | 'muted'",
           "required": false,
           "description": "Semantic per-row state applied by data, not position, so it survives sorting. `muted` recesses a row (e.g. a resource that no longer exists) via `t-table__row--muted`, written at compound specificity so it wins over the zebra/hover rules."
+        },
+        {
+          "name": "rowHref",
+          "type": "(row: Record<string, unknown>, index: number) => string | undefined",
+          "default": "undefined",
+          "description": "The row NAVIGATES: a real `href` per row, rendered as an `<a>` in the first cell and stretched over the whole row via `::after`, so ctrl/middle-click, \"open in new tab\", and the status-bar URL all work and the accessible role is `link`. Mutually exclusive with `rowTo` and `rowActivatable` — dev builds warn. The affordance follows the RESOLVED target: a row whose function returns `undefined` renders no link and gets no pointer."
+        },
+        {
+          "name": "rowTo",
+          "type": "(row: Record<string, unknown>, index: number) => string | undefined",
+          "default": "undefined",
+          "description": "Same as `rowHref`, resolved through the app's RouterLink instead of a plain `<a>`."
+        },
+        {
+          "name": "rowLabel",
+          "type": "(row: Record<string, unknown>, index: number) => string",
+          "default": "undefined",
+          "description": "Accessible name for the row's activator, per row — used by BOTH `rowHref`/`rowTo` and `rowActivatable`. Required with the former and strongly advised with the latter: without it the name is every cell concatenated, repeated for every row."
+        },
+        {
+          "name": "rowActivatable",
+          "type": "boolean",
+          "default": "false",
+          "description": "The row ACTIVATES something that is not a route — a modal, a selection. Renders a real `<button>` in the first cell, stretched over the row the same way `rowHref` does, rather than `role=\"button\"` on the `<tr>`, which would make every cell presentational and destroy the table's grid semantics. Mutually exclusive with `rowHref`/`rowTo` — dev builds warn."
+        },
+        {
+          "name": "expandedRow",
+          "type": "string | number | null",
+          "description": "Key of the row whose detail panel is open, matched against the identity `rowKey` resolves."
         }
       ],
       "events": [
@@ -11680,6 +11709,11 @@
           "name": "sort",
           "description": "Emitted when a sortable column header is clicked.",
           "payload": "TTableSortState"
+        },
+        {
+          "name": "row-activate",
+          "description": "Emitted when an activatable row is activated without navigating — see `rowActivatable`.",
+          "payload": "[row: Record<string, unknown>, index: number]"
         }
       ],
       "slots": [
@@ -11694,6 +11728,10 @@
         {
           "name": "empty",
           "description": "Content shown when rows array is empty."
+        },
+        {
+          "name": "detail",
+          "description": "Detail panel for the expanded row, rendered as a `<tr>` adjacent to its own row. Receives `{ row, index }`."
         }
       ],
       "a11y": [

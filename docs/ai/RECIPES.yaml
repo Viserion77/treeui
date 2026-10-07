@@ -106,7 +106,7 @@ recipes:
       - "`TNavMenuItem.icon` is `TIconInput`, so a component is accepted too. Prefer the name: `items` normally lives in a `ref`, a `computed`, or a route config, and a string is never made reactive — a component object there needs `markRaw` or Vue warns."
       - "An item with no icon (or an unregistered name) falls back to a letter marker, and a `console.warn` lists the valid names — once per name, in production builds too. Give every item an icon before shipping a collapsible rail, or the collapsed state is a column of letters."
       - "Icons the app needs but TreeUI does not ship are REGISTERED, not worked around: one `registerTreeIcons` call in `main.ts` and they are usable by name everywhere. Never hand-roll an `<svg>` — without the `absoluteStrokeWidth` correction its stroke scales with the icon (1.67px at size 20, 4px at 48), so it looks bolder than its neighbours at every size above 24."
-      - "Check the name is not already taken before registering it — `hasTreeIcon(name)` answers that. Registering one of the 364 built-in names replaces that built-in everywhere, silently, which is a supported swap but never what you want when the goal was adding an icon."
+      - "Check the name is not already taken before registering it — `hasTreeIcon(name)` answers that. Registering one of the 370 built-in names replaces that built-in everywhere, silently, which is a supported swap but never what you want when the goal was adding an icon."
       - "Keep the icon vocabulary consistent: built-ins use TreeUI's descriptive kebab-case names, so register custom ones with the same convention."
       - "Icon registration is process-wide state. In component tests that register icons, call `resetTreeIcons()` in an `afterEach` so one case's icons do not leak into the next."
       - "Set `to` for the route target on each item — `TNavMenuItem` has no `href` and no `id`; identity is `value`."
@@ -114,7 +114,7 @@ recipes:
     example: |
       // main.ts — register the icons this app needs, once, before mount
       import { createApp } from 'vue';
-      import TreeUIPlugin, { registerTreeIcons } from '@treeui/vue';
+      import { TreeUIPlugin, registerTreeIcons } from '@treeui/vue';
       import '@treeui/vue/style.css';
       import App from './App.vue';
 

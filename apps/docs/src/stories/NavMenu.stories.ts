@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite';
 import { ref } from 'vue';
 import { TNavMenu } from '@treeui/vue';
+import { practiceNote } from './practice-refs';
 
 const items = [
   { label: 'Overview', value: 'overview', description: 'Summary and activity', badge: '12', shortLabel: 'O' },
@@ -19,6 +20,9 @@ const meta = {
   title: 'Components/Layout/NavMenu',
   component: TNavMenu,
   tags: ['autodocs'],
+  parameters: {
+    docs: { description: { component: practiceNote('TNavMenu') } },
+  },
   args: {
     size: 'md',
     collapsed: false,

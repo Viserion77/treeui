@@ -1,11 +1,15 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite';
 import { TCard, TStat, TStatGroup, TText } from '@treeui/vue';
 import { CheckIcon, InfoIcon, iconProps } from './icon-helpers';
+import { practiceNote } from './practice-refs';
 
 const meta = {
   title: 'Components/Data Display/Stat',
   component: TStat,
   tags: ['autodocs'],
+  parameters: {
+    docs: { description: { component: practiceNote('TStat', 'TStatGroup') } },
+  },
   args: {
     label: 'Monthly recurring revenue',
     value: '$48.2k',

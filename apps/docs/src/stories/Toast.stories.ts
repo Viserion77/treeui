@@ -6,7 +6,7 @@ const meta = {
   title: 'Components/Feedback/Toast',
   component: TToastProvider,
   parameters: {
-    docs: { description: { component: practiceNote('TToastProvider') } },
+    docs: { description: { component: practiceNote('TToast', 'TToastProvider') } },
   },
   tags: ['autodocs'],
   args: {

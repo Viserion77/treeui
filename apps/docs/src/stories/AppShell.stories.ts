@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite';
 import { ref } from 'vue';
 import { TAppShell, TAvatar, TBadge, TButton, TNavMenu } from '@treeui/vue';
+import { practiceNote } from './practice-refs';
 
 const items = [
   { label: 'Overview', value: 'overview', description: 'Summary and recent work', shortLabel: 'O' },
@@ -17,6 +18,7 @@ const meta = {
   parameters: {
     // The shell fills the viewport, so give it the whole canvas.
     layout: 'fullscreen',
+    docs: { description: { component: practiceNote('TAppShell') } },
   },
   args: {
     side: 'left',

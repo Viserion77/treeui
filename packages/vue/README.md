@@ -1,6 +1,6 @@
 # @treeui/vue
 
-Vue 3 component library with 40+ accessible, themeable components built on design tokens.
+Vue 3 component library with 100+ accessible, themeable components built on design tokens.
 
 ## Install
 
@@ -16,11 +16,11 @@ Install `@treeui/tokens` only when you need direct access to the token package o
 
 ```ts
 import { createApp } from 'vue'
-import TreeUI from '@treeui/vue'
+import { TreeUIPlugin } from '@treeui/vue'
 import '@treeui/vue/style.css'
 
 const app = createApp(App)
-app.use(TreeUI)
+app.use(TreeUIPlugin)
 app.mount('#app')
 ```
 
@@ -37,31 +37,28 @@ import '@treeui/vue/style.css'
 
 - Install `@treeui/vue`
 - Import `@treeui/vue/style.css` once
-- Use `app.use(TreeUI)` or named imports
+- Use `app.use(TreeUIPlugin)` or named imports
 - Mount `TToastProvider` once near the app root if you use `useToast()`
 - Use `TFormField` as the wrapper for labels, hints, and errors
 
 ## Components
 
-### Form
+100+ components across a handful of families, all sharing the same design
+tokens, the `sm | md | lg` size scale, and the same action variants:
 
-`TInput` · `TTextarea` · `TCheckbox` · `TCombobox` · `TFileUpload` · `TRadio` · `TRadioGroup` · `TSelect` · `TMultiSelect` · `TNumberInput` · `TDatePicker` · `TDateTimePicker` · `TSwitch` · `TFormField` · `TToggleGroup` · `TMarkdownEditor`
+- **Forms & data entry** — text and selection inputs, date and time pickers, file upload, a markdown editor.
+- **Layout & app shell** — containers, grids, stacks, sidebar and navigation shell, accordions, cards, tabs.
+- **Data display & data-viz** — badges, tags, avatars, timelines, stats, and a lightweight, dependency-free chart set.
+- **Overlays** — modals, drawers, dropdowns, popovers, tooltips, context menus, toasts.
+- **Navigation** — breadcrumbs, pagination, steps, tree views, selectable lists.
+- **Feedback** — alerts, progress, spinners, skeletons, empty states.
 
-### Layout
-
-`TContainer` · `TGrid` · `TStack` · `TSidebar` · `TNavMenu` · `TNavbar` / `TAppBar` · `TAccordion` · `TAccordionItem` · `TCard` · `TDivider` · `TTable` · `TTabs` · `TTabList` · `TTab` · `TTabPanel` · `TBreadcrumb` · `TBreadcrumbItem` · `TSelectableList` · `TTreeView` · `TSteps` / `TStepper` · `TPricing` · `TPricingCard`
-
-### Display
-
-`TBadge` · `TAlert` · `TAvatar` · `TEmptyState` · `TTag` · `TTimeline` · `TSpinner` · `TProgress` · `TSkeleton` · `TStat`
-
-### Charts
-
-`TChart` (line / area / bar) · `TSparkline` · `TDonutChart` — a lightweight, dependency-free data-viz set sharing a framework-agnostic geometry engine in `@treeui/utils` and the `--tree-color-chart-*` palette.
-
-### Overlay & Interaction
-
-`TButton` · `TModal` · `TConfirmDialog` · `TDrawer` · `TDropdown` · `TPopover` · `TTooltip` · `TContextMenu` · `TPagination` · `TToast` · `TToastProvider`
+A hand-kept name-by-name list here would drift from what the package actually
+ships — the generated **Foundation/Components** index in the published [Vue
+Storybook](https://viserion77.github.io/treeui/vue/) is built from the same
+catalog the library exports, so it cannot fall behind. For tooling and coding
+agents, `docs/ai/CONTRACTS.yaml` → `primary_exports` is the machine-readable
+list.
 
 ### Table composition
 

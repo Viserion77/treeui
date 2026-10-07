@@ -1,7 +1,7 @@
-component: TFormField
+name: TFormField
 status: available
 package: "@treeui/vue"
-source: TFormField.vue
+source_file: packages/vue/src/components/TFormField.vue
 description: >
   Label + input wrapper with error and hint slots.
   Provides consistent layout, labelling, and validation messaging for any form control.

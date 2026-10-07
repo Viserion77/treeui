@@ -2,11 +2,15 @@ import type { Meta, StoryObj } from '@storybook/vue3-vite';
 import { ref } from 'vue';
 import { TButton, TDatePicker } from '@treeui/vue';
 import { InfoIcon, iconProps } from './icon-helpers';
+import { practiceNote } from './practice-refs';
 
 const meta = {
   title: 'Components/Data Entry/DatePicker',
   component: TDatePicker,
   tags: ['autodocs'],
+  parameters: {
+    docs: { description: { component: practiceNote('TDatePicker') } },
+  },
   args: {
     size: 'md',
     disabled: false,

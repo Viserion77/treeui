@@ -5,11 +5,15 @@ import type {
   TFileUploadRetryPayload,
   TFileUploadState,
 } from '@treeui/vue';
+import { practiceNote } from './practice-refs';
 
 const meta = {
   title: 'Components/Data Entry/FileUpload',
   component: TFileUpload,
   tags: ['autodocs'],
+  parameters: {
+    docs: { description: { component: practiceNote('TFileUpload') } },
+  },
   args: {
     size: 'md',
     multiple: true,

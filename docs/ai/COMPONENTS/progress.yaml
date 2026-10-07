@@ -1,4 +1,4 @@
-component: TProgress
+name: TProgress
 source_file: packages/vue/src/components/TProgress.vue
 package: "@treeui/vue"
 since: "0.2.0"

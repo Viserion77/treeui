@@ -36,7 +36,7 @@ A component takes the narrowest union it can honestly render. Do not widen one t
 
 ## Density
 
-**TreeUI has no density axis.** Spacing density is expressed through the existing `size` prop (`sm | md | lg`), which 50 components accept.
+**TreeUI has no density axis.** Spacing density is expressed through the existing `size` prop (`sm | md | lg`), which 57 components accept.
 
 Four components deliberately spell `size` differently, because they are not sizing a control:
 

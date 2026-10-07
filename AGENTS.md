@@ -120,7 +120,7 @@ changes, update `docs/ai/practices.json`.
   `packages/icons/README.md` and `docs/ai/STANDARDS.yaml` → `icons.branchline`. The rules
   are enforced by rendering, not by review: `branchline.test.ts` fails a build when two
   icons differ by less than 5% of their ink at 16px, or when any node changes less than 1%
-  of a glyph's ink. Never derive geometry from an icon's name.
+  of a glyph's ink at 32px. Never derive geometry from an icon's name.
 - **Sizes**: `sm | md | lg` — shared across most components.
 - **Action variants**: `solid | outline | ghost | soft | danger`.
 - **Card variants**: `outline | soft | inset` — a surface scale, not action variants. `solid` is
@@ -177,11 +177,13 @@ Run before any PR — [CONTRIBUTING.md](./CONTRIBUTING.md#before-opening-a-pull-
 owns this list and its Docker equivalents:
 
 ```bash
-pnpm lint          # ESLint, zero warnings
-pnpm typecheck     # TypeScript strict mode across every workspace package
-pnpm test          # Vitest unit tests with coverage
-pnpm build:site    # what CI builds: packages + landing + both Storybooks + examples
-pnpm test:e2e      # Playwright; optional locally, required in CI
+pnpm lint                        # ESLint, zero warnings
+pnpm typecheck                   # TypeScript strict mode across every workspace package
+pnpm test                        # Vitest unit tests with coverage
+pnpm build:site                  # what CI builds: packages + landing + both Storybooks + examples
+pnpm typecheck:strict-templates  # typechecks consumer templates against the built package (strictTemplates)
+pnpm check:theme                 # validates the example's accent presets against the colour contract
+pnpm test:e2e                    # Playwright; optional locally, required in CI
 ```
 
 When touching the token model, regenerate the ports' source and check it in —

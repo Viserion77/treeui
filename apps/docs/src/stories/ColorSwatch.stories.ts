@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite';
 import { ref } from 'vue';
 import { TColorSwatch } from '@treeui/vue';
+import { practiceNote } from './practice-refs';
 
 const presets = [
   { label: 'Ocean blue', value: '#0969da' },
@@ -14,6 +15,9 @@ const meta = {
   title: 'Components/Data Entry/ColorSwatch',
   component: TColorSwatch,
   tags: ['autodocs'],
+  parameters: {
+    docs: { description: { component: practiceNote('TColorSwatch') } },
+  },
   args: {
     options: presets,
     allowCustom: true,

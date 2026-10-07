@@ -1,4 +1,4 @@
-component: TMarkdownEditor
+name: TMarkdownEditor
 source_file: packages/vue/src/components/TMarkdownEditor.vue
 status: available
 since: 0.x.x

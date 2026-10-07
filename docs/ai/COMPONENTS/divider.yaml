@@ -1,7 +1,7 @@
-component: TDivider
+name: TDivider
 status: available
 package: "@treeui/vue"
-source: TDivider.vue
+source_file: packages/vue/src/components/TDivider.vue
 description: >
   Horizontal or vertical visual separator. Renders a single native <hr> and nothing else —
   there is no default slot, so the "text in the middle of a rule" pattern (an "OR" divider)

@@ -11,8 +11,8 @@ TreeUI ships a local Model Context Protocol server so coding agents can:
 ## What it serves
 
 - a generated catalog built from `docs/ai/*.yaml` and `@treeui/tokens`
-- MCP resources for catalog, setup, selection, recipes, tokens, and per-component metadata
-- MCP tools for search, recommendation, setup lookup, recipe search, and token search
+- 7 MCP resources: `treeui://catalog`, `treeui://selection`, `treeui://setup`, `treeui://recipes`, `treeui://practices`, `treeui://tokens`, and `treeui://components/<name>` (one per component)
+- 6 MCP tools: `search_components`, `recommend_components`, `get_component`, `get_setup_guide`, `search_recipes`, `search_tokens`
 
 ## Token search
 

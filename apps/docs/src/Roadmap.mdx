@@ -18,6 +18,8 @@ Milestones 1–3 are complete and part of the public surface:
 - **Milestone 3 — Routing, cards & inline links**: `TNavMenu` RouterLink support, `TCard` `title` prop and `#actions` slot, `TCard variant="inset"`, `TLink`.
 - **Data visualization**: `TChart`, `TSparkline`, `TDonutChart`, sharing a framework-agnostic geometry engine in `@treeui/utils` and the `--tree-color-chart-*` palette.
 - **React package**: `@treeui/react` ships the core primitives on the same tokens and `t-*` classes.
+- **Android / Compose**: `packages/compose` (`treeui-tokens`, `treeui-compose`) — token layer complete, component set starting (`TButton`, `TBadge`, `TCard`).
+- **Desktop / Rust**: `packages/egui` (`treeui-tokens`, `treeui-egui`) — token layer complete, component set starting (`TButton`, `TBadge`, `TCard`).
 
 ## Planned
 
@@ -29,6 +31,7 @@ Milestones 1–3 are complete and part of the public surface:
 | Motion token expansion | More duration/easing steps and a reduced-motion contract. Not started. |
 | Theme builder | Visual token editor on top of `@treeui/tokens`. Exploratory. |
 | Additional framework packages | `@treeui/svelte` and Web Components reusing the same tokens, naming, and accessibility guidance. Exploratory. |
+| Storybook coverage for shipped components | `TPane`, `TDropVeil`, `TCalendar` / `TCalendarMonthGrid` / `TCalendarTimeGrid`, `TSpanLanes`, `TAudioPlayer`, `TVoiceRecorder` are implemented and exported but have no story file, so they render with no link in the generated Foundation/Components index. Not started. |
 
 ## Table direction
 

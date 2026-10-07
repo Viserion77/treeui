@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from '@storybook/vue3-vite';
 import type { ComponentProps } from 'vue-component-type-helpers';
 import { ref } from 'vue';
 import { TStack, TText, TToggleGroup } from '@treeui/vue';
+import { practiceNote } from './practice-refs';
 
 // `TToggleGroup` is generic over its option type AND its selection mode, so
 // `typeof TToggleGroup` is a generic FUNCTION, which Storybook's
@@ -21,6 +22,9 @@ const meta: Meta<TToggleGroupArgs> = {
   title: 'Components/Data Entry/ToggleGroup',
   component: TToggleGroup as never,
   tags: ['autodocs'],
+  parameters: {
+    docs: { description: { component: practiceNote('TToggleGroup') } },
+  },
   args: {
     size: 'md',
     variant: 'outline',

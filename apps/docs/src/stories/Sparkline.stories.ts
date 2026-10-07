@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite';
 import { TSparkline, TStat } from '@treeui/vue';
+import { practiceNote } from './practice-refs';
 
 const sample = [12, 18, 9, 22, 30, 24, 28, 26, 33, 38];
 
@@ -7,6 +8,9 @@ const meta = {
   title: 'Components/Data Display/Sparkline',
   component: TSparkline,
   tags: ['autodocs'],
+  parameters: {
+    docs: { description: { component: practiceNote('TSparkline') } },
+  },
   args: {
     data: sample,
     type: 'line',

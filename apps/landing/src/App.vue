@@ -18,6 +18,10 @@ import wordmarkDarkUrl from './assets/treeui-wordmark-dark.svg';
 import markUrl from './assets/treeui-logo.svg';
 
 const INSTALL_COMMAND = 'pnpm add @treeui/vue';
+// Bound rather than written as template attributes: vue-tsc 3.3.14 mis-generates
+// any template attribute value containing `//` (vuejs/language-tools#6322).
+const REPO_URL = 'https://github.com/Viserion77/treeui';
+const NPM_URL = 'https://www.npmjs.com/package/@treeui/vue';
 
 const { resolved: resolvedTheme, setMode } = useTheme({ storageKey: 'treeui-landing-theme' });
 const toggleTheme = () => setMode(resolvedTheme.value === 'dark' ? 'light' : 'dark');
@@ -99,7 +103,7 @@ const copyInstall = async () => {
           <a href="./vue/">{{ copy.nav.vueDocs }}</a>
           <a href="./react/">{{ copy.nav.reactDocs }}</a>
           <a href="./examples/dashboard-vue/">{{ copy.nav.examples }}</a>
-          <a href="https://github.com/Viserion77/treeui">GitHub</a>
+          <a :href="REPO_URL">GitHub</a>
         </nav>
         <div class="top__controls">
           <TLanguageSelect
@@ -150,7 +154,7 @@ const copyInstall = async () => {
             <TButton
               as="a"
               variant="outline"
-              href="https://github.com/Viserion77/treeui"
+              :href="REPO_URL"
               target="_blank"
               rel="noopener"
             >
@@ -410,8 +414,8 @@ const copyInstall = async () => {
         <span class="foot__links">
           <a href="#practices">{{ copy.nav.practices }}</a>
           <a href="./vue/">Storybook</a>
-          <a href="https://github.com/Viserion77/treeui">GitHub</a>
-          <a href="https://www.npmjs.com/package/@treeui/vue">npm</a>
+          <a :href="REPO_URL">GitHub</a>
+          <a :href="NPM_URL">npm</a>
         </span>
       </div>
     </footer>

@@ -1,5 +1,11 @@
 # @treeui/mcp
 
+## 0.8.4
+
+### Patch Changes
+
+- Re-release of 0.8.3, which was versioned but never reached npm: the release job's npm token was rejected. The bundled catalog now reports `@treeui/vue` 0.34.3.
+
 ## 0.8.3
 
 ### Patch Changes

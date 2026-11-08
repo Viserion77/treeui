@@ -1,5 +1,11 @@
 # @treeui/vue
 
+## 0.34.3
+
+### Patch Changes
+
+- Re-release of 0.34.2, which was versioned but never reached npm: the release job's npm token was rejected. Nothing changes beyond 0.34.2.
+
 ## 0.34.2
 
 ### Patch Changes

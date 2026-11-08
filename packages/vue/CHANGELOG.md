@@ -1,5 +1,11 @@
 # @treeui/vue
 
+## 0.34.2
+
+### Patch Changes
+
+- Component declarations are now emitted by the Vue language tools 3 generator (via `vite-plugin-dts` 5), and `$el` is inferred from each component's root element — 73 components now type `$el` as their concrete element (for example `HTMLDivElement`) where 33 did before, the rest stay `any`. No runtime change.
+
 ## 0.34.1
 
 ### Patch Changes

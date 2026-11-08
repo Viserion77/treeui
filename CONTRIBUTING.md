@@ -32,6 +32,7 @@ If your change touches interaction or accessibility, also run:
 
 ```bash
 pnpm test:e2e      # Playwright; optional locally, required in CI
+pnpm --filter @treeui/docs test:stories   # every Vue story rendered in Chromium; not in CI yet
 ```
 
 `pnpm build` is the faster inner loop (packages + Vue Storybook only) and does not cover the landing page, the React Storybook, or the examples — `pnpm build:site` does.

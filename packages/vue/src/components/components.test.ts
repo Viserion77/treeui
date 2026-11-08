@@ -4771,7 +4771,14 @@ describe('TChart', () => {
     });
 
     const svg = wrapper.find('.t-chart__svg');
-    await svg.trigger('pointermove', { clientX: 120 });
+    // Dispatched by hand because `trigger('pointermove', { clientX })` breaks
+    // on jsdom's native PointerEvent: test-utils assigns `clientX` after
+    // construction, and that getter lives on MouseEvent.prototype, which its
+    // writability check never looks at.
+    svg.element.dispatchEvent(
+      new PointerEvent('pointermove', { clientX: 120, bubbles: true }),
+    );
+    await nextTick();
 
     expect(wrapper.find('.t-chart__tooltip').exists()).toBe(true);
     expect(wrapper.findAll('.t-chart__tooltip-item')).toHaveLength(2);

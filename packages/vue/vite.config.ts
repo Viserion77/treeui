@@ -10,6 +10,10 @@ export default defineConfig({
   plugins: [
     vue(),
     dts({
+      // Explicit: v5 only switches to the Vue processor when it detects .vue
+      // files, and that detection misses this config — without it the build
+      // still succeeds but ships no .vue.d.ts, so every component is untyped.
+      processor: 'vue',
       tsconfigPath: resolveFromPackage('./tsconfig.json'),
       entryRoot: resolveFromPackage('./src'),
       // The root tsconfig maps @treeui/* to each package's src/ so typecheck

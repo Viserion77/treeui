@@ -11,11 +11,11 @@
     "@treeui/icons": "workspace:*",
     "@treeui/tokens": "workspace:*",
     "@treeui/vue": "workspace:*",
-    "vue": "^3.5.43"
+    "vue": "^3.5.45"
   },
   "devDependencies": {
-    "@storybook/addon-vitest": "^10.6.0",
-    "@vitest/browser": "^4.1.11",
+    "@storybook/addon-vitest": "^10.6.6",
+    "@vitest/browser": "^4.1.12",
     "vue-component-type-helpers": "^3"
   }
 }

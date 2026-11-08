@@ -1,5 +1,11 @@
 # @treeui/mcp
 
+## 0.8.3
+
+### Patch Changes
+
+- Bump `@modelcontextprotocol/sdk` from 1.31.0 to 1.32.2.
+
 ## 0.8.2
 
 ### Patch Changes

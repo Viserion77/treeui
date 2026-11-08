@@ -1,6 +1,6 @@
 {
   "name": "@treeui/mcp",
-  "version": "0.8.2",
+  "version": "0.8.3",
   "description": "Model Context Protocol server and AI catalog for TreeUI.",
   "license": "MIT",
   "author": "TreeUI",
@@ -46,7 +46,7 @@
     "typecheck": "pnpm exec tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.31.0",
+    "@modelcontextprotocol/sdk": "^1.32.2",
     "yaml": "^2.9.1"
   }
 }
